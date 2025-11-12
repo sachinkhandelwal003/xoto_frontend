@@ -44,7 +44,7 @@ const Designers = () => {
       {/* Hero Banner */}
       <div className="relative bg-gradient-to-r from-[#2c3e50] to-[#4a6491] text-white overflow-hidden">
         {/* Background image with overlay */}
-        <div className="absolute inset-0 bg-[url('/designers-banner.jpg')] bg-cover bg-center opacity-30"></div>
+        {/* <div className="absolute inset-0 bg-[url('/designers-banner.jpg')] bg-cover bg-center opacity-30"></div> */}
         
         {/* Animated content */}
         <motion.div 

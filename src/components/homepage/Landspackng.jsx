@@ -11,8 +11,8 @@ import threeImage from "../../assets/img/three.png";
 import lasttImage from "../../assets/img/lastt.jpg";
 import interImage from "../../assets/img/inter.png";
 import { motion } from "framer-motion";
-import Dreamspacking from '../../components/homepage/dreamspacking';
-import Eco from '../../components/homepage/Eco';
+import Dreamspacking from './Dreamspacking';
+import Eco from './Eco';
 
 import {
   TreePine,
