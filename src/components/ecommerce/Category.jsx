@@ -36,7 +36,7 @@ const Category = () => {
   ];
 
   const handleCategoryClick = (categoryName) => {
-    navigate(`/sawtar/ecommerce/filter?category=${categoryName.toLowerCase().replace(/\s+/g, '-')}`);
+    navigate(`/ecommerce/filter?category=${categoryName.toLowerCase().replace(/\s+/g, '-')}`);
   };
 
   return (

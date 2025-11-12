@@ -10,7 +10,7 @@ const HeroSection = () => {
       description:
         "Shop premium furniture, décor, and design accessories — all in one place.",
       icon: "🛋️",
-      link: "/sawtar/ecommerce/b2c",
+      link: "/ecommerce/b2c",
       buttonText: "Start Shopping",
     },
     {
@@ -19,7 +19,7 @@ const HeroSection = () => {
       description:
         "Plan and execute beautiful outdoor spaces with expert design and AI-guided tools.",
       icon: "🌿",
-      link: "/sawtar/landscaping",
+      link: "/landscaping",
       buttonText: "Explore Landscaping",
     },
   ];
@@ -68,14 +68,14 @@ const HeroSection = () => {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
             <Link
-              to="/design-my-space"
+              to=""
               className="bg-[var(--color-primary)] text-white font-semibold px-6 py-3 sm:px-8 sm:py-3 rounded-full hover:bg-[var(--color-hoverbtn)] transition-all duration-300 shadow-lg text-center"
             >
               Design My Space
             </Link>
 
             <Link
-              to="/explore-homes"
+              to=""
               className="border-2 border-white text-white font-semibold px-6 py-3 sm:px-8 sm:py-3 rounded-full hover:bg-white hover:text-[var(--color-text-dark)] transition-all duration-300 text-center"
             >
               Explore Homes

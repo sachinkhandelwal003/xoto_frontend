@@ -52,7 +52,7 @@ const Ecommerce = () => {
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 <button
-                  onClick={() => navigate('/sawtar/ecommerce/filter')}
+                  onClick={() => navigate('/ecommerce/filter')}
                   className="text-white px-6 py-3 rounded-md font-semibold shadow-md transition-all duration-300 hover:brightness-110"
                   style={gradientStyle}
                 >
@@ -60,7 +60,7 @@ const Ecommerce = () => {
                 </button>
 
                 <button
-                  onClick={() => navigate('/sawtar/ecommerce/seller')}
+                  onClick={() => navigate('/ecommerce/seller')}
                   className="text-white px-6 py-3 rounded-md font-semibold shadow-md transition-all duration-300 hover:brightness-110 border border-white "
                 >
                   Register as a Vendor

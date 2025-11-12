@@ -216,7 +216,7 @@ const EcommerceNavbar = () => {
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
-    navigate('/sawtar/');
+    navigate('/');
   };
 
   const handleMenuClick = (event) => {
@@ -230,7 +230,7 @@ const EcommerceNavbar = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/sawtar/ecommerce/search?q=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(selectedLocation)}`);
+      navigate(`/ecommerce/search?q=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(selectedLocation)}`);
       setSearchQuery("");
     }
   };
@@ -270,7 +270,7 @@ const EcommerceNavbar = () => {
 
   {/* Logo (replaces "SAWTAR" text) */}
   <Link
-    to="/sawtar"
+    to="/"
     className="ml-2 md:ml-0 flex items-center"
   >
     <img
@@ -349,14 +349,14 @@ const EcommerceNavbar = () => {
               <FaSearch size={18} />
             </button>
             <Link
-              to="/sawtar/ecommerce/orders"
+              to="/login"
               className="p-2 text-gray-700 hover:text-[#D26C44] relative"
               aria-label="Orders"
             >
               <BsTruck size={20} />
             </Link>
             <Link
-              to="/sawtar/ecommerce/cart"
+              to="/ecommerce/cart"
               className="p-2 text-gray-700 hover:text-[#D26C44] relative"
               aria-label="Cart"
             >
@@ -423,7 +423,7 @@ const EcommerceNavbar = () => {
                   transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                   anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                  <MenuItem onClick={() => navigate('/sawtar/profile')}>
+                  <MenuItem onClick={() => navigate('/profile')}>
                     <Avatar sx={{ bgcolor: '#D26C44' }} />
                     Profile
                   </MenuItem>
@@ -438,7 +438,7 @@ const EcommerceNavbar = () => {
               </Box>
             ) : (
               <button
-                onClick={() => navigate('/sawtar/login')}
+                onClick={() => navigate('/login')}
                 className="p-2 text-gray-700 hover:text-[#D26C44]"
                 aria-label="Login"
               >
@@ -540,7 +540,7 @@ const EcommerceNavbar = () => {
                           {category.subcategories.map((subcategory) => (
                             <div key={subcategory} className="mb-2">
                               <Link
-                                to={`/categories/home-furniture/${category.name.toLowerCase().replace(/\s+/g, '-')}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}
+                                to={`/ecommerce/filter`}
                                 className="block py-1 text-gray-800 hover:text-[#D26C44]"
                               >
                                 {subcategory}

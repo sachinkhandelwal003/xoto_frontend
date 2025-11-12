@@ -20,7 +20,7 @@ const EcommerceBanner = () => {
   const opacityBg = useTransform(scrollYProgress, [0, 0.7], [1, 0.3]);
 
   const handleExploreClick = () => {
-    navigate("/sawtar/ecommerce/");
+    navigate("/ecommerce/");
   };
 
   const features = [

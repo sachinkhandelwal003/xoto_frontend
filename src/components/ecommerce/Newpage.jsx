@@ -194,7 +194,7 @@ const Newpage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex gap-4">
-                <Link to="/sawtar/ecommerce/b2c/">
+                <Link to="/ecommerce/b2c/">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -203,7 +203,7 @@ const Newpage = () => {
                     For Consumers
                   </motion.button>
                 </Link>
-                <Link to="/sawtar/ecommerce/b2b/">
+                <Link to="/ecommerce/b2b/">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}

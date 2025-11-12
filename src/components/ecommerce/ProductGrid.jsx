@@ -93,7 +93,7 @@ const ProductGrid = ({ sortedProducts, showFilters, sortOption, setSortOption })
                   <Button
                     type="primary"
                     icon={<EyeOutlined />}
-                    onClick={() => navigate(`/sawtar/ecommerce/product/${product._id}`)}
+                    onClick={() => navigate(`/ecommerce/product/${product._id}`)}
                   >
                     View Details
                   </Button>

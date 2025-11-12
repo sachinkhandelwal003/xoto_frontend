@@ -20,9 +20,9 @@ const footerData = {
     { label: "3D Rendering", path: "/services/3d-rendering" },
   ],
   resources: [
-    { label: "Xoto Properties", path: "/sawtar/properties" },
-    { label: "Explore Xoto", path: "/sawtar/explore" },
-    { label: "AI Driven", path: "/sawtar/blog" },
+    { label: "Xoto Properties", path: "/properties" },
+    { label: "Explore Xoto", path: "/explore" },
+    { label: "AI Driven", path: "/blog" },
     { label: "Free Consultation", path: "/consultation" },
     { label: "Hire Freelancers", path: "/freelancers" },
   ],

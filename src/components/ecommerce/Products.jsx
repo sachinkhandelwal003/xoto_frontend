@@ -18,9 +18,9 @@ const furnitureProducts = [
 
 // Featured categories
 const featuredCategories = [
-  { name: "Bedroom", image: "https://storage.googleapis.com/a1aa/image/29defbb3-df7e-4e6a-7c13-1610cae8a17f.jpg", description: "Create your perfect sleep sanctuary", link: "/sawtar/ecommerce/filter?category=bedroom" },
-  { name: "Dining Room", image: "https://storage.googleapis.com/a1aa/image/6e2b5524-f366-43ba-2712-11e9d5c4863c.jpg", description: "Elegant dining experiences", link: "/sawtar/ecommerce/filter?category=dining" },
-  { name: "Living Room", image: "https://storage.googleapis.com/a1aa/image/985279b1-0ab6-43ea-6133-e443d99c9b11.jpg", description: "Stylish furniture for your living space", link: "/sawtar/ecommerce/filter?category=living-room" },
+  { name: "Bedroom", image: "https://storage.googleapis.com/a1aa/image/29defbb3-df7e-4e6a-7c13-1610cae8a17f.jpg", description: "Create your perfect sleep sanctuary", link: "/ecommerce/filter?category=bedroom" },
+  { name: "Dining Room", image: "https://storage.googleapis.com/a1aa/image/6e2b5524-f366-43ba-2712-11e9d5c4863c.jpg", description: "Elegant dining experiences", link: "/ecommerce/filter?category=dining" },
+  { name: "Living Room", image: "https://storage.googleapis.com/a1aa/image/985279b1-0ab6-43ea-6133-e443d99c9b11.jpg", description: "Stylish furniture for your living space", link: "/ecommerce/filter?category=living-room" },
 ];
 
 // Custom Arrows
@@ -66,7 +66,7 @@ const ProductItem = ({ product, onViewClick, onAddToCart }) => {
         <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.description}</p>
         <div className="flex space-x-3 mt-auto">
           <button
-            onClick={() => navigate(`/sawtar/ecommerce/product/${product.id}`)}
+            onClick={() => navigate(`/ecommerce/product/${product.id}`)}
             className="flex-1 border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white text-sm font-medium py-2 px-3 rounded-full transition-colors flex items-center justify-center"
           >
             <FiEye className="mr-2" /> AR View
@@ -114,7 +114,7 @@ const Products = () => {
   const newArrivals = furnitureProducts.filter((p) => p.isNew);
 
   const handleViewClick = (product) => {
-    navigate(`/sawtar/ecommerce/product/${product.id}`);
+    navigate(`/ecommerce/product/${product.id}`);
   };
 
   const handleAddToCart = (product) => {
@@ -167,7 +167,7 @@ const Products = () => {
             <img alt="Modern living room set" className="w-full h-full object-cover" src="https://i0.wp.com/www.melaniejadedesign.com/wp-content/uploads/2024/03/lilac.jpg" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-8">
               <button
-                onClick={() => navigate("/sawtar/ecommerce/filter")}
+                onClick={() => navigate("/ecommerce/filter")}
                 className="text-white font-medium py-3 px-8 rounded-full transition-all bg-gradient-to-r from-[var(--color-text-primary)] to-[var(--color-text-green)] hover:opacity-90"
               >
                 Explore the Collection

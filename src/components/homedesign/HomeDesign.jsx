@@ -33,7 +33,7 @@ const HomeDesign = () => {
           </p>
 
           <Link
-            to="/get-estimate"
+            to=""
             className="inline-block bg-[var(--color-primary)] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#5533d8] transition-all shadow-md"
           >
             Get Free Estimate Now

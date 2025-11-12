@@ -32,7 +32,7 @@ const dummyProducts = [
     tags: [{ _id: 't1', name: 'New' }],
     material: { name: 'Wood' },
     category: { name: 'Tables' },
-    brand: { name: 'Sawtar' },
+    brand: { name: 'xoto' },
   },
   {
     _id: '2',
@@ -63,7 +63,7 @@ const dummyProducts = [
     tags: [{ _id: 't2', name: 'Best Seller' }],
     material: { name: 'Fabric' },
     category: { name: 'Chairs' },
-    brand: { name: 'Sawtar' },
+    brand: { name: 'xoto' },
   },
   {
     _id: '3',
@@ -87,7 +87,7 @@ const dummyProducts = [
     tags: [{ _id: 't3', name: 'Premium' }],
     material: { name: 'Stone' },
     category: { name: 'Tables' },
-    brand: { name: 'Sawtar' },
+    brand: { name: 'xoto' },
   },
    {
     _id: '4',
@@ -111,7 +111,7 @@ const dummyProducts = [
     tags: [{ _id: 't3', name: 'Premium' }],
     material: { name: 'Stone' },
     category: { name: 'Tables' },
-    brand: { name: 'Sawtar' },
+    brand: { name: 'xoto' },
   }, {
     _id: '5',
     name: 'Marble Top Console',
@@ -134,7 +134,7 @@ const dummyProducts = [
     tags: [{ _id: 't3', name: 'Premium' }],
     material: { name: 'Stone' },
     category: { name: 'Tables' },
-    brand: { name: 'Sawtar' },
+    brand: { name: 'xoto' },
   }, {
     _id: '6',
     name: 'Marble Top Console',
@@ -157,7 +157,7 @@ const dummyProducts = [
     tags: [{ _id: 't3', name: 'Premium' }],
     material: { name: 'Stone' },
     category: { name: 'Tables' },
-    brand: { name: 'Sawtar' },
+    brand: { name: 'xoto' },
   },
 ];
 

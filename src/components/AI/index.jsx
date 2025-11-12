@@ -28,13 +28,13 @@ const Home = () => {
       title: "Augmented Reality / Virtual Reality",
       description: "Visualize designs in your actual space using AR or immerse yourself in VR",
       icon: <FaArrowsAlt className="text-4xl text-indigo-400" />,
-      action: () => navigate('/sawtar/designs/Tool')
+      action: () => navigate('/designs/Tool')
     },
     {
       title: "Real-Time Collaboration",
       description: "Work simultaneously with team members or clients",
       icon: <FaUsers className="text-4xl text-purple-400" />,
-      action: () => navigate('/sawtar/designs/Tool')
+      action: () => navigate('/designs/Tool')
     },
     {
       title: "AI-Powered Design Assistance",
@@ -46,7 +46,7 @@ const Home = () => {
       title: "Live Designer Consultation",
       description: "Connect with professional interior designers",
       icon: <FaVideo className="text-4xl text-blue-400" />,
-      action: () => navigate('/sawtar/designs/Tool')
+      action: () => navigate('/designs/Tool')
     }
   ];
 
@@ -96,7 +96,7 @@ const Home = () => {
             Create stunning interior designs with our cutting-edge technology and professional tools
           </p>
           <button 
-            onClick={() => navigate('/sawtar/designs/Tool')}
+            onClick={() => navigate('/designs/Tool')}
             className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-indigo-500/30 transition-all"
           >
             Start Designing Now

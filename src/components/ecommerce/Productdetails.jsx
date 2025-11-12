@@ -394,7 +394,7 @@ const ProductDetails = () => {
               key={product._id}
               className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300"
               whileHover={{ y: -8 }}
-              onClick={() => navigate(`/xoto/ecommerce/product/${product._id}`)}
+              onClick={() => navigate(`/ecommerce/product/${product._id}`)}
             >
               <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
                 <img

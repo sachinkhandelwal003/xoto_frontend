@@ -59,7 +59,7 @@ const FourStepDesign = () => {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link
-                  to="/sawtar/designs/Tool"
+                  to="/designs/Tool"
                   className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-all"
                 >
                   Try It Now <FaArrowRight />

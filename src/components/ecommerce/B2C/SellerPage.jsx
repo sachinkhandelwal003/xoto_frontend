@@ -223,7 +223,6 @@ const SellerPage = () => {
         const response = await axios.get('http://localhost:5000/api/categories');
         setCategories(response.data.hierarchy);
       } catch (error) {
-        toast.error('Failed to fetch categories');
       }
     };
     fetchCategories();
