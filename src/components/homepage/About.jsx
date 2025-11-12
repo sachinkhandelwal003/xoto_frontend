@@ -1,6 +1,6 @@
 import React from 'react'
 import Powered from '../Aboutt/Powered'
-import Second from '../aboutt/Second'
+import Second from '../Aboutt/Second'
 // import Vision from '../../components/aboutt/Vision.jsx'
 import Mission from '../Aboutt/Mission'
 // import Dna from '../../components/aboutt/Dna.jsx'
