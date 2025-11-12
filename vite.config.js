@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   
   
-  base: '/sawtar/', // <-- this is correct
+  base: '/', // <-- this is correct
   build: {
     outDir: 'dist',
     emptyOutDir: true,
