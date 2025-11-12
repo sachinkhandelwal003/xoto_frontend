@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import customIcon from '../../assets/img/custom-icon.jpg';
-import cardsBg from '../../assets/img/cardsBg.jpg';
+import cardsBg from '../../assets/img/CardsBg.jpg';
 
 const Cards = () => {
   const deals = [
