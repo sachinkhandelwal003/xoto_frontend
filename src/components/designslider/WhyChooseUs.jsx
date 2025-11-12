@@ -61,7 +61,7 @@ const WhyChooseUs = () => {
       </div>
 
       {/* Custom clip-path shapes */}
-      <style jsx>{`
+      <style>{`
         .clip-custom {
           clip-path: polygon(
             25% 0%,

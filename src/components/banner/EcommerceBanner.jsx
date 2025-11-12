@@ -82,10 +82,10 @@ const EcommerceBanner = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <span className="bg-clip-text text-transparent  text-white text-[linear-gradient(135deg, #D26C44   0%, #8B3F2B  100%)]">
+              <span className="bg-clip-text text-transparent  text-white ">
                 Explore Our Unique
               </span> <br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-600">
+              <span className="bg-clip-text text-white">
                 E-commerce Experience
               </span>
             </motion.h1>
@@ -105,7 +105,7 @@ const EcommerceBanner = () => {
   whileTap={{ scale: 0.95 }}
   className="px-8 py-3 text-white font-semibold rounded-lg flex items-center gap-2 shadow-lg"
   style={{
-    backgroundImage: 'linear-gradient(135deg, #D26C44 0%, #8B3F2B 100%)'
+    background: 'linear-gradient(90deg, var(--color-text-primary), var(--color-text-green))',
   }}
 >
   Discover Now <FiArrowRight />

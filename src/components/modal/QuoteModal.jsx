@@ -79,13 +79,14 @@ const QuoteModal = () => {
                   <Button
                     variant="contained"
                     size="large"
-                    sx={{
-                      backgroundColor: "#D57651",
-                      "&:hover": {
-                        backgroundColor: "#c36645",
-                      },
-                      color: "#fff",
-                    }}
+                   sx={{
+  backgroundColor: "var(--color-btn-secondary)",
+  "&:hover": {
+    backgroundColor: "var(--color-hoverbtn)",
+  },
+  color: "#fff",
+}}
+
                   >
                     Request Quote
                   </Button>

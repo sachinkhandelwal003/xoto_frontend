@@ -1,26 +1,94 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import { FiPlus, FiRefreshCw, FiEye, FiCheck, FiX, FiShoppingBag, FiClock, FiPackage, FiTrendingDown, FiImage, FiFileText } from 'react-icons/fi';
-import { Button, Modal, Input, Tabs, Card, Tag, Select as AntdSelect, Statistic, DatePicker, Form, Collapse, Alert } from 'antd';
-import CustomTable from '../../custom/CustomTable'; // Adjust the path as needed
-import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
-import { showToast } from '../../../../../manageApi/utils/toast';
-import { format, isBefore } from 'date-fns'; // Replaced moment with date-fns, corrected isBefore for disabledDate
+// src/pages/admin/ProductRequestB2C.jsx
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import {
+  FiPlus,
+  FiRefreshCw,
+  FiEye,
+  FiCheck,
+  FiX,
+  FiShoppingBag,
+  FiTrendingDown,
+  FiImage,
+  FiFileText,FiPackage ,FiClock 
+} from "react-icons/fi";
+import {
+  Button,
+  Modal,
+  Input,
+  Tabs,
+  Card,
+  Tag,
+  Select as AntdSelect,
+  Statistic,
+  DatePicker,
+  Form,
+  Collapse,
+  Alert,
+  Space,
+} from "antd";
+import CustomTable from "../../custom/CustomTable";
+import { apiService } from "../../../../../manageApi/utils/custom.apiservice";
+import { showToast } from "../../../../../manageApi/utils/toast";
+import { format, isBefore } from "date-fns";
 
 const { Option } = AntdSelect;
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
-const STATUS_MAP = {
-  ACTIVE: 'active',
-  INACTIVE: 'inactive',
+/* ------------------------------------------------------------------ */
+/*                     PERMISSION HOOK (same as Permission page)      */
+/* ------------------------------------------------------------------ */
+const useProductPermission = () => {
+  const { permissions } = useSelector((s) => s.auth);
+  const p = permissions?.["Request→All Sellers"] ?? {};
+
+  return {
+    canView: !!p.canView,
+    canAdd: !!p.canAdd,
+    canEdit: !!p.canEdit,
+    canDelete: !!p.canDelete,
+    canViewAll: !!p.canViewAll,
+    // we will also expose approve/reject/edit-pricing from the same object
+    canApprove: !!p.canEdit,          // approve = edit permission
+    canReject: !!p.canDelete,         // reject = delete permission
+    canEditPricing: !!p.canEdit,      // pricing edit = edit permission
+    canViewInventory: !!p.canViewAll, // inventory = view-all permission
+  };
+};
+
+/* ------------------------------------------------------------------ */
+/*                     ROLE SLUG MAP (unchanged)                      */
+/* ------------------------------------------------------------------ */
+const ROLE_SLUG_MAP = {
+  0: "superadmin",
+  1: "admin",
+  5: "vendor-b2c",
+  6: "vendor-b2b",
+  7: "freelancer",
+  11: "accountant",
 };
 
 const ProductRequestB2C = () => {
   const { user, token } = useSelector((state) => state.auth);
   const { id: vendorId } = useParams();
+  const [form] = Form.useForm();
+
+  /* ----------------------- PERMISSIONS ----------------------- */
+  const perm = useProductPermission();
+
+  // ROLE & VENDOR LOGIC (unchanged)
+  const roleSlug = ROLE_SLUG_MAP[user?.role?.code] ?? "unknown";
+  const isAdmin = ["superadmin", "admin"].includes(roleSlug);
+  const isVendor = roleSlug === "vendor-b2c";
+
+  // Vendor can only see own products unless superadmin
+  const effectiveVendorId = isAdmin ? vendorId : user.id;
+  const isValidVendorId = effectiveVendorId && effectiveVendorId !== "undefined";
+
+  /* -------------------------- STATE -------------------------- */
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -29,571 +97,490 @@ const ProductRequestB2C = () => {
     totalResults: 0,
     itemsPerPage: 10,
   });
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-  });
-  const [activeTab, setActiveTab] = useState('pending');
+  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
+  const [activeTab, setActiveTab] = useState("pending");
   const [filters, setFilters] = useState({
-    verification_status: 'pending',
-    search: '',
-    category_id: '',
-    date_filter: '',
+    verification_status: "pending",
+    search: "",
+    category_id: "",
+    date_filter: "",
   });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Modals
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [rejectionReason, setRejectionReason] = useState('');
-  const [rejectionSuggestion, setRejectionSuggestion] = useState('');
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [rejectionSuggestion, setRejectionSuggestion] = useState("");
   const [assetErrors, setAssetErrors] = useState([]);
+
+  // Dropdown data
   const [categories, setCategories] = useState([]);
   const [taxes, setTaxes] = useState([]);
-  const [form] = Form.useForm();
 
-  // Validate vendorId
-  const isValidVendorId = vendorId && vendorId !== 'undefined' && vendorId !== 'null';
-
-  // Fetch categories for filter dropdown
+  /* ----------------------- FETCH DATA ------------------------ */
   const fetchCategories = async () => {
     try {
-      const response = await apiService.get('/categories');
-      setCategories(response.categories || []);
-    } catch (error) {
-      showToast('Failed to fetch categories', 'error');
+      const res = await apiService.get("/categories");
+      setCategories(res.categories || []);
+    } catch (err) {
+      showToast("Failed to load categories", "error");
     }
   };
 
-  // Fetch taxes for tax dropdown
   const fetchTaxes = async () => {
     try {
-      const response = await apiService.get('/setting/tax');
-      setTaxes(response.taxes || []);
-    } catch (error) {
-      showToast('Failed to fetch taxes', 'error');
+      const res = await apiService.get("/setting/tax");
+      setTaxes(res.taxes || []);
+    } catch (err) {
+      showToast("Failed to load taxes", "error");
     }
   };
 
-  // Fetch products using vendor_id from URL params
   const fetchProducts = useCallback(
-    async (page = 1, itemsPerPage = 10, filters = {}) => {
+    async (page = 1, limit = 10, filters = {}) => {
+      if (!token || !perm.canView) return;
       setLoading(true);
+
       try {
         const params = {
           page,
-          limit: itemsPerPage,
+          limit,
           verification_status: filters.verification_status,
-          vendor_id: isValidVendorId
-            ? vendorId
-            : user.role === 'Vendor-B2C' && !user.is_superadmin
-            ? user.id
-            : undefined,
+          vendor_id: isValidVendorId ? effectiveVendorId : undefined,
         };
 
         if (filters.search) params.search = filters.search;
         if (filters.category_id) params.category_id = filters.category_id;
         if (filters.date_filter) params.date_filter = filters.date_filter;
 
-        const response = await apiService.get('/products', params);
+        const res = await apiService.get("/products", params);
 
-        const rawProducts = response.products || [];
-        setProducts(rawProducts.map((p, index) => ({ ...p, key: p._id })));
+        const raw = res.products || [];
+        setProducts(raw.map((p) => ({ ...p, key: p._id })));
+
         setPagination({
-          currentPage: response.pagination?.page || 1,
-          totalPages: Math.ceil((response.pagination?.total || 0) / (response.pagination?.limit || 10)) || 1,
-          totalResults: response.pagination?.total || 0,
-          itemsPerPage: response.pagination?.limit || 10,
+          currentPage: res.pagination?.page || 1,
+          totalPages: Math.ceil((res.pagination?.total || 0) / limit) || 1,
+          totalResults: res.pagination?.total || 0,
+          itemsPerPage: res.pagination?.limit || 10,
         });
+
         setStats({
-          total: response.stats?.total || 0,
-          pending: response.stats?.pending || response.stats?.today || 0,
-          approved: response.stats?.approved || response.stats?.month || 0,
-          rejected: response.stats?.rejected || response.stats?.week || 0,
+          total: res.stats?.total || 0,
+          pending: res.stats?.pending || 0,
+          approved: res.stats?.approved || 0,
+          rejected: res.stats?.rejected || 0,
         });
-      } catch (error) {
-        showToast(error.response?.data?.message || 'Failed to fetch products', 'error');
+      } catch (err) {
+        showToast(err.response?.data?.message || "Failed to load products", "error");
         setProducts([]);
       } finally {
         setLoading(false);
       }
     },
-    [user, isValidVendorId, vendorId]
+    [token, perm.canView, effectiveVendorId, isValidVendorId]
   );
 
-  // Fetch data when dependencies change
   useEffect(() => {
     fetchCategories();
     fetchTaxes();
+  }, []);
+
+  useEffect(() => {
     fetchProducts(pagination.currentPage, pagination.itemsPerPage, filters);
   }, [activeTab, refreshTrigger, fetchProducts]);
 
-  // Handle tab change
+  /* -------------------------- HANDLERS -------------------------- */
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    setFilters((prev) => ({
-      ...prev,
-      verification_status: tab,
-    }));
-    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    const newFilters = { ...filters, verification_status: tab };
+    setFilters(newFilters);
+    setPagination((p) => ({ ...p, currentPage: 1 }));
+    fetchProducts(1, pagination.itemsPerPage, newFilters);
   };
 
-  // Handle page change
-  const handlePageChange = (page, itemsPerPage) => {
-    setPagination((prev) => ({ ...prev, currentPage: page, itemsPerPage: itemsPerPage || prev.itemsPerPage }));
-    fetchProducts(page, itemsPerPage || pagination.itemsPerPage, filters);
+  const handlePageChange = (page, limit) => {
+    setPagination((p) => ({ ...p, currentPage: page, itemsPerPage: limit }));
+    fetchProducts(page, limit, filters);
   };
 
-  // Handle filter change
   const handleFilter = (newFilters) => {
-    const updatedFilters = { ...newFilters, verification_status: filters.verification_status };
-    setFilters(updatedFilters);
-    setPagination((prev) => ({ ...prev, currentPage: 1 }));
-    fetchProducts(1, pagination.itemsPerPage, updatedFilters);
+    const updated = { ...newFilters, verification_status: filters.verification_status };
+    setFilters(updated);
+    setPagination((p) => ({ ...p, currentPage: 1 }));
+    fetchProducts(1, pagination.itemsPerPage, updated);
   };
 
-  // Handle refresh
-  const handleRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1);
-  };
+  const handleRefresh = () => setRefreshTrigger((t) => t + 1);
 
-  // Open reject modal
   const openRejectModal = (product) => {
     setSelectedProduct(product);
-    setRejectionReason('');
-    setRejectionSuggestion('');
-    setAssetErrors([]); // Clear asset errors
+    setRejectionReason("");
+    setRejectionSuggestion("");
+    setAssetErrors([]);
     setShowRejectModal(true);
   };
 
-  // Close reject modal
   const closeRejectModal = () => {
     setShowRejectModal(false);
     setSelectedProduct(null);
-    setRejectionReason('');
-    setRejectionSuggestion('');
-    setAssetErrors([]); // Clear asset errors
   };
 
-  // Open pricing modal (renamed from discount modal)
   const openPricingModal = (product) => {
     setSelectedProduct(product);
     form.setFieldsValue({
-      discount_type: product.pricing?.discount?.type || 'percentage',
+      discount_type: product.pricing?.discount?.type || "percentage",
       discount_value: product.pricing?.discount?.value || 0,
       valid_till: product.pricing?.discount?.valid_till
         ? new Date(product.pricing.discount.valid_till)
         : null,
       sale_price: product.pricing?.sale_price || product.pricing?.base_price || 0,
-      tax_id: product.pricing?.tax?.tax_id || '',
+      tax_id: product.pricing?.tax?.tax_id || "",
       rate: product.pricing?.tax?.rate || 0,
     });
     setShowPricingModal(true);
   };
 
-  // Close pricing modal
   const closePricingModal = () => {
     setShowPricingModal(false);
     setSelectedProduct(null);
     form.resetFields();
   };
 
-  // Update product and asset verification
-  const handleStatusUpdate = async (product_id, newStatus, reason = '', suggestion = '') => {
+  const handleStatusUpdate = async (id, status, reason = "", suggestion = "") => {
     try {
-      const data = { status: newStatus };
-      if (newStatus === 'rejected') {
-        data.rejection_reason = reason;
-        data.suggestion = suggestion;
+      const payload = { status };
+      if (status === "rejected") {
+        payload.rejection_reason = reason;
+        payload.suggestion = suggestion;
       }
-
-      const response = await apiService.put(`/products/${product_id}/verify-all`, data);
-      showToast(response.message || `Product and assets ${newStatus} successfully`, 'success');
+      await apiService.put(`/products/${id}/verify-all`, payload);
+      showToast(`Product ${status} successfully`, "success");
       fetchProducts(pagination.currentPage, pagination.itemsPerPage, filters);
       closeRejectModal();
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to update product and assets';
-      showToast(errorMessage, 'error');
-      if (error.response?.data?.assetErrors) {
-        setAssetErrors(error.response.data.assetErrors);
-      }
+    } catch (err) {
+      const msg = err.response?.data?.message || "Update failed";
+      showToast(msg, "error");
+      if (err.response?.data?.assetErrors) setAssetErrors(err.response.data.assetErrors);
     }
   };
 
-  // Handle tax selection change to auto-populate rate
-  const handleTaxChange = (value) => {
-    const selectedTax = taxes.find((t) => t._id === value);
-    if (selectedTax) {
-      form.setFieldsValue({ rate: selectedTax.rate });
-    }
-  };
-
-  // Update product pricing (sale_price, discount, tax) using the new endpoint
   const handlePricingUpdate = async (values) => {
     try {
-      const { discount_type, discount_value, valid_till, sale_price, tax_id, rate } = values;
-      const product_id = selectedProduct._id;
-
       const payload = {
-        sale_price,
+        sale_price: values.sale_price,
         discount: {
-          type: discount_type,
-          value: discount_value,
-          valid_till: valid_till ? valid_till.toISOString() : undefined,
+          type: values.discount_type,
+          value: values.discount_value,
+          valid_till: values.valid_till?.toISOString(),
         },
         tax: {
-          tax_id: tax_id || undefined,
-          rate,
+          tax_id: values.tax_id || undefined,
+          rate: values.rate,
         },
       };
-
-      await apiService.put(`/products/${product_id}/pricing`, payload);
-
-      showToast('Pricing updated successfully', 'success');
+      await apiService.put(`/products/${selectedProduct._id}/pricing`, payload);
+      showToast("Pricing updated", "success");
       fetchProducts(pagination.currentPage, pagination.itemsPerPage, filters);
       closePricingModal();
-    } catch (error) {
-      showToast(error.response?.data?.message || 'Failed to update pricing', 'error');
+    } catch (err) {
+      showToast(err.response?.data?.message || "Pricing update failed", "error");
     }
   };
 
-  // Toggle active/inactive status via Select
-  const handleActiveStatusChange = async (product_id, newStatus) => {
-    try {
-      await apiService.put(`/products/${product_id}`, { status: newStatus });
-      showToast(`Product active status updated to ${newStatus}`, 'success');
-      setProducts((prev) =>
-        prev.map((item) => (item._id === product_id ? { ...item, status: newStatus } : item))
-      );
-    } catch (error) {
-      showToast(error.response?.data?.message || 'Failed to update active status', 'error');
-      fetchProducts(pagination.currentPage, pagination.itemsPerPage, filters);
-    }
+  const handleTaxChange = (value) => {
+    const tax = taxes.find((t) => t._id === value);
+    if (tax) form.setFieldsValue({ rate: tax.rate });
   };
 
-  // Add SNO to data
+  /* -------------------------- TABLE DATA -------------------------- */
   const dataWithSno = useMemo(() => {
-    return products.map((item, index) => ({
-      ...item,
-      sno: (pagination.currentPage - 1) * pagination.itemsPerPage + index + 1,
+    return products.map((p, i) => ({
+      ...p,
+      sno: (pagination.currentPage - 1) * pagination.itemsPerPage + i + 1,
     }));
-  }, [products, pagination.currentPage, pagination.itemsPerPage]);
+  }, [products, pagination]);
 
-  // Table columns for products (added tax rate column)
-  const productColumns = [
-    {
-      key: 'sno',
-      title: 'S.No',
-      render: (value, item) => <div className="font-medium text-gray-900">{item.sno}</div>,
-    },
-    {
-      key: 'name',
-      title: 'Product Name',
-      render: (value, item) => (
-        <div>
-          <div className="font-medium text-gray-900">{item.name || '--'}</div>
-          <div className="text-sm text-gray-500">{item.product_code || 'N/A'}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'vendor',
-      title: 'Vendor',
-      render: (value, item) => (
-        <div>
-          <div className="font-medium text-gray-900">{item.vendor?.full_name || '--'}</div>
-          <div className="text-sm text-gray-500">{item.vendor?.email || '--'}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'category',
-      title: 'Category',
-      render: (value, item) => <div className="text-gray-900">{item.category?.name || '--'}</div>,
-    },
-    {
-      key: 'pricing.sale_price',
-      title: 'Sale Price',
-      render: (value, item) => (
-        <div className="font-medium text-gray-900">
-          {item.pricing?.sale_price > 0
-            ? `${item.pricing.currency.symbol} ${item.pricing.sale_price.toFixed(2)}`
-            : item.pricing?.final_price
-            ? `${item.pricing.currency.symbol} ${item.pricing.final_price.toFixed(2)}`
-            : '--'}
-        </div>
-      ),
-    },
-    {
-      key: 'pricing.discount',
-      title: 'Discount',
-      render: (value, item) => (
-        <div className="text-gray-900">
-          {item.pricing?.discount?.value > 0 && item.pricing?.discount?.approved
-            ? `${
-                item.pricing.discount.type === 'percentage'
-                  ? `${item.pricing.discount.value}%`
-                  : `${item.pricing.currency.symbol} ${item.pricing.discount.value}`
-              } (Valid till ${
-                item.pricing.discount.valid_till
-                  ? format(new Date(item.pricing.discount.valid_till), 'dd/MM/yyyy')
-                  : '--'
-              })`
-            : '--'}
-        </div>
-      ),
-    },
-    {
-      key: 'pricing.tax.rate',
-      title: 'Tax Rate',
-      render: (value, item) => (
-        <div className="text-gray-900">
-          {item.pricing?.tax?.rate ? `${item.pricing.tax.rate}%` : '--'}
-        </div>
-      ),
-    },
-    {
-      key: 'verification_status.status',
-      title: 'Verification Status',
-      render: (value, item) => {
-        const statusConfig = {
-          pending: { color: 'warning', text: 'Pending' },
-          approved: { color: 'success', text: 'Approved' },
-          rejected: { color: 'error', text: 'Rejected' },
-        };
-
-        const config = statusConfig[item.verification_status?.status] || statusConfig.pending;
-
-        return (
-          <div>
-            <Tag color={config.color}>{config.text}</Tag>
-            {item.verification_status?.status === 'rejected' && item.verification_status?.rejection_reason && (
-              <div className="text-sm text-gray-500 mt-1">
-                Reason: {item.verification_status.rejection_reason}
-              </div>
-            )}
-          </div>
-        );
+  /* -------------------------- COLUMNS -------------------------- */
+  const productColumns = useMemo(
+    () => [
+      {
+        key: "sno",
+        title: "S.No",
+        width: 70,
+        render: (_, r) => <span className="font-medium">{r.sno}</span>,
       },
-    },
-    {
-      key: 'status',
-      title: 'Active Status',
-      render: (value, item) => (
-        <AntdSelect
-          value={item.status}
-          onChange={(newValue) => handleActiveStatusChange(item._id, newValue)}
-          style={{ width: 120 }}
-          className={item.status === STATUS_MAP.ACTIVE ? 'text-green-700' : 'text-red-700'}
-        >
-          <Option value={STATUS_MAP.ACTIVE} className="text-green-700">
-            Active
-          </Option>
-          <Option value={STATUS_MAP.INACTIVE} className="text-red-700">
-            Inactive
-          </Option>
-        </AntdSelect>
-      ),
-    },
-    {
-      key: 'createdAt',
-      title: 'Created At',
-      render: (value, item) => (
-        <div className="text-gray-900">
-          {item.createdAt ? format(new Date(item.createdAt), 'dd/MM/yyyy') : '--'}
-        </div>
-      ),
-    },
-    {
-      key: 'actions',
-      title: 'Actions',
-      render: (value, item) => (
-        <div className="flex space-x-2">
-          <Button
-            type="link"
-            icon={<FiEye />}
-            href={`/sawtar/cms/vendor/b2c/product/review/${item._id}`}
-            title="View Details"
-          />
-          {activeTab === 'pending' && (
-            <>
+      {
+        key: "name",
+        title: "Product",
+        width: 220,
+        render: (_, r) => (
+          <div>
+            <div className="font-medium">{r.name || "--"}</div>
+            <div className="text-xs text-gray-500">{r.product_code || "N/A"}</div>
+          </div>
+        ),
+      },
+      {
+        key: "vendor",
+        title: "Vendor",
+        width: 180,
+        render: (_, r) => (
+          <div>
+            <div className="font-medium">{r.vendor?.full_name || "--"}</div>
+            <div className="text-xs text-gray-500">{r.vendor?.email || "--"}</div>
+          </div>
+        ),
+      },
+      {
+        key: "category",
+        title: "Category",
+        width: 140,
+        render: (_, r) => r.category?.name || "--",
+      },
+      {
+        key: "sale_price",
+        title: "Sale Price",
+        width: 120,
+        render: (_, r) => {
+          const price = r.pricing?.sale_price || r.pricing?.final_price || 0;
+          return `${r.pricing?.currency?.symbol || "₹"} ${price.toFixed(2)}`;
+        },
+      },
+      {
+        key: "discount",
+        title: "Discount",
+        width: 160,
+        render: (_, r) => {
+          if (!r.pricing?.discount?.value || !r.pricing?.discount?.approved) return "--";
+          const d = r.pricing.discount;
+          return (
+            <div>
+              {d.type === "percentage" ? `${d.value}%` : `${r.d?.symbol || "₹"} ${d.value}`}
+              <div className="text-xs">
+                Till {d.valid_till ? format(new Date(d.valid_till), "dd/MM") : "--"}
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        key: "tax",
+        title: "Tax",
+        width: 100,
+        render: (_, r) => (r.pricing?.tax?.rate ? `${r.pricing.tax.rate}%` : "--"),
+      },
+      {
+        key: "status",
+        title: "Status",
+        width: 120,
+        render: (_, r) => {
+          const map = {
+            active: { color: "green", label: "Active" },
+            inactive: { color: "red", label: "Inactive" },
+            draft: { color: "gray", label: "Draft" },
+            pending_verification: { color: "orange", label: "Pending" },
+            rejected: { color: "volcano", label: "Rejected" },
+            archived: { color: "purple", label: "Archived" },
+          };
+          const s = map[r.status] || { color: "gray", label: r.status };
+          return <Tag color={s.color}>{s.label}</Tag>;
+        },
+      },
+      {
+        key: "verification",
+        title: "Verification",
+        width: 130,
+        render: (_, r) => {
+          const v = r.verification_status?.status;
+          const map = { pending: "warning", approved: "success", rejected: "error" };
+          return (
+            <div>
+              <Tag color={map[v] || "default"}>{(v || "pending").toUpperCase()}</Tag>
+              {v === "rejected" && r.verification_status?.rejection_reason && (
+                <div className="text-xs text-gray-500">
+                  {r.verification_status.rejection_reason}
+                </div>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        key: "createdAt",
+        title: "Created",
+        width: 110,
+        render: (_, r) =>
+          r.createdAt ? format(new Date(r.createdAt), "dd/MM/yyyy") : "--",
+      },
+      {
+        key: "actions",
+        title: "Actions",
+        fixed: "right",
+        width: 180,
+        render: (_, r) => (
+          <Space>
+            <Button type="link" icon={<FiEye />} href={`/sawtar/dashboard/${roleSlug}/products/${r._id}`} />
+
+            {/* Approve */}
+            {activeTab === "pending" && perm.canApprove && (
               <Button
                 type="link"
                 icon={<FiCheck />}
-                onClick={() => handleStatusUpdate(item._id, 'approved')}
-                title="Approve Product and Assets"
                 className="text-green-600"
+                onClick={() => handleStatusUpdate(r._id, "approved")}
               />
+            )}
+
+            {/* Reject */}
+            {activeTab === "pending" && perm.canReject && (
               <Button
                 type="link"
                 icon={<FiX />}
-                onClick={() => openRejectModal(item)}
-                title="Reject Product and Assets"
                 danger
+                onClick={() => openRejectModal(r)}
               />
-            </>
-          )}
-          <Button
-            type="link"
-            icon={<FiShoppingBag />}
-            href={`/sawtar/cms/products/inventory/${item._id}`}
-            title="Manage Inventory"
-            className="text-purple-600"
-          />
-          <Button
-            type="link"
-            icon={<FiTrendingDown />}
-            onClick={() => openPricingModal(item)}
-            title="Update Pricing"
-            className="text-blue-600"
-          />
-        </div>
-      ),
-    },
-  ];
+            )}
 
-  // Expandable row for asset verification details
-  const expandedRowRender = (item) => {
-    const documentFields = ['product_invoice', 'product_certificate', 'quality_report'];
-    const documents = documentFields
-      .filter((field) => item.documents[field])
-      .map((field) => ({
-        type: field,
-        ...item.documents[field],
-      }));
-    const images = item.color_variants.flatMap((variant) =>
-      variant.images.map((img) => ({
-        type: `Image (${variant.color_name})`,
-        ...img,
-      }))
+            {/* Inventory */}
+            {perm.canViewInventory && (
+              <Button
+                type="link"
+                icon={<FiShoppingBag />}
+                href={`/sawtar/cms/products/inventory/${r._id}`}
+                className="text-purple-600"
+              />
+            )}
+
+            {/* Pricing */}
+            {perm.canEditPricing && (
+              <Button
+                type="link"
+                icon={<FiTrendingDown />}
+                onClick={() => openPricingModal(r)}
+                className="text-blue-600"
+              />
+            )}
+          </Space>
+        ),
+      },
+    ],
+    [
+      activeTab,
+      perm.canApprove,
+      perm.canReject,
+      perm.canViewInventory,
+      perm.canEditPricing,
+      roleSlug,
+    ]
+  );
+
+  /* ----------------------- EXPANDABLE ROW ----------------------- */
+  const expandedRowRender = (record) => {
+    const docs = Object.entries(record.documents || {})
+      .filter(([k, v]) => v && k !== "__typename")
+      .map(([k, v]) => ({ type: k, ...v }));
+
+    const images = (record.color_variants || []).flatMap((v) =>
+      (v.images || []).map((img) => ({ type: `Image (${v.color_name})`, ...img }))
     );
 
     return (
       <Collapse>
-        <Panel header="Asset Verification Details" key="assets">
-          {documents.map((doc) => (
-            <div key={doc._id} className="mb-2">
-              <div className="flex items-center">
-                <FiFileText className="mr-2" />
-                <span>{doc.type}: </span>
-                <Tag color={doc.verified ? 'green' : 'red'} className="ml-2">
-                  {doc.verified ? 'Verified' : 'Not Verified'}
-                </Tag>
-              </div>
-              {!doc.verified && doc.reason && (
-                <div className="text-sm text-gray-500 ml-6">
-                  Reason: {doc.reason}
-                  {doc.suggestion && <div>Suggestion: {doc.suggestion}</div>}
+        <Panel header="Asset Details" key="1">
+          {docs.map((d) => (
+            <div key={d._id} className="mb-2 flex items-center">
+              <FiFileText className="mr-2" />
+              <span>{d.type}:</span>
+              <Tag color={d.verified ? "green" : "red"} className="ml-2">
+                {d.verified ? "Verified" : "Not Verified"}
+              </Tag>
+              {!d.verified && d.reason && (
+                <div className="text-xs text-gray-500 ml-6">
+                  {d.reason}
+                  {d.suggestion && <div>Suggestion: {d.suggestion}</div>}
                 </div>
               )}
             </div>
           ))}
           {images.map((img) => (
-            <div key={img._id} className="mb-2">
-              <div className="flex items-center">
-                <FiImage className="mr-2" />
-                <span>{img.type}: {img.alt_text}</span>
-                <Tag color={img.verified ? 'green' : 'red'} className="ml-2">
-                  {img.verified ? 'Verified' : 'Not Verified'}
-                </Tag>
-              </div>
-              {!img.verified && img.reason && (
-                <div className="text-sm text-gray-500 ml-6">
-                  Reason: {img.reason}
-                  {img.suggestion && <div>Suggestion: {img.suggestion}</div>}
-                </div>
-              )}
+            <div key={img._id} className="mb-2 flex items-center">
+              <FiImage className="mr-2" />
+              <span>{img.type}:</span>
+              <Tag color={img.verified ? "green" : "red"} className="ml-2">
+                {img.verified ? "Verified" : "Not Verified"}
+              </Tag>
             </div>
           ))}
-          {item.three_d_model && (
-            <div className="mb-2">
-              <div className="flex items-center">
-                <FiFileText className="mr-2" />
-                <span>3D Model</span>
-                <Tag color={item.three_d_model.verified ? 'green' : 'red'} className="ml-2">
-                  {item.three_d_model.verified ? 'Verified' : 'Not Verified'}
-                </Tag>
-              </div>
-              {!item.three_d_model.verified && item.three_d_model.reason && (
-                <div className="text-sm text-gray-500 ml-6">
-                  Reason: {item.three_d_model.reason}
-                  {item.three_d_model.suggestion && <div>Suggestion: {item.three_d_model.suggestion}</div>}
-                </div>
-              )}
-            </div>
-          )}
         </Panel>
       </Collapse>
     );
   };
 
+  /* -------------------------- RENDER -------------------------- */
+  if (!perm.canView) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-semibold">Access Denied</h2>
+        <p>You don't have permission to view product requests.</p>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ minHeight: '100vh' }}>
-      <div className="max-w-7xl mx-auto">
-        <Card style={{ marginBottom: 24 }} bodyStyle={{ padding: '16px 24px' }}>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">B2C Product Requests</h1>
-              <p className="text-gray-500 mt-1">Manage and review product requests</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                onClick={handleRefresh}
-                icon={<FiRefreshCw className={loading ? 'animate-spin' : ''} />}
-                loading={loading}
-                className="flex items-center gap-2"
-              >
-                Refresh
-              </Button>
-              <Button type="primary" icon={<FiPlus />} href="/sawtar/cms/products/add" className="flex items-center gap-2">
-                Add Product
-              </Button>
-            </div>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <Card className="mb-6" bodyStyle={{ padding: "16px 24px" }}>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">B2C Product Requests</h1>
+            <p className="text-gray-500">Review and manage product submissions</p>
           </div>
-        </Card>
-
-        <Tabs activeKey={activeTab} onChange={handleTabChange} className="mb-6">
-          {['pending', 'approved', 'rejected'].map((tab) => (
-            <TabPane tab={`${tab.charAt(0).toUpperCase() + tab.slice(1)} Requests`} key={tab} />
-          ))}
-        </Tabs>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Card className="shadow-md border-0 rounded-xl">
-            <Statistic
-              title="Total Products"
-              value={stats.total}
-              prefix={<FiPackage className="text-blue-600" />}
-              valueStyle={{ color: '#3f51b5', fontWeight: 500 }}
-            />
-          </Card>
-          <Card className="shadow-md border-0 rounded-xl">
-            <Statistic
-              title="Pending"
-              value={stats.pending}
-              prefix={<FiClock className="text-yellow-600" />}
-              valueStyle={{ color: '#ff9800', fontWeight: 500 }}
-            />
-          </Card>
-          <Card className="shadow-md border-0 rounded-xl">
-            <Statistic
-              title="Approved"
-              value={stats.approved}
-              prefix={<FiCheck className="text-green-600" />}
-              valueStyle={{ color: '#4caf50', fontWeight: 500 }}
-            />
-          </Card>
-          <Card className="shadow-md border-0 rounded-xl">
-            <Statistic
-              title="Rejected"
-              value={stats.rejected}
-              prefix={<FiX className="text-red-600" />}
-              valueStyle={{ color: '#f44336', fontWeight: 500 }}
-            />
-          </Card>
+          <Button icon={<FiRefreshCw />} onClick={handleRefresh}>
+            Refresh
+          </Button>
         </div>
+      </Card>
 
+      {/* Tabs */}
+      <Tabs activeKey={activeTab} onChange={handleTabChange} className="mb-6">
+        {["pending", "approved", "rejected"].map((t) => (
+          <TabPane
+            key={t}
+            tab={`${t.charAt(0).toUpperCase() + t.slice(1)} (${
+              t === "pending"
+                ? stats.pending
+                : t === "approved"
+                ? stats.approved
+                : stats.rejected
+            })`}
+          />
+        ))}
+      </Tabs>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {[
+          { title: "Total", value: stats.total, icon: FiPackage, color: "#3f51b5" },
+          { title: "Pending", value: stats.pending, icon: FiClock, color: "#ff9800" },
+          { title: "Approved", value: stats.approved, icon: FiCheck, color: "#4caf50" },
+          { title: "Rejected", value: stats.rejected, icon: FiX, color: "#f44336" },
+        ].map((s) => (
+          <Card key={s.title} className="shadow-md">
+            <Statistic
+              title={s.title}
+              value={s.value}
+              prefix={<s.icon style={{ color: s.color }} />}
+              valueStyle={{ color: s.color }}
+            />
+          </Card>
+        ))}
+      </div>
+
+      {/* Table */}
+      <Card bodyStyle={{ padding: 0, position: "relative" }}>
         <CustomTable
           columns={productColumns}
           data={dataWithSno}
@@ -603,237 +590,147 @@ const ProductRequestB2C = () => {
           onPageChange={handlePageChange}
           onFilter={handleFilter}
           loading={loading}
+          scroll={{ x: 1500 }}
           expandable={{
             expandedRowRender,
-            rowExpandable: (record) => record.documents || record.color_variants.length > 0 || record.three_d_model,
+            rowExpandable: (r) =>
+              !!r.documents || !!r.color_variants?.length || !!r.three_d_model,
           }}
           filters={[
+            { key: "search", type: "text", placeholder: "Search..." },
             {
-              key: 'search',
-              type: 'text',
-              placeholder: 'Search by name or description...',
-            },
-            {
-              key: 'category_id',
-              type: 'select',
-              placeholder: 'All Categories',
-              options: [{ value: '', label: 'All Categories' }, ...categories.map((cat) => ({ value: cat._id, label: cat.name }))],
-            },
-            {
-              key: 'date_filter',
-              type: 'select',
-              placeholder: 'All Dates',
+              key: "category_id",
+              type: "select",
+              placeholder: "Category",
               options: [
-                { value: '', label: 'All Dates' },
-                { value: 'today', label: 'Today' },
-                { value: 'week', label: 'Last Week' },
-                { value: 'month', label: 'Last Month' },
-                { value: 'new', label: 'Last 24 Hours' },
+                { value: "", label: "All" },
+                ...categories.map((c) => ({ value: c._id, label: c.name })),
+              ],
+            },
+            {
+              key: "date_filter",
+              type: "select",
+              placeholder: "Date",
+              options: [
+                { value: "", label: "All" },
+                { value: "today", label: "Today" },
+                { value: "week", label: "Last Week" },
+                { value: "month", label: "Last Month" },
               ],
             },
           ]}
-          emptyMessage={
-            activeTab === 'pending'
-              ? 'No pending product requests found.'
-              : activeTab === 'approved'
-              ? 'No approved products found.'
-              : 'No rejected products found.'
-          }
         />
+      </Card>
 
-        {assetErrors.length > 0 && (
-          <div className="mt-4">
-            {assetErrors.map((error, index) => (
-              <Alert
-                key={index}
-                message={`Asset Error: ${error.assetId}`}
-                description={error.message}
-                type="error"
-                showIcon
-                className="mb-2"
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Asset Errors */}
+      {assetErrors.length > 0 && (
+        <div className="mt-4">
+          {assetErrors.map((e, i) => (
+            <Alert
+              key={i}
+              message={`Asset ${e.assetId}`}
+              description={e.message}
+              type="error"
+              showIcon
+              className="mb-2"
+            />
+          ))}
+        </div>
+      )}
 
+      {/* Reject Modal */}
       <Modal
         open={showRejectModal}
         onCancel={closeRejectModal}
-        title="Reject Product and Assets"
-        footer={[
-          <Button key="cancel" onClick={closeRejectModal}>
-            Cancel
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            danger
-            onClick={() => handleStatusUpdate(selectedProduct._id, 'rejected', rejectionReason, rejectionSuggestion)}
-            disabled={!rejectionReason.trim()}
-          >
-            Confirm Rejection
-          </Button>,
-        ]}
-        centered
+        title="Reject Product"
+        footer={null}
       >
-        <p className="text-gray-600 mb-4">
-          Product: <span className="font-medium">{selectedProduct?.name}</span>
-        </p>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-600 mb-2">Reason for Rejection</label>
-          <TextArea
-            value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
-            rows={4}
-            placeholder="Provide a reason for rejection..."
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-600 mb-2">Suggestion (Optional)</label>
-          <TextArea
-            value={rejectionSuggestion}
-            onChange={(e) => setRejectionSuggestion(e.target.value)}
-            rows={4}
-            placeholder="Provide a suggestion for improvement..."
-          />
-        </div>
+        {selectedProduct && (
+          <>
+            <p>
+              <strong>{selectedProduct.name}</strong>
+            </p>
+            <TextArea
+              rows2
+              placeholder="Reason (required)"
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              className="mb-3"
+            />
+            <TextArea
+              rows={3}
+              placeholder="Suggestion (optional)"
+              value={rejectionSuggestion}
+              onChange={(e) => setRejectionSuggestion(e.target.value)}
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <Button onClick={closeRejectModal}>Cancel</Button>
+              <Button
+                type="primary"
+                danger
+                disabled={!rejectionReason.trim()}
+                onClick={() =>
+                  handleStatusUpdate(
+                    selectedProduct._id,
+                    "rejected",
+                    rejectionReason,
+                    rejectionSuggestion
+                  )
+                }
+              >
+                Reject
+              </Button>
+            </div>
+          </>
+        )}
       </Modal>
 
+      {/* Pricing Modal */}
       <Modal
         open={showPricingModal}
         onCancel={closePricingModal}
         title="Update Pricing"
-        footer={[
-          <Button key="cancel" onClick={closePricingModal}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" form="pricingForm" htmlType="submit">
-            Update
-          </Button>,
-        ]}
-        centered
+        footer={null}
       >
-        <p className="text-gray-600 mb-4">
-          Product: <span className="font-medium">{selectedProduct?.name}</span>
-        </p>
-        <Form
-          form={form}
-          id="pricingForm"
-          onFinish={handlePricingUpdate}
-          layout="vertical"
-          initialValues={{
-            discount_type: 'percentage',
-            discount_value: 0,
-            valid_till: null,
-            sale_price: selectedProduct?.pricing?.sale_price || selectedProduct?.pricing?.base_price || 0,
-            tax_id: '',
-            rate: 0,
-          }}
-        >
-          <Form.Item
-            label="Discount Type"
-            name="discount_type"
-            rules={[{ required: true, message: 'Please select a discount type' }]}
-          >
+        <Form form={form} onFinish={handlePricingUpdate} layout="vertical">
+          <Form.Item label="Discount Type" name="discount_type">
             <AntdSelect>
               <Option value="percentage">Percentage</Option>
-              <Option value="fixed">Fixed Amount</Option>
+              <Option value="fixed">Fixed</Option>
             </AntdSelect>
           </Form.Item>
-          <Form.Item
-            label="Discount Value"
-            name="discount_value"
-            rules={[
-              { required: true, message: 'Please enter a discount value' },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || value < 0) {
-                    return Promise.reject(new Error('Discount value must be non-negative'));
-                  }
-                  if (getFieldValue('discount_type') === 'percentage' && value > 100) {
-                    return Promise.reject(new Error('Percentage discount must be between 0 and 100'));
-                  }
-                  if (
-                    getFieldValue('discount_type') === 'fixed' &&
-                    value > (selectedProduct?.pricing?.base_price || 0)
-                  ) {
-                    return Promise.reject(new Error('Fixed discount cannot exceed base price'));
-                  }
-                  return Promise.resolve();
-                },
-              }),
-            ]}
-          >
-            <Input type="number" min={0} placeholder="Enter discount value" />
+          <Form.Item label="Discount Value" name="discount_value">
+            <Input type="number" min={0} />
           </Form.Item>
-          <Form.Item
-            label="Valid Till"
-            name="valid_till"
-            rules={[{ required: true, message: 'Please select a valid till date' }]}
-          >
-            <DatePicker
-              format="yyyy-MM-dd"
-              disabledDate={(current) => current && isBefore(new Date(current), new Date())}
-            />
+          <Form.Item label="Valid Till" name="valid_till">
+            <DatePicker disabledDate={(d) => d && isBefore(d, new Date())} />
           </Form.Item>
-          <Form.Item
-            label="Sale Price"
-            name="sale_price"
-            rules={[
-              { required: true, message: 'Please enter a sale price' },
-              {
-                validator(_, value) {
-                  if (!value || value < 0) {
-                    return Promise.reject(new Error('Sale price must be non-negative'));
-                  }
-                  if (value > (selectedProduct?.pricing?.base_price || 0)) {
-                    return Promise.reject(new Error('Sale price cannot exceed base price'));
-                  }
-                  return Promise.resolve();
-                },
-              },
-            ]}
-          >
+          <Form.Item label="Sale Price" name="sale_price">
             <Input
               type="number"
               min={0}
-              placeholder="Enter sale price"
-              addonBefore={selectedProduct?.pricing?.currency?.symbol || '₹'}
+              addonBefore={selectedProduct?.pricing?.currency?.symbol}
             />
           </Form.Item>
-          <Form.Item
-            label="Tax"
-            name="tax_id"
-          >
-            <AntdSelect
-              placeholder="Select a tax (optional)"
-              allowClear
-              onChange={handleTaxChange}
-            >
-              {taxes.map((tax) => (
-                <Option key={tax._id} value={tax._id}>
-                  {tax.taxName} ({tax.rate}%)
+          <Form.Item label="Tax" name="tax_id">
+            <AntdSelect allowClear onChange={handleTaxChange}>
+              {taxes.map((t) => (
+                <Option key={t._id} value={t._id}>
+                  {t.taxName} ({t.rate}%)
                 </Option>
               ))}
             </AntdSelect>
           </Form.Item>
-          <Form.Item
-            label="Tax Rate (%)"
-            name="rate"
-            rules={[
-              { required: true, message: 'Please enter a tax rate' },
-              {
-                validator(_, value) {
-                  if (value < 0 || value > 100) {
-                    return Promise.reject(new Error('Tax rate must be between 0 and 100'));
-                  }
-                  return Promise.resolve();
-                },
-              },
-            ]}
-          >
-            <Input type="number" min={0} max={100} step="0.01" placeholder="Enter tax rate" />
+          <Form.Item label="Tax Rate (%)" name="rate">
+            <Input type="number" min={0} max={100} step="0.01" />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button onClick={closePricingModal}>Cancel</Button>
+              <Button type="primary" htmlType="submit">
+                Update
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </Modal>

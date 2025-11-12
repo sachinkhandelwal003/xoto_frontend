@@ -1,13 +1,74 @@
 @import "tailwindcss";
-@import 'swiper/css';
-@import 'swiper/css/navigation';
+@import "swiper/css";
+@import "swiper/css/navigation";
 @import "tw-animate-css";
 
+/* ---- Custom Theme Variables ---- */
+@theme {
+  --color-body: #F2EBF7;
+  --color-text: #000000;
+
+  /* Brand Palette */
+  --color-primary: #5C039B;  /* purple */
+  --color-blue: #03A4F4;     /* blue */
+  --color-green: #64EF0A;    /* green */
+
+  --color-secondary: #64EF0A;
+  --color-green-tertiary: #69ED1F;
+  --color-green-light: #56EA1B;
+  --color-green-accent: #58E526;
+
+  --color-text-primary: #03A4F4;     /* blue */
+  --color-text-secondary: #5C039B;   /* purple */
+  --color-text-dark: #020202;        /* black */
+  --color-text-white: #FFFFFF;       /* white */ 
+  --color-text-green: #64EF0A;       /* green */
+
+  /* Buttons */
+  --color-btn-primary: #03A4F4;    /* blue */
+  --color-btn-secondary: #5C039B;   /* purple */
+  --color-btn-dark: #020202;      /* black */
+  --color-btn-gradient: linear-gradient(90deg, #63C117, #32C882, #69ED1F);
+  --color-gradient--btn-blue-green: linear-gradient(90deg, var(--color-text-primary), var(--color-text-green));
+  --color-hoverbtn: #0997ad;
+
+  /* Custom Accent */
+  --color-customOrange: #D67A56;
+}
+
+/* ---- Global Dark Mode Variant ---- */
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-  --color-body: #F7F6F9;
-  --color-btn: #5B3879;
-  --color-hoverbtn: #ba5933;
-  --color-customOrange: #D67A56; /* fixed invalid hex */
+/* ---- Reusable Global Gradient Button ---- */
+@layer components {
+  .btn-gradient {
+    @apply text-white font-semibold px-6 py-3 rounded-full transition-all duration-300 ease-in-out shadow-md;
+    background: var(--color-gradient--btn-blue-green);
+  }
+
+  .btn-gradient:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline {
+    @apply border-2 font-semibold rounded-full transition-all duration-300 ease-in-out;
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-secondary);
+  }
+
+  .btn-outline:hover {
+    background-color: var(--color-text-secondary);
+    color: var(--color-text-white);
+  }
+
+  .tag-new {
+    background: var(--color-gradient--btn-blue-green);
+    color: var(--color-text-white);
+  }
+
+  .tag-sale {
+    background-color: var(--color-text-secondary);
+    color: var(--color-text-white);
+  }
 }

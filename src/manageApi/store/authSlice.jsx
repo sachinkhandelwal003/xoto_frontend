@@ -1,128 +1,131 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { jwtDecode } from 'jwt-decode';
-import axios from 'axios';
+// store/authSlice.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
+// Load from localStorage
 const loadInitialState = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   if (token) {
     try {
       const decoded = jwtDecode(token);
       if (decoded.exp * 1000 > Date.now()) {
         return {
           user: decoded,
-          token: token,
-          permissions: [],
+          token,
+          permissions: {}, // FLAT MAP
           loading: false,
           error: null,
-          isAuthenticated: true
+          isAuthenticated: true,
         };
       } else {
-        localStorage.removeItem('token');
+        localStorage.removeItem("token");
       }
     } catch (error) {
-      localStorage.removeItem('token');
+      localStorage.removeItem("token");
     }
   }
   return {
     user: null,
     token: null,
-    permissions: [],
+    permissions: {},
     loading: false,
     error: null,
-    isAuthenticated: false
+    isAuthenticated: false,
   };
 };
 
+// LOGIN
 export const loginUser = createAsyncThunk(
-  'auth/loginUser',
+  "auth/loginUser",
   async ({ email, password, endpoint }, { rejectWithValue }) => {
     try {
       const response = await axios.post(endpoint, { email, password });
       const data = response.data;
-      
-      if (!data.success) {
-        return rejectWithValue(data);
-      }
-      
-      localStorage.setItem('token', data.token);
+
+      if (!data.success) return rejectWithValue(data);
+
+      localStorage.setItem("token", data.token);
       const decoded = jwtDecode(data.token);
-      
-      return { 
-        user: decoded, 
-        token: data.token, 
-        message: data.message 
-      };
+
+      return { user: decoded, token: data.token };
     } catch (err) {
-      const errorResponse = err.response?.data || { 
-        message: 'Network error', 
-        errors: [] 
-      };
-      return rejectWithValue(errorResponse);
+      return rejectWithValue(
+        err.response?.data || { message: "Network error" }
+      );
     }
   }
 );
 
+// LOGOUT
 export const logoutUser = createAsyncThunk(
-  'auth/logoutUser', 
+  "auth/logoutUser",
   async (_, { getState }) => {
     try {
-      const { auth: { token } } = getState();
-      if (token) {
-        await axios.post('/api/auth/logout');
-      }
+      const { token } = getState().auth;
+      if (token) await axios.post("/api/auth/logout");
     } catch (error) {
-      console.warn('Logout error:', error);
+      console.warn("Logout error:", error);
     } finally {
-      localStorage.removeItem('token');
-      return null;
+      localStorage.removeItem("token");
     }
   }
 );
 
+// REFRESH TOKEN
 export const refreshToken = createAsyncThunk(
-  'auth/refreshToken', 
+  "auth/refreshToken",
   async (_, { getState, rejectWithValue }) => {
     try {
-      const { auth: { token } } = getState();
-      if (!token) return rejectWithValue('No token to refresh');
-      
-      const response = await axios.post('/api/auth/refresh');
-      const newToken = response.data.token;
+      const { token } = getState().auth;
+      if (!token) return rejectWithValue("No token");
+
+      const res = await axios.post("/api/auth/refresh");
+      const newToken = res.data.token;
       const decoded = jwtDecode(newToken);
-      
-      localStorage.setItem('token', newToken);
+
+      localStorage.setItem("token", newToken);
       return { user: decoded, token: newToken };
     } catch (err) {
-      localStorage.removeItem('token');
-      return rejectWithValue('Refresh failed');
+      localStorage.removeItem("token");
+      return rejectWithValue("Refresh failed");
     }
   }
 );
 
-export const fetchPermissions = createAsyncThunk(
-  'auth/fetchPermissions',
-  async ({ roleCode, token }, { rejectWithValue }) => {
+// FETCH MY PERMISSIONS (NEW ENDPOINT)
+export const fetchMyPermissions = createAsyncThunk(
+  "auth/fetchMyPermissions",
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/permission?roleCode=${roleCode}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.data.success) {
-        return response.data.permissions;
+      const { token } = getState().auth;
+      const res = await axios.get(
+        "http://localhost:5000/api/permission/my/get",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (res.data.success) {
+        return res.data.permissions;
       } else {
-        return rejectWithValue(response.data.message);
+        return rejectWithValue(res.data.message);
       }
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Error fetching permissions');
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch permissions"
+      );
     }
   }
 );
 
+// SLICE
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState: loadInitialState(),
   reducers: {
     rehydrateAuthState: (state) => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token) {
         try {
           const decoded = jwtDecode(token);
@@ -130,31 +133,27 @@ const authSlice = createSlice({
             state.user = decoded;
             state.token = token;
             state.isAuthenticated = true;
-            state.error = null;
           } else {
-            localStorage.removeItem('token');
+            localStorage.removeItem("token");
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
           }
-        } catch (error) {
-          localStorage.removeItem('token');
+        } catch {
+          localStorage.removeItem("token");
           state.user = null;
           state.token = null;
           state.isAuthenticated = false;
         }
-      } else {
-        state.user = null;
-        state.token = null;
-        state.isAuthenticated = false;
       }
     },
     clearError: (state) => {
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
+      // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -168,19 +167,22 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message || 'Login failed';
+        state.error = action.payload.message || "Login failed";
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
       })
+
+      // LOGOUT
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.token = null;
-        state.permissions = [];
-        state.loading = false;
-        state.error = null;
+        state.permissions = {};
         state.isAuthenticated = false;
+        state.error = null;
       })
+
+      // REFRESH
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.token = action.payload.token;
@@ -189,19 +191,40 @@ const authSlice = createSlice({
       .addCase(refreshToken.rejected, (state) => {
         state.user = null;
         state.token = null;
-        state.permissions = [];
+        state.permissions = {};
         state.isAuthenticated = false;
       })
-      .addCase(fetchPermissions.pending, (state) => {
+
+      // FETCH PERMISSIONS
+      .addCase(fetchMyPermissions.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchPermissions.fulfilled, (state, action) => {
+      .addCase(fetchMyPermissions.fulfilled, (state, action) => {
         state.loading = false;
-        state.permissions = action.payload;
+        // FLAT MAP: "Productsss→Add New" → { canView: 1, route: "/products/new" }
+        state.permissions = action.payload.reduce((map, p) => {
+          const key = p.subModule
+            ? `${p.module.name}→${p.subModule.name}`
+            : p.module.name;
+
+          map[key] = {
+            canView: p.permissions.canView,
+            canAdd: p.permissions.canAdd,
+            canEdit: p.permissions.canEdit,
+            canDelete: p.permissions.canDelete,
+            canViewAll: p.permissions.canViewAll,
+            route: p.subModule?.route || p.module.route,
+            icon: p.subModule?.icon || p.module.icon,
+            name: p.subModule?.name || p.module.name,
+            moduleName: p.module.name,
+          };
+          return map;
+        }, {});
       })
-      .addCase(fetchPermissions.rejected, (state, action) => {
+      .addCase(fetchMyPermissions.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.permissions = {};
       });
   },
 });

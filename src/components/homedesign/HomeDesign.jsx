@@ -1,144 +1,81 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import video from '../../assets/video/illustrationvideos.mp4';
-import { FaCouch, FaRulerCombined, FaPaintRoller } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Home, Image, Trees, Sparkles, Building2, Paintbrush } from "lucide-react";
+import houseimage from "../../assets/img/house.png";
 
 const HomeDesign = () => {
-  const navigate = useNavigate();
+  const badges = [
+    { id: 1, label: "Exterior Upgrade", icon: <Building2 className="w-4 h-4 text-white" />, top: "5%", left: "36%" },
+    { id: 2, label: "Interior Transformation", icon: <Home className="w-4 h-4 text-white" />, top: "30%", left: "65%" },
+    { id: 3, label: "Smart Furniture Swap", icon: <Sparkles className="w-4 h-4 text-white" />, top: "56%", left: "70%" },
+    { id: 4, label: "Landscaping", icon: <Trees className="w-4 h-4 text-white" />, bottom: "10%", left: "60%" },
+    { id: 5, label: "Image Perfection", icon: <Image className="w-4 h-4 text-white" />, bottom: "15%", left: "35%" },
+    { id: 6, label: "Virtual Design Studio", icon: <Paintbrush className="w-4 h-4 text-white" />, top: "34%", left: "23%" },
+  ];
 
   return (
-    <section className="py-20 px-4 bg-white text-gray-900 relative overflow-hidden">
+    <section className="relative w-full bg-[var(--color-body)] overflow-hidden pt-28 pb-28">
+      <div className="relative z-10 flex flex-col lg:flex-row items-center px-6 sm:px-12 lg:px-24">
+        {/* ---------- LEFT SIDE (Content) ---------- */}
+        <div className="lg:w-[40%] w-full z-20 space-y-6 relative pb-20">
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-black leading-tight">
+            Your Space, <br />
+            <span className="text-black">
+              Redefined Instantly.
+            </span>
+          </h2>
 
-      {/* Heading */}
-      <motion.h2
-        initial={{ opacity: 0, y: -40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="text-4xl md:text-5xl font-extrabold text-center mb-4"
-      >
-        AI-Powered Home Design Studio
-      </motion.h2>
+          <p className="text-gray-700 text-lg leading-relaxed max-w-md">
+            Upload your villa layout and let{" "}
+            <span className="font-semibold">Xoto AI</span> craft stunning
+            outdoor and interior design options — tailored perfectly to your
+            taste.
+          </p>
 
-      {/* Subheading */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.8 }}
-        viewport={{ once: true }}
-        className="text-center text-lg md:text-xl mb-6 max-w-2xl mx-auto"
-      >
-        Create your dream home with intelligent design recommendations, virtual previews, and more.
-      </motion.p>
+          <Link
+            to="/get-estimate"
+            className="inline-block bg-[var(--color-primary)] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#5533d8] transition-all shadow-md"
+          >
+            Get Free Estimate Now
+          </Link>
+        </div>
 
-      {/* CTA Button */}
-      <motion.button
-        initial={{ opacity: 0, scale: 0.9 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.4, duration: 0.6 }}
-        viewport={{ once: true }}
-        className="mx-auto block bg-gradient-to-r from-[#BA5933] via-orange-500 to-[#BA5933] 
-             bg-[length:200%_200%] bg-left hover:bg-right 
-             px-10 py-3 rounded-full font-semibold text-white shadow-md 
-             transition-all duration-700 ease-in-out animate-gradient-slide"
-        onClick={() => navigate("/sawtar/designs")}
-      >
-        Explore Now
-      </motion.button>
+        {/* ---------- RIGHT SIDE (Image + Badges) ---------- */}
+        <div className="hidden lg:block absolute right-[-5%] top-1/2 -translate-y-1/2 w-[70%]">
+          <div className="relative w-full flex justify-end items-center">
+            {/* 3D House Image */}
+            <img
+              src={houseimage}
+              alt="3D House"
+              className="w-[90%] max-w-3xl drop-shadow-2xl select-none"
+            />
 
-      {/* Stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.8 }}
-        viewport={{ once: true }}
-        className="mt-10 mb-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto"
-      >
-        {[
-          { value: "1500+", label: "Homes Designed" },
-          { value: "AI Powered", label: "Smart Suggestions" },
-          { value: "100%", label: "Client Satisfaction" },
-          { value: "50+", label: "Design Styles" }
-        ].map((stat, index) => (
-          <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
-            <h3 className="text-3xl font-bold text-orange-600 mb-2">{stat.value}</h3>
-            <p className="text-sm text-gray-600">{stat.label}</p>
-          </div>
-        ))}
-      </motion.div>
-
-      {/* Video with Icons */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 0.8 }}
-        viewport={{ once: true }}
-        className="mt-12 relative max-w-6xl mx-auto rounded-2xl overflow-hidden shadow-xl"
-      >
-        <motion.div
-          initial={{ x: -100, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="hidden md:block absolute left-[-60px] top-1/2 transform -translate-y-1/2 text-orange-400 text-5xl animate-bounce-slow"
-        >
-          <FaCouch />
-        </motion.div>
-
-        <motion.div
-          initial={{ x: 100, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="hidden md:block absolute right-[-60px] top-1/2 transform -translate-y-1/2 text-yellow-500 text-5xl animate-bounce-slow"
-        >
-          <FaPaintRoller />
-        </motion.div>
-
-        <video
-          src={video}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full max-h-[500px] object-cover rounded-2xl"
-        />
-      </motion.div>
-
-      {/* AR & VR Integration Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
-        viewport={{ once: true }}
-        className="mt-20 bg-gray-50 py-12 px-6 rounded-2xl shadow-inner max-w-6xl mx-auto"
-      >
-        <h3 className="text-3xl font-extrabold text-center text-gray-800 mb-4">
-          Virtual Showroom with AR & VR Integration
-        </h3>
-        <p className="text-center text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
-          Experience your dream space before it’s built. Explore a 3D walkthrough of various interior themes and place virtual furniture, décor, and materials in your space using AR/VR technologies.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-          <div className="p-6 bg-white rounded-xl shadow border">
-            <FaRulerCombined className="text-4xl text-orange-500 mx-auto mb-4" />
-            <h4 className="text-xl font-semibold mb-2">3D Walkthrough</h4>
-            <p className="text-gray-600 text-sm">Navigate through different interior designs in immersive 3D environments.</p>
-          </div>
-
-          <div className="p-6 bg-white rounded-xl shadow border">
-            <FaCouch className="text-4xl text-orange-400 mx-auto mb-4" />
-            <h4 className="text-xl font-semibold mb-2">Virtual Placement</h4>
-            <p className="text-gray-600 text-sm">Place and customize furniture, décor, and materials in your real space using AR.</p>
-          </div>
-
-          <div className="p-6 bg-white rounded-xl shadow border">
-            <FaPaintRoller className="text-4xl text-yellow-500 mx-auto mb-4" />
-            <h4 className="text-xl font-semibold mb-2">Cross-Platform Support</h4>
-            <p className="text-gray-600 text-sm">Compatible with ARCore (Android), ARKit (iOS), and VR headsets using Unity & WebXR.</p>
+            {/* Floating Badges */}
+            {badges.map((b) => (
+              <div
+                key={b.id}
+                className="absolute flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-lg border border-gray-200 whitespace-nowrap transition-all duration-300 hover:bg-[var(--color-primary)] hover:text-white"
+                style={{
+                  top: b.top,
+                  left: b.left,
+                  bottom: b.bottom,
+                }}
+              >
+                {/* Icon bubble */}
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                  style={{
+                    background: "var(--color-gradient--btn-blue-green)",
+                  }}
+                >
+                  {b.icon}
+                </div>
+                <span className="text-sm font-semibold">{b.label}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 };

@@ -39,7 +39,6 @@ const ProductProfile = () => {
           showToast('Product not found', 'error');
         }
       } catch (error) {
-        showToast(error.response?.data?.message || 'Failed to fetch product', 'error');
       } finally {
         setLoading(false);
       }

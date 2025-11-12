@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import {
   Button,
   Drawer,
-  Form,
   Switch,
   Card,
   Space,
@@ -11,27 +10,42 @@ import {
   Tooltip,
   Spin,
   Typography,
+  Divider,
 } from 'antd';
-import {
-  EyeOutlined,
-  SaveOutlined,
-  CloseOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons';
+import { Form } from 'antd';
+import { EyeOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
 import CustomTable from '../../pages/custom/CustomTable';
 import { apiService } from '../../../../manageApi/utils/custom.apiservice';
 import { showToast } from '../../../../manageApi/utils/toast';
 import { showSuccessAlert, showErrorAlert } from '../../../../manageApi/utils/sweetAlert';
+import { moduleService } from '../modules/module.service';
+
+// Helper: Deep clone to avoid mutation
+const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
+
+const useModulePermission = () => {
+  const { permissions } = useSelector(s => s.auth);
+  const p = permissions?.['Module→All Modules'] ?? {};
+  return {
+    canView: !!p.canView,
+    canAdd: !!p.canAdd,
+    canEdit: !!p.canEdit,
+    canDelete: !!p.canDelete,
+    canViewAll: !!p.canViewAll,
+  };
+};
 
 const Permission = () => {
-  const { token } = useSelector((state) => state.auth);
+  const { token } = useSelector(s => s.auth);
+  const perm = useModulePermission();
+
   const [roles, setRoles] = useState([]);
   const [modules, setModules] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isPermissionDrawerOpen, setIsPermissionDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
-  const [rolePermissions, setRolePermissions] = useState({});
+  const [rolePermMap, setRolePermMap] = useState({});
   const [saving, setSaving] = useState(false);
   const [filters, setFilters] = useState({});
   const [pagination, setPagination] = useState({
@@ -41,98 +55,98 @@ const Permission = () => {
     itemsPerPage: 10,
   });
 
-  // Sync token with localStorage
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem('token', token);
-    }
-  }, [token]);
+  const getPermValue = (value) => value === 1 || value === true;
 
-  // Fetch roles, modules, and permissions
-  const fetchData = async (page = 1, itemsPerPage = 10, filters = {}) => {
+  /* -------------------------- FETCH DATA -------------------------- */
+  const fetchData = useCallback(async (page = 1, itemsPerPage = 10, filters = {}) => {
+    if (!perm.canView) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      const params = { page, limit: itemsPerPage };
-      if (filters.isActive !== undefined) params.isActive = filters.isActive === true;
-
       const [rolesRes, modulesRes, permissionsRes] = await Promise.all([
-        apiService.get('/roles', params),
-        apiService.get('/module', { limit: 100 }),
-        apiService.get('/permission', { limit: 1000 }),
+        apiService.get('/roles', { page, limit: itemsPerPage, ...filters }),
+        moduleService.getAll(),
+        apiService.get('/permission', { limit: 1000 })
       ]);
 
+      const sortedModules = (modulesRes.data || []).sort((a, b) => a.position - b.position);
+      setModules(sortedModules);
       setRoles(rolesRes.roles || []);
-      setModules(modulesRes.modules || []);
       setPermissions(permissionsRes.permissions || []);
+
       setPagination({
-        currentPage: rolesRes.pagination.currentPage || 1,
-        totalPages: rolesRes.pagination.totalPages || 1,
-        totalResults: rolesRes.pagination.totalRecords || 0,
-        itemsPerPage: rolesRes.pagination.perPage || 10,
+        currentPage: rolesRes.pagination?.currentPage || 1,
+        totalPages: rolesRes.pagination?.totalPages || 1,
+        totalResults: rolesRes.pagination?.totalRecords || 0,
+        itemsPerPage: rolesRes.pagination?.perPage || 10,
       });
 
-      // Create a map of role permissions for easier access
-      const permissionsMap = {};
-      permissionsRes.permissions.forEach((permission) => {
-        const roleId = permission.roleId._id;
-        if (!permissionsMap[roleId]) {
-          permissionsMap[roleId] = {};
-        }
-        permissionsMap[roleId][permission.moduleId._id] = {
-          id: permission._id,
-          canAdd: !!permission.canAdd,
-          canEdit: !!permission.canEdit,
-          canView: !!permission.canView,
-          canDelete: !!permission.canDelete,
-          canViewAll: !!permission.canViewAll,
+      // Build immutable permission map
+      const map = {};
+      permissionsRes.permissions.forEach(p => {
+        const roleId = p.role._id;
+        const modId = p.module._id;
+        const subId = p.subModule?._id || null;
+
+        if (!map[roleId]) map[roleId] = {};
+        if (!map[roleId][modId]) map[roleId][modId] = {};
+
+        const key = subId || '__module__';
+        map[roleId][modId][key] = {
+          id: p._id,
+          canAdd: getPermValue(p.permissions.canAdd),
+          canEdit: getPermValue(p.permissions.canEdit),
+          canView: getPermValue(p.permissions.canView),
+          canDelete: getPermValue(p.permissions.canDelete),
+          canViewAll: getPermValue(p.permissions.canViewAll),
         };
       });
-      setRolePermissions(permissionsMap);
-    } catch (error) {
-      showToast(error.response?.data?.message || 'Failed to fetch data', 'error');
+      setRolePermMap(map);
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to load data', 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, [perm.canView]);
 
   useEffect(() => {
-    fetchData(pagination.currentPage, pagination.itemsPerPage, filters);
-  }, []);
+    if (token) {
+      localStorage.setItem('token', token);
+      fetchData(pagination.currentPage, pagination.itemsPerPage, filters);
+    }
+  }, [token, fetchData]);
 
-  // Handle page change
-  const handlePageChange = (page, itemsPerPage) => {
-    fetchData(page, itemsPerPage, filters);
-  };
-
-  // Handle filter change
+  const handlePageChange = (page, itemsPerPage) => fetchData(page, itemsPerPage, filters);
   const handleFilter = (newFilters) => {
     setFilters(newFilters);
     fetchData(1, pagination.itemsPerPage, newFilters);
   };
 
-  // Open drawer for viewing/editing role permissions
-  const openPermissionDrawer = (role) => {
+  const openDrawer = (role) => {
     setSelectedRole(role);
-    setIsPermissionDrawerOpen(true);
+    setDrawerOpen(true);
   };
 
-  // Close drawer
-  const closePermissionDrawer = () => {
-    setIsPermissionDrawerOpen(false);
+  const closeDrawer = () => {
+    setDrawerOpen(false);
     setSelectedRole(null);
   };
 
-  // Handle permission change
-  const handlePermissionChange = (moduleId, permissionType, value) => {
-    setRolePermissions((prev) => {
-      const newPermissions = { ...prev };
+  /* --------------------- IMMUTABLE UPDATE --------------------- */
+  const updatePerm = useCallback((moduleId, subId, type, value) => {
+    setRolePermMap(prev => {
+      const copy = deepClone(prev);
+      const roleId = selectedRole._id;
 
-      if (!newPermissions[selectedRole._id]) {
-        newPermissions[selectedRole._id] = {};
-      }
+      if (!copy[roleId]) copy[roleId] = {};
+      if (!copy[roleId][moduleId]) copy[roleId][moduleId] = {};
 
-      if (!newPermissions[selectedRole._id][moduleId]) {
-        newPermissions[selectedRole._id][moduleId] = {
+      const key = subId || '__module__';
+      if (!copy[roleId][moduleId][key]) {
+        copy[roleId][moduleId][key] = {
           canAdd: false,
           canEdit: false,
           canView: false,
@@ -141,172 +155,170 @@ const Permission = () => {
         };
       }
 
-      newPermissions[selectedRole._id][moduleId][permissionType] = value;
-
-      return newPermissions;
+      copy[roleId][moduleId][key][type] = value;
+      return copy;
     });
-  };
+  }, [selectedRole]);
 
-  // Save permissions
+  /* -------------------------- SAVE -------------------------- */
   const savePermissions = async () => {
+    if (!perm.canEdit) {
+      showToast('You do not have permission to edit', 'warning');
+      return;
+    }
+
     setSaving(true);
-    try {
-      const rolePerms = rolePermissions[selectedRole._id] || {};
+    const roleId = selectedRole._id;
+    const rolePerms = rolePermMap[roleId] || {};
+    const toCreate = [];
+    const toUpdate = [];
+    const toDelete = [];
 
-      const toCreate = [];
-      const toUpdate = [];
-      const toDelete = [];
+    Object.entries(rolePerms).forEach(([modId, modPerms]) => {
+      Object.entries(modPerms).forEach(([key, p]) => {
+        const subId = key === '__module__' ? null : key;
+        const hasAny = p.canAdd || p.canEdit || p.canView || p.canDelete || p.canViewAll;
 
-      Object.entries(rolePerms).forEach(([moduleId, perm]) => {
-        const hasAnyPermission =
-          perm.canAdd || perm.canEdit || perm.canView || perm.canDelete || perm.canViewAll;
+        const payload = {
+          canAdd: p.canAdd ? 1 : 0,
+          canEdit: p.canEdit ? 1 : 0,
+          canView: p.canView ? 1 : 0,
+          canDelete: p.canDelete ? 1 : 0,
+          canViewAll: p.canViewAll ? 1 : 0,
+        };
 
-        if (hasAnyPermission) {
-          if (perm.id) {
-            toUpdate.push({
-              id: perm.id,
-              data: {
-                canAdd: perm.canAdd ? 1 : 0,
-                canEdit: perm.canEdit ? 1 : 0,
-                canView: perm.canView ? 1 : 0,
-                canDelete: perm.canDelete ? 1 : 0,
-                canViewAll: perm.canViewAll ? 1 : 0,
-              },
-            });
-          } else {
-            toCreate.push({
-              roleId: selectedRole._id,
-              moduleId,
-              canAdd: perm.canAdd ? 1 : 0,
-              canEdit: perm.canEdit ? 1 : 0,
-              canView: perm.canView ? 1 : 0,
-              canDelete: perm.canDelete ? 1 : 0,
-              canViewAll: perm.canViewAll ? 1 : 0,
-            });
-          }
-        } else if (perm.id) {
-          toDelete.push(perm.id);
+        if (hasAny && p.id) {
+          toUpdate.push({ id: p.id, data: payload });
+        } else if (hasAny && !p.id) {
+          toCreate.push({ roleId, moduleId: modId, subModuleId: subId, ...payload });
+        } else if (!hasAny && p.id) {
+          toDelete.push(p.id);
         }
       });
+    });
 
-      await Promise.all(toDelete.map((id) => apiService.delete(`/permission/${id}`)));
-      await Promise.all(toUpdate.map(({ id, data }) => apiService.put(`/permission/${id}`, data)));
-      if (toCreate.length > 0) {
+    try {
+      // Delete first
+      if (toDelete.length) {
+        await Promise.all(toDelete.map(id => apiService.delete(`/permission/${id}`)));
+      }
+
+      // Update
+      if (toUpdate.length) {
+        await Promise.all(toUpdate.map(({ id, data }) => apiService.put(`/permission/${id}`, data)));
+      }
+
+      // Create
+      if (toCreate.length) {
         await apiService.post('/permission', toCreate);
       }
 
-      showSuccessAlert('Success', 'Permissions saved successfully');
-      closePermissionDrawer();
+      showSuccessAlert('Success', `${toCreate.length} created, ${toUpdate.length} updated, ${toDelete.length} removed`);
+      closeDrawer();
       fetchData(pagination.currentPage, pagination.itemsPerPage, filters);
-    } catch (error) {
-      showErrorAlert('Error', error.response?.data?.message || 'Failed to save permissions');
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Save failed';
+      showErrorAlert('Error', msg);
+      console.error('Save error:', err.response?.data);
     } finally {
       setSaving(false);
     }
   };
 
-  // Get permission status for a role and module
-  const getPermissionStatus = (roleId, moduleId) => {
-    if (!rolePermissions[roleId] || !rolePermissions[roleId][moduleId]) {
-      return 'No permissions';
-    }
-
-    const perms = rolePermissions[roleId][moduleId];
-    const activePerms = [];
-
-    if (perms.canView) activePerms.push('View');
-    if (perms.canAdd) activePerms.push('Add');
-    if (perms.canEdit) activePerms.push('Edit');
-    if (perms.canDelete) activePerms.push('Delete');
-    if (perms.canViewAll) activePerms.push('View All');
-
-    return activePerms.length > 0 ? activePerms.join(', ') : 'No permissions';
-  };
-
-  // Table columns
-  const columns = useMemo(
-    () => [
-      {
-        key: 'name',
-        title: 'Role Name',
-        sortable: true,
-        filterable: false,
-        render: (value) => <span className="font-medium text-gray-900">{value}</span>,
+  /* -------------------------- COLUMNS -------------------------- */
+  const columns = useMemo(() => [
+    {
+      key: 'name',
+      title: 'Role Name',
+      sortable: true,
+      render: v => <span className="font-medium text-gray-900">{v}</span>,
+    },
+    {
+      key: 'code',
+      title: 'Role Code',
+      sortable: true,
+      render: v => <Tag color="blue">{v}</Tag>,
+    },
+    {
+      key: 'description',
+      title: 'Description',
+      render: v => <span className="text-gray-900">{v || '—'}</span>,
+    },
+    {
+      key: 'permissions',
+      title: 'Permissions Summary',
+      render: (_, r) => {
+        const totalItems = modules.reduce((c, m) => c + 1 + m.subModules.length, 0);
+        const granted = Object.values(rolePermMap[r._id] || {}).reduce(
+          (c, mod) => c + Object.keys(mod).length,
+          0
+        );
+        return (
+          <div>
+            <span className="font-medium">{granted}</span> / {totalItems}
+            <br />
+            <span className="text-xs text-gray-500">
+              {granted === 0 ? 'None' : granted === totalItems ? 'All' : 'Partial'}
+            </span>
+          </div>
+        );
       },
-      {
-        key: 'code',
-        title: 'Role Code',
-        sortable: true,
-        filterable: false,
-        render: (value) => <Tag color="blue">{value}</Tag>,
-      },
-      {
-        key: 'description',
-        title: 'Description',
-        render: (value) => <span className="text-gray-900">{value || 'No description'}</span>,
-      },
-      {
-        key: 'permissions',
-        title: 'Permissions Summary',
-        render: (value, record) => {
-          const moduleCount = modules.length;
-          let grantedCount = 0;
+    },
+    {
+      key: 'isActive',
+      title: 'Status',
+      sortable: true,
+      filterable: true,
+      filterKey: 'isActive',
+      filterOptions: [
+        { value: true, label: 'Active' },
+        { value: false, label: 'Inactive' },
+      ],
+      render: v => <Tag color={v ? 'green' : 'red'}>{v ? 'Active' : 'Inactive'}</Tag>,
+    },
+    {
+      key: 'actions',
+      title: 'Actions',
+      render: (_, r) => (
+        <Space>
+          <Tooltip title="Manage Permissions">
+            <Button
+              type="link"
+              icon={<EyeOutlined />}
+              onClick={() => openDrawer(r)}
+              disabled={!perm.canView}
+            />
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ], [modules, rolePermMap, perm.canView]);
 
-          if (rolePermissions[record._id]) {
-            grantedCount = Object.keys(rolePermissions[record._id]).length;
-          }
+  /* -------------------------- RENDER -------------------------- */
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
-          return (
-            <div>
-              <span className="font-medium">{grantedCount}</span> of {moduleCount} modules
-              <br />
-              <span className="text-gray-500 text-xs">
-                {grantedCount > 0 ? 'Some permissions granted' : 'No permissions set'}
-              </span>
-            </div>
-          );
-        },
-      },
-      {
-        key: 'isActive',
-        title: 'Status',
-        sortable: true,
-        filterable: true,
-        filterKey: 'isActive',
-        filterOptions: [
-          { value: true, label: 'Active' },
-          { value: false, label: 'Inactive' },
-        ],
-        render: (value) => (
-          <Tag color={value ? 'green' : 'red'}>{value ? 'Active' : 'Inactive'}</Tag>
-        ),
-      },
-      {
-        key: 'actions',
-        title: 'Actions',
-        render: (value, record) => (
-          <Space size="small">
-            <Tooltip title="Manage Permissions">
-              <Button
-                type="link"
-                icon={<EyeOutlined />}
-                onClick={() => openPermissionDrawer(record)}
-              />
-            </Tooltip>
-          </Space>
-        ),
-      },
-    ],
-    [modules.length, rolePermissions]
-  );
+  if (!perm.canView) {
+    return (
+      <div className="p-8 text-center">
+        <Typography.Title level={4} type="secondary">
+          You do not have permission to view Role Permissions.
+        </Typography.Title>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen p-4 bg-gray-50">
       <div className="flex justify-between items-center mb-6">
         <Typography.Title level={3} style={{ margin: 0, color: '#1f2937' }}>
           Role Permissions Management
         </Typography.Title>
-       
       </div>
 
       <CustomTable
@@ -330,74 +342,98 @@ const Permission = () => {
           </div>
         }
         placement="right"
-        onClose={closePermissionDrawer}
-        open={isPermissionDrawerOpen}
+        onClose={closeDrawer}
+        open={drawerOpen}
         closeIcon={<CloseOutlined />}
-        width={800}
+        width={960}
         destroyOnClose
         maskClosable={false}
       >
-        <div className="mt-4">
-          {selectedRole && (
-            <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-              {modules.map((module) => {
-                const modulePerms = rolePermissions[selectedRole._id]?.[module._id] || {
-                  canAdd: false,
-                  canEdit: false,
-                  canView: false,
-                  canDelete: false,
-                  canViewAll: false,
-                };
+        {selectedRole && (
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            {modules.map(mod => {
+              const modPerms = rolePermMap[selectedRole._id]?.[mod._id] || {};
+              const permTypes = ['canView', 'canAdd', 'canEdit', 'canDelete', 'canViewAll'];
 
-                return (
-                  <Card key={module._id} style={{ borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                    <Typography.Title level={5}>{module.name}</Typography.Title>
-                    <Typography.Text type="secondary">{module.description}</Typography.Text>
-                    <div className="mt-4 grid grid-cols-3 gap-4">
-                      <Form.Item label="Can View">
-                        <Switch
-                          checked={modulePerms.canView}
-                          onChange={(checked) => handlePermissionChange(module._id, 'canView', checked)}
-                        />
-                      </Form.Item>
-                      <Form.Item label="Can Add">
-                        <Switch
-                          checked={modulePerms.canAdd}
-                          onChange={(checked) => handlePermissionChange(module._id, 'canAdd', checked)}
-                        />
-                      </Form.Item>
-                      <Form.Item label="Can Edit">
-                        <Switch
-                          checked={modulePerms.canEdit}
-                          onChange={(checked) => handlePermissionChange(module._id, 'canEdit', checked)}
-                        />
-                      </Form.Item>
-                      <Form.Item label="Can Delete">
-                        <Switch
-                          checked={modulePerms.canDelete}
-                          onChange={(checked) => handlePermissionChange(module._id, 'canDelete', checked)}
-                        />
-                      </Form.Item>
-                      <Form.Item label="Can View All">
-                        <Switch
-                          checked={modulePerms.canViewAll}
-                          onChange={(checked) => handlePermissionChange(module._id, 'canViewAll', checked)}
-                        />
-                      </Form.Item>
+              return (
+                <Card
+                  key={mod._id}
+                  title={
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{mod.name}</span>
+                      {mod.description && (
+                        <Typography.Text type="secondary" className="text-sm">
+                          – {mod.description}
+                        </Typography.Text>
+                      )}
                     </div>
-                  </Card>
-                );
-              })}
-            </Space>
-          )}
-        </div>
-        <div className="mt-6 flex justify-end gap-2">
-          <Button onClick={closePermissionDrawer}>Cancel</Button>
+                  }
+                  style={{ borderRadius: 12 }}
+                  bodyStyle={{ padding: mod.subModules.length ? '16px' : '24px' }}
+                >
+                  {mod.subModules.length === 0 ? (
+                    <div className="grid grid-cols-3 gap-6">
+                      {permTypes.map(type => {
+                        const p = modPerms['__module__'] || {};
+                        const checked = !!p[type];
+                        const label = type.replace('can', 'Can ').replace('All', ' All');
+
+                        return (
+                          <Form.Item key={type} label={label} className="mb-0">
+                            <Switch
+                              checked={checked}
+                              onChange={c => updatePerm(mod._id, null, type, c)}
+                              disabled={!perm.canEdit}
+                            />
+                          </Form.Item>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    mod.subModules.map(sub => {
+                      const p = modPerms[sub._id] || {};
+                      return (
+                        <div key={sub._id} className="mb-8 last:mb-0">
+                          <Divider orientation="left" className="mb-4">
+                            <span className="text-sm font-semibold text-gray-700">{sub.name}</span>
+                          </Divider>
+                          <div className="grid grid-cols-3 gap-6">
+                            {permTypes.map(type => {
+                              const checked = !!p[type];
+                              const label = type.replace('can', 'Can ').replace('All', ' All');
+
+                              return (
+                                <Form.Item key={type} label={label} className="mb-0">
+                                  <Switch
+                                    checked={checked}
+                                    onChange={c => updatePerm(mod._id, sub._id, type, c)}
+                                    disabled={!perm.canEdit}
+                                  />
+                                </Form.Item>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </Card>
+              );
+            })}
+          </Space>
+        )}
+
+        <div className="mt-8 flex justify-end gap-3 sticky bottom-0 bg-white p-4 border-t">
+          <Button onClick={closeDrawer} size="large">
+            Cancel
+          </Button>
           <Button
             type="primary"
             icon={<SaveOutlined />}
             onClick={savePermissions}
             loading={saving}
+            disabled={!perm.canEdit}
+            size="large"
           >
             Save Permissions
           </Button>

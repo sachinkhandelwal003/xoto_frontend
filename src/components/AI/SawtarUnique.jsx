@@ -5,34 +5,34 @@ import { motion } from 'framer-motion';
 const SawtarUnique = () => {
   const features = [
     { 
-      icon: <FaCogs className="text-[#D26C44]" size={50} />, 
+      icon: <FaCogs className="text-[var(--color-text-white)]" size={50} />, 
       title: "AI-Powered Interior Modeling", 
       subtitle: "Visualize any space in 3D instantly with our advanced AI technology" 
     },
     { 
-      icon: <FaLightbulb className="text-[#D26C44]" size={50} />, 
+      icon: <FaLightbulb className="text-[var(--color-text-white)]" size={50} />, 
       title: "Smart Suggestions", 
       subtitle: "Get personalized design ideas tailored to your taste via AI" 
     },
     { 
-      icon: <FaShoppingCart className="text-[#D26C44]" size={50} />, 
+      icon: <FaShoppingCart className="text-[var(--color-text-white)]" size={50} />, 
       title: "Integrated E-commerce", 
       subtitle: "Seamlessly buy products as you design your perfect space" 
     },
     { 
-      icon: <FaBalanceScale className="text-[#D26C44]" size={50} />, 
+      icon: <FaBalanceScale className="text-[var(--color-text-white)]" size={50} />, 
       title: "Pre-Purchase Comparison", 
       subtitle: "Compare products, prices and styles with ease" 
     },
     { 
-      icon: <FaComments className="text-[#D26C44]" size={50} />, 
+      icon: <FaComments className="text-[var(--color-text-white)]" size={50} />, 
       title: "Live Consultation", 
       subtitle: "Chat with design experts for instant professional help" 
     },
   ];
 
   return (
-    <section className="bg-[#1A132F] text-[#F7F1E5] py-20 px-4">
+    <section className=" bg-[var(--color-text-primary)] text-[#F7F1E5] py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -42,7 +42,7 @@ const SawtarUnique = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            What Makes <span className="text-[#D26C44]">Sawtar</span> Unique
+            What Makes <span className="text-[var(--color-text-green)]">Sawtar</span> Unique
           </h2>
           <p className="text-lg max-w-3xl mx-auto text-[#F7F1E5]/90">
             Revolutionizing interior design with cutting-edge technology and seamless shopping experience
@@ -58,14 +58,15 @@ const SawtarUnique = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               whileHover={{ y: -5 }}
-              className="bg-[#2A1B3D]/50 p-6 rounded-xl border border-[#3E2A5D] hover:border-[#D26C44]/50 transition-all"
+              className="bg-white p-6 rounded-xl  hover:border-white/50 transition-all"
             >
               <div className="flex flex-col items-center text-center h-full">
-                <div className="w-20 h-20 rounded-full bg-[#2A1B3D] flex items-center justify-center mb-5">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-[#F7F1E5]/80 text-sm flex-grow">
+               <div className="w-20 h-20 rounded-full bg-[var(--color-green)] flex items-center justify-center mb-5 ">
+  {feature.icon}
+</div>
+
+                <h3 className="text-xl font-semibold mb-2 text-[var(--color-text-dark)]">{feature.title}</h3>
+                <p className="text-[var(--color-text-dark)]/80 text-sm flex-grow">
                   {feature.subtitle}
                 </p>
               </div>

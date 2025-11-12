@@ -93,11 +93,8 @@ const ProductReview = () => {
           setProduct(response.products[0]);
         } else {
           showToast('Product not found', 'error');
-          navigate('/sawtar/cms/vendor/b2c/product-requests');
         }
       } catch (error) {
-        showToast(error.response?.data?.message || 'Failed to fetch product', 'error');
-        navigate('/sawtar/cms/vendor/b2c/product-requests');
       } finally {
         setLoading(false);
       }
@@ -119,7 +116,6 @@ const ProductReview = () => {
       // Use the verify-all endpoint
       await apiService.put(`/products/${productId}/verify-all`, data);
       showToast(`Product ${newStatus} successfully`, 'success');
-      navigate('/sawtar/cms/vendor/b2c/product-requests');
     } catch (error) {
       showToast(error.response?.data?.message || `Failed to ${newStatus} product`, 'error');
     } finally {
@@ -238,7 +234,7 @@ const ProductReview = () => {
           <Button
             type="primary"
             className="mt-4"
-            onClick={() => navigate('/sawtar/cms/vendor/b2c/product-requests')}
+            onClick={() => navigate(-1)}
           >
             Back to Product Requests
           </Button>

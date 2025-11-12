@@ -5,6 +5,7 @@ import { FiUser } from "react-icons/fi";  // ✅ Correct package
 import { TbEye } from "react-icons/tb";
 import { BsTruck } from "react-icons/bs";
 import { CiShoppingCart } from "react-icons/ci";
+import logoNew from "../../assets/img/logoNew.png";
 
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -257,21 +258,28 @@ const EcommerceNavbar = () => {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Left: Logo and Mobile Menu */}
-          <div className="flex items-center">
-            <button
-              className="md:hidden p-2 rounded-md text-gray-700 hover:text-[#D26C44]"
-              onClick={() => setIsMobileOpen(!isMobileOpen)}
-              aria-label={isMobileOpen ? "Close menu" : "Open menu"}
-            >
-              {isMobileOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
-            </button>
-            <Link
-              to="/sawtar"
-              className="ml-2 md:ml-0 text-xl font-bold text-gray-800 flex items-center"
-            >
-              <span>SAWTAR</span>
-            </Link>
-          </div>
+       <div className="flex items-center">
+  {/* Mobile menu button */}
+  <button
+    className="md:hidden p-2 rounded-md text-gray-700 hover:text-[#D26C44]"
+    onClick={() => setIsMobileOpen(!isMobileOpen)}
+    aria-label={isMobileOpen ? "Close menu" : "Open menu"}
+  >
+    {isMobileOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+  </button>
+
+  {/* Logo (replaces "SAWTAR" text) */}
+  <Link
+    to="/sawtar"
+    className="ml-2 md:ml-0 flex items-center"
+  >
+    <img
+      src={logoNew}
+      alt="Logo"
+      className="h-10 w-auto object-contain"
+    />
+  </Link>
+</div>
 
           {/* Center: Search Bar (Desktop) */}
           <div className="hidden md:flex flex-1 max-w-2xl mx-8">
@@ -361,7 +369,7 @@ const EcommerceNavbar = () => {
             </Link>
             <button
               onClick={handleOpen}
-              className="p-2 text-[#D26C44] border border-[#D26C44] rounded-md flex items-center space-x-2 hover:bg-[#D26C44]/10 transition-colors"
+              className="p-2 text-[var(--color-text-secondary)] border   border-[var(--color-text-secondary)] rounded-md flex items-center space-x-2 hover:bg-[#D26C44]/10 transition-colors"
               aria-label="AI View Design"
             >
               <TbEye size={16} />

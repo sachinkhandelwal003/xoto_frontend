@@ -133,7 +133,7 @@ const FreelancerNavbar = () => {
             }}
             onClick={() => navigate("/sawtar/")}
           >
-            SAWTAR
+            XOTO
           </Typography>
 
           {/* Desktop Navigation */}

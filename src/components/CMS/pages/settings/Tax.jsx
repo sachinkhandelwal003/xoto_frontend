@@ -77,7 +77,6 @@ const fetchTaxes = async (page = 1, itemsPerPage = 10, filters = {}) => {
     });
   } catch (error) {
     console.error('Fetch taxes error:', error);
-    showToast(error.response?.data?.message || 'Failed to fetch taxes', 'error');
   } finally {
     setLoading(false);
   }

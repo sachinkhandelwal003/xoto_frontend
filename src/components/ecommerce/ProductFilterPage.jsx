@@ -1,15 +1,168 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Layout, Card, Spin, Alert, Image } from 'antd';
+import React, { useState, useMemo } from 'react';
+import { Layout, Card, Image, Button, Tag, Modal, Dropdown, Space, Avatar, Typography, Empty } from 'antd';
+import { VideoCameraOutlined, DownOutlined } from '@ant-design/icons';
+import bannerImage from '../../assets/img/ecommercebanner.png'; // Keep your banner or use placeholder
 import Filters from './Filters';
 import ProductGrid from './ProductGrid';
-import bannerImage from '../../assets/img/ecommercebanner.png';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../../manageApi/store/productsSlice';
 
 const { Content } = Layout;
+const { Text } = Typography;
+
+// Dummy Product Data
+const dummyProducts = [
+  {
+    _id: '1',
+    name: 'Nordic Oak Coffee Table',
+    short_description: 'Minimalist Scandinavian design with solid oak legs.',
+    pricing: {
+      sale_price: 12999,
+      mrp: 18999,
+      discount: { value: 32, type: 'percentage' },
+      currency: { symbol: '₹' },
+    },
+    color_variants: [
+      {
+        color_name: 'Natural Oak',
+        color_code: '#D4A574',
+        images: [
+          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+        ],
+      },
+    ],
+    tags: [{ _id: 't1', name: 'New' }],
+    material: { name: 'Wood' },
+    category: { name: 'Tables' },
+    brand: { name: 'Sawtar' },
+  },
+  {
+    _id: '2',
+    name: 'Velvet Accent Armchair',
+    short_description: 'Luxurious velvet upholstery with golden legs.',
+    pricing: {
+      sale_price: 24999,
+      mrp: 34999,
+      discount: { value: 29, type: 'percentage' },
+      currency: { symbol: '₹' },
+    },
+    color_variants: [
+      {
+        color_name: 'Emerald Green',
+        color_code: '#10B981',
+        images: [
+          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+        ],
+      },
+      {
+        color_name: 'Royal Blue',
+        color_code: '#3B82F6',
+        images: [
+          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+        ],
+      },
+    ],
+    tags: [{ _id: 't2', name: 'Best Seller' }],
+    material: { name: 'Fabric' },
+    category: { name: 'Chairs' },
+    brand: { name: 'Sawtar' },
+  },
+  {
+    _id: '3',
+    name: 'Marble Top Console',
+    short_description: 'Italian Carrara marble with matte black steel frame.',
+    pricing: {
+      sale_price: 35999,
+      mrp: 49999,
+      discount: { value: 28, type: 'percentage' },
+      currency: { symbol: '₹' },
+    },
+    color_variants: [
+      {
+        color_name: 'White Marble',
+        color_code: '#F3F4F6',
+        images: [
+          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+        ],
+      },
+    ],
+    tags: [{ _id: 't3', name: 'Premium' }],
+    material: { name: 'Stone' },
+    category: { name: 'Tables' },
+    brand: { name: 'Sawtar' },
+  },
+   {
+    _id: '4',
+    name: 'Marble Top Console',
+    short_description: 'Italian Carrara marble with matte black steel frame.',
+    pricing: {
+      sale_price: 35999,
+      mrp: 49999,
+      discount: { value: 28, type: 'percentage' },
+      currency: { symbol: '₹' },
+    },
+    color_variants: [
+      {
+        color_name: 'White Marble',
+        color_code: '#F3F4F6',
+        images: [
+          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+        ],
+      },
+    ],
+    tags: [{ _id: 't3', name: 'Premium' }],
+    material: { name: 'Stone' },
+    category: { name: 'Tables' },
+    brand: { name: 'Sawtar' },
+  }, {
+    _id: '5',
+    name: 'Marble Top Console',
+    short_description: 'Italian Carrara marble with matte black steel frame.',
+    pricing: {
+      sale_price: 35999,
+      mrp: 49999,
+      discount: { value: 28, type: 'percentage' },
+      currency: { symbol: '₹' },
+    },
+    color_variants: [
+      {
+        color_name: 'White Marble',
+        color_code: '#F3F4F6',
+        images: [
+          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+        ],
+      },
+    ],
+    tags: [{ _id: 't3', name: 'Premium' }],
+    material: { name: 'Stone' },
+    category: { name: 'Tables' },
+    brand: { name: 'Sawtar' },
+  }, {
+    _id: '6',
+    name: 'Marble Top Console',
+    short_description: 'Italian Carrara marble with matte black steel frame.',
+    pricing: {
+      sale_price: 35999,
+      mrp: 49999,
+      discount: { value: 28, type: 'percentage' },
+      currency: { symbol: '₹' },
+    },
+    color_variants: [
+      {
+        color_name: 'White Marble',
+        color_code: '#F3F4F6',
+        images: [
+          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+        ],
+      },
+    ],
+    tags: [{ _id: 't3', name: 'Premium' }],
+    material: { name: 'Stone' },
+    category: { name: 'Tables' },
+    brand: { name: 'Sawtar' },
+  },
+];
 
 const ProductFilterPage = () => {
-  const [priceRange, setPriceRange] = useState([0, 5000]);
+  const [priceRange, setPriceRange] = useState([0, 50000]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedStyles, setSelectedStyles] = useState([]);
@@ -26,15 +179,6 @@ const ProductFilterPage = () => {
     sort: false,
   });
 
-  const dispatch = useDispatch();
-  const { products, loading, error } = useSelector((state) => state.products);
-
-  useEffect(() => {
-    if (products.length === 0) {
-      dispatch(fetchProducts());
-    }
-  }, [dispatch, products.length]);
-
   const toggleFilter = (filterType, id) => {
     const setters = {
       category: setSelectedCategories,
@@ -42,51 +186,48 @@ const ProductFilterPage = () => {
       style: setSelectedStyles,
       material: setSelectedMaterials,
     };
-    setters[filterType]((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    const setter = setters[filterType];
+    if (setter) {
+      setter((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+    }
   };
 
   const toggleDropdown = (dropdown) => {
     setOpenDropdown((prev) => ({ ...prev, [dropdown]: !prev[dropdown] }));
   };
 
-  // Filter products based on selected filters
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const productPrice = product.pricing?.sale_price || 0;
-      const productColors = product.color_variants?.map((v) => v.color_name.toLowerCase()) || [];
-      const productCategory = product.category?.name || '';
-      const productMaterial = product.material?.name || '';
+    return dummyProducts.filter((product) => {
+      const price = product.pricing.sale_price;
+      const colors = product.color_variants.map((v) => v.color_name.toLowerCase());
+      const category = product.category.name;
+      const material = product.material.name;
 
       return (
-        (selectedCategories.length === 0 || selectedCategories.includes(productCategory)) &&
-        (selectedColors.length === 0 || selectedColors.some((color) => productColors.includes(color))) &&
-        (selectedStyles.length === 0 || selectedStyles.includes(product.style)) &&
-        (selectedMaterials.length === 0 || selectedMaterials.includes(productMaterial)) &&
-        productPrice >= priceRange[0] &&
-        productPrice <= priceRange[1]
+        (selectedCategories.length === 0 || selectedCategories.includes(category)) &&
+        (selectedColors.length === 0 || selectedColors.some((c) => colors.includes(c.toLowerCase()))) &&
+        (selectedStyles.length === 0 || selectedStyles.includes('all')) &&
+        (selectedMaterials.length === 0 || selectedMaterials.includes(material)) &&
+        price >= priceRange[0] &&
+        price <= priceRange[1]
       );
     });
-  }, [products, selectedCategories, selectedColors, selectedStyles, selectedMaterials, priceRange]);
+  }, [selectedCategories, selectedColors, selectedStyles, selectedMaterials, priceRange]);
 
-  // Sort products based on sortOption
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((a, b) => {
-      const priceA = a.pricing?.sale_price || 0;
-      const priceB = b.pricing?.sale_price || 0;
+      const priceA = a.pricing.sale_price;
+      const priceB = b.pricing.sale_price;
 
       switch (sortOption) {
         case 'price-low-high':
           return priceA - priceB;
         case 'price-high-low':
           return priceB - priceA;
-        case 'rating':
-          return (b.rating || 0) - (a.rating || 0);
         case 'newest':
-          return new Date(b.createdAt) - new Date(a.createdAt);
+          return b._id - a._id;
         default:
-          return (b.reviewCount || 0) - (a.reviewCount || 0);
+          return 0;
       }
     });
   }, [filteredProducts, sortOption]);
@@ -96,73 +237,38 @@ const ProductFilterPage = () => {
     setSelectedColors([]);
     setSelectedStyles([]);
     setSelectedMaterials([]);
-    setPriceRange([0, 5000]);
+    setPriceRange([0, 50000]);
   };
-
-  if (loading && products.length === 0) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   return (
     <Layout style={{ background: 'white', minHeight: '100vh' }}>
       <Content style={{ padding: '0 50px' }}>
-        {error && (
-          <Alert
-            message={error}
-            type="warning"
-            showIcon
-            closable
-            style={{ margin: '16px 0' }}
-          />
-        )}
-
-        {/* Banner Section */}
+        {/* Banner */}
         <Card
-          style={{
-            margin: '16px 0',
-            borderRadius: 12,
-            border: '1px solid #f0f0f0',
-            overflow: 'hidden',
-          }}
+          style={{ margin: '16px 0', borderRadius: 12, overflow: 'hidden' }}
           bodyStyle={{ padding: 0 }}
         >
-          <div style={{ position: 'relative', height: 200, background: '#fafafa' }}>
+          <div style={{ position: 'relative', height: 200 }}>
             <Image
-              src={bannerImage}
-              alt="Filter Banner"
+              src={bannerImage || 'https://images.unsplash.com/photo-1618221195710-dd030f2a2f1b?w=1600'}
+              alt="Banner"
               preview={false}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                opacity: 0.7,
-              }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }}
             />
             <div
               style={{
                 position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
+                inset: 0,
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 textAlign: 'center',
+                color: 'white',
               }}
             >
-              <div>
-                <h2 style={{ fontSize: 28, fontWeight: 600, color: '#1f2937', marginBottom: 8 }}>
-                  Discover Your Perfect Style
-                </h2>
-                <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>
-                  Use our filters to find the ideal pieces for your home
-                </p>
-              </div>
+              <h2 style={{ fontSize: 32, fontWeight: 700, margin: 0 }}>Discover Your Style</h2>
+              <p style={{ fontSize: 16, margin: '8px 0 0' }}>Curated furniture for modern homes</p>
             </div>
           </div>
         </Card>

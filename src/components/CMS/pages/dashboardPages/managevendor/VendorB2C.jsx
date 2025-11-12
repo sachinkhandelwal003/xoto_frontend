@@ -155,37 +155,21 @@ const VendorB2C = () => {
 
   // Table columns for B2C vendors
   const vendorColumns = [
-    {
-      key: 'email',
-      title: 'Email',
-      sortable: true,
-      filterable: true,
-      render: (value) => <span className="text-gray-900">{value || '--'}</span>,
-    },
-    {
-      key: 'store_details.store_name',
-      title: 'Store Name',
-      sortable: true,
-      filterable: true,
-      render: (value, item) => (
-        <div>
-          <div className="font-medium text-gray-900">{item.store_details?.store_name || '--'}</div>
-          {item.full_name && (
-            <div className="text-xs text-gray-500">Owner: {item.full_name}</div>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'store_details.store_type',
-      title: 'Store Type',
-      sortable: true,
-      render: (value, item) => (
-        <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800">
-          {item.store_details?.store_type || '--'}
-        </span>
-      ),
-    },
+   {
+  key: 'email',
+  title: 'Name',
+  sortable: true,
+  filterable: true,
+  render: (value, record) => (
+    <div className="flex flex-col">
+      <span className="text-gray-900 font-medium">{record.full_name || '--'}</span>
+      <span className="text-gray-500 text-sm">{record.email || '--'}</span>
+    </div>
+  ),
+},
+
+ 
+    
     {
       key: 'mobile',
       title: 'Mobile',
@@ -199,70 +183,8 @@ const VendorB2C = () => {
         </div>
       ),
     },
-    {
-      key: 'registration.gstin',
-      title: 'GSTIN',
-      sortable: true,
-      render: (value, item) => <span className="text-gray-900">{item.registration?.gstin || '--'}</span>,
-    },
-    {
-      key: 'registration.pan_number',
-      title: 'PAN Number',
-      sortable: true,
-      render: (value, item) => <span className="text-gray-900">{item.registration?.pan_number || '--'}</span>,
-    },
-    {
-      key: 'store_details.categories',
-      title: 'Categories & Subcategories',
-      sortable: false,
-      render: (value, item) => {
-        const categories = item.store_details?.categories || [];
-        
-        if (categories.length === 0) {
-          return '--';
-        }
-        
-        return (
-          <div className="space-y-2">
-            {categories.map((category, index) => {
-              const key = `${item._id}-${index}`;
-              const isExpanded = expandedCategories[key];
-              const sub_categories = category.sub_categories || [];
-              
-              return (
-                <div key={key} className="border rounded-md p-2">
-                  <div 
-                    className="flex justify-between items-center cursor-pointer"
-                    onClick={() => toggleCategoryExpansion(item._id, index)}
-                  >
-                    <span className="font-medium text-sm">{category.name}</span>
-                    {sub_categories.length > 0 && (
-                      isExpanded ? <FiChevronUp /> : <FiChevronDown />
-                    )}
-                  </div>
-                  
-                  {isExpanded && sub_categories.length > 0 && (
-                    <div className="mt-2 pl-2 border-t pt-2">
-                      <div className="text-xs font-semibold text-gray-500 mb-1">Subcategories:</div>
-                      <div className="flex flex-wrap gap-1">
-                        {sub_categories.map((subcategory, subIndex) => (
-                          <span
-                            key={subIndex}
-                            className="px-2 py-1 text-xs rounded bg-gray-100 text-gray-800"
-                          >
-                            {subcategory}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        );
-      },
-    },
+   
+
     {
       key: 'status_info.status',
       title: 'Status',
@@ -306,7 +228,7 @@ const VendorB2C = () => {
       render: (value, item) => (
         <div className="flex space-x-2">
           <Link
-            to={`/sawtar/cms/vendors/b2c/${item._id}`}
+            to={`/sawtar/dashboard/superadmin/seller/${item._id}`}
             className="text-blue-600 hover:text-blue-800 p-1 rounded"
             title="View Details"
           >

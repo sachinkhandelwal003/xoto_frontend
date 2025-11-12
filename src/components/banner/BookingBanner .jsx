@@ -44,7 +44,7 @@ const ConsultationSection = () => {
         {/* Book a Consultation Card */}
         <motion.div
           whileHover={{ scale: 1.03 }}
-          className="bg-white shadow-lg rounded-xl p-4 transition-all border border-orange-200 flex flex-col h-full"
+className="bg-white shadow-lg rounded-xl p-4 transition-all border border-[var(--color-text-green)] flex flex-col h-full"
         >
           <div className="flex flex-col items-center text-center mb-4">
             <img
@@ -52,7 +52,7 @@ const ConsultationSection = () => {
               alt="Consultation"
               className="w-16 h-16 object-contain mb-3"
             />
-            <h3 className="text-xl font-semibold mb-2 text-[#BA5933]">Book a Consultation</h3>
+            <h3 className="text-xl font-semibold mb-2 text-[var(--color-text-dark)]">Book a Consultation</h3>
             <p className="text-sm text-gray-600 mb-4">Schedule a one-on-one session for users, customers, B2B or B2C support.</p>
           </div>
           <button
@@ -60,7 +60,9 @@ const ConsultationSection = () => {
               setServiceType("User Consultation");
               setIsOpen(true);
             }}
-            className="mt-auto bg-[#D26C44] hover:bg-[#ba5933] text-white px-4 py-2 rounded-full font-medium text-sm shadow mx-auto"
+            className="mt-auto text-white px-4 py-2 rounded-full font-medium text-sm shadow mx-auto" style={{
+    background: 'linear-gradient(90deg, var(--color-text-primary), var(--color-text-green))',
+  }}
           >
             Book Now
           </button>
@@ -77,7 +79,7 @@ const ConsultationSection = () => {
               alt="Interior Design"
               className="w-16 h-16 object-contain mb-3"
             />
-            <h3 className="text-xl font-semibold mb-2 text-[#BA5933]">Live Interior Design</h3>
+            <h3 className="text-xl font-semibold mb-2 text-[var(--color-text-dark)]">Live Interior Design</h3>
             <p className="text-sm text-gray-600 mb-4">Connect with an expert interior designer in real-time and transform your space.</p>
           </div>
           <button
@@ -86,7 +88,9 @@ const ConsultationSection = () => {
               setIsOpen(true);
             }}
             className="mt-auto bg-[#D26C44] hover:bg-[#ba5933] text-white px-4 py-2 rounded-full font-medium text-sm shadow mx-auto"
-          >
+          style={{
+    background: 'linear-gradient(90deg, var(--color-text-primary), var(--color-text-green))',
+  }}>
             Start Live Consultation
           </button>
         </motion.div>
@@ -102,7 +106,7 @@ const ConsultationSection = () => {
               alt="Product Help"
               className="w-16 h-16 object-contain mb-3"
             />
-            <h3 className="text-xl font-semibold mb-2 text-[#BA5933]">B2B & B2C Product Help</h3>
+            <h3 className="text-xl font-semibold mb-2 text-[var(--color-text-dark)]">B2B & B2C Product Help</h3>
             <p className="text-sm text-gray-600 mb-4">Get real-time product support and service for your business or consumer needs.</p>
           </div>
           <button
@@ -111,7 +115,9 @@ const ConsultationSection = () => {
               setIsOpen(true);
             }}
             className="mt-auto bg-[#D26C44] hover:bg-[#ba5933] text-white px-4 py-2 rounded-full font-medium text-sm shadow mx-auto"
-          >
+          style={{
+    background: 'linear-gradient(90deg, var(--color-text-primary), var(--color-text-green))',
+  }}>
             Get Help Now
           </button>
         </motion.div>

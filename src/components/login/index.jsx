@@ -1,4 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
+// src/pages/auth/Login.jsx
+import React, { useState, useEffect, useContext } from "react";
 import {
   TextField,
   Button,
@@ -17,120 +18,102 @@ import {
   Step,
   StepLabel,
   Alert,
-  CircularProgress,
   IconButton,
   InputAdornment,
-} from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../manageApi/context/AuthContext.jsx';
-import loginimage from '../../assets/img/homepage.png';
+  CircularProgress,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../manageApi/context/AuthContext.jsx";
+import loginimage from "../../assets/img/one.png";
+import logoNew from "../../assets/img/logoNew.png";
+import { toast } from "react-toastify";
 
 const Login = () => {
-  const [activeTab, setActiveTab] = useState('login');
+  const [activeTab, setActiveTab] = useState("login");
   const [activeStep, setActiveStep] = useState(0);
-  const [userType, setUserType] = useState('');
-  const [vendorType, setVendorType] = useState('');
+  const [userType, setUserType] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    dateOfBirth: '',
-    mobileNumber: '',
+    email: "",
+    password: "",
     rememberMe: false,
   });
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState('');
-  const { user, token, loading, login, register } = useContext(AuthContext);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const {
+    user,
+    token,
+    loading,
+    error: authError,
+    login,
+    isAuthenticated,
+  } = useContext(AuthContext);
   const navigate = useNavigate();
 
-// Redirect based on role after login
-useEffect(() => {
-  if (user && token) {
-    const roleCode = user.role?.code;
-    switch (roleCode) {
-      case '3': // Employee
-        navigate('/sawtar/cms/employee/dashboard');
-        break;
-      case '2': // Customer
-        navigate('/sawtar/');
-        break;
-      case '6': // Vendor B2B
-        navigate('/sawtar/cms/seller/b2b/dashboard');
-        break;
-      case '5': // Vendor B2C
-        navigate('/sawtar/cms/seller/b2c/dashboard');
-        break;
-      case '8': // Business
-        navigate('/sawtar/cms/business/dashboard');
-        break;
-      case '7': // Freelancer
-        navigate('/sawtar/cms/freelancer/dashboard');
-        break;
-      default:
-        // do nothing if role is missing or not mapped
-        break;
+  // === REDIRECT AFTER SUCCESSFUL LOGIN ===
+  useEffect(() => {
+    if (isAuthenticated && user && token) {
+      const roleCode = user?.role?.code?.toString();
+      const rolePathMap = {
+        0: "/sawtar/dashboard/superadmin",
+        1: "/sawtar/dashboard/admin",
+        5: "/sawtar/dashboard/vendor-b2c",
+        6: "/sawtar/dashboard/vendor-b2b",
+        7: "/sawtar/dashboard/freelancer",
+      };
+      const redirectPath = rolePathMap[roleCode] || "/sawtar/";
+      toast.success(`Welcome ${user?.role?.name || "User"}!`);
+      navigate(redirectPath, { replace: true });
     }
-  }
-}, [user, token, navigate]);
+  }, [isAuthenticated, user, token, navigate]);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     setActiveStep(0);
-    setUserType('');
-    setVendorType('');
+    setUserType("");
     setErrors({});
-    setSuccessMessage('');
+    setSuccessMessage("");
     setShowPassword(false);
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      dateOfBirth: '',
-      mobileNumber: '',
-      rememberMe: false,
-    });
+    setFormData({ email: "", password: "", rememberMe: false });
   };
 
   const handleNext = () => {
     if (!userType) {
-      setErrors({ general: 'Please select an account type' });
+      setErrors({ general: "Please select an account type" });
       return;
     }
-    if (userType === 'vendor' && !vendorType) {
-      setErrors({ general: 'Please select a vendor type (B2B or B2C)' });
+
+    // Freelancer → redirect to registration
+    if (activeTab === "register" && userType === "freelancer") {
+      navigate("/sawtar/freelancer/registration");
       return;
     }
-    setActiveStep((prev) => prev + 1);
+
+    // Vendor → no registration, go to login
+    if (activeTab === "register" && userType.includes("vendor")) {
+      setActiveTab("login");
+      setActiveStep(1);
+      return;
+    }
+
+    setActiveStep(1);
     setErrors({});
   };
 
   const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
+    setActiveStep(0);
     setErrors({});
-    setSuccessMessage('');
+    setSuccessMessage("");
     setShowPassword(false);
-    if (userType === 'vendor') {
-      setVendorType('');
-    }
   };
 
   const handleUserTypeChange = (event) => {
     setUserType(event.target.value);
-    setVendorType('');
     setErrors({});
-    setSuccessMessage('');
-    setShowPassword(false);
-  };
-
-  const handleVendorTypeChange = (event) => {
-    setVendorType(event.target.value);
-    setErrors({});
-    setSuccessMessage('');
+    setSuccessMessage("");
     setShowPassword(false);
   };
 
@@ -138,74 +121,35 @@ useEffect(() => {
     const { name, value, type, checked } = event.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
-    // Clear specific field error when user types
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-    if (errors.general) {
-      setErrors((prev) => ({ ...prev, general: '' }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    if (errors.general) setErrors((prev) => ({ ...prev, general: "" }));
   };
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
-  // Validate form data
   const validateForm = () => {
     const newErrors = {};
-
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!emailRegex.test(formData.email))
+      newErrors.email = "Invalid email format";
 
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    // Registration-specific validations
-    if (activeTab === 'register') {
-      if (!formData.name) {
-        newErrors.name = 'Name is required';
-      }
-      if (!formData.confirmPassword) {
-        newErrors.confirmPassword = 'Confirm password is required';
-      } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
-      }
-      if (!formData.dateOfBirth) {
-        newErrors.dateOfBirth = 'Date of birth is required';
-      } else {
-        const dob = new Date(formData.dateOfBirth);
-        if (isNaN(dob.getTime())) {
-          newErrors.dateOfBirth = 'Invalid date of birth format';
-        } else {
-          const age = new Date().getFullYear() - dob.getFullYear();
-          if (age < 18) {
-            newErrors.dateOfBirth = 'You must be at least 18 years old';
-          }
-        }
-      }
-    }
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
 
     return newErrors;
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setErrors({});
-    setSuccessMessage('');
+    setSuccessMessage("");
 
-    // Validate form
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
@@ -213,198 +157,135 @@ useEffect(() => {
     }
 
     try {
-      if (activeTab === 'login') {
-        // Handle login
-        const { email, password } = formData;
+      let loginEndpoint = "";
 
-        // Determine login endpoint based on user type
-        let loginEndpoint;
-        switch (userType) {
-          case 'customer':
-            loginEndpoint = 'http://localhost:5000/api/customer/login';
-            break;
-          case 'employee':
-            loginEndpoint = '/api/auth/employee/login';
-            break;
-          case 'vendor':
-            loginEndpoint = vendorType === 'b2b' ? '/api/vendor/b2b/login' : '/api/vendor/b2c/login';
-            break;
-          case 'business':
-            loginEndpoint = '/api/business/login';
-            break;
-          case 'freelancer':
-            loginEndpoint = '/api/freelancer/login';
-            break;
-          default:
-            throw new Error('Invalid account type');
-        }
-
-        const response = await login(email, password, loginEndpoint);
-
-        if (!response.success) {
-          if (response.errors && Array.isArray(response.errors)) {
-            const fieldErrors = {};
-            response.errors.forEach((error) => {
-              fieldErrors[error.field] = error.message;
-            });
-            setErrors(fieldErrors);
-          } else {
-            setErrors({ general: response.message || 'Login failed' });
-          }
-          return;
-        }
-
-        setSuccessMessage(response.message || 'Login successful!');
+      // Dynamic API based on userType
+      if (userType === "freelancer") {
+        loginEndpoint = "/api/freelancer/login";
+      } else if (userType === "vendor-b2c") {
+        loginEndpoint = "/api/vendor/b2c/login";
+      } else if (userType === "vendor-b2b") {
+        loginEndpoint = "/api/vendor/b2b/login";
       } else {
-        // Handle registration (only for customers)
-        if (userType !== 'customer') {
-          setErrors({ general: 'Only customer registration is available at this time' });
-          return;
-        }
-
-        const { name, email, password, confirmPassword, dateOfBirth } = formData;
-
-        // Prepare registration data
-        const registrationData = {
-          name,
-          email: email.toLowerCase().trim(),
-          password,
-          confirmPassword,
-          date_of_birth: dateOfBirth,
-          agreed_to_terms: true, // Required by backend
-        };
-
-        const response = await register(registrationData, 'http://localhost:5000/api/customer/');
-
-        if (!response.success) {
-          if (response.errors && Array.isArray(response.errors)) {
-            const fieldErrors = {};
-            response.errors.forEach((error) => {
-              fieldErrors[error.field] = error.message;
-            });
-            setErrors(fieldErrors);
-          } else {
-            setErrors({ general: response.message || 'Registration failed' });
-          }
-          return;
-        }
-
-        setSuccessMessage(response.message || 'Registration successful!');
-
-        // Auto-login after successful registration
-        setTimeout(async () => {
-          try {
-            const loginResponse = await login(email, password, 'http://localhost:5000/api/customer/login');
-            if (!loginResponse.success) {
-              setErrors({ general: 'Registration successful! Please login manually.' });
-            }
-          } catch (loginError) {
-            setErrors({ general: 'Registration successful! Please login manually.' });
-          }
-        }, 1000);
+        loginEndpoint = "/api/auth/login";
       }
-    } catch (err) {
-      setErrors({ general: err.message || 'An error occurred. Please try again.' });
+
+      const response = await login(formData.email, formData.password, loginEndpoint);
+
+      if (response?.success) {
+        setSuccessMessage(`Welcome! Redirecting...`);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrors({ general: error.message || "Login failed. Please try again." });
     }
   };
 
-  const renderError = (fieldName) => {
-    return errors[fieldName] ? (
-      <Typography color="error" variant="caption" sx={{ mt: 1, display: 'block' }}>
-        {errors[fieldName]}
-      </Typography>
-    ) : null;
+  const steps = ["Select Account Type", "Login"];
+
+  const inputSx = (field) => ({
+    "& .MuiInputBase-root": {
+      backgroundColor: "#e5e7eb",
+      color: "#374151",
+      borderRadius: "4px",
+      border: errors[field] ? "1px solid #ef4444" : "1px solid #e5e7eb",
+      padding: "0.75rem 1rem",
+      "&:focus-within": { backgroundColor: "#fff", borderColor: "#6b7280" },
+    },
+    "& .MuiInputBase-input": { padding: "0.75rem 0" },
+    "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+  });
+
+  const buttonSx = {
+    backgroundColor: "#1976D2",
+    color: "#fff",
+    fontWeight: "bold",
+    textTransform: "none",
+    padding: "0.5rem 1rem",
+    borderRadius: "4px",
+    "&:hover": { backgroundColor: "#1565C0" },
+    "&:disabled": { backgroundColor: "#9ca3af" },
   };
 
-  const steps = ['Select Account Type', activeTab === 'login' ? 'Login' : 'Register'];
+  const outlineButtonSx = {
+    borderColor: "#1976D2",
+    color: "#1976D2",
+    fontWeight: "bold",
+    textTransform: "none",
+    padding: "0.5rem 1rem",
+    borderRadius: "4px",
+    "&:hover": { backgroundColor: "rgba(25, 118, 210, 0.08)", borderColor: "#1565C0" },
+  };
 
   return (
     <Box
       sx={{
-        display: 'flex',
-        minHeight: '100vh',
+        display: "flex",
+        minHeight: "100vh",
         backgroundImage: `url(${loginimage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        flexDirection: { xs: 'column', md: 'row' },
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        flexDirection: { xs: "column", md: "row" },
       }}
     >
+      {/* Left Side */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 1 }}
         style={{
-          flex: '1',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '2rem',
-          color: '#fff',
-          textAlign: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(4px)',
+          flex: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "2rem",
+          color: "#fff",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          backdropFilter: "blur(4px)",
         }}
       >
-        <Box>
-          <Typography
-            variant="h3"
-            component="h1"
-            gutterBottom
-            sx={{ fontWeight: 'bold', fontSize: { xs: '2rem', md: '3rem' } }}
-          >
-            {activeTab === 'login' ? 'Welcome Back!' : 'Join Us!'}
+        <Box textAlign="center">
+          <Typography variant="h3" fontWeight="bold" sx={{ mb: 2 }}>
+            {activeTab === "login" ? "Welcome Back!" : "Join Us!"}
           </Typography>
-          <Typography
-            variant="h6"
-            sx={{ mt: 2, fontSize: { xs: '1rem', md: '1.25rem' } }}
-          >
+          <Typography variant="h6" sx={{ mb: 3 }}>
             {activeStep === 0
-              ? 'Select your account type to continue'
-              : activeTab === 'login'
-              ? userType === 'customer'
-                ? 'Customer Portal - Manage your account'
-                : userType === 'employee'
-                ? 'Employee Portal - Access your dashboard'
-                : userType === 'business'
-                ? 'Business Portal - Manage your business account'
-                : userType === 'freelancer'
-                ? 'Freelancer Portal - Manage your freelancer account'
-                : `Vendor Portal (${vendorType?.toUpperCase()}) - Manage your vendor account`
-              : 'Customer Registration'}
+              ? "Select your account type to continue"
+              : `${userType.charAt(0).toUpperCase() + userType.slice(1).replace("-", " ")} Login`}
           </Typography>
+          {activeStep === 0 && (
+            <img
+              src={logoNew}
+              alt="App Logo"
+              style={{
+                width: "140px",
+                height: "auto",
+                marginTop: "1rem",
+                objectFit: "contain",
+                borderRadius: "12px",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+              }}
+            />
+          )}
         </Box>
       </motion.div>
 
+      {/* Right Side Form */}
       <motion.div
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 1 }}
         style={{
-          flex: '1',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '2rem',
+          flex: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "2rem",
         }}
       >
-        <Card
-          sx={{
-            width: '100%',
-            maxWidth: 500,
-            p: { xs: 3, md: 4 },
-            boxShadow: 8,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderRadius: 4,
-          }}
-        >
+        <Card sx={{ maxWidth: 500, width: "100%", p: 4, boxShadow: 8, borderRadius: 4 }}>
           <CardContent>
-            <Tabs
-              value={activeTab}
-              onChange={handleTabChange}
-              centered
-              sx={{ mb: 2 }}
-            >
+            <Tabs value={activeTab} onChange={handleTabChange} centered sx={{ mb: 2 }}>
               <Tab label="Login" value="login" />
               <Tab label="Register" value="register" />
             </Tabs>
@@ -417,375 +298,113 @@ useEffect(() => {
               ))}
             </Stepper>
 
-            {errors.general && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {errors.general}
-              </Alert>
-            )}
+            {errors.general && <Alert severity="error" sx={{ mb: 2 }}>{errors.general}</Alert>}
+            {authError && <Alert severity="error" sx={{ mb: 2 }}>{authError}</Alert>}
+            {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
+            {loading && <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}><CircularProgress sx={{ color: "#1976D2" }} /></Box>}
 
-            {successMessage && (
-              <Alert severity="success" sx={{ mb: 2 }}>
-                {successMessage}
-              </Alert>
-            )}
-
-            {loading && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <CircularProgress />
-              </Box>
-            )}
-
+            {/* === STEP 0: Select Account Type === */}
             {activeStep === 0 ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Typography variant="h5" component="h2" gutterBottom align="center">
-                  Select Your Account Type
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Typography variant="h5" align="center" gutterBottom>
+                  Select Account Type
                 </Typography>
-                <RadioGroup
-                  name="account-type"
-                  value={userType}
-                  onChange={handleUserTypeChange}
-                  sx={{ gap: 2, mt: 3 }}
-                >
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      borderColor: userType === 'employee' ? 'primary.main' : 'divider',
-                      backgroundColor: userType === 'employee' ? 'rgba(25, 118, 210, 0.08)' : 'background.paper',
-                    }}
-                  >
-                    <FormControlLabel
-                      value="employee"
-                      control={<Radio color="primary" />}
-                      label={
-                        <Box sx={{ ml: 1 }}>
-                          <Typography variant="subtitle1">Employee</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Regular staff members
-                          </Typography>
-                        </Box>
-                      }
-                      sx={{ width: '100%', m: 0 }}
-                    />
-                  </Card>
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      borderColor: userType === 'customer' ? 'primary.main' : 'divider',
-                      backgroundColor: userType === 'customer' ? 'rgba(25, 118, 210, 0.08)' : 'background.paper',
-                    }}
-                  >
-                    <FormControlLabel
-                      value="customer"
-                      control={<Radio color="primary" />}
-                      label={
-                        <Box sx={{ ml: 1 }}>
-                          <Typography variant="subtitle1">Customer</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Clients and service users
-                          </Typography>
-                        </Box>
-                      }
-                      sx={{ width: '100%', m: 0 }}
-                    />
-                  </Card>
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      borderColor: userType === 'vendor' ? 'primary.main' : 'divider',
-                      backgroundColor: userType === 'vendor' ? 'rgba(25, 118, 210, 0.08)' : 'background.paper',
-                    }}
-                  >
-                    <FormControlLabel
-                      value="vendor"
-                      control={<Radio color="primary" />}
-                      label={
-                        <Box sx={{ ml: 1 }}>
-                          <Typography variant="subtitle1">Vendor</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Manage your vendor account (B2B or B2C)
-                          </Typography>
-                        </Box>
-                      }
-                      sx={{ width: '100%', m: 0 }}
-                    />
-                    {userType === 'vendor' && (
-                      <Box sx={{ ml: 4, mt: 2 }}>
-                        <Typography variant="subtitle2" gutterBottom>
-                          Select Vendor Type:
-                        </Typography>
-                        <RadioGroup
-                          name="vendor-type"
-                          value={vendorType}
-                          onChange={handleVendorTypeChange}
-                          sx={{ gap: 1 }}
-                        >
-                          <FormControlLabel
-                            value="b2b"
-                            control={<Radio color="primary" size="small" />}
-                            label={
-                              <Typography variant="body2">B2B (Business-to-Business)</Typography>
-                            }
-                          />
-                          <FormControlLabel
-                            value="b2c"
-                            control={<Radio color="primary" size="small" />}
-                            label={
-                              <Typography variant="body2">B2C (Business-to-Consumer)</Typography>
-                            }
-                          />
-                        </RadioGroup>
-                      </Box>
-                    )}
-                  </Card>
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      borderColor: userType === 'business' ? 'primary.main' : 'divider',
-                      backgroundColor: userType === 'business' ? 'rgba(25, 118, 210, 0.08)' : 'background.paper',
-                    }}
-                  >
-                    <FormControlLabel
-                      value="business"
-                      control={<Radio color="primary" />}
-                      label={
-                        <Box sx={{ ml: 1 }}>
-                          <Typography variant="subtitle1">Business</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Manage your business account
-                          </Typography>
-                        </Box>
-                      }
-                      sx={{ width: '100%', m: 0 }}
-                    />
-                  </Card>
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      borderColor: userType === 'freelancer' ? 'primary.main' : 'divider',
-                      backgroundColor: userType === 'freelancer' ? 'rgba(25, 118, 210, 0.08)' : 'background.paper',
-                    }}
-                  >
-                    <FormControlLabel
-                      value="freelancer"
-                      control={<Radio color="primary" />}
-                      label={
-                        <Box sx={{ ml: 1 }}>
-                          <Typography variant="subtitle1">Freelancer</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Manage your freelancer account
-                          </Typography>
-                        </Box>
-                      }
-                      sx={{ width: '100%', m: 0 }}
-                    />
-                  </Card>
+
+                <RadioGroup value={userType} onChange={handleUserTypeChange} sx={{ gap: 2, mt: 3 }}>
+                  {[
+                    // { value: "employee", label: "Employee" },
+                    // { value: "customer", label: "Customer" },
+                    { value: "freelancer", label: "Xoto Partner" },
+                    { value: "vendor-b2c", label: " Xoto Vendor" },
+                    // { value: "vendor-b2b", label: "Vendor (B2B)" },
+                  ].map((type) => (
+                    <Card
+                      key={type.value}
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        borderColor: userType === type.value ? "#1976D2" : "divider",
+                      }}
+                    >
+                      <FormControlLabel
+                        value={type.value}
+                        control={<Radio sx={{ color: "#1976D2" }} />}
+                        label={type.label}
+                        sx={{ width: "100%", m: 0 }}
+                      />
+                    </Card>
+                  ))}
                 </RadioGroup>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+
+                <Box sx={{ mt: 3 }}>
                   <Button
                     variant="contained"
                     onClick={handleNext}
-                    disabled={!userType || (userType === 'vendor' && !vendorType)}
-                    sx={{ width: '100%' }}
+                    disabled={!userType}
+                    fullWidth
+                    sx={buttonSx}
                   >
                     Continue
                   </Button>
                 </Box>
               </motion.div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Typography variant="h5" component="h2" gutterBottom align="center">
-                  {activeTab === 'login'
-                    ? `${userType.charAt(0).toUpperCase() + userType.slice(1)}${
-                        userType === 'vendor' ? ` (${vendorType.toUpperCase()})` : ''
-                      } Login`
-                    : 'Customer Registration'}
-                </Typography>
+              /* === STEP 1: Login Form === */
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                  {activeTab === 'register' && (
-                    <>
-                      <Box sx={{ mb: 2 }}>
-                        <TextField
-                          margin="normal"
-                          required
-                          fullWidth
-                          name="name"
-                          label="Full Name"
-                          id="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          error={!!errors.name}
-                          helperText={errors.name || 'Enter your full name'}
-                        />
-                      </Box>
-                      <Box sx={{ mb: 2 }}>
-                        <TextField
-                          margin="normal"
-                          required
-                          fullWidth
-                          name="dateOfBirth"
-                          label="Date of Birth"
-                          type="date"
-                          id="dateOfBirth"
-                          value={formData.dateOfBirth}
-                          onChange={handleInputChange}
-                          error={!!errors.dateOfBirth}
-                          helperText={errors.dateOfBirth || 'Enter your date of birth (YYYY-MM-DD)'}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Box>
-                      <Box sx={{ mb: 2 }}>
-                        <TextField
-                          margin="normal"
-                          fullWidth
-                          name="mobileNumber"
-                          label="Mobile Number (Optional)"
-                          type="tel"
-                          id="mobileNumber"
-                          value={formData.mobileNumber}
-                          onChange={handleInputChange}
-                          error={!!errors.mobileNumber}
-                          helperText={errors.mobileNumber || 'Enter your mobile number'}
-                        />
-                      </Box>
-                    </>
-                  )}
-                  <Box sx={{ mb: 2 }}>
-                    <TextField
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="email"
-                      label="Email Address"
-                      name="email"
-                      autoComplete="email"
-                      autoFocus
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      error={!!errors.email}
-                      helperText={errors.email || 'Enter your email address'}
-                    />
-                  </Box>
-                  <Box sx={{ mb: 2 }}>
-                    <TextField
-                      margin="normal"
-                      required
-                      fullWidth
-                      name="password"
-                      label="Password"
-                      type={showPassword ? 'text' : 'password'}
-                      id="password"
-                      autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'}
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      error={!!errors.password}
-                      helperText={errors.password || 'Password must be at least 6 characters'}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              aria-label="toggle password visibility"
-                              onClick={handleTogglePasswordVisibility}
-                              edge="end"
-                            >
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-                  {activeTab === 'register' && (
-                    <Box sx={{ mb: 2 }}>
-                      <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="confirmPassword"
-                        label="Confirm Password"
-                        type={showPassword ? 'text' : 'password'}
-                        id="confirmPassword"
-                        value={formData.confirmPassword}
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                    sx={inputSx("email")}
+                  />
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    error={!!errors.password}
+                    helperText={errors.password}
+                    sx={inputSx("password")}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleTogglePasswordVisibility}>
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name="rememberMe"
+                        checked={formData.rememberMe}
                         onChange={handleInputChange}
-                        error={!!errors.confirmPassword}
-                        helperText={errors.confirmPassword || 'Re-enter your password'}
                       />
-                    </Box>
-                  )}
-                  {activeTab === 'login' && (
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          name="rememberMe"
-                          checked={formData.rememberMe}
-                          onChange={handleInputChange}
-                          color="primary"
-                        />
-                      }
-                      label="Remember me"
-                    />
-                  )}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-                    <Button variant="outlined" onClick={handleBack}>
+                    }
+                    label="Remember me"
+                  />
+
+                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+                    <Button variant="outlined" onClick={handleBack} sx={outlineButtonSx}>
                       Back
                     </Button>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                    >
-                      {activeTab === 'login' ? 'Login' : 'Register'}
+                    <Button type="submit" variant="contained" disabled={loading} sx={buttonSx}>
+                      {loading ? "Logging in..." : "Login"}
                     </Button>
                   </Box>
-                  <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-                    {activeTab === 'login' ? (
-                      <>
-                        Don't have an account?{' '}
-                        <Link
-                          component="button"
-                          type="button"
-                          onClick={() => {
-                            setActiveTab('register');
-                            setUserType('customer');
-                            setActiveStep(1); // Skip to registration form
-                          }}
-                          underline="hover"
-                        >
-                          Register as Customer
-                        </Link>
-                      </>
-                    ) : (
-                      <>
-                        Already have an account?{' '}
-                        <Link
-                          component="button"
-                          type="button"
-                          onClick={() => setActiveTab('login')}
-                          underline="hover"
-                        >
-                          Login
-                        </Link>
-                      </>
-                    )}
-                  </Typography>
-                  <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-                    <Link href="/admin-login" underline="hover">
-                      Admin/Superadmin Login
-                    </Link>
-                  </Typography>
                 </Box>
               </motion.div>
             )}

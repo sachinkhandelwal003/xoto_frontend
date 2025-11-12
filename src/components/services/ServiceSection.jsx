@@ -22,7 +22,7 @@ export default function ServiceSection() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Banner Section */}
       <motion.div
-        className="relative bg-gradient-to-r from-[#1A132F] to-[#3A2A5E] text-white py-20 md:py-32 overflow-hidden"
+        className="relative bg-[var(--color-text-primary)] text-white py-20 md:py-32 overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -411,7 +411,7 @@ export default function ServiceSection() {
       {/* CTA Section */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <motion.div
-          className="bg-gradient-to-r from-[#D26C44] to-[#e07a50] rounded-3xl p-8 md:p-12 text-white overflow-hidden relative"
+          className="bg-[var(--color-text-dark)] rounded-3xl p-8 md:p-12 text-white overflow-hidden relative"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
@@ -438,7 +438,7 @@ export default function ServiceSection() {
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 -left-full group-hover:left-full transition-all duration-700"></span>
               </button>
               <button
-                className="relative overflow-hidden px-8 py-3 font-semibold text-[#D26C44] bg-white rounded-full shadow-lg transform transition duration-300 hover:scale-105 group"
+                className="relative overflow-hidden px-8 py-3 font-semibold text-[var(--color-text-dark)] bg-white rounded-full shadow-lg transform transition duration-300 hover:scale-105 group"
                 onClick={() => navigate('/sawtar/freelancer/registration')}
               >
                 <span className="relative z-10">Registration for Freelancers</span>

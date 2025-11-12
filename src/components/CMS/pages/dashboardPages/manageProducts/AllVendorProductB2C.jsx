@@ -93,7 +93,6 @@ const AllVendorProductB2C = () => {
           rejected: response.stats?.rejected || response.stats?.week || 0,
         });
       } catch (error) {
-        showToast(error.response?.data?.message || 'Failed to fetch products', 'error');
         setProducts([]);
       } finally {
         setLoading(false);

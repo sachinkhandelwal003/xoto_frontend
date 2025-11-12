@@ -1,10 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
-import { apiService } from '../../../../../../manageApi/utils/custom.apiservice';
-import { showToast } from '../../../../../../manageApi/utils/toast';
-import { FaArrowLeft, FaFile, FaBuilding, FaPhone, FaEnvelope, FaGlobe, FaClock, FaStar, FaChartLine, FaUsers, FaBox, FaServicestack, FaInfoCircle, FaHistory } from 'react-icons/fa';
-import { ArrowDownOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
+import { apiService } from "../../../../../../manageApi/utils/custom.apiservice";
+import { showToast } from "../../../../../../manageApi/utils/toast";
+import {
+  FaArrowLeft,
+  FaFile,
+  FaBuilding,
+  FaPhone,
+  FaEnvelope,
+  FaGlobe,
+  FaClock,
+  FaStar,
+  FaChartLine,
+  FaUsers,
+  FaBox,
+  FaServicestack,
+  FaInfoCircle,
+  FaHistory,
+  FaBriefcase,
+  FaTools,
+  FaRuler,
+  FaLanguage,
+  FaMoneyBill,
+  FaIdCard,
+  FaCertificate,
+} from "react-icons/fa";
+import { ArrowDownOutlined } from "@ant-design/icons";
 import {
   Card,
   Modal,
@@ -25,7 +47,7 @@ import {
   Col,
   Empty,
   Badge,
-} from 'antd';
+} from "antd";
 
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -43,12 +65,12 @@ const FreelancerProfile = () => {
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
-  const [reason, setReason] = useState('');
-  const [suggestion, setSuggestion] = useState('');
+  const [reason, setReason] = useState("");
+  const [suggestion, setSuggestion] = useState("");
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
     }
     fetchFreelancer();
   }, [id, token]);
@@ -56,11 +78,14 @@ const FreelancerProfile = () => {
   const fetchFreelancer = async () => {
     setLoading(true);
     try {
-      const response = await apiService.get(`/freelancer?freelancerId=${id}`);
+      // Fixed API endpoint as per your example
+      const response = await apiService.get(`/freelancer?id=${id}`);
       setFreelancer(response.freelancer);
     } catch (error) {
-      showToast(error.response?.data?.message || 'Failed to fetch freelancer details', 'error');
-      navigate('/sawtar/cms/freelancer');
+      showToast(
+        error.response?.data?.message || "Failed to fetch freelancer details",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -69,38 +94,44 @@ const FreelancerProfile = () => {
   const openVerificationModal = (docId, approving) => {
     setSelectedDocId(docId);
     setIsApproving(approving);
-    setReason('');
-    setSuggestion('');
+    setReason("");
+    setSuggestion("");
     setVerificationModalOpen(true);
   };
 
   const handleSubmitVerification = async () => {
     if (!isApproving && !reason.trim()) {
-      showToast('Reason is required for rejection', 'error');
+      showToast("Reason is required for rejection", "error");
       return;
     }
 
     setVerifyingDoc(selectedDocId);
     try {
-      await apiService.put('/freelancer/document/verification/check', {
+      await apiService.put("/freelancer/document/verification/check", {
         freelancerId: id,
         documentId: selectedDocId,
         verified: isApproving,
         reason: reason.trim(),
         suggestion: suggestion.trim(),
       });
-      showToast(`Document ${isApproving ? 'approved' : 'rejected'} successfully`, 'success');
+      showToast(
+        `Document ${isApproving ? "approved" : "rejected"} successfully`,
+        "success"
+      );
       fetchFreelancer();
       setVerificationModalOpen(false);
     } catch (error) {
-      showToast(error.response?.data?.message || 'Failed to update document', 'error');
+      showToast(
+        error.response?.data?.message || "Failed to update document",
+        "error"
+      );
     } finally {
       setVerifyingDoc(null);
     }
   };
 
   const downloadDocument = (path) => {
-    window.open(`http://localhost:5000/${path}`, '_blank');
+    window.open(`http://localhost:5000/${path}`, "_blank");
   };
 
   const openImageModal = (document) => {
@@ -115,7 +146,15 @@ const FreelancerProfile = () => {
 
   const isImageFile = (filename) => {
     if (!filename) return false;
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
+    const imageExtensions = [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".bmp",
+      ".webp",
+      ".svg",
+    ];
     return imageExtensions.some((ext) => filename.toLowerCase().endsWith(ext));
   };
 
@@ -132,7 +171,7 @@ const FreelancerProfile = () => {
       <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-200 min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Text type="danger">Freelancer not found</Text>
-          <Button type="primary" onClick={() => navigate('/sawtar/cms/freelancer')} className="mt-2">
+          <Button type="primary" onClick={() => navigate(-1)} className="mt-2">
             Back to Freelancers
           </Button>
         </div>
@@ -140,549 +179,384 @@ const FreelancerProfile = () => {
     );
   }
 
-  const documentTypes = {
-    resume: 'Resume',
-    portfolio: 'Portfolio',
-    identity_proof: 'Identity Proof',
-    address_proof: 'Address Proof',
-  };
-
-  const getDocumentsByType = () => {
-    const docs = {};
-    Object.keys(documentTypes).forEach((type) => {
-      if (freelancer.documents && freelancer.documents[type]) {
-        docs[type] = { ...freelancer.documents[type], type };
-      }
-    });
-    return docs;
-  };
-
-  const groupedDocuments = getDocumentsByType();
+  const fullName =
+    `${freelancer.name?.first_name || ""} ${freelancer.name?.last_name || ""}`.trim();
 
   const statusColor = {
-    0: 'orange',
-    1: 'green',
-    2: 'red',
-    3: 'gray',
+    0: "orange",
+    1: "green",
+    2: "red",
+    3: "gray",
   };
 
   const statusLabel = {
-    0: 'Pending',
-    1: 'Approved',
-    2: 'Rejected',
-    3: 'Suspended',
+    0: "Pending",
+    1: "Approved",
+    2: "Rejected",
+    3: "Suspended",
   };
 
-  const reviewColumns = [
-    {
-      title: 'User Name',
-      dataIndex: 'user_name',
-      key: 'user_name',
-      render: (text) => text || '--',
-    },
-    {
-      title: 'Rating',
-      dataIndex: 'rating',
-      key: 'rating',
-      render: (text) => text || '--',
-    },
-    {
-      title: 'Comment',
-      dataIndex: 'comment',
-      key: 'comment',
-      render: (text) => text || '--',
-    },
-    {
-      title: 'Reply',
-      dataIndex: 'reply',
-      key: 'reply',
-      render: (text) => text || '--',
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      render: (text) => (text ? new Date(text).toLocaleString() : '--'),
-    },
-  ];
-
-  const historyColumns = [
-    {
-      title: 'Updated By',
-      dataIndex: 'updated_by',
-      key: 'updated_by',
-      render: (text) => text || '--',
-    },
-    {
-      title: 'Action',
-      dataIndex: 'action',
-      key: 'action',
-      render: (text) => text || '--',
-    },
-    {
-      title: 'Changes',
-      dataIndex: 'changes',
-      key: 'changes',
-      render: (changes) => (changes ? changes.join(', ') : '--'),
-    },
-    {
-      title: 'Updated At',
-      dataIndex: 'updated_at',
-      key: 'updated_at',
-      render: (text) => (text ? new Date(text).toLocaleString() : '--'),
-    },
-  ];
+  const documentTypeLabel = {
+    resume: "Resume",
+    portfolio: "Portfolio",
+    identityProof: "Identity Proof",
+    addressProof: "Address Proof",
+    certificate: "Certificate",
+  };
 
   return (
     <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-200 min-h-screen">
       <div className="mb-8 bg-white text-gray-900 p-8 rounded-2xl shadow-xl border border-gray-200">
         <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-extrabold tracking-tight">Freelancer Profile</h1>
-          <Button icon={<FaArrowLeft />} type="link" onClick={() => navigate('/sawtar/cms/freelancer')}>
+          <h1 className="text-4xl font-extrabold tracking-tight">
+            Freelancer Profile
+          </h1>
+          <Button
+            icon={<FaArrowLeft />}
+            type="link"
+            onClick={() => navigate(-1)}
+          >
             Back to Freelancers
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {/* Basic Information */}
+        {/* Profile Header */}
+        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 lg:col-span-3">
+          <div className="flex items-center gap-6">
+            <Avatar
+              size={120}
+              src={
+                freelancer.profile_image
+                  ? `http://localhost:5000/${freelancer.profile_image}`
+                  : undefined
+              }
+              className="bg-teal-500"
+            >
+              {fullName.charAt(0)}
+            </Avatar>
+            <div>
+              <Title level={2} className="m-0">
+                {fullName || "N/A"}
+              </Title>
+              <Paragraph className="text-lg text-gray-600">
+                {freelancer.email}
+              </Paragraph>
+              <Space>
+                <Tag color={statusColor[freelancer.status_info?.status]}>
+                  {statusLabel[freelancer.status_info?.status] || "Unknown"}
+                </Tag>
+                {freelancer.is_mobile_verified && (
+                  <Tag color="green">Mobile Verified</Tag>
+                )}
+              </Space>
+            </div>
+          </div>
+        </Card>
+
+        {/* Basic Info */}
         <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
           <Title level={4} className="text-teal-600 mb-4 flex items-center">
             <FaBuilding className="mr-2" /> Basic Information
           </Title>
-          <div className="flex justify-center mb-4">
-            <Avatar size={96} className="bg-teal-500">
-              <FaBuilding className="text-white text-3xl" />
-            </Avatar>
-          </div>
           <Space direction="vertical" className="w-full">
             <div>
-              <Text type="secondary">Email</Text>
-              <Paragraph>{freelancer.email || '--'}</Paragraph>
+              <Text type="secondary">Email:</Text>{" "}
+              <Paragraph>{freelancer.email}</Paragraph>
             </div>
             <div>
-              <Text type="secondary">Full Name</Text>
-              <Paragraph>{freelancer.full_name || '--'}</Paragraph>
+              <Text type="secondary">Mobile:</Text>{" "}
+              <Paragraph>{freelancer.mobile || "--"}</Paragraph>
             </div>
             <div>
-              <Text type="secondary">Mobile</Text>
-              <Paragraph>
-                {freelancer.mobile || '--'}
-                {freelancer.is_mobile_verified && <Tag color="green" className="ml-2">Verified</Tag>}
-              </Paragraph>
-            </div>
-            <div>
-              <Text type="secondary">Status</Text>
-              <Paragraph>
-                <Tag color={statusColor[freelancer.status_info?.status]}>
-                  {statusLabel[freelancer.status_info?.status] || 'Unknown'}
-                </Tag>
-              </Paragraph>
-            </div>
-            <div>
-              <Text type="secondary">Availability</Text>
-              <Paragraph>{freelancer.availability || '--'}</Paragraph>
-            </div>
-            <div>
-              <Text type="secondary">Languages</Text>
-              <Paragraph>{freelancer.languages?.join(', ') || '--'}</Paragraph>
+              <Text type="secondary">Languages:</Text>{" "}
+              <Paragraph>{freelancer.languages?.join(", ") || "--"}</Paragraph>
             </div>
           </Space>
         </Card>
 
-        {/* Location Details */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 lg:col-span-2">
+        {/* Professional Details */}
+        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
           <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaInfoCircle className="mr-2" /> Location Details
+            <FaBriefcase className="mr-2" /> Professional Details
           </Title>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Text type="secondary">City</Text>
-              <Paragraph>{freelancer.location?.city || '--'}</Paragraph>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">State</Text>
-              <Paragraph>{freelancer.location?.state || '--'}</Paragraph>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">Country</Text>
-              <Paragraph>{freelancer.location?.country || '--'}</Paragraph>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">Pincode</Text>
-              <Paragraph>{freelancer.location?.pincode || '--'}</Paragraph>
-            </Col>
-          </Row>
+          <Space direction="vertical" className="w-full">
+            <div>
+              <Text type="secondary">Experience:</Text>{" "}
+              <Paragraph>
+                {freelancer.professional?.experience_years || 0} years
+              </Paragraph>
+            </div>
+            <div>
+              <Text type="secondary">Availability:</Text>{" "}
+              <Paragraph>
+                {freelancer.professional?.availability || "--"}
+              </Paragraph>
+            </div>
+            <div>
+              <Text type="secondary">Working Radius:</Text>{" "}
+              <Paragraph>
+                {freelancer.professional?.working_radius || "--"}
+              </Paragraph>
+            </div>
+            <div>
+              <Text type="secondary">Skills:</Text>{" "}
+              <Paragraph>
+                {freelancer.professional?.skills?.join(", ") || "--"}
+              </Paragraph>
+            </div>
+            <div>
+              <Text type="secondary">Bio:</Text>{" "}
+              <Paragraph>{freelancer.professional?.bio || "--"}</Paragraph>
+            </div>
+          </Space>
+        </Card>
+
+        {/* Location */}
+        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+          <Title level={4} className="text-teal-600 mb-4 flex items-center">
+            <FaGlobe className="mr-2" /> Location
+          </Title>
+          <Space direction="vertical">
+            <Text>
+              {freelancer.location?.city || "--"},{" "}
+              {freelancer.location?.state || "--"}
+            </Text>
+            <Text>
+              {freelancer.location?.country || "--"} -{" "}
+              {freelancer.location?.pincode || "--"}
+            </Text>
+          </Space>
+        </Card>
+
+        {/* Payment Details */}
+        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+          <Title level={4} className="text-teal-600 mb-4 flex items-center">
+            <FaMoneyBill className="mr-2" /> Payment Info
+          </Title>
+          <Space direction="vertical">
+            <div>
+              <Text type="secondary">Preferred Method:</Text>{" "}
+              <Paragraph>
+                {freelancer.payment?.preferred_method || "--"}
+              </Paragraph>
+            </div>
+            <div>
+              <Text type="secondary">Advance %:</Text>{" "}
+              <Paragraph>
+                {freelancer.payment?.advance_percentage || 0}%
+              </Paragraph>
+            </div>
+            <div>
+              <Text type="secondary">GST Number:</Text>{" "}
+              <Paragraph>{freelancer.payment?.gst_number || "--"}</Paragraph>
+            </div>
+          </Space>
         </Card>
 
         {/* Services Offered */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 lg:col-span-2">
           <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaServicestack className="mr-2" /> Services Offered
+            <FaServicestack className="mr-2" /> Services Offered (
+            {freelancer.services_offered?.length || 0})
           </Title>
-          {freelancer.servicesOffered?.length > 0 ? (
+          {freelancer.services_offered?.length > 0 ? (
             <List
-              dataSource={freelancer.servicesOffered}
-              renderItem={(service, index) => (
-                <List.Item key={index}>
+              dataSource={freelancer.services_offered}
+              renderItem={(service) => (
+                <List.Item>
                   <List.Item.Meta
-                    title={service.title || '--'}
-                    description={`Price Range: ${service.priceRange || '--'}`}
+                    title={
+                      <Text strong>
+                        {service.category?.name || "Unknown Category"} →{" "}
+                        {service.subcategory?.name || "Unknown Subcategory"}
+                      </Text>
+                    }
+                    description={
+                      <Space direction="vertical">
+                        <Text>{service.description}</Text>
+                        <Text type="secondary">
+                          Price: {service.price_range} / {service.unit}
+                        </Text>
+                        {service.images?.length > 0 && (
+                          <div className="flex gap-2 flex-wrap">
+                            {service.images.map((img, i) => (
+                              <Image
+                                key={i}
+                                width={60}
+                                height={60}
+                                src={`http://localhost:5000/${img}`}
+                                className="object-cover rounded"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </Space>
+                    }
                   />
                 </List.Item>
               )}
             />
           ) : (
-            <Empty description="No services offered" />
+            <Empty />
           )}
         </Card>
 
-        {/* Contact Persons */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        {/* Portfolio */}
+        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 lg:col-span-3">
           <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaUsers className="mr-2" /> Contact Persons
-          </Title>
-          <Collapse accordion>
-            <Panel header="Primary Contact" key="primary">
-              <Space direction="vertical">
-                <Text>Name: {freelancer.contacts?.primary_contact?.name || '--'}</Text>
-                <Text>Designation: {freelancer.contacts?.primary_contact?.designation || '--'}</Text>
-                <Text>Email: {freelancer.contacts?.primary_contact?.email || '--'}</Text>
-                <Text>Mobile: {freelancer.contacts?.primary_contact?.mobile || '--'}</Text>
-                <Text>WhatsApp: {freelancer.contacts?.primary_contact?.whatsapp || '--'}</Text>
-              </Space>
-            </Panel>
-            <Panel header="Support Contact" key="support">
-              <Space direction="vertical">
-                <Text>Name: {freelancer.contacts?.support_contact?.name || '--'}</Text>
-                <Text>Designation: {freelancer.contacts?.support_contact?.designation || '--'}</Text>
-                <Text>Email: {freelancer.contacts?.support_contact?.email || '--'}</Text>
-                <Text>Mobile: {freelancer.contacts?.support_contact?.mobile || '--'}</Text>
-                <Text>WhatsApp: {freelancer.contacts?.support_contact?.whatsapp || '--'}</Text>
-              </Space>
-            </Panel>
-          </Collapse>
-        </Card>
-
-        {/* Documents */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 col-span-1 md:col-span-2 lg:col-span-3">
-          <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaFile className="mr-2" /> Documents
+            <FaBox className="mr-2" /> Portfolio (
+            {freelancer.portfolio?.length || 0})
           </Title>
           <Row gutter={16}>
-            {Object.entries(documentTypes).map(([type, label]) => (
-              <Col xs={24} md={12} key={type}>
-                <Title level={5} className="text-teal-600 mb-2">
-                  {label}
-                </Title>
-                {groupedDocuments[type] ? (
-                  <Card bordered className="bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-start">
-                      <Space direction="vertical">
-                        <Tag color={groupedDocuments[type].verified ? 'green' : 'orange'}>
-                          {groupedDocuments[type].verified ? 'Verified' : 'Pending Verification'}
-                        </Tag>
-                        {(groupedDocuments[type].reason || groupedDocuments[type].suggestion) && (
-                          <Space direction="vertical" size="small">
-                            {groupedDocuments[type].reason && (
-                              <Text type="danger">Reason: {groupedDocuments[type].reason}</Text>
-                            )}
-                            {groupedDocuments[type].suggestion && (
-                              <Text type="secondary">Suggestion: {groupedDocuments[type].suggestion}</Text>
-                            )}
-                          </Space>
-                        )}
-                        {groupedDocuments[type].uploaded_at && (
-                          <Text type="secondary">
-                            Uploaded At: {new Date(groupedDocuments[type].uploaded_at).toLocaleString()}
-                          </Text>
-                        )}
-                      </Space>
-                      <Space>
-                        {groupedDocuments[type].path && isImageFile(groupedDocuments[type].path) && (
-                          <Tooltip title="View Document">
-                            <Button icon={<ArrowDownOutlined />} onClick={() => openImageModal(groupedDocuments[type])} />
-                          </Tooltip>
-                        )}
-                        <Tooltip title="Download Document">
-                          <Button
-                            icon={<ArrowDownOutlined />}
-                            onClick={() => downloadDocument(groupedDocuments[type].path)}
-                            disabled={!groupedDocuments[type].path}
-                          />
-                        </Tooltip>
-                        {!groupedDocuments[type].verified && (
-                          <>
-                            <Tooltip title="Approve Document">
-                              <Button
-                                type="primary"
-                                icon={<FaArrowLeft />} // Replace with check icon if needed
-                                onClick={() => openVerificationModal(groupedDocuments[type]._id, true)}
-                                disabled={verifyingDoc === groupedDocuments[type]._id}
-                              />
-                            </Tooltip>
-                            <Tooltip title="Reject Document">
-                              <Button
-                                danger
-                                icon={<FaArrowLeft />} // Replace with clear icon
-                                onClick={() => openVerificationModal(groupedDocuments[type]._id, false)}
-                                disabled={verifyingDoc === groupedDocuments[type]._id}
-                              />
-                            </Tooltip>
-                          </>
-                        )}
-                      </Space>
-                    </div>
-                    {groupedDocuments[type].path && isImageFile(groupedDocuments[type].path) && (
-                      <div className="mt-4 cursor-pointer" onClick={() => openImageModal(groupedDocuments[type])}>
-                        <Image
-                          src={`http://localhost:5000/${groupedDocuments[type].path}`}
-                          alt={label}
-                          preview={false}
-                          className="max-h-48 object-contain"
-                          fallback={<div className="h-48 bg-gray-100 flex flex-col items-center justify-center"><FaFile size={32} className="text-gray-500" /><Text type="secondary">Preview not available</Text></div>}
-                        />
-                      </div>
+            {freelancer.portfolio?.map((item, index) => (
+              <Col xs={24} md={12} lg={8} key={index}>
+                <Card hoverable className="mb-4">
+                  <Title level={5}>{item.title}</Title>
+                  <Text type="secondary">
+                    {item.category?.name} → {item.subcategory?.name}
+                  </Text>
+                  <Paragraph>{item.description}</Paragraph>
+                  <Space direction="vertical" size="small">
+                    <Text>Client: {item.client_name || "--"}</Text>
+                    <Text>Area: {item.area || "--"}</Text>
+                    <Text>Duration: {item.duration || "--"}</Text>
+                    {item.completed_at && (
+                      <Text>
+                        Completed:{" "}
+                        {new Date(item.completed_at).toLocaleDateString()}
+                      </Text>
                     )}
-                  </Card>
-                ) : (
-                  <Card bordered className="bg-gray-50 rounded-lg">
-                    <Empty description="No document uploaded" />
-                  </Card>
-                )}
-              </Col>
-            ))}
-            {/* Certificates */}
-            <Col xs={24} md={12}>
-              <Title level={5} className="text-teal-600 mb-2">
-                Certificates
-              </Title>
-              {freelancer.documents?.certificates?.length > 0 ? (
-                freelancer.documents.certificates.map((cert, index) => (
-                  <Card key={index} bordered className="bg-gray-50 rounded-lg mb-4">
-                    <div className="flex justify-between items-start">
-                      <Space direction="vertical">
-                        <Tag color={cert.verified ? 'green' : 'orange'}>
-                          {cert.verified ? 'Verified' : 'Pending Verification'}
-                        </Tag>
-                        {(cert.reason || cert.suggestion) && (
-                          <Space direction="vertical" size="small">
-                            {cert.reason && <Text type="danger">Reason: {cert.reason}</Text>}
-                            {cert.suggestion && <Text type="secondary">Suggestion: {cert.suggestion}</Text>}
-                          </Space>
-                        )}
-                        {cert.uploaded_at && (
-                          <Text type="secondary">
-                            Uploaded At: {new Date(cert.uploaded_at).toLocaleString()}
-                          </Text>
-                        )}
-                      </Space>
-                      <Space>
-                        {cert.path && isImageFile(cert.path) && (
-                          <Tooltip title="View Document">
-                            <Button icon={<ArrowDownOutlined />} onClick={() => openImageModal(cert)} />
-                          </Tooltip>
-                        )}
-                        <Tooltip title="Download Document">
-                          <Button
-                            icon={<ArrowDownOutlined />}
-                            onClick={() => downloadDocument(cert.path)}
-                            disabled={!cert.path}
-                          />
-                        </Tooltip>
-                        {!cert.verified && (
-                          <>
-                            <Tooltip title="Approve Document">
-                              <Button
-                                type="primary"
-                                icon={<FaArrowLeft />}
-                                onClick={() => openVerificationModal(cert._id, true)}
-                                disabled={verifyingDoc === cert._id}
-                              />
-                            </Tooltip>
-                            <Tooltip title="Reject Document">
-                              <Button
-                                danger
-                                icon={<FaArrowLeft />}
-                                onClick={() => openVerificationModal(cert._id, false)}
-                                disabled={verifyingDoc === cert._id}
-                              />
-                            </Tooltip>
-                          </>
-                        )}
-                      </Space>
-                    </div>
-                    {cert.path && isImageFile(cert.path) && (
-                      <div className="mt-4 cursor-pointer" onClick={() => openImageModal(cert)}>
+                  </Space>
+                  {item.images?.length > 0 && (
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      {item.images.map((img, i) => (
                         <Image
-                          src={`http://localhost:5000/${cert.path}`}
-                          alt={`Certificate ${index + 1}`}
-                          preview={false}
-                          className="max-h-48 object-contain"
-                          fallback={<div className="h-48 bg-gray-100 flex flex-col items-center justify-center"><FaFile size={32} className="text-gray-500" /><Text type="secondary">Preview not available</Text></div>}
-                        />
-                      </div>
-                    )}
-                  </Card>
-                ))
-              ) : (
-                <Card bordered className="bg-gray-50 rounded-lg">
-                  <Empty description="No certificates uploaded" />
-                </Card>
-              )}
-            </Col>
-          </Row>
-        </Card>
-
-        {/* Performance & Analytics */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-          <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaChartLine className="mr-2" /> Performance & Analytics
-          </Title>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Text type="secondary">Ratings</Text>
-              <Paragraph>{freelancer.performance?.ratings || '--'}</Paragraph>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">Reviews Count</Text>
-              <Paragraph>{freelancer.performance?.reviewsCount || '--'}</Paragraph>
-            </Col>
-          </Row>
-        </Card>
-
-        {/* Social Links & Gallery */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 lg:col-span-2">
-          <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaGlobe className="mr-2" /> Social Links & Gallery
-          </Title>
-          <Row gutter={16}>
-            <Col span={24}>
-              <Text type="secondary">Social Links</Text>
-              <Paragraph>
-                LinkedIn: {freelancer.common?.socialLinks?.linkedin || '--'} <br />
-                Instagram: {freelancer.common?.socialLinks?.instagram || '--'} <br />
-                Twitter: {freelancer.common?.socialLinks?.twitter || '--'} <br />
-                Facebook: {freelancer.common?.socialLinks?.facebook || '--'} <br />
-                YouTube: {freelancer.common?.socialLinks?.youtube || '--'}
-              </Paragraph>
-            </Col>
-            <Col span={24}>
-              <Collapse accordion>
-                <Panel header={`Gallery (${freelancer.common?.gallery?.length || 0})`} key="gallery">
-                  {freelancer.common?.gallery?.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {freelancer.common.gallery.map((img, index) => (
-                        <Image
-                          key={index}
-                          width={100}
-                          height={100}
+                          key={i}
+                          width={80}
                           src={`http://localhost:5000/${img}`}
-                          alt={`Gallery ${index}`}
-                          className="object-cover rounded-lg"
+                          className="rounded"
                         />
                       ))}
                     </div>
-                  ) : (
-                    <Empty description="No gallery items" />
                   )}
-                </Panel>
-              </Collapse>
-            </Col>
+                </Card>
+              </Col>
+            ))}
+            {(!freelancer.portfolio || freelancer.portfolio.length === 0) && (
+              <Empty />
+            )}
           </Row>
         </Card>
 
-        {/* Reviews */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 col-span-1 md:col-span-2 lg:col-span-3">
+        {/* Documents - All in one card */}
+        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 lg:col-span-3">
           <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaStar className="mr-2" /> Reviews
+            <FaIdCard className="mr-2" /> Documents & Certificates
           </Title>
-          {freelancer.common?.reviews?.length > 0 ? (
-            <Table columns={reviewColumns} dataSource={freelancer.common.reviews} rowKey="review_id" pagination={false} />
-          ) : (
-            <Empty description="No reviews available" />
-          )}
+          <Row gutter={16}>
+            {freelancer.documents?.map((doc, index) => (
+              <Col xs={24} md={12} lg={8} key={index}>
+                <Card
+                  title={documentTypeLabel[doc.type] || doc.type}
+                  className="mb-4"
+                >
+                  <Space direction="vertical" className="w-full">
+                    <Tag color={doc.verified ? "green" : "orange"}>
+                      {doc.verified ? "Verified" : "Pending"}
+                    </Tag>
+                    {doc.reason && (
+                      <Text type="danger">Reason: {doc.reason}</Text>
+                    )}
+                    {doc.suggestion && (
+                      <Text type="secondary">Suggestion: {doc.suggestion}</Text>
+                    )}
+                    <Text type="secondary">
+                      Uploaded: {new Date(doc.uploaded_at).toLocaleString()}
+                    </Text>
+
+                    {doc.path && isImageFile(doc.path) && (
+                      <Image
+                        src={`http://localhost:5000/${doc.path}`}
+                        width="100%"
+                        className="mt-3 rounded cursor-pointer"
+                        onClick={() => openImageModal(doc)}
+                      />
+                    )}
+
+                    <Space className="mt-3">
+                      <Button
+                        icon={<ArrowDownOutlined />}
+                        onClick={() => downloadDocument(doc.path)}
+                      >
+                        Download
+                      </Button>
+                      {!doc.verified && (
+                        <>
+                          <Button
+                            type="primary"
+                            size="small"
+                            onClick={() => openVerificationModal(doc._id, true)}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            danger
+                            size="small"
+                            onClick={() =>
+                              openVerificationModal(doc._id, false)
+                            }
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                    </Space>
+                  </Space>
+                </Card>
+              </Col>
+            ))}
+            {(!freelancer.documents || freelancer.documents.length === 0) && (
+              <Col span={24}>
+                <Empty description="No documents uploaded" />
+              </Col>
+            )}
+          </Row>
         </Card>
 
-        {/* Meta Information */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        {/* Gallery */}
+        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 lg:col-span-3">
           <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaInfoCircle className="mr-2" /> Meta Information
+            <FaGlobe className="mr-2" /> Gallery
           </Title>
-          <Space direction="vertical" className="w-full">
-            <div>
-              <Text type="secondary">Agreed to Terms</Text>
-              <Paragraph>{freelancer.meta?.agreed_to_terms ? 'Yes' : 'No'}</Paragraph>
+          {freelancer.gallery?.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {freelancer.gallery.map((img, i) => (
+                <Image
+                  key={i}
+                  src={`http://localhost:5000/${img}`}
+                  className="rounded-lg object-cover h-32"
+                />
+              ))}
             </div>
-            <div>
-              <Text type="secondary">Portal Access</Text>
-              <Paragraph>{freelancer.meta?.portal_access ? 'Yes' : 'No'}</Paragraph>
-            </div>
-            <div>
-              <Text type="secondary">Created At</Text>
-              <Paragraph>{freelancer.meta?.created_at ? new Date(freelancer.meta.created_at).toLocaleString() : '--'}</Paragraph>
-            </div>
-            <div>
-              <Text type="secondary">Updated At</Text>
-              <Paragraph>{freelancer.meta?.updated_at ? new Date(freelancer.meta.updated_at).toLocaleString() : '--'}</Paragraph>
-            </div>
-          </Space>
-        </Card>
-
-        {/* Change History */}
-        <Card className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 col-span-1 md:col-span-2 lg:col-span-3">
-          <Title level={4} className="text-teal-600 mb-4 flex items-center">
-            <FaHistory className="mr-2" /> Change History
-          </Title>
-          {freelancer.meta?.change_history && freelancer.meta.change_history.length > 0 ? (
-            <Table columns={historyColumns} dataSource={freelancer.meta.change_history} rowKey={(record, index) => index} pagination={false} />
           ) : (
-            <Empty description="No change history available" />
+            <Empty />
           )}
         </Card>
       </div>
 
-      {/* Image Viewer Modal */}
+      {/* Image Modal */}
       <Modal
         open={imageViewerOpen}
         onCancel={closeImageModal}
         footer={null}
-        centered
-        width={600}
-        bodyStyle={{ maxHeight: '80vh', overflowY: 'auto' }}
+        width={800}
       >
-        <Title level={4} className="text-teal-600">
-          {documentTypes[selectedDocument?.type] || selectedDocument?.type || 'Certificate'}
-        </Title>
-        <div className="flex justify-center mb-4">
-          <Image
-            src={`http://localhost:5000/${selectedDocument?.path}`}
-            alt={documentTypes[selectedDocument?.type]}
-            className="max-h-96 object-contain"
-            fallback={
-              <div className="h-96 bg-gray-100 flex flex-col items-center justify-center">
-                <FaFile size={32} className="text-gray-500" />
-                <Text type="secondary">Unable to load document preview</Text>
-                <Text type="secondary" className="text-sm mt-2">Please download the document to view it</Text>
-              </div>
-            }
-          />
-        </div>
-        {(selectedDocument?.reason || selectedDocument?.suggestion) && (
-          <Space direction="vertical" className="mb-4">
-            {selectedDocument.reason && <Text type="danger">Reason: {selectedDocument.reason}</Text>}
-            {selectedDocument.suggestion && <Text type="secondary">Suggestion: {selectedDocument.suggestion}</Text>}
-          </Space>
-        )}
-        <Divider />
-        <div className="flex justify-between items-center">
-          <Tag color={selectedDocument?.verified ? 'green' : 'orange'}>
-            {selectedDocument?.verified ? 'Verified' : 'Pending Verification'}
-          </Tag>
-          <Button icon={<ArrowDownOutlined />} type="primary" onClick={() => downloadDocument(selectedDocument?.path)}>
-            Download
-          </Button>
-        </div>
+        <Image
+          src={`http://localhost:5000/${selectedDocument?.path}`}
+          className="w-full"
+        />
       </Modal>
 
       {/* Verification Modal */}
@@ -690,38 +564,34 @@ const FreelancerProfile = () => {
         open={verificationModalOpen}
         onCancel={() => setVerificationModalOpen(false)}
         footer={null}
-        centered
-        width={600}
       >
-        <Title level={4} className="text-teal-600 mb-4">
-          {isApproving ? 'Approve Document' : 'Reject Document'}
-        </Title>
-        <Input
-          placeholder={isApproving ? 'Optional' : 'Required'}
+        <Title level={4}>{isApproving ? "Approve" : "Reject"} Document</Title>
+        <TextArea
+          placeholder="Reason (required for rejection)"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          status={!isApproving && !reason.trim() ? 'error' : ''}
-          className="mb-4"
+          rows={3}
+          className="mb-3"
         />
-        {!isApproving && !reason.trim() && <Text type="danger" className="mb-2">Reason is required for rejection</Text>}
         <TextArea
-          placeholder="Optional"
+          placeholder="Suggestion (optional)"
           value={suggestion}
           onChange={(e) => setSuggestion(e.target.value)}
-          rows={4}
-          className="mb-4"
+          rows={3}
+          className="mb-3"
         />
-        <div className="flex justify-end gap-2">
-          <Button onClick={() => setVerificationModalOpen(false)}>Cancel</Button>
+        <Space>
+          <Button onClick={() => setVerificationModalOpen(false)}>
+            Cancel
+          </Button>
           <Button
-            type="primary"
-            danger={!isApproving}
+            type={isApproving ? "primary" : "danger"}
             onClick={handleSubmitVerification}
             loading={verifyingDoc === selectedDocId}
           >
-            {isApproving ? 'Approve' : 'Reject'}
+            {isApproving ? "Approve" : "Reject"}
           </Button>
-        </div>
+        </Space>
       </Modal>
     </div>
   );

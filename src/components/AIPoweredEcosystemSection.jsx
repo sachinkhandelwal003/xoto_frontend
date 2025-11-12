@@ -1,90 +1,124 @@
+'use client';
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaRobot } from 'react-icons/fa';
+// import trusttImage from "../assets/img/buy.jpg"
+import trusztImage from "./../assets/img/truszt.png"
 
-const AIPoweredEcosystemSection = () => {
-  const navigate = useNavigate();
-
-  const handleCalculateNow = () => {
-    navigate('/sawtar/quotation');
-  };
-
+export default function HomeJourneySection() {
   return (
-    <section className="relative bg-gradient-to-br from-amber-50 to-orange-50 py-20 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          {/* Left Side: Content */}
-          <div className="lg:w-1/2">
-            <div className="flex items-center gap-3 mb-3">
-              <FaRobot className="text-orange-500 text-2xl" />
-              <span className="uppercase tracking-wide font-semibold text-orange-600">
-                AI Powered Cost Estimator
-              </span>
-            </div>
+    <section className="relative w-full min-h-screen overflow-hidden bg-gradient-to-b from-blue-900/50 to-black">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src={trusztImage}
+          alt="Luxury modern villa at night"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
+      </div>
 
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-              Your Dream Home Is Just One Click Away
-            </h2>
-
-            <p className="text-lg text-gray-700 mb-8">
-              Get accurate cost estimates powered by AI and visualize your perfect space before spending a rupee.
+      {/* Content */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-6 py-20">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left: Text */}
+          <div className="text-white">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+              Your AI-Powered <br />
+              <span className="text-white">Home Journey</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-2xl">
+              From landscaping to purchase and financing — XOTO personalizes every step to help you discover, design, and maintain your dream home on one seamless platform.
             </p>
-
-            <div className="space-y-5 mb-10">
-              {[
-                "Instant cost calculations for your project",
-                "3D visualization of your future space",
-                "Verified professionals at your service",
-                "Multiple design styles to match your taste"
-              ].map((feature, index) => (
-                <div key={index} className="flex items-center">
-                  <div className="bg-amber-100 p-1.5 rounded-full mr-4">
-                    <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-800">{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={handleCalculateNow}
-              className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-2 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center group"
-            >
-              Calculate Now
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 ml-3 transition-transform duration-300 group-hover:translate-x-1" 
-                viewBox="0 0 20 20" 
-                fill="currentColor"
-              >
-                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
           </div>
 
-          {/* Right Side: Image */}
-          <div className="lg:w-1/2 relative">
-            <div className="bg-white p-2 rounded-xl shadow-2xl border border-gray-100 transform rotate-1 hover:rotate-0 transition-transform duration-500">
-              <img 
-                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1470&q=80" 
-                alt="AI Home Design"
-                className="w-full h-auto rounded-lg object-cover"
+          {/* Right: Journey Path */}
+          <div className="relative flex justify-center">
+            {/* Curved SVG Path */}
+            <svg
+              className="absolute w-full h-full top-0 left-0 -z-10"
+              viewBox="0 0 600 600"
+              fill="none"
+            >
+              <path
+                d="M100,150 Q200,100 300,150 Q400,200 450,300 Q400,400 300,450 Q200,500 100,450"
+                stroke="url(#path-gradient)"
+                strokeWidth="3"
+                strokeLinecap="round"
+                className="opacity-70"
               />
-              <div className="absolute -bottom-3 -right-3 bg-orange-500 text-white px-4 py-2 rounded-lg font-medium shadow-xl text-sm">
-                AI Estimates from ₹25,000+
+              <defs>
+                <linearGradient id="path-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#06b6d4" />
+                  <stop offset="100%" stopColor="#10b981" />
+                </linearGradient>
+              </defs>
+            </svg>
+
+            {/* Journey Steps */}
+            <div className="space-y-16">
+              {/* Step 1: Design */}
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                  </svg>
+                </div>
+                <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full border border-white/30 hover:bg-white/20 transition-all shadow-md">
+                  Design
+                </button>
+              </div>
+
+              {/* Step 2: Buy */}
+              <div className="flex items-center gap-4 ml-20">
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 3h18l-2 12H5L3 3zm4 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+                  </svg>
+                </div>
+                <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full border border-white/30 hover:bg-white/20 transition-all shadow-md">
+                  Buy
+                </button>
+              </div>
+
+              {/* Step 3: Upgrade */}
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-lg">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2v8m-5 5l5-5 5 5m-10 7h20" />
+                  </svg>
+                </div>
+                <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full border border-white/30 hover:bg-white/20 transition-all shadow-md">
+                  Upgrade
+                </button>
+              </div>
+
+              {/* Step 4: Maintain */}
+              <div className="flex items-center gap-4 ml-32">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  </svg>
+                </div>
+                <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full border border-white/30 hover:bg-white/20 transition-all shadow-md">
+                  Maintain
+                </button>
+              </div>
+
+              {/* Step 5: Resell */}
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center shadow-lg">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 3h18v4H3V3zm4 6h14v12H7V9zm2 2v8h10v-8H9z" />
+                  </svg>
+                </div>
+                <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full border border-white/30 hover:bg-white/20 transition-all shadow-md">
+                  Resell
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Decorative elements */}
-      <div className="absolute top-20 left-20 w-32 h-32 rounded-full bg-amber-200/30 blur-3xl"></div>
-      <div className="absolute bottom-10 right-20 w-40 h-40 rounded-full bg-orange-200/30 blur-3xl"></div>
     </section>
   );
-};
-
-export default AIPoweredEcosystemSection;
+}
