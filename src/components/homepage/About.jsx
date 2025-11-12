@@ -1,8 +1,8 @@
 import React from 'react'
-import Powered from '../../components/Aboutt/Powered'
-import Second from '../../components/aboutt/Second'
+import Powered from '../Aboutt/Powered'
+import Second from '../aboutt/Second'
 // import Vision from '../../components/aboutt/Vision.jsx'
-import Mission from '../../components/aboutt/Mission'
+import Mission from '../Aboutt/Mission'
 // import Dna from '../../components/aboutt/Dna.jsx'
 // import { SecurityRounded } from '@mui/icons-material'
 
