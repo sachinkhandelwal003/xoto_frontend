@@ -10,7 +10,7 @@ import exploreoneImage from '../../assets/img/exploreone.png';
 import exploretwoImage from '../../assets/img/exploretwo.png';
 import explorethreeImage from '../../assets/img/explorethree.png';
 import lasttImage from '../../assets/img/lastt.jpg';
-import Dreamspacking from '../../components/homepage/dreamspacking';
+import Dreamspacking from './Dreamspacking';
 import Eco from '../../components/homepage/Eco';
 import bbImage from '../../assets/img/bb.png';
 
