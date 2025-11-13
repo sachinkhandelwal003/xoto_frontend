@@ -37,7 +37,7 @@ const Profile = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/customer/profile`, {
+        const response = await axios.get(`https://kotiboxglobaltech.online/api/customer/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

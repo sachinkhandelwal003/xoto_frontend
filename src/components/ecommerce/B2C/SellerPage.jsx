@@ -92,7 +92,7 @@ const registerVendor = async (data) => {
   }
   console.groupEnd();
   // =============== API REQUEST ===============
-  const response = await axios.post('http://localhost:5000/api/vendor/b2c', formData, {
+  const response = await axios.post('https://kotiboxglobaltech.online/api/vendor/b2c', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return response.data;
@@ -220,7 +220,7 @@ const SellerPage = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/categories');
+        const response = await axios.get('https://kotiboxglobaltech.online/api/categories');
         setCategories(response.data.hierarchy);
       } catch (error) {
       }
@@ -325,7 +325,7 @@ const SellerPage = () => {
     }
     const fullMobile = `${countryCode}${mobile}`;
     try {
-      await axios.post('http://localhost:5000/api/auth/otp/send', { mobile: fullMobile });
+      await axios.post('https://kotiboxglobaltech.online/api/auth/otp/send', { mobile: fullMobile });
       setOtpSent(true);
       toast.success('OTP sent!');
     } catch (error) {
@@ -341,7 +341,7 @@ const SellerPage = () => {
     }
     const fullMobile = `${countryCode}${mobile}`;
     try {
-      await axios.post('http://localhost:5000/api/auth/otp/verify', { mobile: fullMobile, otp });
+      await axios.post('https://kotiboxglobaltech.online/api/auth/otp/verify', { mobile: fullMobile, otp });
       setMobileVerified(true);
       setValue('mobileVerified', true, { shouldValidate: true });
       toast.success('Mobile verified!');

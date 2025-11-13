@@ -10,8 +10,8 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 
 // Base API URLs
-const API_URL = 'http://localhost:5000/api/vendor/b2b';
-const OTP_API_URL = 'http://localhost:5000/api/auth/otp';
+const API_URL = 'https://kotiboxglobaltech.online/api/vendor/b2b';
+const OTP_API_URL = 'https://kotiboxglobaltech.online/api/auth/otp';
 
 // File upload validation (only checks file type and size, no form validation)
 const validateFile = (file) => {

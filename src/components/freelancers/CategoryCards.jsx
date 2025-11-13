@@ -22,7 +22,7 @@ const CategoryCards = ({ categoryId }) => {
       try {
         setLoading(true);
         const { data } = await axios.get(
-          `http://localhost:5000/api/freelancer/subcategory?category=${categoryId}`
+          `https://kotiboxglobaltech.online/api/freelancer/subcategory?category=${categoryId}`
         );
 
         if (data.success && Array.isArray(data.subcategories)) {

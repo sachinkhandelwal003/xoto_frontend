@@ -48,7 +48,7 @@ const languageOptions = [
 /* ---------- API helpers ---------- */
 const fetchCategories = async () => {
   const { data } = await axios.get(
-    "http://localhost:5000/api/freelancer/category?active=true"
+    "https://kotiboxglobaltech.online/api/freelancer/category?active=true"
   );
   if (!data.success) throw new Error("Failed to load categories");
   return data.categories.map((c) => ({ value: c._id, label: c.name }));
@@ -56,7 +56,7 @@ const fetchCategories = async () => {
 
 const fetchSubcategories = async (catId) => {
   const { data } = await axios.get(
-    `http://localhost:5000/api/freelancer/subcategory?category=${catId}`
+    `https://kotiboxglobaltech.online/api/freelancer/subcategory?category=${catId}`
   );
   if (!data.success) throw new Error("Failed to load subcategories");
   return data.subcategories.map((s) => ({ value: s._id, label: s.name }));
@@ -144,7 +144,7 @@ const Registration = () => {
     }
     setOtpLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/otp/send", { mobile });
+      await axios.post("https://kotiboxglobaltech.online/api/auth/otp/send", { mobile });
       setOtpModal(true);
       showToast(`OTP sent to ${mobile}`, "success");
     } catch (e) {
@@ -160,7 +160,7 @@ const Registration = () => {
       return;
     }
     try {
-      await axios.post("http://localhost:5000/api/auth/otp/verify", {
+      await axios.post("https://kotiboxglobaltech.online/api/auth/otp/verify", {
         mobile,
         otp,
       });
@@ -221,7 +221,7 @@ const Registration = () => {
     };
 
     try {
-      await axios.post("http://localhost:5000/api/freelancer", payload, {
+      await axios.post("https://kotiboxglobaltech.online/api/freelancer", payload, {
         headers: { "Content-Type": "application/json" },
       });
 

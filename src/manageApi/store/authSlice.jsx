@@ -100,7 +100,7 @@ export const fetchMyPermissions = createAsyncThunk(
     try {
       const { token } = getState().auth;
       const res = await axios.get(
-        "http://localhost:5000/api/permission/my/get",
+        "https://kotiboxglobaltech.online/api/permission/my/get",
         {
           headers: { Authorization: `Bearer ${token}` },
         }

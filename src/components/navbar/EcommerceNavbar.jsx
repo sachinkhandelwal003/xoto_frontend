@@ -186,7 +186,7 @@ const EcommerceNavbar = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/customer/profile",
+        "https://kotiboxglobaltech.online/api/customer/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`,

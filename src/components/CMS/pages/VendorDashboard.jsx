@@ -36,7 +36,7 @@ export default function VendorDashboard() {
       if (!user?.id) return;
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/auth/customer/${user.id}`);
+        const response = await axios.get(`https://kotiboxglobaltech.online/api/auth/customer/${user.id}`);
         const data = response.data.customer;
         console.log('Fetched customer data:', data);
 
@@ -44,7 +44,7 @@ export default function VendorDashboard() {
 
         if (data?.isVendor) {
           // Fetch vendor-specific data (replace with your actual API endpoint)
-          const vendorResponse = await axios.get(`http://localhost:5000/api/vendor/${user.id}/dashboard`, {
+          const vendorResponse = await axios.get(`https://kotiboxglobaltech.online/api/vendor/${user.id}/dashboard`, {
             headers: { Authorization: `Bearer ${user.token}` },
           });
           setVendorData({

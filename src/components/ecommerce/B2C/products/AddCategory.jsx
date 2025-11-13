@@ -43,7 +43,7 @@ const AddCategory = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/categories");
+      const res = await axios.get("https://kotiboxglobaltech.online/api/categories");
       if (res.data.success) {
         setCategories(res.data.categories);
         setTreeData(transformHierarchy(res.data.hierarchy));
@@ -60,7 +60,7 @@ const AddCategory = () => {
     try {
       setTrashedLoading(true);
       const res = await axios.get(
-        "http://localhost:5000/api/categories?includeDeleted=true&status=0"
+        "https://kotiboxglobaltech.online/api/categories?includeDeleted=true&status=0"
       );
       if (res.data.success) {
         setTrashedCategories(res.data.categories);
@@ -146,12 +146,12 @@ const AddCategory = () => {
       setLoading(true);
       if (selectedCategory && !selectedParent) {
         await axios.put(
-          `http://localhost:5000/api/categories/${selectedCategory._id}`,
+          `https://kotiboxglobaltech.online/api/categories/${selectedCategory._id}`,
           formData
         );
         message.success("Category updated successfully");
       } else {
-        await axios.post("http://localhost:5000/api/categories", formData);
+        await axios.post("https://kotiboxglobaltech.online/api/categories", formData);
         message.success("Category created successfully");
       }
       form.resetFields();
@@ -170,7 +170,7 @@ const AddCategory = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/categories/${id}`);
+      await axios.delete(`https://kotiboxglobaltech.online/api/categories/${id}`);
       message.success("Category soft deleted successfully");
       fetchCategories();
       fetchTrashedCategories();
@@ -185,7 +185,7 @@ const AddCategory = () => {
 
   const handleRestore = async (id) => {
     try {
-      await axios.post(`http://localhost:5000/api/categories/${id}/restore`);
+      await axios.post(`https://kotiboxglobaltech.online/api/categories/${id}/restore`);
       message.success("Category restored successfully");
       fetchCategories();
       fetchTrashedCategories();

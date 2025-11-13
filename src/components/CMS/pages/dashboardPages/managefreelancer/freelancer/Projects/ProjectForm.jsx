@@ -74,7 +74,7 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
   const fetchCategories = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:5000/api/freelancer/category?active=true",
+        "https://kotiboxglobaltech.online/api/freelancer/category?active=true",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -89,7 +89,7 @@ const ProjectForm = ({ project, onSuccess, onCancel }) => {
     if (!catId) return setSubcategories([]);
     try {
       const { data } = await axios.get(
-        `http://localhost:5000/api/freelancer/subcategory?category=${catId}`,
+        `https://kotiboxglobaltech.online/api/freelancer/subcategory?category=${catId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
