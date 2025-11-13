@@ -63,7 +63,7 @@ export default function XotoLandingPage() {
           </p>
 
         <Link
-  to="/admin/login"
+  to="/login"
   className="mt-8 px-8 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 flex items-center gap-2"
 >
   Join The Xoto Partner Ecosystem
