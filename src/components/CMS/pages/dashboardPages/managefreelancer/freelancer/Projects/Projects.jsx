@@ -598,7 +598,7 @@ const Projects = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <Title level={3}>Projects Management</Title>
-        <Link to={`/sawtar/dashboard/${roleSlug}/addProjects`}>
+        <Link to={`/dashboard/${roleSlug}/addProjects`}>
           <Button type="primary" icon={<ArrowRightOutlined />}>
             Go to Projects
           </Button>

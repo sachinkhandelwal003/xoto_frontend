@@ -1,28 +1,7 @@
 // src/pages/auth/Login.jsx
 import React, { useState, useEffect, useContext } from "react";
-import {
-  TextField,
-  Button,
-  Typography,
-  Link,
-  Box,
-  Card,
-  CardContent,
-  Tabs,
-  Tab,
-  FormControlLabel,
-  Checkbox,
-  Radio,
-  RadioGroup,
-  Stepper,
-  Step,
-  StepLabel,
-  Alert,
-  IconButton,
-  InputAdornment,
-  CircularProgress,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Form, Input, Button, Radio, Card, Typography, Alert, Checkbox } from "antd";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../manageApi/context/AuthContext.jsx";
@@ -30,388 +9,395 @@ import loginimage from "../../assets/img/one.png";
 import logoNew from "../../assets/img/logoNew.png";
 import { toast } from "react-toastify";
 
+// Custom Theme Override (Your Brand Colors)
+const theme = {
+  token: {
+    colorPrimary: "#5C039B",     // Main Purple
+    colorInfo: "#03A4F4",        // Blue for text/links
+    colorSuccess: "#64EF0A",     // Green for success
+    colorTextBase: "#020202",
+    colorBgBase: "#FFFFFF",
+  },
+};
+
+const { Title, Text } = Typography;
+
 const Login = () => {
+  const [form] = Form.useForm();
   const [activeTab, setActiveTab] = useState("login");
   const [activeStep, setActiveStep] = useState(0);
   const [userType, setUserType] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    rememberMe: false,
-  });
-  const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [generalError, setGeneralError] = useState("");
 
-  const {
-    user,
-    token,
-    loading,
-    error: authError,
-    login,
-    isAuthenticated,
-  } = useContext(AuthContext);
+  const { login, isAuthenticated, user, token } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // === REDIRECT AFTER SUCCESSFUL LOGIN ===
+  // Role-based redirect + Welcome message with Role Name
   useEffect(() => {
     if (isAuthenticated && user && token) {
+      const roleName = user?.role?.name || "User";
       const roleCode = user?.role?.code?.toString();
+
       const rolePathMap = {
-        0: "/sawtar/dashboard/superadmin",
-        1: "/sawtar/dashboard/admin",
-        5: "/sawtar/dashboard/vendor-b2c",
-        6: "/sawtar/dashboard/vendor-b2b",
-        7: "/sawtar/dashboard/freelancer",
+        0: "/dashboard/superadmin",
+        1: "/dashboard/admin",
+        5: "/dashboard/vendor-b2c",
+        6: "/dashboard/vendor-b2b",
+        7: "/dashboard/freelancer",
       };
-      const redirectPath = rolePathMap[roleCode] || "/sawtar/";
-      toast.success(`Welcome ${user?.role?.name || "User"}!`);
+
+      const redirectPath = rolePathMap[roleCode] || "/dashboard";
+
+      toast.success(`Welcome back, ${user?.name || "User"}! (${roleName})`, {
+        position: "top-right",
+        autoClose: 4000,
+        style: {
+          background: "#64EF0A",
+          color: "#020202",
+          fontWeight: "bold",
+          fontSize: "16px",
+          borderRadius: "12px",
+        },
+      });
+
       navigate(redirectPath, { replace: true });
     }
   }, [isAuthenticated, user, token, navigate]);
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-    setActiveStep(0);
-    setUserType("");
-    setErrors({});
-    setSuccessMessage("");
-    setShowPassword(false);
-    setFormData({ email: "", password: "", rememberMe: false });
-  };
-
   const handleNext = () => {
     if (!userType) {
-      setErrors({ general: "Please select an account type" });
+      setGeneralError("Please select an account type");
       return;
     }
 
-    // Freelancer → redirect to registration
     if (activeTab === "register" && userType === "freelancer") {
-      navigate("/sawtar/freelancer/registration");
+      navigate("/freelancer/registration");
       return;
     }
 
-    // Vendor → no registration, go to login
     if (activeTab === "register" && userType.includes("vendor")) {
       setActiveTab("login");
-      setActiveStep(1);
-      return;
     }
 
     setActiveStep(1);
-    setErrors({});
+    setGeneralError("");
   };
 
   const handleBack = () => {
     setActiveStep(0);
-    setErrors({});
-    setSuccessMessage("");
-    setShowPassword(false);
+    setGeneralError("");
+    form.resetFields();
   };
 
-  const handleUserTypeChange = (event) => {
-    setUserType(event.target.value);
-    setErrors({});
-    setSuccessMessage("");
-    setShowPassword(false);
-  };
-
-  const handleInputChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
-    if (errors.general) setErrors((prev) => ({ ...prev, general: "" }));
-  };
-
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    if (!formData.email) newErrors.email = "Email is required";
-    else if (!emailRegex.test(formData.email))
-      newErrors.email = "Invalid email format";
-
-    if (!formData.password) newErrors.password = "Password is required";
-    else if (formData.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-
-    return newErrors;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    setSuccessMessage("");
-
-    const formErrors = validateForm();
-    if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
-      return;
-    }
+  const onFinish = async (values) => {
+    setLoading(true);
+    setGeneralError("");
 
     try {
-      let loginEndpoint = "";
+      let endpointPath = "/auth/login";
+      if (userType === "freelancer") endpointPath = "/freelancer/login";
+      else if (userType === "vendor-b2c") endpointPath = "/vendor/b2c/login";
+      else if (userType === "vendor-b2b") endpointPath = "/vendor/b2b/login";
 
-      // Dynamic API based on userType
-      if (userType === "freelancer") {
-        loginEndpoint = "/api/freelancer/login";
-      } else if (userType === "vendor-b2c") {
-        loginEndpoint = "/api/vendor/b2c/login";
-      } else if (userType === "vendor-b2b") {
-        loginEndpoint = "/api/vendor/b2b/login";
-      } else {
-        loginEndpoint = "/api/auth/login";
-      }
-
-      const response = await login(formData.email, formData.password, loginEndpoint);
-
-      if (response?.success) {
-        setSuccessMessage(`Welcome! Redirecting...`);
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setErrors({ general: error.message || "Login failed. Please try again." });
+      await login(values.email, values.password, endpointPath);
+    } catch (err) {
+      const errorMsg = err.message || "Invalid email or password. Please try again.";
+      setGeneralError(errorMsg);
+      toast.error(errorMsg, {
+        style: { background: "#ff4d4f", color: "white" },
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const steps = ["Select Account Type", "Login"];
-
-  const inputSx = (field) => ({
-    "& .MuiInputBase-root": {
-      backgroundColor: "#e5e7eb",
-      color: "#374151",
-      borderRadius: "4px",
-      border: errors[field] ? "1px solid #ef4444" : "1px solid #e5e7eb",
-      padding: "0.75rem 1rem",
-      "&:focus-within": { backgroundColor: "#fff", borderColor: "#6b7280" },
-    },
-    "& .MuiInputBase-input": { padding: "0.75rem 0" },
-    "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-  });
-
-  const buttonSx = {
-    backgroundColor: "#1976D2",
-    color: "#fff",
-    fontWeight: "bold",
-    textTransform: "none",
-    padding: "0.5rem 1rem",
-    borderRadius: "4px",
-    "&:hover": { backgroundColor: "#1565C0" },
-    "&:disabled": { backgroundColor: "#9ca3af" },
-  };
-
-  const outlineButtonSx = {
-    borderColor: "#1976D2",
-    color: "#1976D2",
-    fontWeight: "bold",
-    textTransform: "none",
-    padding: "0.5rem 1rem",
-    borderRadius: "4px",
-    "&:hover": { backgroundColor: "rgba(25, 118, 210, 0.08)", borderColor: "#1565C0" },
-  };
+  const accountTypes = [
+    { value: "freelancer", label: "Xoto Partner", desc: "Earn by providing services" },
+    { value: "vendor-b2c", label: "Xoto Vendor", desc: "Sell products directly to customers" },
+  ];
 
   return (
-    <Box
-      sx={{
-        display: "flex",
+    <div
+      style={{
         minHeight: "100vh",
         backgroundImage: `url(${loginimage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        flexDirection: { xs: "column", md: "row" },
+        display: "flex",
+        position: "relative",
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
-      {/* Left Side */}
-      <motion.div
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 1 }}
+      {/* Dark Overlay */}
+      <div
         style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "2rem",
-          color: "#fff",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          backdropFilter: "blur(4px)",
+          position: "absolute",
+          inset: 0,
+          background: "rgba(0, 0, 0, 0.6)",
+          backdropFilter: "blur(8px)",
         }}
-      >
-        <Box textAlign="center">
-          <Typography variant="h3" fontWeight="bold" sx={{ mb: 2 }}>
-            {activeTab === "login" ? "Welcome Back!" : "Join Us!"}
-          </Typography>
-          <Typography variant="h6" sx={{ mb: 3 }}>
+      />
+
+      <div style={{ flex: 1, display: "flex", zIndex: 10 }}>
+        {/* Left Side - Welcome */}
+        <motion.div
+          initial={{ x: -200, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "2rem",
+            color: "white",
+            textAlign: "center",
+          }}
+        >
+          <Title level={1} style={{ color: "#03A4F4", marginBottom: 16, fontWeight: 800, fontSize: "3.5rem" }}>
+            {activeTab === "login" ? "Welcome Back!" : "Join Xoto"}
+          </Title>
+          <Text style={{ fontSize: "1.6rem", color: "#fff", maxWidth: 600, opacity: 0.9 }}>
             {activeStep === 0
-              ? "Select your account type to continue"
-              : `${userType.charAt(0).toUpperCase() + userType.slice(1).replace("-", " ")} Login`}
-          </Typography>
+              ? "Choose your role to get started"
+              : `Login as ${userType === "freelancer" ? "Partner" : "Vendor"}`}
+          </Text>
+
           {activeStep === 0 && (
-            <img
+            <motion.img
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.6, type: "spring", stiffness: 120 }}
               src={logoNew}
-              alt="App Logo"
+              alt="Xoto Logo"
               style={{
-                width: "140px",
-                height: "auto",
-                marginTop: "1rem",
-                objectFit: "contain",
-                borderRadius: "12px",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                width: 200,
+                marginTop: 50,
+                borderRadius: 24,
               }}
             />
           )}
-        </Box>
-      </motion.div>
+        </motion.div>
 
-      {/* Right Side Form */}
-      <motion.div
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 1 }}
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "2rem",
-        }}
-      >
-        <Card sx={{ maxWidth: 500, width: "100%", p: 4, boxShadow: 8, borderRadius: 4 }}>
-          <CardContent>
-            <Tabs value={activeTab} onChange={handleTabChange} centered sx={{ mb: 2 }}>
-              <Tab label="Login" value="login" />
-              <Tab label="Register" value="register" />
-            </Tabs>
+        {/* Right Side - Form */}
+        <motion.div
+          initial={{ x: 200, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "2rem",
+          }}
+        >
+          <Card
+            style={{
+              width: "100%",
+              maxWidth: 520,
+              borderRadius: 24,
+              background: "rgba(255, 255, 255, 0.98)",
+            }}
+            bodyStyle={{ padding: "48px" }}
+          >
+            {/* Tabs */}
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <Button
+                type={activeTab === "login" ? "primary" : "default"}
+                size="large"
+                style={{
+                  width: 150,
+                  height: 50,
+                  fontWeight: "bold",
+                  background: activeTab === "login" ? "#5C039B" : undefined,
+                  borderColor: "#5C039B",
+                }}
+                onClick={() => {
+                  setActiveTab("login");
+                  setActiveStep(0);
+                  setUserType("");
+                  form.resetFields();
+                  setGeneralError("");
+                }}
+              >
+                Login
+              </Button>
+              <Button
+                type={activeTab === "register" ? "primary" : "default"}
+                size="large"
+                style={{
+                  width: 150,
+                  height: 50,
+                  fontWeight: "bold",
+                  marginLeft: 20,
+                  background: activeTab === "register" ? "#5C039B" : undefined,
+                  borderColor: "#5C039B",
+                }}
+                onClick={() => {
+                  setActiveTab("register");
+                  setActiveStep(0);
+                  setUserType("");
+                  form.resetFields();
+                  setGeneralError("");
+                }}
+              >
+                Register
+              </Button>
+            </div>
 
-            <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
+            <Text strong style={{ display: "block", textAlign: "center", marginBottom: 24, fontSize: 16, color: "#5C039B" }}>
+              Step {activeStep + 1} of 2
+            </Text>
 
-            {errors.general && <Alert severity="error" sx={{ mb: 2 }}>{errors.general}</Alert>}
-            {authError && <Alert severity="error" sx={{ mb: 2 }}>{authError}</Alert>}
-            {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
-            {loading && <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}><CircularProgress sx={{ color: "#1976D2" }} /></Box>}
+            {generalError && (
+              <Alert
+                message={generalError}
+                type="error"
+                showIcon
+                style={{ marginBottom: 24, borderRadius: 12 }}
+                closable
+                onClose={() => setGeneralError("")}
+              />
+            )}
 
-            {/* === STEP 0: Select Account Type === */}
+            {/* Step 0: Select Role */}
             {activeStep === 0 ? (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <Typography variant="h5" align="center" gutterBottom>
-                  Select Account Type
-                </Typography>
+              <div>
+                <Title level={3} style={{ textAlign: "center", color: "#5C039B", marginBottom: 32 }}>
+                  Choose Your Role
+                </Title>
 
-                <RadioGroup value={userType} onChange={handleUserTypeChange} sx={{ gap: 2, mt: 3 }}>
-                  {[
-                    // { value: "employee", label: "Employee" },
-                    // { value: "customer", label: "Customer" },
-                    { value: "freelancer", label: "Xoto Partner" },
-                    { value: "vendor-b2c", label: " Xoto Vendor" },
-                    // { value: "vendor-b2b", label: "Vendor (B2B)" },
-                  ].map((type) => (
-                    <Card
-                      key={type.value}
-                      variant="outlined"
-                      sx={{
-                        p: 2,
-                        borderColor: userType === type.value ? "#1976D2" : "divider",
-                      }}
-                    >
-                      <FormControlLabel
-                        value={type.value}
-                        control={<Radio sx={{ color: "#1976D2" }} />}
-                        label={type.label}
-                        sx={{ width: "100%", m: 0 }}
-                      />
-                    </Card>
-                  ))}
-                </RadioGroup>
+                <Radio.Group
+                  value={userType}
+                  onChange={(e) => {
+                    setUserType(e.target.value);
+                    setGeneralError("");
+                  }}
+                  style={{ width: "100%" }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                    {accountTypes.map((type) => (
+                      <Card
+                        key={type.value}
+                        hoverable
+                        onClick={() => setUserType(type.value)}
+                        style={{
+                          borderRadius: 16,
+                          border: userType === type.value ? "3px solid #5C039B" : "1px solid #ddd",
+                          boxShadow: userType === type.value ? "0 0 20px rgba(92, 3, 155, 0.2)" : "none",
+                          transition: "all 0.3s",
+                        }}
+                      >
+                        <Radio value={type.value}>
+                          <Text strong style={{ fontSize: 20, color: "#5C039B" }}>
+                            {type.label}
+                          </Text>
+                        </Radio>
+                        <br />
+                        <Text type="secondary" style={{ fontSize: 15 }}>{type.desc}</Text>
+                      </Card>
+                    ))}
+                  </div>
+                </Radio.Group>
 
-                <Box sx={{ mt: 3 }}>
-                  <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    disabled={!userType}
-                    fullWidth
-                    sx={buttonSx}
-                  >
-                    Continue
-                  </Button>
-                </Box>
-              </motion.div>
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  onClick={handleNext}
+                  disabled={!userType}
+                  style={{
+                    height: 58,
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    marginTop: 32,
+                    background: "#5C039B",
+                    borderColor: "#5C039B",
+                    borderRadius: 16,
+                  }}
+                >
+                  Continue →
+                </Button>
+              </div>
             ) : (
-              /* === STEP 1: Login Form === */
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    label="Email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    error={!!errors.email}
-                    helperText={errors.email}
-                    sx={inputSx("email")}
-                  />
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    error={!!errors.password}
-                    helperText={errors.password}
-                    sx={inputSx("password")}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={handleTogglePasswordVisibility}>
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="rememberMe"
-                        checked={formData.rememberMe}
-                        onChange={handleInputChange}
-                      />
-                    }
-                    label="Remember me"
-                  />
+              /* Step 1: Login Form */
+              <div>
+                <Title level={3} style={{ textAlign: "center", color: "#5C039B", marginBottom: 32 }}>
+                  Sign In to Dashboard
+                </Title>
 
-                  <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-                    <Button variant="outlined" onClick={handleBack} sx={outlineButtonSx}>
+                <Form form={form} layout="vertical" onFinish={onFinish}>
+                  <Form.Item
+                    name="email"
+                    label={<span style={{ color: "#5C039B", fontWeight: 600 }}>Email Address</span>}
+                    rules={[
+                      { required: true, message: "Please enter your email" },
+                      { type: "email", message: "Invalid email format" },
+                    ]}
+                  >
+                    <Input
+                      size="large"
+                      placeholder="you@example.com"
+                      style={{ borderRadius: 12, height: 50 }}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="password"
+                    label={<span style={{ color: "#5C039B", fontWeight: 600 }}>Password</span>}
+                    rules={[
+                      { required: true, message: "Please enter your password" },
+                      { min: 6, message: "Password must be 6+ characters" },
+                    ]}
+                  >
+                    <Input.Password
+                      size="large"
+                      placeholder="••••••••"
+                      style={{ borderRadius: 12, height: 50 }}
+                      iconRender={(visible) => (
+                        <span style={{ color: "#5C039B" }}>
+                          {visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                        </span>
+                      )}
+                    />
+                  </Form.Item>
+
+                  <Form.Item name="remember" valuePropName="checked">
+                    <Checkbox style={{ color: "#020202" }}>Remember me</Checkbox>
+                  </Form.Item>
+
+                  <div style={{ display: "flex", gap: 16, marginTop: 30 }}>
+                    <Button size="large" onClick={handleBack} style={{ flex: 1, height: 50, borderRadius: 12 }}>
                       Back
                     </Button>
-                    <Button type="submit" variant="contained" disabled={loading} sx={buttonSx}>
-                      {loading ? "Logging in..." : "Login"}
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loading}
+                      size="large"
+                      style={{
+                        flex: 2,
+                        height: 50,
+                        background: "#5C039B",
+                        borderColor: "#5C039B",
+                        fontWeight: "bold",
+                        fontSize: 17,
+                        borderRadius: 12,
+                      }}
+                    >
+                      {loading ? "Signing In..." : "Login Now"}
                     </Button>
-                  </Box>
-                </Box>
-              </motion.div>
+                  </div>
+                </Form>
+              </div>
             )}
-          </CardContent>
-        </Card>
-      </motion.div>
-    </Box>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
   );
 };
 

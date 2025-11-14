@@ -1,106 +1,105 @@
-// context/AuthProvider.jsx
+// src/context/AuthProvider.jsx
 import React, { createContext, useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
-import { 
-  loginUser, 
-  logoutUser, 
-  refreshToken, 
-  rehydrateAuthState, 
-  fetchMyPermissions  
+import {
+  loginUser,
+  logoutUser,
+  refreshToken,
+  rehydrateAuthState,
+  fetchMyPermissions,
 } from '../store/authSlice';
 
 export const AuthContext = createContext();
 
+const API_BASE = 'https://kotiboxglobaltech.online/api';
+
 export const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const { 
-    user, 
-    token, 
-    loading, 
-    error, 
-    isAuthenticated 
-  } = useSelector((state) => state.auth);
+  const { user, token, loading, error, isAuthenticated } = useSelector((state) => state.auth);
 
   const [intervalId, setIntervalId] = useState(null);
-  const hasFetchedPermissions = useRef(false); // ← Track if permissions were fetched
+  const hasFetchedPermissions = useRef(false);
 
-  // 1. Rehydrate on mount
+  // Rehydrate auth state on app mount
   useEffect(() => {
     dispatch(rehydrateAuthState());
   }, [dispatch]);
 
-  // 2. Fetch permissions ONLY ONCE after successful login
+  // Fetch permissions once after successful authentication
   useEffect(() => {
-    if (isAuthenticated && user && token && !hasFetchedPermissions.current) {
-      hasFetchedPermissions.current = true; // Prevent re-fetch
-      dispatch(fetchMyPermissions()).catch(() => {
-        // Optional: handle failure without breaking
-      });
+    if (isAuthenticated && token && !hasFetchedPermissions.current) {
+      hasFetchedPermissions.current = true;
+      dispatch(fetchMyPermissions()).unwrap().catch(() => {});
     }
 
-    // Reset flag on logout
     if (!isAuthenticated) {
       hasFetchedPermissions.current = false;
     }
-  }, [isAuthenticated, user, token, dispatch]);
+  }, [isAuthenticated, token, dispatch]);
 
-  // 3. Auto refresh token
+  // Auto token refresh logic
   useEffect(() => {
-    if (!token) {
-      if (intervalId) {
-        clearInterval(intervalId);
-        setIntervalId(null);
+  if (!token) return;
+
+  const checkAndRefresh = () => {
+    try {
+      const decoded = jwtDecode(token);
+      const timeUntilExpiry = decoded.exp * 1000 - Date.now();
+
+      if (timeUntilExpiry < 5 * 60 * 1000) {
+        dispatch(refreshToken());
       }
-      return;
+    } catch (err) {
+      console.error('Invalid token, logging out');
+      dispatch(logoutUser());
     }
-
-    const checkAndRefresh = () => {
-      try {
-        const decoded = jwtDecode(token);
-        const timeToExp = decoded.exp * 1000 - Date.now();
-        if (timeToExp < 5 * 60 * 1000) {
-          dispatch(refreshToken());
-        }
-      } catch (err) {
-        dispatch(logoutUser());
-      }
-    };
-
-    checkAndRefresh();
-    const id = setInterval(checkAndRefresh, 60 * 1000);
-    setIntervalId(id);
-
-    return () => {
-      clearInterval(id);
-      setIntervalId(null);
-    };
-  }, [token, dispatch]); // ← Removed `intervalId` from deps
-
-  // 4. Login / Logout
-  const login = async (email, password, endpoint) => {
-    const result = await dispatch(loginUser({ email, password, endpoint })).unwrap();
-    return result;
   };
 
-  const logout = async () => {
-    hasFetchedPermissions.current = false; // Reset on logout
-    await dispatch(logoutUser()).unwrap();
+  checkAndRefresh();
+  const id = setInterval(checkAndRefresh, 60 * 1000);
+
+  return () => clearInterval(id);
+}, [token, dispatch]);
+
+
+  // Enhanced login function that accepts dynamic endpoint
+  const login = async (email, password, endpointPath = '/auth/login') => {
+    const fullEndpoint = `${API_BASE}${endpointPath}`;
+    
+    return await dispatch(
+      loginUser({
+        email,
+        password,
+        endpoint: fullEndpoint,
+      })
+    ).unwrap();
   };
 
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      token, 
-      loading, 
-      error, 
-      isAuthenticated,
-      login, 
-      logout 
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  // Logout with optional backend call
+  const logout = async (logoutEndpoint = '/auth/logout') => {
+    hasFetchedPermissions.current = false;
+    const fullEndpoint = `${API_BASE}${logoutEndpoint}`;
+    
+    try {
+      await dispatch(logoutUser(fullEndpoint)).unwrap();
+    } catch (err) {
+      // Even if backend fails, clear local state
+      dispatch(logoutUser());
+    }
+  };
+
+  const value = {
+    user,
+    token,
+    loading,
+    error,
+    isAuthenticated,
+    login,    // Now supports dynamic endpoints
+    logout,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

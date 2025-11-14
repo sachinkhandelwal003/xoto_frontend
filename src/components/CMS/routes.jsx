@@ -144,11 +144,12 @@ const CmsRoutes = () => {
       <Route path="products/:id" element={<ProductReview />} />
       <Route path="products/view/:id" element={<ProductProfile />} />
       <Route path="seller/:id" element={<VendorB2CProfile />} />
+            <Route path="seller/product/:id" element={<ProductRequestB2C />} />
+
       <Route path="freelancer/myprofile" element={<MyprofileFreelancer />} />
       <Route path="/update/:id" element={<UpdateFreelncerProfile />} />
 
       {/* Catch-all fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

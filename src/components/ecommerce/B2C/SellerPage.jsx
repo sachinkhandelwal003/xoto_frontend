@@ -242,7 +242,7 @@ const SellerPage = () => {
       console.log('✅ Vendor Registration Successful:', response);
       toast.success('Registration successful!');
       reset();
-      navigate('/sawtar/login');
+      navigate('/login');
     },
     onError: (error) => {
       console.error('❌ Vendor Registration Error:', error);
@@ -431,7 +431,7 @@ const SellerPage = () => {
             </Title>
           </div>
           <Text className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Join Sawtar LuxeInteriors as a premium vendor. Complete the registration process to start selling your products.
+            Join Xoto as a premium vendor. Complete the registration process to start selling your products.
           </Text>
         </motion.div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -1299,7 +1299,7 @@ const SellerPage = () => {
                               <br />
                               • You comply with all applicable laws and regulations
                               <br />
-                              • Sawtar LuxeInteriors may verify provided information
+                              • Xoto LuxeInteriors may verify provided information
                               <br />
                               • Approval is subject to verification and compliance checks
                             </Text>

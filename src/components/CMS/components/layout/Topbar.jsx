@@ -31,23 +31,23 @@ const Topbar = () => {
     const roleCode = user?.role?.code;
     switch (roleCode) {
       case "0":
-        return "/sawtar/cms/superadmin/myprofile";
+        return "/superadmin/myprofile";
       case "1":
-        return "/sawtar/cms/admin/myprofile";
+        return "/admin/myprofile";
       case "2":
-        return "/sawtar/cms/customer/myprofile";
+        return "/customer/myprofile";
       case "3":
-        return "/sawtar/cms/employee/myprofile";
+        return "/employee/myprofile";
       case "6":
-        return "/sawtar/cms/seller/b2b/myprofile";
+        return "/seller/b2b/myprofile";
       case "5":
-        return "/sawtar/dashboard/vendor-b2c/profile";
+        return "/dashboard/vendor-b2c/profile";
       case "8":
-        return "/sawtar/cms/business/myprofile";
+        return "/business/myprofile";
       case "7":
-        return "/sawtar/dashboard/freelancer/myprofile";
+        return "/dashboard/freelancer/myprofile";
       default:
-        return "/sawtar/cms/profile";
+        return "/profile";
     }
   };
 
@@ -67,7 +67,7 @@ const Topbar = () => {
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
-    navigate("/sawtar/");
+    navigate("/");
     handleMenuClose();
   };
 

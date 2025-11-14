@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { loginStart, loginSuccess, loginFailure, logout } from './authSlice';
 
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = 'https://kotiboxglobaltech.online/api';
 
 export const loginUser = (email, password, endpoint) => async (dispatch) => {
   try {
@@ -27,7 +27,7 @@ export const loginUser = (email, password, endpoint) => async (dispatch) => {
 
 export const logoutUser = () => async (dispatch) => {
   try {
-    await axios.post('/api/auth/logout');
+    await axios.post('/auth/logout');
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     dispatch(logout());

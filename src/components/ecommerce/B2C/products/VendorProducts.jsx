@@ -21,9 +21,9 @@ const VendorProducts = () => {
   });
   
   const ROUTES = {
-  SELLER_ADD_PRODUCT: '/sawtar/dashboard/vendor-b2c/products/add',
-  SELLER_PRODUCT_REVIEW: '/sawtar/dashboard/vendor-b2c/products/view',
-  SELLER_PRODUCT_INVENTORY: '/sawtar/cms/seller/b2c/product/inventory',
+  SELLER_ADD_PRODUCT: '/dashboard/vendor-b2c/products/add',
+  SELLER_PRODUCT_REVIEW: '/dashboard/vendor-b2c/products/view',
+  SELLER_PRODUCT_INVENTORY: 'dashboard/b2c/product/inventory',
 };
   const [stats, setStats] = useState({
     total: 0,

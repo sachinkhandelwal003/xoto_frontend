@@ -3,6 +3,9 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
+// Set base URL globally
+const API_BASE = 'https://kotiboxglobaltech.online/api';
+
 // Load from localStorage
 const loadInitialState = () => {
   const token = localStorage.getItem("token");
@@ -10,10 +13,11 @@ const loadInitialState = () => {
     try {
       const decoded = jwtDecode(token);
       if (decoded.exp * 1000 > Date.now()) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         return {
           user: decoded,
           token,
-          permissions: {}, // FLAT MAP
+          permissions: {},
           loading: false,
           error: null,
           isAuthenticated: true,
@@ -35,10 +39,10 @@ const loadInitialState = () => {
   };
 };
 
-// LOGIN
+// LOGIN - Using the correct endpoint
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async ({ email, password, endpoint }, { rejectWithValue }) => {
+  async ({ email, password, endpoint = "/auth/login" }, { rejectWithValue }) => {
     try {
       const response = await axios.post(endpoint, { email, password });
       const data = response.data;
@@ -46,12 +50,13 @@ export const loginUser = createAsyncThunk(
       if (!data.success) return rejectWithValue(data);
 
       localStorage.setItem("token", data.token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+      
       const decoded = jwtDecode(data.token);
-
-      return { user: decoded, token: data.token };
+      return { user: decoded, token: data.token, message: data.message };
     } catch (err) {
       return rejectWithValue(
-        err.response?.data || { message: "Network error" }
+        err.response?.data || { message: "Network error", errors: [] }
       );
     }
   }
@@ -63,11 +68,12 @@ export const logoutUser = createAsyncThunk(
   async (_, { getState }) => {
     try {
       const { token } = getState().auth;
-      if (token) await axios.post("/api/auth/logout");
+      if (token) await axios.post("/auth/logout");
     } catch (error) {
       console.warn("Logout error:", error);
     } finally {
       localStorage.removeItem("token");
+      delete axios.defaults.headers.common['Authorization'];
     }
   }
 );
@@ -80,31 +86,30 @@ export const refreshToken = createAsyncThunk(
       const { token } = getState().auth;
       if (!token) return rejectWithValue("No token");
 
-      const res = await axios.post("/api/auth/refresh");
+      const res = await axios.post("/auth/refresh");
       const newToken = res.data.token;
       const decoded = jwtDecode(newToken);
 
       localStorage.setItem("token", newToken);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       return { user: decoded, token: newToken };
     } catch (err) {
       localStorage.removeItem("token");
+      delete axios.defaults.headers.common['Authorization'];
       return rejectWithValue("Refresh failed");
     }
   }
 );
 
-// FETCH MY PERMISSIONS (NEW ENDPOINT)
+// FETCH MY PERMISSIONS
 export const fetchMyPermissions = createAsyncThunk(
   "auth/fetchMyPermissions",
   async (_, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      const res = await axios.get(
-        "https://kotiboxglobaltech.online/api/permission/my/get",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await axios.get("https://kotiboxglobaltech.online/api/permission/my/get", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (res.data.success) {
         return res.data.permissions;
@@ -133,17 +138,20 @@ const authSlice = createSlice({
             state.user = decoded;
             state.token = token;
             state.isAuthenticated = true;
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           } else {
             localStorage.removeItem("token");
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
+            delete axios.defaults.headers.common['Authorization'];
           }
         } catch {
           localStorage.removeItem("token");
           state.user = null;
           state.token = null;
           state.isAuthenticated = false;
+          delete axios.defaults.headers.common['Authorization'];
         }
       }
     },
@@ -167,7 +175,7 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message || "Login failed";
+        state.error = action.payload?.message || "Login failed";
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
@@ -201,7 +209,6 @@ const authSlice = createSlice({
       })
       .addCase(fetchMyPermissions.fulfilled, (state, action) => {
         state.loading = false;
-        // FLAT MAP: "Productsss→Add New" → { canView: 1, route: "/products/new" }
         state.permissions = action.payload.reduce((map, p) => {
           const key = p.subModule
             ? `${p.module.name}→${p.subModule.name}`

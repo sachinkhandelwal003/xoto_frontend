@@ -25,57 +25,122 @@ const ecosystemData = [
   },
 ];
 
-export default function TestimonialSlider() {
+export default function EcosystemSlider() {
   return (
-    <div className="relative w-full bg-[var(--color-body)] py-20 overflow-hidden">
-      {/* Background Image */}
+    <section className="relative w-full bg-[var(--color-body)] py-10 sm:py-12 md:py-16 lg:py-20 overflow-hidden">
+      {/* Background Image with Overlay */}
       <div className="absolute inset-0">
-        <img src={aaImage} alt="city" className="w-full h-full object-cover" />
+        <img
+          src={aaImage}
+          alt="City landscape"
+          className="w-full h-full object-cover object-center"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20"></div>
       </div>
 
-      {/* Content Layer */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center text-4xl font-extrabold text-white mb-16 drop-shadow-lg">
+      {/* Main Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Title */}
+        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-8 sm:mb-10 md:mb-12 lg:mb-16 drop-shadow-xl tracking-tight">
           Our Tech Ecosystem
         </h2>
 
-        {/* Swiper Section */}
+        {/* Swiper Carousel */}
         <div className="w-full">
           <Swiper
             modules={[Pagination, Navigation]}
-            pagination={{ clickable: true }}
-            navigation
+            pagination={{
+              clickable: true,
+              bulletActiveClass: "swiper-pagination-bullet-active !bg-white !opacity-100",
+              bulletClass: "swiper-pagination-bullet !bg-white/50 !w-2 !h-2 md:!w-3 md:!h-3",
+            }}
+            navigation={{
+              prevEl: ".custom-swiper-button-prev",
+              nextEl: ".custom-swiper-button-next",
+            }}
             centeredSlides={true}
             loop={true}
-            slidesPerView={1.3} // Slightly more than one to show peek of next/previous cards
-            spaceBetween={60}
-            className="!pb-10"
+            grabCursor={true}
+            slidesPerView={1}
+            spaceBetween={16}
+            breakpoints={{
+              480: {
+                slidesPerView: 1,
+                spaceBetween: 20,
+              },
+              640: {
+                slidesPerView: 1.1,
+                spaceBetween: 24,
+              },
+              768: {
+                slidesPerView: 1.2,
+                spaceBetween: 30,
+              },
+              1024: {
+                slidesPerView: 1.3,
+                spaceBetween: 40,
+              },
+              1280: {
+                slidesPerView: 1.3,
+                spaceBetween: 60,
+              },
+            }}
+            className="!pb-10 sm:!pb-12 md:!pb-14 lg:!pb-16"
           >
             {ecosystemData.map((item, index) => (
               <SwiperSlide key={index}>
                 {({ isActive }) => (
                   <div
-                    className={`flex items-center gap-10 mx-auto max-w-5xl rounded-[3rem] px-16 py-16 transition-all duration-500 shadow-2xl backdrop-blur-sm ${
-                      isActive
-                        ? "scale-105 bg-gradient-to-br from-purple-700 via-black to-purple-800 text-white"
-                        : "scale-95 bg-gradient-to-br from-purple-900 via-black to-purple-900 opacity-70 text-gray-200"
-                    }`}
+                    className={`
+                      group relative flex flex-col sm:flex-row items-center gap-4 sm:gap-6 md:gap-8 lg:gap-10
+                      mx-auto w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md md:max-w-3xl lg:max-w-5xl
+                      rounded-2xl sm:rounded-3xl
+                      px-5 py-6 sm:px-8 sm:py-8 md:px-12 md:py-12 lg:px-16 lg:py-16
+                      transition-all duration-500 ease-out
+                      shadow-xl backdrop-blur-xl border border-white/10
+                      ${isActive
+                        ? "scale-100 sm:scale-105 bg-gradient-to-br from-purple-600 via-purple-800 to-purple-900 text-white ring-4 ring-purple-500/30"
+                        : "scale-90 sm:scale-95 bg-gradient-to-br from-purple-900/80 via-black/80 to-purple-900/80 text-gray-200 opacity-75"
+                      }
+                    `}
                   >
-                    {/* Left: Logo */}
-                    <div className="flex-shrink-0">
-                      <img
-                        src={logoNew}
-                        alt="Logo"
-                        className="h-36 w-36 object-contain drop-shadow-2xl"
-                      />
+                    {/* Logo */}
+                    <div className="flex-shrink-0 p-2">
+                      <div className="relative">
+                        <img
+                          src={logoNew}
+                          alt={`${item.title} Logo`}
+                          className={`
+                            w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36
+                            object-contain drop-shadow-2xl transition-transform duration-500
+                            ${isActive ? "scale-110" : "scale-100"}
+                          `}
+                        />
+                        {isActive && (
+                          <div className="absolute inset-0 rounded-full bg-white/20 blur-xl animate-pulse"></div>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Right: Text */}
-                    <div className="flex flex-col text-left">
-                      <h3 className="text-4xl font-extrabold mb-6 text-white">
+                    {/* Text Content */}
+                    <div className="flex flex-col text-center sm:text-left flex-1 space-y-2 sm:space-y-3 md:space-y-4">
+                      <h3
+                        className={`
+                          font-extrabold tracking-tight text-white
+                          text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl
+                          ${isActive ? "text-white" : "text-gray-100"}
+                        `}
+                      >
                         {item.title}
                       </h3>
-                      <p className="text-lg leading-relaxed opacity-90 max-w-2xl">
+                      <p
+                        className={`
+                          leading-relaxed opacity-90 max-w-xl mx-auto sm:mx-0
+                          text-xs xs:text-sm sm:text-base md:text-lg lg:text-lg
+                          ${isActive ? "text-gray-100" : "text-gray-300"}
+                        `}
+                      >
                         {item.description}
                       </p>
                     </div>
@@ -84,8 +149,46 @@ export default function TestimonialSlider() {
               </SwiperSlide>
             ))}
           </Swiper>
+
+          {/* Custom Navigation Buttons */}
+          <div className="flex justify-center items-center gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
+            <button
+              className="custom-swiper-button-prev
+                !static !mt-0 
+                w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 md:w-14 md:h-14
+                rounded-full bg-white/20 backdrop-blur-md
+                hover:bg-white/40 text-white
+                flex items-center justify-center shadow-xl
+                transition-all duration-300 hover:scale-110
+                border border-white/30
+              "
+            >
+              <svg className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <button
+              className="custom-swiper-button-next
+                !static !mt-0 
+                w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 md:w-14 md:h-14
+                rounded-full bg-white/20 backdrop-blur-md
+                hover:bg-white/40 text-white
+                flex items-center justify-center shadow-xl
+                transition-all duration-300 hover:scale-110
+                border border-white/30
+              "
+            >
+              <svg className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Optional: Pagination Dots Below */}
+          <div className="swiper-pagination !static !bottom-0 !mt-4"></div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

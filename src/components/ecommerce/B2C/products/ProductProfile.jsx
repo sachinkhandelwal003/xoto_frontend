@@ -403,7 +403,7 @@ const ProductProfile = () => {
                           cover={
                             <img
                               alt={img.alt_text || `Image ${imgIndex + 1}`}
-                              src={`http://localhost:5000/${img.url}`}
+                              src={`https://kotiboxglobaltech.online/${img.url}`}
                               className="h-40 object-cover"
                               onError={(e) => {
                                 e.target.src = 'https://via.placeholder.com/150?text=Image+Not+Found';

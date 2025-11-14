@@ -4,43 +4,34 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
-  Drawer,
   Card,
   Space,
   Tag,
   Tooltip,
-  Spin,
-  Typography,
-  Descriptions,
-  Divider,
   Modal,
   Input,
   Tabs,
-  Badge,
+  Statistic,
   Popconfirm,
-  Image,
   Alert,
 } from "antd";
 import {
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  EyeOutlined,
-  UserOutlined,
-  MobileOutlined,
-  EnvironmentOutlined,
-  TagsOutlined,
-  CalendarOutlined,
-} from "@ant-design/icons";
+  FiPlus,
+  FiRefreshCw,
+  FiEye,
+  FiCheck,
+  FiX,
+  FiUser,
+  FiClock,
+} from "react-icons/fi";
 import moment from "moment";
 import { apiService } from "../../../../../../manageApi/utils/custom.apiservice";
 import CustomTable from "../../../custom/CustomTable";
 
-const { Title, Text } = Typography;
 const { TextArea } = Input;
+const { TabPane } = Tabs;
 
-/* --------------------------------------------------------------
-   Role → slug map (your existing map)
-   -------------------------------------------------------------- */
+// Role map
 const roleSlugMap = {
   0: "superadmin",
   1: "admin",
@@ -50,32 +41,32 @@ const roleSlugMap = {
   11: "accountant",
 };
 
+// Permission Hook - Same logic as ProductRequestB2C
+const useFreelancerPermission = () => {
+  const { permissions } = useSelector((s) => s.auth);
+  const p = permissions?.["Xoto Partners→All Partners"] ?? {};
+
+  return {
+    canView: !!p.canView,
+    canAdd: !!p.canAdd,
+    canEdit: !!p.canEdit,
+    canDelete: !!p.canDelete,
+    canApprove: !!p.canEdit,
+    canReject: !!p.canDelete,
+  };
+};
+
 const Freelancers = () => {
   const navigate = useNavigate();
-  const { token, user, permissions } = useSelector((s) => s.auth);
+  const { token, user } = useSelector((s) => s.auth);
+  const perm = useFreelancerPermission();
 
-  /* ---------- Role & Permission logic ---------- */
   const roleSlug = roleSlugMap[user?.role?.code] ?? "dashboard";
-  const isAdmin = ["superadmin", "admin"].includes(roleSlug);
 
-  // <--  NEW: Use the exact key you posted
-  const partnerPerm = permissions?.["Xoto Partners→All Partners"] ?? {};
-
-  const canView   = isAdmin || !!partnerPerm.canView;
-  const canEdit   = isAdmin || !!partnerPerm.canEdit;
-  const canAdd    = isAdmin || !!partnerPerm.canAdd;      // for “New Request”
-  const canDelete = isAdmin || !!partnerPerm.canDelete;   // (future use)
-  const canViewAll = isAdmin || !!partnerPerm.canViewAll; // (future use)
-
-  /* ---------- UI state ---------- */
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
   const [freelancers, setFreelancers] = useState([]);
-  const [selectedFreelancer, setSelectedFreelancer] = useState(null);
-  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
-  const [rejectModalVisible, setRejectModalVisible] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState("");
-  const [rejectingId, setRejectingId] = useState(null);
+  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -84,107 +75,115 @@ const Freelancers = () => {
     itemsPerPage: 10,
   });
 
-  const statusMap = { pending: 0, approved: 1, rejected: 2 };
-  const statusColors = { 0: "orange", 1: "green", 2: "red" };
-  const statusLabels = { 0: "Pending", 1: "Approved", 2: "Rejected" };
+  const [selectedFreelancer, setSelectedFreelancer] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
-  /* --------------------- FETCH --------------------- */
+  // Fetch Freelancers + Stats
   const fetchFreelancers = useCallback(
     async (page = 1, limit = 10) => {
-      if (!token || !canView) return;
+      if (!token || !perm.canView) return;
       setLoading(true);
+
       try {
-        const params = { page, limit, status: statusMap[activeTab] };
-        const { freelancers = [], pagination: pag = {} } = await apiService.get(
-          "/freelancer",
-          params
-        );
-        setFreelancers(freelancers);
+        const statusMap = { pending: 0, approved: 1, rejected: 2 };
+        const res = await apiService.get("/freelancer", {
+          page,
+          limit,
+          status: statusMap[activeTab],
+        });
+
+        setFreelancers((res.freelancers || []).map((f, i) => ({
+          ...f,
+          key: f._id,
+          sno: (page - 1) * limit + i + 1,
+        })));
+
         setPagination({
-          currentPage: pag.page ?? 1,
-          totalPages: pag.totalPages ?? 1,
-          totalResults: pag.total ?? 0,
-          itemsPerPage: pag.limit ?? 10,
+          currentPage: res.pagination?.page || 1,
+          totalPages: res.pagination?.totalPages || 1,
+          totalResults: res.pagination?.total || 0,
+          itemsPerPage: res.pagination?.limit || 10,
+        });
+
+        // Stats from API or fallback
+        setStats({
+          total: res.stats?.total || 0,
+          pending: res.stats?.pending || 0,
+          approved: res.stats?.approved || 0,
+          rejected: res.stats?.rejected || 0,
         });
       } catch (err) {
-        console.error("Fetch freelancers error:", err);
+        console.error(err);
+        setFreelancers([]);
       } finally {
         setLoading(false);
       }
     },
-    [activeTab, token, canView]
+    [activeTab, token, perm.canView]
   );
 
   useEffect(() => {
     fetchFreelancers(pagination.currentPage, pagination.itemsPerPage);
   }, [activeTab, fetchFreelancers]);
 
-  const handlePageChange = (page, limit) => fetchFreelancers(page, limit);
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    setPagination((p) => ({ ...p, currentPage: 1 }));
+  };
 
-  /* --------------------- STATUS UPDATE --------------------- */
-  const updateStatus = async (id, status, reason = "") => {
-    if (!canEdit) return;
+  const handlePageChange = (page, limit) => {
+    fetchFreelancers(page, limit);
+  };
+
+  const handleRefresh = () => fetchFreelancers(pagination.currentPage, pagination.itemsPerPage);
+
+  const handleApprove = async (id) => {
     try {
-      const payload = { status };
-      if (status === 2 && reason.trim()) payload.rejection_reason = reason.trim();
-      await apiService.put(`/freelancer/${id}/status`, payload);
-      fetchFreelancers(pagination.currentPage, pagination.itemsPerPage);
+      await apiService.put(`/freelancer/${id}/status`, { status: 1 });
+      handleRefresh();
     } catch (err) {
-      console.error("Update status error:", err);
-    } finally {
-      setRejectModalVisible(false);
-      setRejectionReason("");
-      setRejectingId(null);
+      console.error(err);
     }
   };
 
-  /* --------------------- REJECT MODAL --------------------- */
-  const openRejectModal = (freelancer) => {
-    setSelectedFreelancer(freelancer);
-    setRejectingId(freelancer._id);
+  const openRejectModal = (record) => {
+    setSelectedFreelancer(record);
     setRejectionReason("");
-    setRejectModalVisible(true);
-  };
-  const closeRejectModal = () => {
-    setRejectModalVisible(false);
-    setSelectedFreelancer(null);
-    setRejectingId(null);
-    setRejectionReason("");
+    setShowRejectModal(true);
   };
 
-  /* --------------------- DETAIL DRAWER --------------------- */
-  const openDetailDrawer = (freelancer) => {
-    setSelectedFreelancer(freelancer);
-    setDetailDrawerOpen(true);
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) return;
+    try {
+      await apiService.put(`/freelancer/${selectedFreelancer._id}/status`, {
+        status: 2,
+        rejection_reason: rejectionReason,
+      });
+      handleRefresh();
+      setShowRejectModal(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  /* --------------------- NAVIGATE TO PROFILE --------------------- */
-  const goToProfile = (id) => {
-    navigate(`/sawtar/dashboard/${roleSlug}/freelancer/${id}`);
-  };
-
-  /* --------------------- TABLE COLUMNS --------------------- */
+  // Table Columns
   const columns = useMemo(
     () => [
       {
-        key: "sno",
         title: "S.No",
-        width: 70,
-        render: (_, __, idx) => {
-          const page = pagination.currentPage ?? 1;
-          const perPage = pagination.itemsPerPage ?? 10;
-          return (page - 1) * perPage + idx + 1;
-        },
+        key: "sno",
+        width: 80,
+        render: (_, r) => <span className="font-medium">{r.sno}</span>,
       },
       {
-        key: "name",
         title: "Freelancer",
-        width: 200,
+        width: 250,
         render: (_, r) => (
           <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-              style={{ backgroundColor: "#14b8a6" }}
+              style={{ backgroundColor: "#5C039B" }}
             >
               {r.name?.first_name?.[0]?.toUpperCase() || "F"}
             </div>
@@ -192,22 +191,19 @@ const Freelancers = () => {
               <div className="font-medium">
                 {r.name?.first_name} {r.name?.last_name}
               </div>
-              <Text type="secondary" className="text-xs">
-                {r.email}
-              </Text>
+              <div className="text-xs text-gray-500">{r.email}</div>
             </div>
           </div>
         ),
       },
       {
-        key: "mobile",
         title: "Mobile",
         width: 140,
         render: (_, r) => (
           <Space>
-            <Text>{r.mobile}</Text>
+            {r.mobile}
             {r.is_mobile_verified && (
-              <Tag icon={<CheckCircleOutlined />} color="success">
+              <Tag color="green" icon={<FiCheck />}>
                 Verified
               </Tag>
             )}
@@ -215,88 +211,76 @@ const Freelancers = () => {
         ),
       },
       {
-        key: "location",
         title: "Location",
-        width: 140,
+        width: 160,
         render: (_, r) => {
-          const city = r.location?.city;
-          const country = r.location?.country;
-          const loc = city && country ? `${city}, ${country}` : city || country || "—";
-          return <Text>{loc}</Text>;
+          const loc = [r.location?.city, r.location?.country].filter(Boolean).join(", ");
+          return loc || "—";
         },
       },
       {
-        key: "services",
         title: "Services",
-        width: 110,
+        width: 100,
         render: (_, r) => (
-          <Tag color="blue" icon={<TagsOutlined />}>
-            {r.services_offered?.length ?? 0}
-          </Tag>
+          <Tag color="purple">{r.services_offered?.length || 0}</Tag>
         ),
       },
       {
-        key: "status",
         title: "Status",
         width: 110,
         render: (_, r) => {
-          const s = r.status_info?.status ?? 0;
-          return <Tag color={statusColors[s]}>{statusLabels[s]}</Tag>;
+          const s = r.status_info?.status;
+          const map = { 0: "orange", 1: "green", 2: "red" };
+          const label = { 0: "Pending", 1: "Approved", 2: "Rejected" };
+          return <Tag color={map[s]}>{label[s]}</Tag>;
         },
       },
       {
-        key: "createdAt",
         title: "Registered",
-        width: 120,
-        render: (_, r) => moment(r.createdAt).format("DD MMM YYYY"),
+        width: 130,
+        render: (_, r) => moment(r.createdAt).format("DD/MM/YYYY"),
       },
       {
-        key: "actions",
         title: "Actions",
-        width: 180,
         fixed: "right",
+        width: 160,
         render: (_, r) => (
           <Space>
-            <Tooltip title="View Details">
-              <Button size="small" icon={<EyeOutlined />} onClick={() => goToProfile(r._id)} />
-            </Tooltip>
+            <Button
+              type="link"
+              icon={<FiEye />}
+              onClick={() => navigate(`/dashboard/${roleSlug}/freelancer/${r._id}`)}
+            />
 
+            {activeTab === "pending" && perm.canApprove && (
+              <Popconfirm
+                title="Approve this freelancer?"
+                onConfirm={() => handleApprove(r._id)}
+              >
+                <Button type="link" icon={<FiCheck />} className="text-green-600" />
+              </Popconfirm>
+            )}
 
-            {/* Approve / Reject – only for pending & when canEdit */}
-            {activeTab === "pending" && canEdit && (
-              <>
-                <Popconfirm
-                  title="Approve this freelancer?"
-                  onConfirm={() => updateStatus(r._id, 1)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button size="small" type="primary" icon={<CheckCircleOutlined />} />
-                </Popconfirm>
-
-                <Tooltip title="Reject">
-                  <Button
-                    size="small"
-                    danger
-                    icon={<CloseCircleOutlined />}
-                    onClick={() => openRejectModal(r)}
-                  />
-                </Tooltip>
-              </>
+            {activeTab === "pending" && perm.canReject && (
+              <Button
+                type="link"
+                danger
+                icon={<FiX />}
+                onClick={() => openRejectModal(r)}
+              />
             )}
           </Space>
         ),
       },
     ],
-    [activeTab, pagination, canEdit, roleSlug]
+    [activeTab, perm.canApprove, perm.canReject, roleSlug, navigate]
   );
 
-  /* --------------------- RENDER --------------------- */
-  if (!canView) {
+  if (!perm.canView) {
     return (
       <div className="p-6 text-center">
-        <Title level={4}>Access Denied</Title>
-        <Text>You don't have permission to view Freelancers.</Text>
+        <h2 className="text-xl font-semibold">Access Denied</h2>
+        <p>You don't have permission to view freelancers.</p>
       </div>
     );
   }
@@ -304,237 +288,99 @@ const Freelancers = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <Title level={3}>Freelancer Management</Title>
-          <Text type="secondary">
-            Review, approve, or reject freelancer applications
-          </Text>
+      <Card className="mb-6" bodyStyle={{ padding: "16px 24px" }}>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">Freelancer Requests</h1>
+            <p className="text-gray-500">Review and manage freelancer applications</p>
+          </div>
+          <Space>
+            {/* {perm.canAdd && (
+              <Button
+                type="primary"
+                icon={<FiPlus />}
+                onClick={() => navigate("/sawtar/cms/freelancer/request")}
+              >
+                New Request
+              </Button>
+            )} */}
+            <Button icon={<FiRefreshCw />} onClick={handleRefresh}>
+              Refresh
+            </Button>
+          </Space>
         </div>
-
-        {/* NEW REQUEST – only when canAdd */}
-        {canAdd && (
-          <Button
-            type="primary"
-            icon={<UserOutlined />}
-            onClick={() => navigate("/sawtar/cms/freelancer/request")}
-          >
-            New Request
-          </Button>
-        )}
-      </div>
+      </Card>
 
       {/* Tabs */}
-      <Tabs activeKey={activeTab} onChange={setActiveTab} className="mb-4">
-        {["pending", "approved", "rejected"].map((tab) => {
-          const count = activeTab === tab ? pagination.totalResults : 0;
-          return (
-            <Tabs.TabPane
-              key={tab}
-              tab={
-                <span>
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  {count > 0 && (
-                    <Badge
-                      count={count}
-                      style={{ marginLeft: 8, backgroundColor: "#14b8a6" }}
-                    />
-                  )}
-                </span>
-              }
-            />
-          );
-        })}
+      <Tabs activeKey={activeTab} onChange={handleTabChange} className="mb-6">
+        <TabPane tab={`Pending `} key="pending" />
+        <TabPane tab={`Approved `} key="approved" />
+        <TabPane tab={`Rejected `} key="rejected" />
       </Tabs>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {[
+          { title: "Total", value: stats.total, icon: FiUser, color: "#5C039B" },
+          { title: "Pending", value: stats.pending, icon: FiClock, color: "#ff9800" },
+          { title: "Approved", value: stats.approved, icon: FiCheck, color: "#4caf50" },
+          { title: "Rejected", value: stats.rejected, icon: FiX, color: "#f44336" },
+        ].map((s) => (
+          <Card key={s.title} className="shadow-md">
+            <Statistic
+              title={s.title}
+              value={s.value}
+              prefix={<s.icon style={{ color: s.color }} />}
+              valueStyle={{ color: s.color }}
+            />
+          </Card>
+        ))}
+      </div>
 
       {/* Table */}
       <Card bodyStyle={{ padding: 0 }}>
         <CustomTable
           columns={columns}
           data={freelancers}
+          loading={loading}
           totalItems={pagination.totalResults}
           currentPage={pagination.currentPage}
           itemsPerPage={pagination.itemsPerPage}
           onPageChange={handlePageChange}
-          loading={loading}
-          scroll={{ x: 1350 }}
+          scroll={{ x: 1400 }}
         />
       </Card>
 
-      {/* ---------- DETAIL DRAWER ---------- */}
-      <Drawer
-        title="Freelancer Details"
-        open={detailDrawerOpen}
-        onClose={() => setDetailDrawerOpen(false)}
-        width={700}
-        destroyOnClose
-      >
-        {selectedFreelancer && (
-          <div>
-            <div className="flex items-center gap-4 mb-6">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold"
-                style={{ backgroundColor: "#14b8a6" }}
-              >
-                {selectedFreelancer.name?.first_name?.[0]?.toUpperCase() || "F"}
-              </div>
-              <div>
-                <Title level={4} className="mb-0">
-                  {selectedFreelancer.name?.first_name} {selectedFreelancer.name?.last_name}
-                </Title>
-                <Text type="secondary">{selectedFreelancer.email}</Text>
-              </div>
-            </div>
-
-            <Descriptions bordered column={2}>
-              <Descriptions.Item label="Mobile" span={1}>
-                <Space>
-                  <MobileOutlined />
-                  {selectedFreelancer.mobile}
-                  {selectedFreelancer.is_mobile_verified && (
-                    <Tag color="green" icon={<CheckCircleOutlined />}>
-                      Verified
-                    </Tag>
-                  )}
-                </Space>
-              </Descriptions.Item>
-              <Descriptions.Item label="Location" span={1}>
-                <Space>
-                  <EnvironmentOutlined />
-                  {selectedFreelancer.location?.city && `${selectedFreelancer.location.city}, `}
-                  {selectedFreelancer.location?.country || "—"}
-                </Space>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Services Offered" span={2}>
-                <Space wrap>
-                  {selectedFreelancer.services_offered?.length > 0 ? (
-                    selectedFreelancer.services_offered.map((s, i) => (
-                      <Tag key={i} color="blue">
-                        {s}
-                      </Tag>
-                    ))
-                  ) : (
-                    <Text type="secondary">None</Text>
-                  )}
-                </Space>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Skills" span={2}>
-                <Space wrap>
-                  {selectedFreelancer.skills?.length > 0 ? (
-                    selectedFreelancer.skills.map((skill, i) => (
-                      <Tag key={i} color="purple">
-                        {skill}
-                      </Tag>
-                    ))
-                  ) : (
-                    <Text type="secondary">No skills listed</Text>
-                  )}
-                </Space>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Status" span={1}>
-                <Tag
-                  color={statusColors[selectedFreelancer.status_info?.status ?? 0]}
-                >
-                  {statusLabels[selectedFreelancer.status_info?.status ?? 0]}
-                </Tag>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Registered" span={1}>
-                <Space>
-                  <CalendarOutlined />
-                  {moment(selectedFreelancer.createdAt).format(
-                    "DD MMM YYYY, HH:mm"
-                  )}
-                </Space>
-              </Descriptions.Item>
-            </Descriptions>
-
-            {/* Rejection Reason */}
-            {selectedFreelancer.status_info?.status === 2 &&
-              selectedFreelancer.status_info?.rejection_reason && (
-                <>
-                  <Divider />
-                  <Alert
-                    message="Rejection Reason"
-                    description={selectedFreelancer.status_info.rejection_reason}
-                    type="error"
-                    showIcon
-                  />
-                </>
-              )}
-
-            {/* Documents */}
-            {selectedFreelancer.documents?.length > 0 && (
-              <>
-                <Divider />
-                <Title level={5}>Documents</Title>
-                <Space wrap>
-                  {selectedFreelancer.documents.map((doc, i) => (
-                    <Card key={i} size="small" style={{ width: 200 }}>
-                      <Image
-                        src={doc.url}
-                        alt={doc.type}
-                        width="100%"
-                        height={120}
-                        style={{ objectFit: "cover" }}
-                        preview
-                      />
-                      <Text strong className="block mt-2">
-                        {doc.type}
-                      </Text>
-                    </Card>
-                  ))}
-                </Space>
-              </>
-            )}
-          </div>
-        )}
-      </Drawer>
-
-      {/* ---------- REJECT MODAL ---------- */}
+      {/* Reject Modal */}
       <Modal
+        open={showRejectModal}
         title="Reject Freelancer"
-        open={rejectModalVisible}
-        onCancel={closeRejectModal}
+        onCancel={() => setShowRejectModal(false)}
         footer={null}
-        width={500}
       >
         {selectedFreelancer && (
-          <div>
-            <Text strong>
-              {selectedFreelancer.name?.first_name}{" "}
-              {selectedFreelancer.name?.last_name}
-            </Text>
-            <Text type="secondary" className="block mb-3">
-              {selectedFreelancer.email}
-            </Text>
-
+          <>
+            <p className="font-medium mb-4">
+              {selectedFreelancer.name?.first_name} {selectedFreelancer.name?.last_name}
+            </p>
             <TextArea
               rows={4}
-              placeholder="Enter reason for rejection (required)"
+              placeholder="Reason for rejection (required)"
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="mb-4"
             />
-
-            <Space className="w-full justify-end">
-              <Button onClick={closeRejectModal}>Cancel</Button>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button onClick={() => setShowRejectModal(false)}>Cancel</Button>
               <Button
                 type="primary"
                 danger
-                loading={rejectingId === selectedFreelancer._id}
                 disabled={!rejectionReason.trim()}
-                onClick={() =>
-                  updateStatus(selectedFreelancer._id, 2, rejectionReason)
-                }
+                onClick={handleReject}
               >
-                Confirm Reject
+                Reject
               </Button>
-            </Space>
-          </div>
+            </div>
+          </>
         )}
       </Modal>
     </div>

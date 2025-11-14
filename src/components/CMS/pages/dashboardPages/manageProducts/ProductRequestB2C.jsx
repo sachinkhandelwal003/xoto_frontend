@@ -422,7 +422,7 @@ const ProductRequestB2C = () => {
         width: 180,
         render: (_, r) => (
           <Space>
-            <Button type="link" icon={<FiEye />} href={`/sawtar/dashboard/${roleSlug}/products/${r._id}`} />
+            <Button type="link" icon={<FiEye />} href={`/dashboard/${roleSlug}/products/${r._id}`} />
 
             {/* Approve */}
             {activeTab === "pending" && perm.canApprove && (
@@ -444,15 +444,7 @@ const ProductRequestB2C = () => {
               />
             )}
 
-            {/* Inventory */}
-            {perm.canViewInventory && (
-              <Button
-                type="link"
-                icon={<FiShoppingBag />}
-                href={`/sawtar/cms/products/inventory/${r._id}`}
-                className="text-purple-600"
-              />
-            )}
+          
 
             {/* Pricing */}
             {perm.canEditPricing && (
