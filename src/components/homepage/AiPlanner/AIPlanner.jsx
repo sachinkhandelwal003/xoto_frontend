@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Upload, Sun, Sprout, Zap, X, Check, Loader, Image as ImageIcon, ArrowLeft, Download, RotateCcw } from 'lucide-react';
+import { Sparkles, Upload, Sun, Sprout, Zap, X, Check, Loader, Image as ImageIcon, ArrowLeft, Download, RotateCcw, Trash2 } from 'lucide-react';
 import { Button, Modal, Progress, Card, Tag, Empty, notification } from 'antd';
 
 // Dummy Images (using Unsplash or placeholder)
@@ -28,15 +28,39 @@ const gardenElements = [
   { value: 'seating', label: 'Seating Area', img: 'https://images.unsplash.com/photo-1586023492125-27b2c0d58d9f?w=400' },
 ];
 
-// Different generated design images
-const generatedDesignImages = [
-  'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600', // Modern
-  'https://images.unsplash.com/photo-1587502537104-aac4031028fe?w=600', // Japanese
-  'https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=600', // Cottage
-  'https://images.unsplash.com/photo-1558618666-4178cb59b3d7?w=600', // Mediterranean
-  'https://images.unsplash.com/photo-1583258292688-d0213dc5a3f8?w=600', // Tropical
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600', // Minimalist
-];
+// Different generated design images based on styles
+const styleBasedImages = {
+  modern: [
+    'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600',
+    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600',
+    'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600'
+  ],
+  japanese: [
+    'https://images.unsplash.com/photo-1587502537104-aac4031028fe?w=600',
+    'https://images.unsplash.com/photo-1545569341-9c0d4d3dcce6?w=600',
+    'https://images.unsplash.com/photo-1587502536575-6df6c808d5f5?w=600'
+  ],
+  cottage: [
+    'https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=600',
+    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600',
+    'https://images.unsplash.com/photo-1598726668148-999da4e02c31?w=600'
+  ],
+  mediterranean: [
+    'https://images.unsplash.com/photo-1558618666-4178cb59b3d7?w=600',
+    'https://images.unsplash.com/photo-1560717780-2d4727b99f73?w=600',
+    'https://images.unsplash.com/photo-1589656493111-7eb93561a91f?w=600'
+  ],
+  tropical: [
+    'https://images.unsplash.com/photo-1583258292688-d0213dc5a3f8?w=600',
+    'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=600',
+    'https://images.unsplash.com/photo-1589656493111-7eb93561a91f?w=600'
+  ],
+  minimalist: [
+    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600',
+    'https://images.unsplash.com/photo-1564013797765-e0ef549569a6?w=600',
+    'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600'
+  ]
+};
 
 const AIPlanner = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -54,8 +78,31 @@ const AIPlanner = () => {
   const [showStyleModal, setShowStyleModal] = useState(false);
   const [showElementModal, setShowElementModal] = useState(false);
 
-  const getRandomDesignImages = (count = 3) => {
-    const shuffled = [...generatedDesignImages].sort(() => 0.5 - Math.random());
+  // File upload state
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+
+  // Get design images based on selected styles
+  const getStyleBasedDesignImages = (count = 3) => {
+    let availableImages = [];
+    
+    if (selectedStyles.length > 0) {
+      // Get images from selected styles
+      selectedStyles.forEach(style => {
+        if (styleBasedImages[style]) {
+          availableImages = [...availableImages, ...styleBasedImages[style]];
+        }
+      });
+    } else {
+      // If no styles selected, use all images
+      Object.values(styleBasedImages).forEach(images => {
+        availableImages = [...availableImages, ...images];
+      });
+    }
+
+    // Remove duplicates and shuffle
+    const uniqueImages = [...new Set(availableImages)];
+    const shuffled = uniqueImages.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
   };
 
@@ -65,9 +112,102 @@ const AIPlanner = () => {
     setSelectedStyles([]);
     setSelectedElements([]);
     setSpecificRequirement('');
+    setUploadedFile(null);
     notification.success({ 
       message: 'Design Reset', 
       description: 'All inputs have been cleared. Ready for a new design!' 
+    });
+  };
+
+  // Handle file upload from PC
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    processUploadedFile(file);
+  };
+
+  // Handle drag and drop
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      processUploadedFile(files[0]);
+    }
+  };
+
+  // Process uploaded file
+  const processUploadedFile = (file) => {
+    if (file) {
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        notification.error({
+          message: 'Invalid File Type',
+          description: 'Please upload an image file (JPEG, PNG, etc.)'
+        });
+        return;
+      }
+
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        notification.error({
+          message: 'File Too Large',
+          description: 'Please upload an image smaller than 10MB'
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedFile(file);
+        setSelectedImage(e.target.result);
+        setShowUploadModal(false);
+        notification.success({
+          message: 'Image Uploaded Successfully!',
+          description: 'Your photo is ready for design generation'
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle example image selection
+  const handleExampleImageSelect = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setUploadedFile(null); // Clear any uploaded file when selecting example
+    setShowUploadModal(false);
+    notification.success({ 
+      message: 'Example Image Selected', 
+      description: 'Your example image is ready for design generation!' 
+    });
+  };
+
+  // Remove selected image
+  const removeSelectedImage = () => {
+    setSelectedImage(null);
+    setUploadedFile(null);
+    notification.info({ 
+      message: 'Image Removed', 
+      description: 'You can upload a new image to continue' 
+    });
+  };
+
+  // Delete a design
+  const deleteDesign = (designId) => {
+    setDesigns(prev => prev.filter(design => design.id !== designId));
+    notification.success({
+      message: 'Design Deleted',
+      description: 'The design has been removed successfully'
     });
   };
 
@@ -89,8 +229,8 @@ const AIPlanner = () => {
         clearInterval(interval);
         setIsGenerating(false);
 
-        // Generate 3 different design images
-        const generatedImages = getRandomDesignImages(3);
+        // Generate 3 different design images based on selected styles
+        const generatedImages = getStyleBasedDesignImages(3);
         setCurrentGeneratedImages(generatedImages);
 
         // Create 3 new designs with different images
@@ -101,13 +241,18 @@ const AIPlanner = () => {
           styles: selectedStyles,
           elements: selectedElements,
           requirement: specificRequirement,
-          timestamp: new Date().toLocaleString()
+          timestamp: new Date().toLocaleString(),
+          isUploaded: !!uploadedFile,
+          originalImage: selectedImage
         }));
 
         setDesigns(prev => [...newDesigns, ...prev]);
         setShowGeneratedModal(true);
 
-        notification.success({ message: '3 Designs Generated Successfully!' });
+        notification.success({ 
+          message: '3 Designs Generated Successfully!',
+          description: `Created ${selectedStyles.length > 0 ? selectedStyles.map(s => gardenStyles.find(gs => gs.value === s)?.label).join(', ') : 'beautiful'} garden designs`
+        });
       }
     }, 150);
   };
@@ -178,15 +323,25 @@ const AIPlanner = () => {
               ) : (
                 <div className="relative">
                   <img src={selectedImage} alt="Space" className="w-full h-64 object-cover rounded-2xl border-4 border-purple-500" />
-                  <button
-                    onClick={() => setSelectedImage(null)}
-                    className="absolute top-3 right-3 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                  <div className="mt-3 flex items-center gap-2 text-green-500">
-                    <Check className="w-6 h-6" />
-                    <span className="font-medium">Ready!</span>
+                  <div className="absolute top-3 right-3 flex gap-2">
+                    <button
+                      onClick={removeSelectedImage}
+                      className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-all"
+                      title="Remove Image"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-green-500">
+                      <Check className="w-6 h-6" />
+                      <span className="font-medium">Ready!</span>
+                    </div>
+                    {uploadedFile && (
+                      <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">
+                        Uploaded: {uploadedFile.name}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
@@ -277,13 +432,24 @@ const AIPlanner = () => {
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-4xl font-bold text-purple-800">Your Designs</h2>
               {designs.length > 0 && (
-                <button
-                  onClick={resetDesign}
-                  className="flex items-center gap-2 px-6 py-3 bg-white text-purple-600 border-2 border-purple-300 rounded-xl hover:bg-purple-50 hover:border-purple-500 transition-all font-semibold"
-                >
-                  <RotateCcw className="w-5 h-5" />
-                  New Design
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={resetDesign}
+                    className="flex items-center gap-2 px-6 py-3 bg-white text-purple-600 border-2 border-purple-300 rounded-xl hover:bg-purple-50 hover:border-purple-500 transition-all font-semibold"
+                  >
+                    <RotateCcw className="w-5 h-5" />
+                    New Design
+                  </button>
+                  {designs.length > 0 && (
+                    <button
+                      onClick={() => setDesigns([])}
+                      className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white border-2 border-red-500 rounded-xl hover:bg-red-600 transition-all font-semibold"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                      Clear All
+                    </button>
+                  )}
+                </div>
               )}
             </div>
             {designs.length === 0 ? (
@@ -308,7 +474,14 @@ const AIPlanner = () => {
                     actions={[
                       <Button type="text" icon={<Download size={16} />} className="text-purple-600">Download</Button>,
                       <Button type="text" className="text-blue-500">Edit</Button>,
-                      <Button type="text" danger>Delete</Button>,
+                      <Button 
+                        type="text" 
+                        danger 
+                        icon={<Trash2 size={16} />}
+                        onClick={() => deleteDesign(design.id)}
+                      >
+                        Delete
+                      </Button>,
                     ]}
                   >
                     <div className="p-4">
@@ -330,6 +503,12 @@ const AIPlanner = () => {
                           "{design.requirement}"
                         </p>
                       )}
+                      {design.isUploaded && (
+                        <div className="mt-2 flex items-center gap-1 text-xs text-purple-500">
+                          <Upload className="w-3 h-3" />
+                          Custom Upload
+                        </div>
+                      )}
                     </div>
                   </Card>
                 ))}
@@ -339,24 +518,74 @@ const AIPlanner = () => {
         </div>
       </div>
 
-      {/* Upload Modal */}
+      {/* Upload Modal with Both Options */}
       <Modal open={showUploadModal} footer={null} onCancel={() => setShowUploadModal(false)} width={800}>
-        <h2 className="text-2xl font-bold mb-6 text-purple-700">Choose Your Space</h2>
-        <div className="grid grid-cols-2 gap-6">
-          {dummySpaceImages.map((img, i) => (
-            <div
-              key={i}
-              onClick={() => {
-                setSelectedImage(img);
-                setShowUploadModal(false);
-                notification.success({ message: 'Photo selected!' });
-              }}
-              className="cursor-pointer group"
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-6 text-purple-700">Choose Your Space</h2>
+          
+          {/* Upload from PC Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-4 text-purple-600">Upload from Your Computer</h3>
+            <div 
+              className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
+                dragOver ? 'border-purple-500 bg-purple-50' : 'border-purple-300 hover:border-purple-500'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
             >
-              <img src={img} className="w-full h-64 object-cover rounded-xl group-hover:scale-105 transition-all border-4 border-purple-200 group-hover:border-purple-500" />
-              <p className="text-center mt-3 font-medium text-purple-600">Example Space {i + 1}</p>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="file-upload"
+              />
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer flex flex-col items-center justify-center"
+              >
+                <Upload className="w-16 h-16 text-purple-400 mb-4" />
+                <p className="text-xl font-medium text-purple-600 mb-2">
+                  {dragOver ? 'Drop your image here' : 'Click to Upload or Drag & Drop'}
+                </p>
+                <p className="text-sm text-purple-500 mb-4">JPG, PNG, WEBP (Max 10MB)</p>
+                <button 
+                  type="button"
+                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all"
+                >
+                  Browse Files
+                </button>
+              </label>
             </div>
-          ))}
+          </div>
+
+          <div className="relative flex items-center mb-8">
+            <div className="flex-grow border-t border-purple-200"></div>
+            <span className="mx-4 text-purple-500 font-medium">OR</span>
+            <div className="flex-grow border-t border-purple-200"></div>
+          </div>
+
+          {/* Example Images Section */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-purple-600">Choose from Example Spaces</h3>
+            <div className="grid grid-cols-2 gap-6">
+              {dummySpaceImages.map((img, i) => (
+                <div
+                  key={i}
+                  onClick={() => handleExampleImageSelect(img)}
+                  className="cursor-pointer group"
+                >
+                  <img 
+                    src={img} 
+                    className="w-full h-64 object-cover rounded-xl group-hover:scale-105 transition-all border-4 border-purple-200 group-hover:border-purple-500" 
+                    alt={`Example Space ${i + 1}`}
+                  />
+                  <p className="text-center mt-3 font-medium text-purple-600">Example Space {i + 1}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </Modal>
 
@@ -375,10 +604,10 @@ const AIPlanner = () => {
                 );
               }}
               className={`cursor-pointer rounded-xl overflow-hidden border-4 transition-all ${
-                selectedStyles.includes(style.value) ? 'border-purple-500 shadow-xl bg-purple-50' : 'border-purple-200'
+                selectedStyles.includes(style.value) ? 'border-purple-500 shadow-xl bg-purple-50' : 'border-purple-200 hover:border-purple-300'
               }`}
             >
-              <img src={style.img} className="w-full h-48 object-cover" />
+              <img src={style.img} className="w-full h-48 object-cover" alt={style.label} />
               <div className="p-4 bg-white">
                 <p className="font-semibold text-center text-purple-700">{style.label}</p>
                 {selectedStyles.includes(style.value) && (
@@ -405,10 +634,10 @@ const AIPlanner = () => {
                 );
               }}
               className={`cursor-pointer rounded-xl overflow-hidden border-4 transition-all ${
-                selectedElements.includes(el.value) ? 'border-green-500 shadow-xl bg-green-50' : 'border-green-200'
+                selectedElements.includes(el.value) ? 'border-green-500 shadow-xl bg-green-50' : 'border-green-200 hover:border-green-300'
               }`}
             >
-              <img src={el.img} className="w-full h-48 object-cover" />
+              <img src={el.img} className="w-full h-48 object-cover" alt={el.label} />
               <div className="p-4 bg-white">
                 <p className="font-semibold text-center text-green-700">{el.label}</p>
                 {selectedElements.includes(el.value) && (
@@ -430,7 +659,9 @@ const AIPlanner = () => {
       >
         <div className="text-center py-8">
           <Check className="w-20 h-20 text-green-500 mx-auto mb-6 animate-bounce" />
-          <h2 className="text-4xl font-bold mb-8 text-purple-700">Your 3 Designs Are Ready!</h2>
+          <h2 className="text-4xl font-bold mb-8 text-purple-700">
+            Your {selectedStyles.length > 0 ? selectedStyles.map(s => gardenStyles.find(gs => gs.value === s)?.label).join(' & ') : 'Beautiful'} Garden Designs Are Ready!
+          </h2>
           <div className="grid grid-cols-3 gap-6 mb-8">
             {currentGeneratedImages.map((image, index) => (
               <div key={index} className="text-center">
@@ -439,7 +670,9 @@ const AIPlanner = () => {
                   alt={`Design ${index + 1}`}
                   className="w-full h-64 object-cover rounded-2xl shadow-lg mb-4 border-4 border-purple-200" 
                 />
-                <p className="font-semibold text-lg text-purple-600">Design {index + 1}</p>
+                <p className="font-semibold text-lg text-purple-600">
+                  {selectedStyles.length > 0 ? gardenStyles.find(gs => gs.value === selectedStyles[0])?.label : 'Beautiful'} Design {index + 1}
+                </p>
               </div>
             ))}
           </div>
@@ -477,10 +710,10 @@ const AIPlanner = () => {
               }}
             />
             <p className="mt-6 text-lg text-purple-600">
-              {generationProgress < 30 && "Analyzing your space..."}
-              {generationProgress >= 30 && generationProgress < 60 && "Designing layout..."}
-              {generationProgress >= 60 && generationProgress < 90 && "Adding plants & elements..."}
-              {generationProgress >= 90 && "Finalizing designs..."}
+              {generationProgress < 30 && "Analyzing your space and preferences..."}
+              {generationProgress >= 30 && generationProgress < 60 && `Designing ${selectedStyles.length > 0 ? selectedStyles.map(s => gardenStyles.find(gs => gs.value === s)?.label).join(', ') : 'beautiful'} layout...`}
+              {generationProgress >= 60 && generationProgress < 90 && "Adding plants & garden elements..."}
+              {generationProgress >= 90 && "Finalizing your garden designs..."}
             </p>
           </div>
         </Modal>
