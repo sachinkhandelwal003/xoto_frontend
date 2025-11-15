@@ -288,7 +288,7 @@ const AddProjects = () => {
     try {
       await apiService.upload("/freelancer/projects", fd, token);
       showSuccessAlert("Success", "Project created!");
-      navigate("/sawtar/dashboard/freelancer/projects");
+      navigate(-1);
     } catch (err) {
       const errs = err?.response?.data?.errors;
       if (Array.isArray(errs)) {

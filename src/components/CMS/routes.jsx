@@ -140,11 +140,11 @@ const CmsRoutes = () => {
         }
       />
 
-      <Route path="freelancer/:id" element={<FreelancerProfile />} />
-      <Route path="products/:id" element={<ProductReview />} />
+      <Route path="products" element={<ProductReview />} />
       <Route path="products/view/:id" element={<ProductProfile />} />
       <Route path="seller/:id" element={<VendorB2CProfile />} />
             <Route path="seller/product/:id" element={<ProductRequestB2C />} />
+<Route path="freelancer" element={<FreelancerProfile />} />
 
       <Route path="freelancer/myprofile" element={<MyprofileFreelancer />} />
       <Route path="/update/:id" element={<UpdateFreelncerProfile />} />

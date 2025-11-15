@@ -142,7 +142,7 @@ const AccountantDashboard = () => {
               : "bg-indigo-600 text-white hover:bg-indigo-700"
           }`}
           onClick={() =>
-            navigate(`/sawtar/dashboard/accountant/update/${user?.id || "demo"}`)
+            navigate(`/dashboard/accountant/update/${user?.id || "demo"}`)
           }
           disabled={progress.completionPercentage >= 100}
         >

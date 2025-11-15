@@ -93,12 +93,8 @@ const Freelancers = () => {
           status: statusMap[activeTab],
         });
 
-        setFreelancers((res.freelancers || []).map((f, i) => ({
-          ...f,
-          key: f._id,
-          sno: (page - 1) * limit + i + 1,
-        })));
-
+       
+setFreelancers(res.freelancers)
         setPagination({
           currentPage: res.pagination?.page || 1,
           totalPages: res.pagination?.totalPages || 1,
@@ -247,10 +243,13 @@ const Freelancers = () => {
         render: (_, r) => (
           <Space>
             <Button
-              type="link"
-              icon={<FiEye />}
-              onClick={() => navigate(`/dashboard/${roleSlug}/freelancer/${r._id}`)}
-            />
+  type="link"
+  icon={<FiEye />}
+  onClick={() =>
+    navigate(`/dashboard/${roleSlug}/freelancer?freelancerId=${r._id}`)
+  }
+/>
+
 
             {activeTab === "pending" && perm.canApprove && (
               <Popconfirm

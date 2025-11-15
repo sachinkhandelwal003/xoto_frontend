@@ -209,7 +209,7 @@ const ProductProfile = () => {
           <Button
             type="primary"
             className="mt-4"
-            onClick={() => navigate('/sawtar/cms/vendor/b2c/product-requests')}
+            onClick={() => navigate(-1)}
           >
             Back to Product Requests
           </Button>
@@ -646,7 +646,7 @@ const ProductProfile = () => {
         </div>
       )}
 
-      {product.verification_status?.status === 'approved' && (
+      {/* {product.verification_status?.status === 'approved' && (
         <div className="mt-8 flex justify-end">
           <Button
             type="primary"
@@ -656,7 +656,7 @@ const ProductProfile = () => {
             Manage Inventory
           </Button>
         </div>
-      )}
+      )} */}
 
       <Modal
         open={imageViewerOpen}

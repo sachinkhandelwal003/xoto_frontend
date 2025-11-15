@@ -52,11 +52,11 @@ import {
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 const { TextArea } = Input;
+import { useLocation } from "react-router-dom";
 
 const FreelancerProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useSelector((state) => state.auth);
   const [freelancer, setFreelancer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [verifyingDoc, setVerifyingDoc] = useState(null);
@@ -67,30 +67,28 @@ const FreelancerProfile = () => {
   const [isApproving, setIsApproving] = useState(false);
   const [reason, setReason] = useState("");
   const [suggestion, setSuggestion] = useState("");
+const location = useLocation();
+const params = new URLSearchParams(location.search);
 
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-    }
-    fetchFreelancer();
-  }, [id, token]);
+const freelancerId = params.get("freelancerId");
+ 
 
   const fetchFreelancer = async () => {
     setLoading(true);
     try {
       // Fixed API endpoint as per your example
-      const response = await apiService.get(`/freelancer?id=${id}`);
+const response = await apiService.get(`/freelancer?id=${freelancerId}`);
       setFreelancer(response.freelancer);
     } catch (error) {
-      showToast(
-        error.response?.data?.message || "Failed to fetch freelancer details",
-        "error"
-      );
+      
     } finally {
       setLoading(false);
     }
   };
-
+ useEffect(() => {
+   
+    fetchFreelancer();
+  }, [freelancerId]);
   const openVerificationModal = (docId, approving) => {
     setSelectedDocId(docId);
     setIsApproving(approving);

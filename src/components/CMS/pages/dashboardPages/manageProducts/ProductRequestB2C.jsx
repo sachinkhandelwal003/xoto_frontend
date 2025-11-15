@@ -422,7 +422,11 @@ const ProductRequestB2C = () => {
         width: 180,
         render: (_, r) => (
           <Space>
-            <Button type="link" icon={<FiEye />} href={`/dashboard/${roleSlug}/products/${r._id}`} />
+<Button
+  type="link"
+  icon={<FiEye />}
+  href={`/dashboard/${roleSlug}/products?productId=${r._id}`}
+/>
 
             {/* Approve */}
             {activeTab === "pending" && perm.canApprove && (

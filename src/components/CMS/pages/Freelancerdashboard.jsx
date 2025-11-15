@@ -169,7 +169,7 @@ const Freelancerdashboard = () => {
               : "bg-blue-600 text-white hover:bg-blue-700"
           }`}
           onClick={() =>
-            navigate(`/sawtar/dashboard/freelancer/update/${user?.id}`)
+            navigate(`/dashboard/freelancer/update/${user?.id}`)
           }
         >
           {progress.completionPercentage < 100

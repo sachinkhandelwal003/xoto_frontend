@@ -6,7 +6,7 @@ import { FaUsers, FaChartLine, FaUserTie, FaRobot } from "react-icons/fa";
 import huuuImage from '../../assets/img/huuu.png';
 import Partner from '../../components/Ecosystem/Partner'
 import Built from '../../components/Ecosystem/Built'
-import Join from '../Ecosystem/Our'
+import Join from '../Ecosystem/Join'
 import Our from '../Ecosystem/Our'
 import Grow from '../../components/Ecosystem/Grow'
 import { Link } from "react-router-dom";

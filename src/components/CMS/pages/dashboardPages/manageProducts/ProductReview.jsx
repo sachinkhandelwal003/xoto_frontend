@@ -8,6 +8,7 @@ import { showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
 import { Button, Card, Spin, Row, Col, Descriptions, Empty, Tag, Modal, Input, Divider, Tooltip, Space, Progress, Alert, Tabs, Typography, Collapse } from 'antd';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { useLocation } from "react-router-dom";
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -15,12 +16,17 @@ const { Panel } = Collapse;
 const { Title, Paragraph, Text: TypographyText } = Typography;
 
 const ProductReview = () => {
-  const { user, token } = useSelector((state) => state.auth);
-  const { id: productId } = useParams();
+const { user, token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Extract productId from URL query: ?productId=abc123
+  const query = new URLSearchParams(location.search);
+  const productId = query.get('productId');
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [verifyingProduct, setVerifyingProduct] = useState(false); // New state for product verification loading
+  const [verifyingProduct, setVerifyingProduct] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectionSuggestion, setRejectionSuggestion] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -38,7 +44,6 @@ const ProductReview = () => {
     verified: 0,
     percentage: 0,
   });
-
   // Sync token with localStorage
   useEffect(() => {
     if (token) {
@@ -46,7 +51,42 @@ const ProductReview = () => {
     }
   }, [token]);
 
-  // Calculate verification progress
+ 
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!productId) {
+        showToast('No product ID provided', 'error');
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await apiService.get('/products', {
+          params: { product_id: productId },
+        });
+
+        if (response.success && response.products?.length > 0) {
+          setProduct(response.products[0]);
+        } else {
+          showToast('Product not found', 'error');
+          setProduct(null);
+        }
+      } catch (error) {
+        showToast(error.response?.data?.message || 'Failed to load product', 'error');
+        console.error('Fetch error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.id && productId) {
+      fetchProduct();
+    }
+  }, [productId, user?.id]);
+
+   // Calculate verification progress
   useEffect(() => {
     if (product) {
       let totalAssets = 0;
@@ -81,30 +121,6 @@ const ProductReview = () => {
       });
     }
   }, [product]);
-
-  // Fetch product details
-  useEffect(() => {
-    const fetchProduct = async () => {
-      setLoading(true);
-      try {
-        const params = { product_id: productId };
-        const response = await apiService.get('/products', params);
-        if (response.success && response.products.length > 0) {
-          setProduct(response.products[0]);
-        } else {
-          showToast('Product not found', 'error');
-        }
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (user.id && productId) {
-      fetchProduct();
-    }
-  }, [user.id, productId, navigate]);
-
   // Handle product status update (approve/reject)
   const handleStatusUpdate = async (newStatus, reason = '', suggestion = '') => {
     setVerifyingProduct(true);
@@ -750,7 +766,7 @@ const ProductReview = () => {
         </div>
       )}
 
-      {product.verification_status.status === 'approved' && (
+      {/* {product.verification_status.status === 'approved' && (
         <div className="mt-8 flex justify-end">
           <Tooltip title="Manage Inventory">
             <Button
@@ -763,7 +779,7 @@ const ProductReview = () => {
             </Button>
           </Tooltip>
         </div>
-      )}
+      )} */}
 
       {/* Product Reject Modal */}
       <Modal open={showRejectModal} onCancel={closeRejectModal} footer={null} centered>

@@ -10,7 +10,7 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   BankOutlined,
-  UserAddOutlined,
+  UserAddOutlined,PlusCircleOutlined,PlusOutlined
 } from "@ant-design/icons";
 import {
   Button,
@@ -272,58 +272,63 @@ const Projects = () => {
 
   /* ---------- ADD MILESTONE – FINAL CORRECTED VERSION ---------- */
   const addMilestone = async (values) => {
-    if (!selectedProject) return;
+  if (!selectedProject) {
+    message.error("No project selected");
+    return;
+  }
 
-    const start = moment(values.start_date);
-    const end = moment(values.end_date);
-    if (!start.isValid() || !end.isValid() || start.isSameOrAfter(end)) {
-      showErrorAlert("Invalid Dates", "Start date must be before end date");
-      return;
-    }
+  const startDate = moment(values.start_date);
+  const endDate = moment(values.end_date);
 
-    setAddingMilestone(true);
-    const formData = new FormData();
+  // Validate dates
+  if (!startDate.isValid() || !endDate.isValid()) {
+    message.error("Please select valid dates");
+    return;
+  }
 
-    formData.append("title", values.title);
-    formData.append("description", values.description?.trim() ?? "");
-    formData.append("start_date", start.format("YYYY-MM-DD"));
-    formData.append("end_date", end.format("YYYY-MM-DD"));
-    formData.append("due_date", moment(values.due_date).format("YYYY-MM-DD"));
-    formData.append("amount", Number(values.amount));
+  if (startDate.isSameOrAfter(endDate)) {
+    message.error("Start date must be before end date");
+    return;
+  }
 
-    const fileList = values.photos?.fileList ?? [];
-    const photos = fileList.map((f) => f.originFileObj).filter(Boolean);
-    photos.forEach((file) => formData.append("photos", file));
+  setAddingMilestone(true);
 
-    console.group("addMilestone – FormData payload");
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`${key} → ${value.name} (${value.size} bytes)`);
-      } else {
-        console.log(`${key} →`, value);
+  const formData = new FormData();
+
+  // Required fields
+  formData.append("title", values.title.trim());
+  formData.append("amount", values.amount);
+  formData.append("start_date", startDate.format("YYYY-MM-DD"));
+  formData.append("end_date", endDate.format("YYYY-MM-DD"));
+  formData.append("description", values.description?.trim() || "");
+
+  // Optional photos
+  if (values.photos && values.photos.length > 0) {
+    values.photos.forEach((file) => {
+      if (file.originFileObj) {
+        formData.append("photos", file.originFileObj);
       }
-    }
-    console.log("Total photos →", photos.length);
-    console.groupEnd();
+    });
+  }
 
-    try {
-      await apiService.upload(
-        `/freelancer/projects/${selectedProject._id}/milestones`,
-        formData
-      );
-      showSuccessAlert("Success", "Milestone added");
-      milestoneForm.resetFields();
-      await fetchMilestones(selectedProject._id);
-    } catch (err) {
-      console.error("addMilestone error →", err);
-      showErrorAlert(
-        "Error",
-        err?.response?.data?.message || "Failed to add milestone"
-      );
-    } finally {
-      setAddingMilestone(false);
-    }
-  };
+  try {
+    const response = await apiService.upload(
+      `/freelancer/projects/${selectedProject._id}/milestones`,
+      formData
+    );
+
+
+    message.success("Milestone added successfully!");
+    milestoneForm.resetFields();
+    await fetchMilestones(selectedProject._id); // Refresh list
+  } catch (error) {
+    console.error("Failed to add milestone:", error);
+    const msg = error?.response?.data?.message || "Failed to add milestone";
+    message.error(msg);
+  } finally {
+    setAddingMilestone(false);
+  }
+};
 
   const updateMilestoneProgress = async (milestoneId, progress) => {
     try {
@@ -788,94 +793,116 @@ const Projects = () => {
         destroyOnClose
       >
         {/* ---- ADD MILESTONE (Admin only) ---- */}
-        {isAdmin && (
-          <Card title="Add New Milestone" style={{ marginBottom: 16 }}>
-            <Form form={milestoneForm} onFinish={addMilestone} layout="vertical">
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    name="title"
-                    label="Title"
-                    rules={[{ required: true, message: "Title required" }]}
-                  >
-                    <Input placeholder="Milestone title" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="amount"
-                    label="Amount"
-                    rules={[{ required: true, message: "Amount required" }]}
-                  >
-                    <InputNumber
-                      min={0}
-                      style={{ width: "100%" }}
-                      formatter={(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
+      {isAdmin && (
+  <Card
+    title="Add New Milestone"
+    style={{ marginBottom: 24 }}
+    className="shadow-sm"
+  >
+    <Form
+      form={milestoneForm}
+      onFinish={addMilestone}
+      layout="vertical"
+      initialValues={{
+        amount: 0,
+      }}
+    >
+      <Row gutter={16}>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name="title"
+            label="Milestone Title"
+            rules={[{ required: true, message: "Please enter milestone title" }]}
+          >
+            <Input size="large" placeholder="e.g. Site Survey & Design" />
+          </Form.Item>
+        </Col>
 
-              <Row gutter={16}>
-                <Col span={8}>
-                  <Form.Item
-                    name="start_date"
-                    label="Start Date"
-                    rules={[{ required: true, message: "Start date required" }]}
-                  >
-                    <DatePicker style={{ width: "100%" }} />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item
-                    name="end_date"
-                    label="End Date"
-                    rules={[{ required: true, message: "End date required" }]}
-                  >
-                    <DatePicker style={{ width: "100%" }} />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item
-                    name="due_date"
-                    label="Due Date"
-                    rules={[{ required: true, message: "Due date required" }]}
-                  >
-                    <DatePicker style={{ width: "100%" }} />
-                  </Form.Item>
-                </Col>
-              </Row>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name="amount"
+            label="Amount (₹)"
+            rules={[{ required: true, message: "Please enter amount" }]}
+          >
+            <InputNumber
+              min={1}
+              style={{ width: "100%" }}
+              size="large"
+              formatter={(value) => `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              parser={(value) => value.replace(/₹\s?|(,*)/g, "")}
+              placeholder="500000"
+            />
+          </Form.Item>
+        </Col>
+      </Row>
 
-           <Form.Item name="description" label="Description">
-  <Input placeholder="Optional description" />
-</Form.Item>
+      <Row gutter={16}>
+        <Col xs={24} sm={8}>
+          <Form.Item
+            name="start_date"
+            label="Start Date"
+            rules={[{ required: true, message: "Start date is required" }]}
+          >
+            <DatePicker style={{ width: "100%" }} size="large" format="DD MMM YYYY" />
+          </Form.Item>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Form.Item
+            name="end_date"
+            label="End Date"
+            rules={[{ required: true, message: "End date is required" }]}
+          >
+            <DatePicker style={{ width: "100%" }} size="large" format="DD MMM YYYY" />
+          </Form.Item>
+        </Col>
+        
+      </Row>
 
-              <Form.Item
-                name="photos"
-                label="Photos (optional, max 10)"
-                valuePropName="fileList"
-                getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
-              >
-                <Upload
-                  listType="picture-card"
-                  multiple
-                  beforeUpload={() => false}
-                  accept="image/*"
-                  maxCount={10}
-                >
-                  <div>
-                    <UploadOutlined />
-                    <div style={{ marginTop: 8 }}>Upload</div>
-                  </div>
-                </Upload>
-              </Form.Item>
+      <Form.Item name="description" label="Description (Optional)">
+        <Input.TextArea
+          rows={3}
+          placeholder="Brief description of work in this milestone..."
+        />
+      </Form.Item>
 
-              <Button type="primary" htmlType="submit" loading={addingMilestone} block>
-                {addingMilestone ? "Adding…" : "Add Milestone"}
-              </Button>
-            </Form>
-          </Card>
-        )}
+      <Form.Item
+        name="photos"
+        label="Upload Photos (Optional, max 10)"
+        valuePropName="fileList"
+        getValueFromEvent={(e) => {
+          if (Array.isArray(e)) return e;
+          return e && e.fileList;
+        }}
+      >
+        <Upload
+          listType="picture-card"
+          multiple
+          accept="image/*"
+          maxCount={10}
+          beforeUpload={() => false} // Prevent auto upload
+        >
+          <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
+          </div>
+        </Upload>
+      </Form.Item>
+
+      <Form.Item>
+        <Button
+          type="primary"
+          htmlType="submit"
+          size="large"
+          loading={addingMilestone}
+          block
+          icon={<PlusCircleOutlined />}
+        >
+          {addingMilestone ? "Adding Milestone..." : "Add Milestone"}
+        </Button>
+      </Form.Item>
+    </Form>
+  </Card>
+)}
 
         {/* ---- LIST OF MILESTONES ---- */}
         <Spin spinning={loadingMilestones}>

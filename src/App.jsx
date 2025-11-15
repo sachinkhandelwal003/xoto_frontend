@@ -119,6 +119,7 @@ function LayoutWrapper({ children }) {
     "/dashboard",
     "/customer/dashboard",
     "/admin/login",
+    "/accountant/login",
     "/ecommerce/seller",
     "/ecommerce/cart",
   ];
@@ -149,6 +150,7 @@ function LayoutWrapper({ children }) {
     "/customer/dashboard",
     "/profile",
     "/admin/login",
+    "/accountant/login",
     "/ecommerce/seller",
     "/freelancer/registration",
   ];
@@ -189,6 +191,7 @@ function LayoutWrapper({ children }) {
     "/designs/Tool",
     "/profile",
     "/admin/login",
+    "/accountant/login",
     "/ecommerce/seller",
     "/ecommerce/product",
   ];

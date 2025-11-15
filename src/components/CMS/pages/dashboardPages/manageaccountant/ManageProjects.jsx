@@ -1,3 +1,4 @@
+// src/pages/accountant/ManageProjects.jsx
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -8,12 +9,9 @@ import {
   Download,
   ChevronDown,
   ChevronUp,
-  CheckCircle,
-  Clock,
-  AlertCircle,
   Plus,
-  Edit,
   Eye,
+  FileCheck,
 } from "lucide-react";
 import {
   Tabs,
@@ -34,361 +32,98 @@ import {
   Select,
   message,
   Popconfirm,
+  Alert,
 } from "antd";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import dayjs from "dayjs";
+import { apiService } from "../../../../../manageApi/utils/custom.apiservice";
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 const { TextArea } = Input;
-const { Option } = Select;
 
-const DUMMY_PROJECTS = [
-  {
-    _id: "690c59818289e277bfbd7c76",
-    title: "Beach Resort Landscape",
-    budget: 1200000,
-    category: { _id: "6909a3b797c3a7739b4e3e86", name: "Hardscape" },
-    subcategory: { _id: "6909b9146b8aa6018b482101", name: "Paving (interlock, tiles, stone)" },
-    customer: { name: "Beach Resort Ltd.", email: "accounts@beachresort.com", phone: "+91 9876543210" },
-    milestones: [
-      {
-        title: "Site Survey & Design",
-        description: "Topography, soil, irrigation plan",
-        start_date: "2025-12-01T00:00:00.000Z",
-        end_date: "2025-12-20T00:00:00.000Z",
-        due_date: "2025-12-20T00:00:00.000Z",
-        amount: 180000,
-        status: "pending",
-        progress: 0,
-        photos: [],
-        is_deleted: false,
-        _id: "690c59818289e277bfbd7c77",
-        daily_updates: [],
-        createdAt: "2025-11-06T08:17:05.188Z",
-        updatedAt: "2025-11-06T08:17:05.188Z",
-      },
-      {
-        title: "Planting & Softscape",
-        description: "Trees, shrubs, lawn",
-        start_date: "2025-12-21T00:00:00.000Z",
-        end_date: "2026-02-10T00:00:00.000Z",
-        due_date: "2026-02-10T00:00:00.000Z",
-        amount: 450000,
-        status: "pending",
-        progress: 0,
-        photos: [],
-        is_deleted: false,
-        _id: "690c59818289e277bfbd7c78",
-        daily_updates: [],
-        createdAt: "2025-11-06T08:17:05.188Z",
-        updatedAt: "2025-11-06T08:17:05.188Z",
-      },
-    ],
-    status: "in_progress",
-    createdAt: "2025-11-06T08:17:05.188Z",
-    milestones_count: 2,
-    completed_milestones: 0,
-    progress_percentage: 0,
-  },
-  {
-    _id: "690c59808289e277bfbd7c64",
-    title: "Beach Resort Landscape",
-    budget: 1200000,
-    category: { _id: "6909a3b797c3a7739b4e3e86", name: "Hardscape" },
-    subcategory: { _id: "6909b9146b8aa6018b482101", name: "Paving (interlock, tiles, stone)" },
-    customer: { name: "Beach Resort Ltd.", email: "accounts@beachresort.com", phone: "+91 9876543210" },
-    milestones: [
-      {
-        title: "Site Survey & Design",
-        description: "Topography, soil, irrigation plan",
-        start_date: "2025-12-01T00:00:00.000Z",
-        end_date: "2025-12-20T00:00:00.000Z",
-        due_date: "2025-12-20T00:00:00.000Z",
-        amount: 180000,
-        status: "pending",
-        progress: 0,
-        photos: [],
-        is_deleted: false,
-        _id: "690c59808289e277bfbd7c65",
-        daily_updates: [],
-        createdAt: "2025-11-06T08:17:04.031Z",
-        updatedAt: "2025-11-06T08:17:04.031Z",
-      },
-      {
-        title: "Planting & Softscape",
-        description: "Trees, shrubs, lawn",
-        start_date: "2025-12-21T00:00:00.000Z",
-        end_date: "2026-02-10T00:00:00.000Z",
-        due_date: "2026-02-10T00:00:00.000Z",
-        amount: 450000,
-        status: "pending",
-        progress: 0,
-        photos: [],
-        is_deleted: false,
-        _id: "690c59808289e277bfbd7c66",
-        daily_updates: [],
-        createdAt: "2025-11-06T08:17:04.031Z",
-        updatedAt: "2025-11-06T08:17:04.031Z",
-      },
-    ],
-    status: "in_progress",
-    createdAt: "2025-11-06T08:17:04.031Z",
-    milestones_count: 2,
-    completed_milestones: 0,
-    progress_percentage: 0,
-  },
-  {
-    _id: "690c233b72c624347c13b577",
-    title: "Beach Resort Landscape",
-    budget: 1200000,
-    category: { _id: "6909a3b797c3a7739b4e3e86", name: "Hardscape" },
-    subcategory: { _id: "6909b9146b8aa6018b482101", name: "Paving (interlock, tiles, stone)" },
-    customer: { name: "Beach Resort Ltd.", email: "accounts@beachresort.com", phone: "+91 9876543210" },
-    milestones: [
-      {
-        title: "Site Survey & Design",
-        description: "Topography, soil, irrigation plan",
-        start_date: "2025-12-01T00:00:00.000Z",
-        end_date: "2025-12-20T00:00:00.000Z",
-        due_date: "2025-12-20T00:00:00.000Z",
-        amount: 180000,
-        status: "release_requested",
-        progress: 100,
-        photos: [],
-        is_deleted: false,
-        _id: "690c233b72c624347c13b578",
-        daily_updates: [
-          {
-            date: "2025-12-10T18:29:59.999Z",
-            work_done: "Installed 50m² of paving blocks, leveled ground",
-            updated_by: "690b766c9dad93bc9ae31c11",
-            approval_status: "approved",
-            approved_progress: 100,
-            _id: "690c2831f2910b1fafa60533",
-            createdAt: "2025-11-06T04:46:41.843Z",
-            updatedAt: "2025-11-06T04:49:26.771Z",
-            approved_at: "2025-11-06T04:49:26.760Z",
-          },
-          {
-            date: "2025-12-11T18:29:59.999Z",
-            work_done: "Installed 50m² of paving blocks, leveled ground",
-            updated_by: "690b766c9dad93bc9ae31c11",
-            approval_status: "pending",
-            approved_progress: 0,
-            _id: "690c2fb4f8d3db7f2675cd7d",
-            createdAt: "2025-11-06T05:18:44.287Z",
-            updatedAt: "2025-11-06T05:18:44.287Z",
-          },
-        ],
-        createdAt: "2025-11-06T04:25:31.451Z",
-        updatedAt: "2025-11-06T05:44:50.875Z",
-      },
-      {
-        title: "Planting & Softscape",
-        description: "Trees, shrubs, lawn",
-        start_date: "2025-12-21T00:00:00.000Z",
-        end_date: "2026-02-10T00:00:00.000Z",
-        due_date: "2026-02-10T00:00:00.000Z",
-        amount: 450000,
-        status: "in_progress",
-        progress: 0,
-        photos: [],
-        is_deleted: false,
-        _id: "690c233b72c624347c13b579",
-        daily_updates: [
-          {
-            date: "2025-12-21T00:00:00.000Z",
-            work_done: "Installed 50m² of paving blocks, leveled ground",
-            updated_by: "690b766c9dad93bc9ae31c11",
-            approval_status: "pending",
-            approved_progress: 0,
-            _id: "690c434f9edac18c70a969ac",
-            createdAt: "2025-11-06T06:42:23.155Z",
-            updatedAt: "2025-11-06T06:42:23.155Z",
-          },
-          {
-            date: "2025-12-22T00:00:00.000Z",
-            work_done: "sdfsdgsdfsdf",
-            updated_by: "690b766c9dad93bc9ae31c11",
-            approval_status: "pending",
-            approved_progress: 0,
-            _id: "690c49039edac18c70a96c00",
-            createdAt: "2025-11-06T07:06:43.294Z",
-            updatedAt: "2025-11-06T07:06:43.294Z",
-          },
-        ],
-        createdAt: "2025-11-06T04:25:31.452Z",
-        updatedAt: "2025-11-06T07:06:43.294Z",
-      },
-      {
-        title: "Irrigation System Installation",
-        description: "Install drip lines, valves, controllers",
-        start_date: "2025-12-21T00:00:00.000Z",
-        end_date: "2026-01-10T00:00:00.000Z",
-        due_date: "2026-01-10T00:00:00.000Z",
-        amount: 180000,
-        status: "in_progress",
-        progress: 0,
-        photos: [],
-        is_deleted: false,
-        _id: "690c29fc09e8fa6db536396d",
-        daily_updates: [
-          {
-            date: "2025-12-23T00:00:00.000Z",
-            work_done: "sdfgsdgsdg",
-            updated_by: "690b766c9dad93bc9ae31c11",
-            approval_status: "pending",
-            approved_progress: 0,
-            _id: "690c497a60f9016d4d29e0d6",
-            createdAt: "2025-11-06T07:08:42.158Z",
-            updatedAt: "2025-11-06T07:08:42.158Z",
-          },
-        ],
-        createdAt: "2025-11-06T04:54:20.092Z",
-        updatedAt: "2025-11-06T07:08:42.158Z",
-      },
-    ],
-    status: "completed",
-    createdAt: "2025-11-06T04:25:31.452Z",
-    milestones_count: 3,
-    completed_milestones: 0,
-    progress_percentage: 0,
-  },
-];
-
-/* ---------- DUMMY INVOICES (one per project) ---------- */
-const DUMMY_INVOICES = {
-  "690c59818289e277bfbd7c76": [
-    {
-      _id: "inv-001",
-      invoiceNumber: "INV-7C76-1234",
-      date: "2025-11-01",
-      dueDate: "2025-11-16",
-      total: 180000,
-      status: "pending",
-      items: [
-        { description: "Site Survey & Design (Milestone 1)", qty: 1, rate: 180000 },
-      ],
-      notes: "Payment due in 15 days.",
-    },
-  ],
-  "690c59808289e277bfbd7c64": [
-    {
-      _id: "inv-002",
-      invoiceNumber: "INV-7C64-5678",
-      date: "2025-11-02",
-      dueDate: "2025-11-17",
-      total: 450000,
-      status: "paid",
-      items: [
-        { description: "Planting & Softscape (Milestone 2)", qty: 1, rate: 450000 },
-      ],
-      notes: "",
-    },
-  ],
-  "690c233b72c624347c13b577": [
-    {
-      _id: "inv-003",
-      invoiceNumber: "INV-B577-9012",
-      date: "2025-11-03",
-      dueDate: "2025-11-18",
-      total: 360000,
-      status: "overdue",
-      items: [
-        { description: "Site Survey & Design (Milestone 1)", qty: 1, rate: 180000 },
-        { description: "Irrigation System (partial)", qty: 1, rate: 180000 },
-      ],
-      notes: "Overdue – please settle ASAP.",
-    },
-  ],
-};
-
-// Xoto Logo as SVG data URL (simplified version)
 const XOTO_LOGO = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjUwIiB2aWV3Qm94PSIwIDAgMTUwIDUwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjMjg3NEE2Ii8+CjxwYXRoIGQ9Ik0zMCAxNUw0MCAzNUw1MCAxNUg2MEw0NSw0MEg1NUwzMCwxNVoiIGZpbGw9IndoaXRlIi8+Cjx0ZXh0IHg9Ijc1IiB5PSIzMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSI+WFBPVE8gQ09SUDwvdGV4dD4KPC9zdmc+";
 
 const ManageProjects = () => {
-  const [projects] = useState(DUMMY_PROJECTS);
-  const [invoices] = useState(DUMMY_INVOICES);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [expandedProject, setExpandedProject] = useState(null);
   const [invoiceModalVisible, setInvoiceModalVisible] = useState(false);
+  const [invoiceType, setInvoiceType] = useState("tax"); // "po" or "tax"
   const [selectedProject, setSelectedProject] = useState(null);
-  const [invoiceForm] = Form.useForm();
-  const [invoiceLoading, setInvoiceLoading] = useState(false);
+  const [form] = Form.useForm();
 
-  const createInvoice = async (values) => {
-    setInvoiceLoading(true);
-    try {
-      const invoiceData = {
-        projectId: selectedProject._id,
-        invoiceNumber: values.invoiceNumber,
-        date: values.date.format("YYYY-MM-DD"),
-        dueDate: values.dueDate.format("YYYY-MM-DD"),
-        items: values.items,
-        total: values.items.reduce((s, i) => s + i.rate * i.qty, 0),
-        status: "pending",
-        notes: values.notes,
-      };
-      message.success("Invoice created (demo)");
-      setInvoiceModalVisible(false);
-      invoiceForm.resetFields();
-    } catch (err) {
-      message.error("Failed (demo)");
-    } finally {
-      setInvoiceLoading(false);
-    }
+  // Fetch Accountant's Assigned Projects
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.get("freelancer/projects/my/get");
+        console.log(response)
+        if (response.success) {
+          setProjects(response.projects || []);
+        } else {
+          throw new Error(response.message || "Failed to load projects");
+        }
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+        setError(err.message || "Failed to load assigned projects");
+        message.error("Could not load projects");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const openInvoiceModal = (project, type) => {
+    setSelectedProject(project);
+    setInvoiceType(type);
+    setInvoiceModalVisible(true);
+
+    const invNo = type === "po"
+      ? `PO-${project._id.slice(-6).toUpperCase()}-${Date.now().toString().slice(-4)}`
+      : `INV-${project._id.slice(-6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+
+    form.setFieldsValue({
+      invoiceNumber: invNo,
+      date: dayjs(),
+      dueDate: dayjs().add(15, "day"),
+      items: [{ description: "Advance Payment - Site Clearance", qty: 1, rate: project.budget * 0.2 }],
+    });
   };
 
-  const updateInvoiceStatus = async (invoiceId, status) => {
-    message.success(`Invoice ${invoiceId} marked as ${status} (demo)`);
-  };
-
-  const downloadInvoicePDF = (project, invoice) => {
+  const downloadPDF = (project, values, type) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
-    let yPosition = margin;
+    let y = 20;
 
-    // Add Xoto Logo
-    doc.addImage(XOTO_LOGO, 'PNG', margin, yPosition, 40, 15);
-    
-    // Company Info
-    doc.setFontSize(8);
-    doc.setTextColor(100);
-    doc.text("XPOTO CORP", pageWidth - 60, yPosition);
-    doc.text("123 Business Park", pageWidth - 60, yPosition + 4);
-    doc.text("Mumbai, Maharashtra 400001", pageWidth - 60, yPosition + 8);
-    doc.text("GSTIN: 27AABCU9603R1ZX", pageWidth - 60, yPosition + 12);
-    doc.text("+91 98765 43210 | info@xoto.com", pageWidth - 60, yPosition + 16);
-
-    yPosition += 30;
-
-    // Invoice Title
-    doc.setFontSize(20);
+    // Logo & Header
+    doc.addImage(XOTO_LOGO, "PNG", 14, y, 40, 15);
+    doc.setFontSize(18);
     doc.setTextColor(40, 116, 166);
-    doc.text("TAX INVOICE", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 15;
+    doc.text(type === "po" ? "PURCHASE ORDER" : "TAX INVOICE", pageWidth / 2, y + 10, { align: "center" });
 
-    // Invoice Details
+    y += 30;
+
+    // Details
     doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Invoice #: ${invoice.invoiceNumber}`, margin, yPosition);
-    doc.text(`Date: ${new Date(invoice.date).toLocaleDateString()}`, margin, yPosition + 6);
-    doc.text(`Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}`, margin, yPosition + 12);
+    doc.text(`${type === "po" ? "PO" : "Invoice"} #: ${values.invoiceNumber}`, 14, y);
+    doc.text(`Date: ${values.date.format("DD MMM YYYY")}`, 14, y + 6);
+    doc.text(`Due Date: ${values.dueDate.format("DD MMM YYYY")}`, 14, y + 12);
 
-    // Client Details
-    doc.text("Bill To:", pageWidth / 2, yPosition);
-    doc.setFontSize(9);
-    doc.text(project.customer?.name || "Beach Resort Ltd.", pageWidth / 2, yPosition + 5);
-    doc.text(project.customer?.email || "accounts@beachresort.com", pageWidth / 2, yPosition + 10);
-    doc.text(project.customer?.phone || "+91 9876543210", pageWidth / 2, yPosition + 15);
-    doc.text(`Project: ${project.title}`, pageWidth / 2, yPosition + 20);
+    doc.text(`Project: ${project.title}`, pageWidth / 2 + 10, y);
+    doc.text(`Category: ${project.category?.name || "N/A"}`, pageWidth / 2 + 10, y + 6);
+    doc.text(`Budget: ₹${project.budget.toLocaleString()}`, pageWidth / 2 + 10, y + 12);
 
-    yPosition += 35;
+    y += 30;
 
     // Items Table
-    const tableData = invoice.items.map((it, i) => [
+    const items = values.items || [];
+    const tableData = items.map((it, i) => [
       i + 1,
       it.description,
       it.qty,
@@ -397,138 +132,65 @@ const ManageProjects = () => {
     ]);
 
     doc.autoTable({
-      head: [["#", "Description", "Qty", "Rate (₹)", "Amount (₹)"]],
+      head: [["#", "Description", "Qty", "Rate", "Amount"]],
       body: tableData,
-      startY: yPosition,
+      startY: y,
       theme: "grid",
-      styles: { fontSize: 9, cellPadding: 3 },
-      headStyles: { 
-        fillColor: [40, 116, 166],
-        textColor: 255,
-        fontStyle: 'bold'
-      },
-      columnStyles: {
-        0: { cellWidth: 15 },
-        1: { cellWidth: 80 },
-        2: { cellWidth: 20 },
-        3: { cellWidth: 30 },
-        4: { cellWidth: 30 }
-      }
+      headStyles: { fillColor: [40, 116, 166] },
     });
 
-    const finalY = doc.lastAutoTable.finalY + 10;
-    
-    // Total Amount
+    const finalY = doc.lastAutoTable.finalY + 15;
+    const total = items.reduce((sum, i) => sum + i.qty * i.rate, 0);
+    const gst = total * 0.18;
+    const grandTotal = total + gst;
+
     doc.setFontSize(12);
-    doc.setTextColor(0);
-    doc.setFont(undefined, 'bold');
-    doc.text(`Total Amount: ₹${invoice.total.toLocaleString()}`, pageWidth - margin - 50, finalY);
-    
-    // Tax Details (dummy)
+    doc.text(`Subtotal: ₹${total.toLocaleString()}`, pageWidth - 70, finalY);
+    if (type === "tax") {
+      doc.text(`CGST @9%: ₹${(gst / 2).toLocaleString()}`, pageWidth - 70, finalY + 8);
+      doc.text(`SGST @9%: ₹${(gst / 2).toLocaleString()}`, pageWidth - 70, finalY + 16);
+    }
+    doc.setFontSize(14);
+    doc.setFont(undefined, "bold");
+    doc.text(`Total: ₹${type === "tax" ? grandTotal.toLocaleString() : total.toLocaleString()}`, pageWidth - 70, finalY + 30);
+
     doc.setFontSize(9);
     doc.setTextColor(100);
-    doc.text("GST @18% included", pageWidth - margin - 50, finalY + 6);
-    
-    // Status
-    doc.text(`Status: ${invoice.status.toUpperCase()}`, margin, finalY + 15);
-    
-    // Notes
-    if (invoice.notes) {
-      doc.text(`Notes: ${invoice.notes}`, margin, finalY + 25);
-    }
+    doc.text("Bank: HDFC Bank | A/c: 50200078901234 | IFSC: HDFC0000123", 14, doc.internal.pageSize.getHeight() - 30);
+    doc.text("UPI: xoto.corp@okhdfcbank", 14, doc.internal.pageSize.getHeight() - 20);
 
-    // Payment Instructions
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    const paymentY = finalY + 35;
-    doc.text("Payment Instructions:", margin, paymentY);
-    doc.text("• Bank Transfer: Account Name: XPOTO CORP, Bank: HDFC Bank, Account: 123456789012", margin, paymentY + 5);
-    doc.text("• UPI: xoto.corp@okhdfcbank", margin, paymentY + 10);
-    doc.text("• Cheque: Payable to XPOTO CORP", margin, paymentY + 15);
-
-    // Footer
-    const footerY = doc.internal.pageSize.getHeight() - 20;
-    doc.setFontSize(7);
-    doc.setTextColor(150);
-    doc.text("Thank you for your business!", pageWidth / 2, footerY, { align: "center" });
-    doc.text("This is a computer-generated invoice, no signature required.", pageWidth / 2, footerY + 4, { align: "center" });
-
-    doc.save(`invoice-${invoice.invoiceNumber}.pdf`);
+    doc.save(`${type === "po" ? "PO" : "Invoice"}-${values.invoiceNumber}.pdf`);
+    message.success(`${type === "po" ? "PO" : "Tax Invoice"} downloaded!`);
   };
 
-  const InvoiceItems = () => (
-    <Form.List name="items">
-      {(fields, { add, remove }) => (
-        <div>
-          {fields.map(({ key, name, ...rest }) => (
-            <Space key={key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
-              <Form.Item {...rest} name={[name, "description"]} rules={[{ required: true, message: "Required" }]}>
-                <Input placeholder="Item description" />
-              </Form.Item>
-              <Form.Item {...rest} name={[name, "qty"]} rules={[{ required: true, message: "Required" }]}>
-                <InputNumber min={1} placeholder="Qty" />
-              </Form.Item>
-              <Form.Item {...rest} name={[name, "rate"]} rules={[{ required: true, message: "Required" }]}>
-                <InputNumber min={0} placeholder="Rate" />
-              </Form.Item>
-              <Button type="link" danger onClick={() => remove(name)}>
-                Remove
-              </Button>
-            </Space>
-          ))}
-          <Button type="dashed" onClick={() => add()} block icon={<Plus />}>
-            Add Item
-          </Button>
-        </div>
-      )}
-    </Form.List>
-  );
+  const handleCreateInvoice = (values) => {
+    downloadPDF(selectedProject, values, invoiceType);
+    setInvoiceModalVisible(false);
+    form.resetFields();
+  };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case "completed":
-        return "green";
-      case "in_progress":
-        return "blue";
-      case "pending":
-        return "orange";
-      default:
-        return "gray";
-    }
+    const map = {
+      completed: "green",
+      in_progress: "blue",
+      pending: "orange",
+      approved: "green",
+      release_requested: "gold",
+    };
+    return map[status] || "default";
   };
 
-  const getInvoiceStatusColor = (status) => {
-    switch (status) {
-      case "paid":
-        return "green";
-      case "pending":
-        return "orange";
-      case "overdue":
-        return "red";
-      case "cancelled":
-        return "gray";
-      default:
-        return "blue";
-    }
-  };
-
-  const openCreateInvoice = (project) => {
-    setSelectedProject(project);
-    setInvoiceModalVisible(true);
-    const invNo = `INV-${project._id.slice(-6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
-    invoiceForm.setFieldsValue({
-      invoiceNumber: invNo,
-      date: dayjs(),
-      dueDate: dayjs().add(15, "day"),
-      items: [{ description: "", qty: 1, rate: 0 }],
-    });
-  };
+  if (loading) return <div className="flex justify-center py-20"><Spin size="large" tip="Loading your projects..." /></div>;
+  if (error) return <Alert message="Error" description={error} type="error" showIcon className="m-6" />;
+  if (projects.length === 0) return <Empty description="No projects assigned yet" className="mt-20" />;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">My Projects</h1>
-        <p className="text-gray-500">Track milestones, invoices, and progress</p>
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+          <Briefcase className="text-green-600" /> Assigned Projects
+        </h1>
+        <p className="text-gray-600 mt-2">Manage finances, generate POs & Tax Invoices</p>
       </motion.div>
 
       <div className="space-y-6">
@@ -539,151 +201,89 @@ const ManageProjects = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
           >
-            <Card>
+            <Card className="shadow-lg">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800">{project.title}</h3>
-                  <Space size="middle" className="mt-2">
+                  <h3 className="text-2xl font-bold text-gray-800">{project.title}</h3>
+                  <Space size="middle" className="mt-3">
                     <Tag color={getStatusColor(project.status)}>
-                      {project.status.replace("_", " ").toUpperCase()}
+                      {project.status.toUpperCase()}
                     </Tag>
-                    <span className="text-sm text-gray-600">
-                      <DollarSign className="w-4 h-4 inline" /> ₹{project.budget.toLocaleString()}
-                    </span>
-                    <span className="text-sm text-gray-600">
-                      <Briefcase className="w-4 h-4 inline" /> {project.category.name}
-                    </span>
-                    <span className="text-sm text-gray-600">Progress: {project.progress_percentage}%</span>
+                    <span className="text-lg font-medium">₹{project.budget.toLocaleString()}</span>
+                    <span>{project.category?.name} → {project.subcategory?.name}</span>
+                    <Progress percent={project.progress_percentage} size="small" className="w-32" />
                   </Space>
                 </div>
                 <Button
                   type="text"
+                  size="large"
                   icon={expandedProject === project._id ? <ChevronUp /> : <ChevronDown />}
                   onClick={() => setExpandedProject(expandedProject === project._id ? null : project._id)}
                 />
               </div>
 
               {expandedProject === project._id && (
-                <Tabs defaultActiveKey="milestones" className="mt-4">
-                  {/* ---------- MILESTONES TAB ---------- */}
-                  <TabPane tab="Milestones" key="milestones">
+                <Tabs defaultActiveKey="milestones">
+                  <TabPane tab={`Milestones (${project.milestones_count})`} key="milestones">
                     <Collapse accordion>
                       {project.milestones.map((m) => (
                         <Panel
+                          key={m._id}
                           header={
                             <div className="flex justify-between">
-                              <span>{m.title}</span>
+                              <span className="font-medium">{m.title}</span>
                               <Space>
-                                <Tag
-                                  color={m.status === "release_requested" ? "gold" : getStatusColor(m.status)}
-                                >
-                                  {m.status.replace("_", " ")}
+                                <Tag color={getStatusColor(m.status)}>
+                                  {m.status.replace(/_/g, " ").toUpperCase()}
                                 </Tag>
-                                <span>₹{m.amount.toLocaleString()}</span>
+                                <span className="font-medium">₹{m.amount.toLocaleString()}</span>
                               </Space>
                             </div>
                           }
-                          key={m._id}
                         >
-                          <div className="space-y-3">
-                            <p className="text-sm text-gray-600">{m.description}</p>
-                            <div className="flex gap-4 text-xs text-gray-500">
-                              <span>
-                                <Calendar className="w-3 h-3 inline" />{" "}
-                                {new Date(m.start_date).toLocaleDateString()} -{" "}
-                                {new Date(m.end_date).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <Progress percent={m.progress} size="small" />
-                            {m.daily_updates.length > 0 && (
-                              <div className="mt-3">
-                                <p className="font-medium text-sm mb-1">Daily Updates:</p>
-                                {m.daily_updates.map((u) => (
-                                  <div key={u._id} className="text-xs bg-gray-50 p-2 rounded mb-1">
-                                    <strong>{new Date(u.date).toLocaleDateString()}:</strong> {u.work_done}
-                                    {u.approval_status && (
-                                      <Tag
-                                        color={u.approval_status === "approved" ? "green" : "orange"}
-                                        className="ml-2"
-                                      >
-                                        {u.approval_status}
-                                      </Tag>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
+                          <p className="text-gray-600">{m.description}</p>
+                          <div className="my-3">
+                            <Progress percent={m.progress} status={m.progress === 100 ? "success" : "active"} />
                           </div>
+                          {m.daily_updates?.length > 0 && (
+                            <div className="bg-gray-50 p-3 rounded mt-3">
+                              <strong>Recent Updates:</strong>
+                              {m.daily_updates.slice(0, 3).map((u) => (
+                                <div key={u._id} className="text-sm mt-1">
+                                  • {dayjs(u.date).format("DD MMM YYYY")}: {u.work_done}
+                                  {u.approval_status && (
+                                    <Tag color="green" className="ml-2 text-xs">APPROVED</Tag>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </Panel>
                       ))}
                     </Collapse>
                   </TabPane>
 
-                  {/* ---------- INVOICES TAB ---------- */}
-                  <TabPane tab="Invoices" key="invoices">
-                    <div className="mb-4">
-                      <Button type="primary" icon={<Plus />} onClick={() => openCreateInvoice(project)}>
-                        Create PO
-                      </Button> 
-                      <Button type="primary" icon={<Plus />} onClick={() => openCreateInvoice(project)} style={{ marginLeft: 8 }}>
-                        Generate Tax Invoice
+                  <TabPane tab="Generate Documents" key="documents">
+                    <Space size="middle" wrap>
+                      <Button
+                        type="primary"
+                        size="large"
+                        icon={<FileCheck className="mr-2" />}
+                        onClick={() => openInvoiceModal(project, "po")}
+                        style={{ background: "#52c41a", borderColor: "#52c41a" }}
+                      >
+                        Generate Purchase Order (PO)
                       </Button>
-                    </div>
-
-                    <Table
-                      dataSource={invoices[project._id] || []}
-                      pagination={false}
-                      rowKey="_id"
-                      size="small"
-                    >
-                      <Table.Column title="Invoice #" dataIndex="invoiceNumber" />
-                      <Table.Column
-                        title="Date"
-                        render={(_, r) => new Date(r.date).toLocaleDateString()}
-                      />
-                      <Table.Column
-                        title="Due Date"
-                        render={(_, r) => new Date(r.dueDate).toLocaleDateString()}
-                      />
-                      <Table.Column
-                        title="Amount"
-                        render={(_, r) => `₹${r.total.toLocaleString()}`}
-                      />
-                      <Table.Column
-                        title="Status"
-                        render={(_, r) => (
-                          <Tag color={getInvoiceStatusColor(r.status)}>{r.status.toUpperCase()}</Tag>
-                        )}
-                      />
-                      <Table.Column
-                        title="Actions"
-                        render={(_, invoice) => (
-                          <Space>
-                            <Button
-                              size="small"
-                              icon={<Download className="w-4 h-4" />}
-                              onClick={() => downloadInvoicePDF(project, invoice)}
-                            >
-                              PDF
-                            </Button>
-                            {invoice.status === "pending" && (
-                              <Popconfirm
-                                title="Mark as paid?"
-                                onConfirm={() => updateInvoiceStatus(invoice._id, "paid")}
-                              >
-                                <Button size="small" type="primary">
-                                  Mark Paid
-                                </Button>
-                              </Popconfirm>
-                            )}
-                          </Space>
-                        )}
-                      />
-                    </Table>
-
-                    {(!invoices[project._id] || invoices[project._id].length === 0) && (
-                      <Empty description="No invoices created yet" />
-                    )}
+                      <Button
+                        type="primary"
+                        size="large"
+                        danger
+                        icon={<FileText className="mr-2" />}
+                        onClick={() => openInvoiceModal(project, "tax")}
+                      >
+                        Generate Tax Invoice (GST)
+                      </Button>
+                    </Space>
                   </TabPane>
                 </Tabs>
               )}
@@ -692,29 +292,26 @@ const ManageProjects = () => {
         ))}
       </div>
 
-      {/* ---------- CREATE INVOICE MODAL ---------- */}
+      {/* Invoice / PO Modal */}
       <Modal
-        title="Create New Invoice"
+        title={invoiceType === "po" ? "Generate Purchase Order" : "Generate Tax Invoice"}
         open={invoiceModalVisible}
         onCancel={() => {
           setInvoiceModalVisible(false);
-          invoiceForm.resetFields();
+          form.resetFields();
         }}
         footer={null}
-        width={700}
+        width={800}
       >
-        <Form form={invoiceForm} layout="vertical" onFinish={createInvoice}>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <Form.Item label="Invoice Number" name="invoiceNumber" rules={[{ required: true }]}>
-              <Input />
+        <Form form={form} layout="vertical" onFinish={handleCreateInvoice}>
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item label="Document Number" name="invoiceNumber" rules={[{ required: true }]}>
+              <Input disabled />
             </Form.Item>
             <Form.Item label="Project">
               <Input value={selectedProject?.title} disabled />
             </Form.Item>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <Form.Item label="Invoice Date" name="date" rules={[{ required: true }]}>
+            <Form.Item label="Issue Date" name="date" rules={[{ required: true }]}>
               <DatePicker className="w-full" />
             </Form.Item>
             <Form.Item label="Due Date" name="dueDate" rules={[{ required: true }]}>
@@ -722,18 +319,36 @@ const ManageProjects = () => {
             </Form.Item>
           </div>
 
-          <Form.Item label="Items">
-            <InvoiceItems />
-          </Form.Item>
+          <Form.List name="items">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name }) => (
+                  <Space key={key} align="baseline" style={{ display: "flex", marginBottom: 8 }}>
+                    <Form.Item name={[name, "description"]} rules={[{ required: true }]}>
+                      <Input placeholder="Description" style={{ width: 300 }} />
+                    </Form.Item>
+                    <Form.Item name={[name, "qty"]} rules={[{ required: true }]}>
+                      <InputNumber min={1} placeholder="Qty" />
+                    </Form.Item>
+                    <Form.Item name={[name, "rate"]} rules={[{ required: true }]}>
+                      <InputNumber min={0} placeholder="Rate" style={{ width: 120 }} />
+                    </Form.Item>
+                    {fields.length > 1 && (
+                      <Button type="text" danger onClick={() => remove(name)}>Remove</Button>
+                    )}
+                  </Space>
+                ))}
+                <Button type="dashed" onClick={() => add()} block icon={<Plus />}>
+                  Add Item
+                </Button>
+              </>
+            )}
+          </Form.List>
 
-          <Form.Item label="Notes" name="notes">
-            <TextArea rows={3} />
-          </Form.Item>
-
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-end gap-3 mt-6">
             <Button onClick={() => setInvoiceModalVisible(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" loading={invoiceLoading}>
-              Create Invoice
+            <Button type="primary" htmlType="submit" icon={<Download />}>
+              Download {invoiceType === "po" ? "PO" : "Tax Invoice"} as PDF
             </Button>
           </div>
         </Form>
