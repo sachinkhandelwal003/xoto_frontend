@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Card from '../Cards/Cards';
+import Card from '../Cards/InteriorCards';
 import StepCarousel from '../../StepCarousel';
 import FreelancersSection from '../../freelancers/FreelancersSection';
 import FaqPage from '../../faq';

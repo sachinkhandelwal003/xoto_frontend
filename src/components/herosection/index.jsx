@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import homeimage from "../../assets/img/homeXOTO.jpg";
 
 const HeroSection = () => {
@@ -9,7 +10,7 @@ const HeroSection = () => {
       title: "Interior E-commerce",
       description:
         "Shop premium furniture, décor, and design accessories — all in one place.",
-      icon: "🛋️",
+      icon: "Sofa",
       link: "/ecommerce/b2c",
       buttonText: "Start Shopping",
     },
@@ -18,11 +19,47 @@ const HeroSection = () => {
       title: "Landscaping Solutions",
       description:
         "Plan and execute beautiful outdoor spaces with expert design and AI-guided tools.",
-      icon: "🌿",
+      icon: "Leaf",
       link: "/landscaping",
       buttonText: "Explore Landscaping",
     },
+    {
+      id: 3,
+      title: "AI Interior",
+      description:
+        "Redesign any room instantly using advanced AI visualization tools.",
+      icon: "Sparkles",
+      link: "/aiInterior",
+      buttonText: "Try AI Design",
+    },
+   
   ];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 2) % features.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 2 + features.length) % features.length);
+  };
+
+  // Auto-play every 6 seconds
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Get the two cards to display (looping)
+  const getVisibleCards = () => {
+    const cards = [];
+    for (let i = 0; i < 2; i++) {
+      const index = (currentIndex + i) % features.length;
+      cards.push(features[index]);
+    }
+    return cards;
+  };
 
   return (
     <section
@@ -35,12 +72,11 @@ const HeroSection = () => {
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40" />
-      
-      {/* ======= Left and Right White Clip Shapes - Hidden on mobile ======= */}
+
+      {/* Bottom Decorative Shapes */}
       <div className="hidden lg:block absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape"></div>
       <div className="hidden lg:block absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape"></div>
 
-      {/* Custom clip paths */}
       <style>{`
         .clip-left-shape {
           clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
@@ -53,7 +89,7 @@ const HeroSection = () => {
       {/* Main Content */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-10 px-4 sm:px-6 lg:px-20 w-full max-w-7xl mx-auto mt-16 lg:mt-0">
         
-        {/* ---------- LEFT SECTION ---------- */}
+        {/* LEFT SECTION - Unchanged */}
         <div className="max-w-2xl space-y-4 lg:space-y-6 text-center lg:text-left">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight sm:leading-tight lg:leading-tight">
             Redefining Living <br />
@@ -65,7 +101,6 @@ const HeroSection = () => {
             every corner of your world.
           </p>
 
-          {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
             <Link
               to=""
@@ -82,13 +117,12 @@ const HeroSection = () => {
             </Link>
           </div>
 
-          {/* Feature Tags */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mt-4 lg:mt-6">
             {[
-              { icon: "🌐", label: "One Stop Solution" },
-              { icon: "⚡", label: "Faster Turn Around Time" },
-              { icon: "👥", label: "Professional Teams" },
-              { icon: "🇦🇪", label: "PAN UAE Presence" },
+              { icon: "Globe", label: "One Stop Solution" },
+              { icon: "Zap", label: "Faster Turn Around Time" },
+              { icon: "Users", label: "Professional Teams" },
+              { icon: "Flag", label: "PAN UAE Presence" },
             ].map((item, idx) => (
               <div
                 key={idx}
@@ -101,30 +135,77 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* ---------- RIGHT SECTION ---------- */}
-        <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-4 sm:gap-6 justify-center items-center mt-4 lg:mt-0">
-          {features.map((feature) => (
-            <div
-              key={feature.id}
-              className="w-full sm:w-80 lg:w-full xl:w-64 p-4 sm:p-6 rounded-2xl bg-white/10 backdrop-blur-md shadow-xl hover:bg-white/20 transition-all duration-300 flex flex-col justify-between"
-            >
-              <div>
-                <div className="text-3xl sm:text-4xl mb-3">{feature.icon}</div>
-                <h3 className="text-xl sm:text-2xl font-semibold mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-xs sm:text-sm opacity-90">{feature.description}</p>
-              </div>
-              <Link
-                to={feature.link}
-                className="mt-4 sm:mt-5 inline-block bg-white text-[var(--color-text-dark)] font-semibold px-4 py-2 sm:px-5 sm:py-2 rounded-md hover:bg-[var(--color-hoverbtn)] hover:text-white transition text-center text-sm sm:text-base"
+        {/* RIGHT SECTION - Now with Slider (2 cards visible) */}
+        <div className="relative">
+          <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-4 sm:gap-6 justify-center items-center">
+            {getVisibleCards().map((feature, idx) => (
+              <div
+                key={feature.id}
+                className={`w-full sm:w-80 lg:w-full xl:w-64 p-4 sm:p-6 rounded-2xl bg-white/10 backdrop-blur-md shadow-xl hover:bg-white/20 transition-all duration-500 flex flex-col justify-between ${
+                  idx === 0 ? "translate-y-4 sm:translate-y-0" : ""
+                }`}
+                style={{
+                  animation: `slideIn 0.6s ease-out ${idx * 0.2}s both`,
+                }}
               >
-                {feature.buttonText}
-              </Link>
-            </div>
-          ))}
+                <div>
+                  <div className="text-3xl sm:text-4xl mb-3">{feature.icon}</div>
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm opacity-90">{feature.description}</p>
+                </div>
+                <Link
+                  to={feature.link}
+                  className="mt-4 sm:mt-5 inline-block bg-white text-[var(--color-text-dark)] font-semibold px-4 py-2 sm:px-5 sm:py-2 rounded-md hover:bg-[var(--color-hoverbtn)] hover:text-white transition text-center text-sm sm:text-base"
+                >
+                  {feature.buttonText}
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur p-3 rounded-full hover:bg-white/40 transition-all z-10"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur p-3 rounded-full hover:bg-white/40 transition-all z-10"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-2 mt-6">
+            {[0, 1].map((i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  Math.floor(currentIndex / 2) === i ? "bg-white w-8" : "bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
+
+      {/* Smooth slide-in animation */}
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </section>
   );
 };

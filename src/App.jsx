@@ -43,6 +43,8 @@ import Service from "./components/homepage/Services";
 import Page2 from "./components/homepage/Page2";
 import Page3 from "./components/homepage/Page3";
 import Page from "./components/homepage/Page";
+import AIPlanner from "./components/homepage/AiPlanner/AIPlanner";
+import Interior from "./components/homepage/Interior/Interior";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -119,6 +121,7 @@ function LayoutWrapper({ children }) {
     "/dashboard",
     "/customer/dashboard",
     "/admin/login",
+    "/aiPlanner",
     "/accountant/login",
     "/ecommerce/seller",
     "/ecommerce/cart",
@@ -150,6 +153,7 @@ function LayoutWrapper({ children }) {
     "/customer/dashboard",
     "/profile",
     "/admin/login",
+        "/aiPlanner",
     "/accountant/login",
     "/ecommerce/seller",
     "/freelancer/registration",
@@ -175,6 +179,7 @@ function LayoutWrapper({ children }) {
     "/dashboard",
     "/customer/dashboard",
     "/admin/login",
+        "/aiPlanner",
     "/ecommerce/seller",
     "/ecommerce/product",
   ];
@@ -191,6 +196,7 @@ function LayoutWrapper({ children }) {
     "/designs/Tool",
     "/profile",
     "/admin/login",
+        "/aiPlanner",
     "/accountant/login",
     "/ecommerce/seller",
     "/ecommerce/product",
@@ -223,10 +229,13 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/landscaping" element={<Landspackng />} />
+                    <Route path="/aiPlanner" element={<AIPlanner />} />
+
           <Route path="/services/interior" element={<Ynterior />} />
           <Route path="/marketplace" element={<Buy />} />
           <Route path="/ecosystem" element={<Ecosystem />} />
           <Route path="/about" element={<About />} />
+          <Route path="/aiInterior" element={<Interior />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -236,7 +245,7 @@ function App() {
           <Route path="/designs" element={<Designs />} />
           <Route
             path="/designs/Tool"
-            element={
+            element={ 
               <DndProvider backend={HTML5Backend}>
                 <AITool />
               </DndProvider>

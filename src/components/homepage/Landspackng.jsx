@@ -13,6 +13,7 @@ import interImage from "../../assets/img/inter.png";
 import { motion } from "framer-motion";
 import Dreamspacking from './Dreamspacking';
 import Eco from './Eco';
+import { Link } from "react-router-dom";
 
 import {
   TreePine,
@@ -224,46 +225,66 @@ export default function Landspackng() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+            className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
           >
             Transforming Homes With Premium
             <br />
             <span className="text-white">Outdoor Solution</span>
           </motion.h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-10"
-          >
-            {services.map((service, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-left"
-              >
-                <div className="text-purple-400 mb-2">{service.icon}</div>
-                <h3 className="text-sm font-semibold text-white">
-                  {service.title}
-                </h3>
-              </motion.div>
-            ))}
-          </motion.div>
+      <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.3 }}
+  className="grid grid-cols-2 gap-4 max-w-5xl mx-auto mb-10"
+>
+  {services.map((service, i) => (
+    <motion.div
+      key={i}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.4 + i * 0.1 }}
+      className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2"
+    >
+      <div className="flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-white">
+          {service.title}
+        </h3>
+      </div>
+    </motion.div>
+  ))}
+</motion.div>
 
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-5 rounded-full text-lg font-bold shadow-xl transition-all flex items-center mx-auto"
-          >
-            Get a free estimate
-            <ArrowRight className="ml-2 w-3 h-3" />
-          </motion.button>
+
+
+          <div className="flex items-center justify-center gap-4 mt-6">
+  <motion.button
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay: 0.8 }}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-3 rounded-full text-lg font-bold shadow-xl transition-all flex items-center"
+  >
+    Get a free estimate
+    <ArrowRight className="ml-2 w-3 h-3" />
+  </motion.button>
+
+<Link to='/aiPlanner'>
+  <motion.button
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay: 0.9 }}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-3 rounded-full text-lg font-bold shadow-xl transition-all flex items-center"
+  >
+    AI Planner
+    <ArrowRight className="ml-2 w-3 h-3" />
+  </motion.button>
+</Link>
+</div>
+
         </div>
       </section>
 

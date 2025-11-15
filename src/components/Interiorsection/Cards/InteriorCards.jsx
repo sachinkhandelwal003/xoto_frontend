@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
 
-const Card = ({ image, hoverImage, text }) => {
+const InteriorCards = ({ image, hoverImage, text }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -41,4 +41,4 @@ const Card = ({ image, hoverImage, text }) => {
   );
 };
 
-export default Card;
+export default InteriorCards;
