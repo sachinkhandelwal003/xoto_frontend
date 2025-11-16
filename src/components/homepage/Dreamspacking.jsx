@@ -26,7 +26,7 @@ const DreamSpacesSection = () => {
       title: "Luxury Coastal Retreat",
       location: "Malibu, USA",
       image:
-        "https://images.unsplash.com/photo-1598300184018-1e0f01398952?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
     },
   ];
 

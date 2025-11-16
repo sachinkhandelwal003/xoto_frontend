@@ -112,9 +112,7 @@ function LayoutWrapper({ children }) {
     "/quotation",
     "/freelancer/browse-category",
     "/freelancer/category",
-    "/ecommerce/filter",
     "/freelancer/free-listing",
-    "/ecommerce/b2c",
     "/ecommerce",
     "/freelancer/create-business",
     "/designs/Tool",
@@ -129,7 +127,6 @@ function LayoutWrapper({ children }) {
 
   const hideNavbar =
     hideNavbarPaths.includes(location.pathname) ||
-    location.pathname.startsWith("/ecommerce/product/") ||
     location.pathname.startsWith("/dashboard/");
 
   const showFreelancerNavbar =
@@ -139,11 +136,8 @@ function LayoutWrapper({ children }) {
     location.pathname === "/freelancer/create-business";
 
   const showEcommerceNavbar =
-    location.pathname === "/ecommerce/b2c" ||
-    location.pathname === "/ecommerce/filter" ||
     location.pathname === "/ecommerce" ||
-    location.pathname === "/ecommerce/cart" ||
-    location.pathname.startsWith("/ecommerce/product/");
+    location.pathname === "/ecommerce/cart";
 
   const hideFooterPaths = [
     "/login",

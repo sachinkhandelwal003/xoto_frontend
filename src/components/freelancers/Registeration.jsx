@@ -19,8 +19,9 @@ import {
   ArrowRight,
 } from "lucide-react";
 import registerimage from "../../assets/img/registergarden.jpg";
-import { showToast } from "../../manageApi/utils/toast"; // ← Already imported
+import { showToast } from "../../manageApi/utils/toast";
 
+// Keep country codes
 const countryCodes = [
   { value: "+91", label: "+91 India" },
   { value: "+971", label: "+971 UAE" },
@@ -67,11 +68,11 @@ const Registration = () => {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [otpModal, setOtpModal] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [otpLoading, setOtpLoading] = useState(false);
+
+  // Keep country code & mobile state
   const [countryCode, setCountryCode] = useState("+971");
   const [mobileNumber, setMobileNumber] = useState("");
+
   const [services, setServices] = useState([
     { category: "", subcategory: "", description: "" },
   ]);
@@ -84,11 +85,21 @@ const Registration = () => {
     setValue,
     watch,
     formState: { errors },
-    getValues,
   } = useForm();
 
   const mobile = watch("mobile");
-  const isMobileVerified = watch("is_mobile_verified");
+
+  // Auto-set mobile verified = true (bypass OTP for testing)
+  useEffect(() => {
+    setValue("is_mobile_verified", true);
+  }, [setValue]);
+
+  // Sync full mobile number with selected country code
+  useEffect(() => {
+    const cleaned = mobileNumber.replace(/\D/g, "").slice(0, 15);
+    const fullMobile = cleaned ? `${countryCode}${cleaned}` : "";
+    setValue("mobile", fullMobile);
+  }, [countryCode, mobileNumber, setValue]);
 
   /* ----- Queries ----- */
   const { data: categories = [], isLoading: catLoading } = useQuery({
@@ -104,15 +115,7 @@ const Registration = () => {
     enabled: !!firstCat,
   });
 
-  /* ----- Mobile Sync ----- */
-  useEffect(() => {
-    const full = mobileNumber
-      ? `${countryCode}${mobileNumber.replace(/\D/g, "")}`
-      : "";
-    setValue("mobile", full);
-  }, [countryCode, mobileNumber, setValue]);
-
-  /* ----- Handlers ----- */
+  /* ----- Navigation ----- */
   const next = () => setStep((s) => s + 1);
   const back = () => setStep((s) => s - 1);
 
@@ -133,45 +136,6 @@ const Registration = () => {
       copy[idx][field] = value;
       return copy;
     });
-  };
-
-  /* ----- OTP ----- */
-  const sendOTP = async () => {
-    const clean = mobile?.replace(/\D/g, "") || "";
-    if (!mobile || clean.length < 10) {
-      showToast("Enter a valid 10-digit mobile number", "error");
-      return;
-    }
-    setOtpLoading(true);
-    try {
-      await axios.post("https://kotiboxglobaltech.online/api/auth/otp/send", { mobile });
-      setOtpModal(true);
-      showToast(`OTP sent to ${mobile}`, "success");
-    } catch (e) {
-      showToast(e.response?.data?.message || "Failed to send OTP", "error");
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-
-  const verifyOTP = async () => {
-    if (otp.length !== 6) {
-      showToast("Enter 6-digit OTP", "error");
-      return;
-    }
-    try {
-      await axios.post("https://kotiboxglobaltech.online/api/auth/otp/verify", {
-        mobile,
-        otp,
-      });
-      setValue("is_mobile_verified", true);
-      setOtpModal(false);
-      setOtp("");
-      showToast("Mobile verified!", "success");
-      next();
-    } catch (e) {
-      showToast(e.response?.data?.message || "Invalid OTP", "error");
-    }
   };
 
   /* ----- Submit ----- */
@@ -196,7 +160,7 @@ const Registration = () => {
         last_name: data.last_name,
       },
       mobile: data.mobile,
-      is_mobile_verified: true,
+      is_mobile_verified: true, // Always true in test mode
       professional: {
         experience_years: Number(data.experience_years) || 0,
         bio: data.bio || "",
@@ -273,527 +237,328 @@ const Registration = () => {
   }
 
   return (
-    <>
-      <div
-        className="min-h-screen bg-cover bg-center flex items-center justify-center p-6"
-        style={{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${registerimage})`,
-        }}
-      >
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-4">
-            {/* Sidebar */}
-            <div className="bg-teal-600 text-white p-8">
-              <h3 className="text-2xl font-bold mb-2">Join as a Pro</h3>
-              <p className="text-teal-100 mb-8">
-                Grow your landscaping business
-              </p>
-              <div className="space-y-6">
-                <div
-                  className={`flex items-center gap-3 ${step >= 0 ? "text-white" : "text-teal-300"}`}
-                >
-                  <User className="w-5 h-5" /> Basic Info
-                </div>
-                <div
-                  className={`flex items-center gap-3 ${step >= 1 ? "text-white" : "text-teal-300"}`}
-                >
-                  <Briefcase className="w-5 h-5" /> Professional
-                </div>
-                <div
-                  className={`flex items-center gap-3 ${step >= 2 ? "text-white" : "text-teal-300"}`}
-                >
-                  <Wrench className="w-5 h-5" /> Services
-                </div>
+    <div
+      className="min-h-screen bg-cover bg-center flex items-center justify-center p-6"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${registerimage})`,
+      }}
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-4">
+          {/* Sidebar */}
+          <div className="bg-teal-600 text-white p-8">
+            <h3 className="text-2xl font-bold mb-2">Join as a Pro</h3>
+            <p className="text-teal-100 mb-8">Grow your landscaping business</p>
+            <div className="space-y-6">
+              <div className={`flex items-center gap-3 ${step >= 0 ? "text-white" : "text-teal-300"}`}>
+                <User className="w-5 h-5" /> Basic Info
               </div>
-              <p className="text-teal-200 text-sm mt-8">
-                Already have an account?{" "}
-                <a href="/login" className="underline font-medium">
-                  Sign in
-                </a>
-              </p>
+              <div className={`flex items-center gap-3 ${step >= 1 ? "text-white" : "text-teal-300"}`}>
+                <Briefcase className="w-5 h-5" /> Professional
+              </div>
+              <div className={`flex items-center gap-3 ${step >= 2 ? "text-white" : "text-teal-300"}`}>
+                <Wrench className="w-5 h-5" /> Services
+              </div>
             </div>
+            <p className="text-teal-200 text-sm mt-8">
+              Already have an account? <a href="/login" className="underline font-medium">Sign in</a>
+            </p>
+          </div>
 
-            {/* Form */}
-            <div className="lg:col-span-3 p-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Landscaper Registration
-              </h2>
-              <p className="text-gray-600">Step {step + 1} of 3</p>
+          {/* Form */}
+          <div className="lg:col-span-3 p-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+              Landscaper Registration
+            </h2>
+            <p className="text-gray-600">Step {step + 1} of 3</p>
 
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="mt-8 space-y-6"
-              >
-                {/* STEP 0: Basic Info */}
-                {step === 0 && (
-                  <div className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          First Name
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                          <input
-                            {...register("first_name", {
-                              required: "Required",
-                            })}
-                            className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                            placeholder="John"
-                          />
-                        </div>
-                        {errors.first_name && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.first_name.message}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Last Name
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                          <input
-                            {...register("last_name", { required: "Required" })}
-                            className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                            placeholder="Doe"
-                          />
-                        </div>
-                        {errors.last_name && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.last_name.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
 
+              {/* STEP 0: Basic Info */}
+              {step === 0 && (
+                <div className="space-y-5">
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                         <input
-                          {...register("email", {
-                            required: "Required",
-                            pattern: {
-                              value: /^\S+@\S+$/i,
-                              message: "Invalid email",
-                            },
-                          })}
-                          className="pl-10 w-full w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          placeholder="john@example.com"
+                          {...register("first_name", { required: "Required" })}
+                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                          placeholder="John"
                         />
                       </div>
-                      {errors.email && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.email.message}
-                        </p>
-                      )}
+                      {errors.first_name && <p className="text-red-500 text-xs mt-1">{errors.first_name.message}</p>}
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Mobile Number
-                      </label>
-                      <div className="flex gap-2">
-                        <Select
-                          value={countryCodes.find(
-                            (c) => c.value === countryCode
-                          )}
-                          onChange={(opt) => setCountryCode(opt.value)}
-                          options={countryCodes}
-                          className="w-32"
-                          classNamePrefix="react-select"
-                        />
-                        <div className="flex-1 relative">
-                          <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400 z-10" />
-                          <input
-                            value={mobileNumber}
-                            onChange={(e) =>
-                              setMobileNumber(
-                                e.target.value.replace(/\D/g, "").slice(0, 15)
-                              )
-                            }
-                            className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                            placeholder="7850992707"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={sendOTP}
-                          disabled={
-                            otpLoading ||
-                            !mobile ||
-                            mobile.replace(/\D/g, "").length < 10
-                          }
-                          className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50"
-                        >
-                          {otpLoading ? "Sending..." : "Send OTP"}
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Full: {mobile || "—"}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Password
-                        </label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                          <input
-                            type="password"
-                            {...register("password", {
-                              required: "Required",
-                              minLength: { value: 6, message: "Min 6 chars" },
-                            })}
-                            className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          />
-                        </div>
-                        {errors.password && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.password.message}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Confirm Password
-                        </label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                          <input
-                            type="password"
-                            {...register("confirmPassword", {
-                              required: "Required",
-                            })}
-                            className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {isMobileVerified && (
-                      <div className="text-right">
-                        <button
-                          type="button"
-                          onClick={next}
-                          className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700"
-                        >
-                          Next <ChevronRight className="w-5 h-5" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* STEP 1: Professional */}
-                {step === 1 && isMobileVerified && (
-                  <div className="space-y-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Years of Experience
-                      </label>
-                      <Controller
-                        name="experience_years"
-                        control={control}
-                        rules={{ required: "Required" }}
-                        render={({ field }) => (
-                          <Select
-                            {...field}
-                            options={experienceOptions}
-                            placeholder="Select experience"
-                            classNamePrefix="react-select"
-                          />
-                        )}
-                      />
-                      {errors.experience_years && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.experience_years.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Bio
-                      </label>
-                      <textarea
-                        {...register("bio", { required: "Required" })}
-                        rows={4}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                        placeholder="I specialize in..."
-                      />
-                      {errors.bio && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.bio.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          City
-                        </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                         <input
-                          {...register("city", { required: "Required" })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          placeholder="Dubai"
-                        />
-                        {errors.city && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.city.message}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          State
-                        </label>
-                        <input
-                          {...register("state")}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          placeholder="Dubai"
+                          {...register("last_name", { required: "Required" })}
+                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                          placeholder="Doe"
                         />
                       </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Pincode
-                        </label>
-                        <input
-                          {...register("pincode")}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          placeholder="123456"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Working Radius (km)
-                        </label>
-                        <input
-                          {...register("working_radius")}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          placeholder="50"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <button
-                        type="button"
-                        onClick={back}
-                        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800"
-                      >
-                        <ChevronLeft className="w-5 h-5" /> Back
-                      </button>
-                      <button
-                        type="button"
-                        onClick={next}
-                        className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700"
-                      >
-                        Next <ChevronRight className="w-5 h-5" />
-                      </button>
+                      {errors.last_name && <p className="text-red-500 text-xs mt-1">{errors.last_name.message}</p>}
                     </div>
                   </div>
-                )}
 
-                {/* STEP 2: Services */}
-                {step === 2 && (
-                  <div className="space-y-6">
-                    {services.map((svc, i) => (
-                      <div
-                        key={i}
-                        className="border border-gray-200 rounded-lg p-5"
-                      >
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="font-medium">Service {i + 1}</h4>
-                          {services.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removeService(i)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          )}
-                        </div>
-                        <div className="space-y-4">
-                          <Select
-                            isLoading={catLoading}
-                            placeholder="Category"
-                            value={categories.find(
-                              (c) => c.value === svc.category
-                            )}
-                            onChange={(opt) =>
-                              updateService(i, "category", opt.value)
-                            }
-                            options={categories}
-                            classNamePrefix="react-select"
-                          />
-                          <Select
-                            isLoading={subLoading}
-                            placeholder="Subcategory"
-                            value={subcategories.find(
-                              (s) => s.value === svc.subcategory
-                            )}
-                            onChange={(opt) =>
-                              updateService(i, "subcategory", opt.value)
-                            }
-                            options={subcategories}
-                            isDisabled={!svc.category}
-                            classNamePrefix="react-select"
-                          />
-                          <textarea
-                            placeholder="Description"
-                            value={svc.description}
-                            onChange={(e) =>
-                              updateService(i, "description", e.target.value)
-                            }
-                            rows={2}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          />
-                        </div>
-                      </div>
-                    ))}
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                      <input
+                        {...register("email", {
+                          required: "Required",
+                          pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
+                        })}
+                        className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                  </div>
 
-                    <button
-                      type="button"
-                      onClick={addService}
-                      className="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 flex items-center justify-center gap-2 text-gray-600 hover:border-teal-500 hover:text-teal-600"
-                    >
-                      <Plus className="w-5 h-5" /> Add Another Service
-                    </button>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Languages
-                      </label>
+                  {/* Mobile with Country Code Select (OTP Removed) */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                    <div className="flex gap-2">
                       <Select
-                        isMulti
-                        value={languageOptions.filter((l) =>
-                          selectedLanguages.includes(l.value)
-                        )}
-                        onChange={(opts) =>
-                          setSelectedLanguages(opts.map((o) => o.value))
-                        }
-                        options={languageOptions}
+                        value={countryCodes.find(c => c.value === countryCode)}
+                        onChange={(opt) => setCountryCode(opt.value)}
+                        options={countryCodes}
+                        className="w-40"
                         classNamePrefix="react-select"
                       />
+                      <div className="flex-1 relative">
+                        <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400 z-10" />
+                        <input
+                          value={mobileNumber}
+                          onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 15))}
+                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                          placeholder="501234567"
+                        />
+                      </div>
                     </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Full: {mobile || "—"} (Auto-verified in test mode)
+                    </p>
+                  </div>
 
+                  {/* Passwords */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Payment Method
-                      </label>
-                      <Controller
-                        name="preferred_method"
-                        control={control}
-                        rules={{ required: "Required" }}
-                        render={({ field }) => (
-                          <Select
-                            {...field}
-                            options={paymentOptions}
-                            placeholder="Select payment method"
-                            classNamePrefix="react-select"
-                          />
-                        )}
-                      />
-                      {errors.preferred_method && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.preferred_method.message}
-                        </p>
-                      )}
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <input
+                          type="password"
+                          {...register("password", {
+                            required: "Required",
+                            minLength: { value: 6, message: "Min 6 chars" },
+                          })}
+                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                        />
+                      </div>
+                      {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                     </div>
-
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        {...register("agreed_to_terms", {
-                          required: "You must agree",
-                        })}
-                        className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
-                      />
-                      <label className="ml-2 text-sm text-gray-700">
-                        I agree to the{" "}
-                        <a href="#" className="text-teal-600 underline">
-                          Terms
-                        </a>{" "}
-                        and{" "}
-                        <a href="#" className="text-teal-600 underline">
-                          Privacy Policy
-                        </a>
-                      </label>
-                    </div>
-                    {errors.agreed_to_terms && (
-                      <p className="text-red-500 text-xs">
-                        {errors.agreed_to_terms.message}
-                      </p>
-                    )}
-
-                    <div className="flex justify-between">
-                      <button
-                        type="button"
-                        onClick={back}
-                        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800"
-                      >
-                        <ChevronLeft className="w-5 h-5" /> Back
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 disabled:opacity-50"
-                      >
-                        {loading ? "Submitting..." : "Complete Registration"}
-                        <Check className="w-5 h-5" />
-                      </button>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <input
+                          type="password"
+                          {...register("confirmPassword", { required: "Required" })}
+                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                        />
+                      </div>
                     </div>
                   </div>
-                )}
-              </form>
-            </div>
+
+                  {/* Next Button - Always enabled (no OTP needed) */}
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={next}
+                      className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700"
+                    >
+                      Next <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 1 & 2 are exactly same as your original (just removed isMobileVerified checks) */}
+              {step === 1 && (
+                <div className="space-y-5">
+                  {/* Same as your original Step 1 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+                    <Controller
+                      name="experience_years"
+                      control={control}
+                      rules={{ required: "Required" }}
+                      render={({ field }) => (
+                        <Select {...field} options={experienceOptions} placeholder="Select experience" classNamePrefix="react-select" />
+                      )}
+                    />
+                    {errors.experience_years && <p className="text-red-500 text-xs mt-1">{errors.experience_years.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                    <textarea
+                      {...register("bio", { required: "Required" })}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                      placeholder="I specialize in..."
+                    />
+                    {errors.bio && <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                      <input {...register("city", { required: "Required" })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Dubai" />
+                      {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                      <input {...register("state")} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Dubai" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                      <input {...register("pincode")} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="123456" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Working Radius (km)</label>
+                      <input {...register("working_radius")} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="50" />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <button type="button" onClick={back} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800">
+                      <ChevronLeft className="w-5 h-5" /> Back
+                    </button>
+                    <button type="button" onClick={next} className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700">
+                      Next <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Services (unchanged) */}
+              {step === 2 && (
+                <div className="space-y-6">
+                  {services.map((svc, i) => (
+                    <div key={i} className="border border-gray-200 rounded-lg p-5">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="font-medium">Service {i + 1}</h4>
+                        {services.length > 1 && (
+                          <button type="button" onClick={() => removeService(i)} className="text-red-600 hover:text-red-700">
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                      <div className="space-y-4">
+                        <Select
+                          isLoading={catLoading}
+                          placeholder="Category"
+                          value={categories.find(c => c.value === svc.category)}
+                          onChange={(opt) => updateService(i, "category", opt.value)}
+                          options={categories}
+                          classNamePrefix="react-select"
+                        />
+                        <Select
+                          isLoading={subLoading}
+                          placeholder="Subcategory"
+                          value={subcategories.find(s => s.value === svc.subcategory)}
+                          onChange={(opt) => updateService(i, "subcategory", opt.value)}
+                          options={subcategories}
+                          isDisabled={!svc.category}
+                          classNamePrefix="react-select"
+                        />
+                        <textarea
+                          placeholder="Description"
+                          value={svc.description}
+                          onChange={(e) => updateService(i, "description", e.target.value)}
+                          rows={2}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={addService}
+                    className="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 flex items-center justify-center gap-2 text-gray-600 hover:border-teal-500 hover:text-teal-600"
+                  >
+                    <Plus className="w-5 h-5" /> Add Another Service
+                  </button>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Languages</label>
+                    <Select
+                      isMulti
+                      value={languageOptions.filter(l => selectedLanguages.includes(l.value))}
+                      onChange={(opts) => setSelectedLanguages(opts.map(o => o.value))}
+                      options={languageOptions}
+                      classNamePrefix="react-select"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                    <Controller
+                      name="preferred_method"
+                      control={control}
+                      rules={{ required: "Required" }}
+                      render={({ field }) => (
+                        <Select {...field} options={paymentOptions} placeholder="Select payment method" classNamePrefix="react-select" />
+                      )}
+                    />
+                    {errors.preferred_method && <p className="text-red-500 text-xs mt-1">{errors.preferred_method.message}</p>}
+                  </div>
+
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      {...register("agreed_to_terms", { required: "You must agree" })}
+                      className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+                    />
+                    <label className="ml-2 text-sm text-gray-700">
+                      I agree to the <a href="#" className="text-teal-600 underline">Terms</a> and <a href="#" className="text-teal-600 underline">Privacy Policy</a>
+                    </label>
+                  </div>
+                  {errors.agreed_to_terms && <p className="text-red-500 text-xs">{errors.agreed_to_terms.message}</p>}
+
+                  <div className="flex justify-between">
+                    <button type="button" onClick={back} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800">
+                      <ChevronLeft className="w-5 h-5" /> Back
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 disabled:opacity-50"
+                    >
+                      {loading ? "Submitting..." : "Complete Registration"}
+                      <Check className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </form>
           </div>
         </div>
-
-        {/* OTP Modal */}
-        {otpModal && (
-          <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl p-6 max-w-sm w-full">
-              <h3 className="text-lg font-semibold mb-3">
-                Verify Mobile Number
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Enter 6-digit OTP sent to <strong>{mobile}</strong>
-              </p>
-              <input
-                type="text"
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="w-full text-center text-2xl tracking-widest border border-gray-300 rounded-lg py-3 mb-4"
-                placeholder="------"
-              />
-              <div className="text-right">
-                <button
-                  onClick={verifyOTP}
-                  disabled={otp.length !== 6}
-                  className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 disabled:opacity-50"
-                >
-                  Verify
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
-    </>
+    </div>
   );
 };
 

@@ -26,7 +26,7 @@ const registerVendor = async (data) => {
   formData.append('confirmPassword', data.confirmPassword);
   formData.append('full_name', data.fullName);
   formData.append('mobile', `${data.countryCode}${data.mobile}`);
-  formData.append('is_mobile_verified', data.mobileVerified ? 'true' : 'false');
+  formData.append('is_mobile_verified', 'true'); // Auto-verified
   formData.append('meta.agreed_to_terms', data.agreedToTerms ? 'true' : 'false');
   // =============== STORE DETAILS ===============
   formData.append('store_details.store_name', data.store_details.store_name || '');
@@ -102,9 +102,6 @@ const SellerPage = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [form] = Form.useForm();
-  const [mobileVerified, setMobileVerified] = useState(false);
-  const [otp, setOtp] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
   const [countryCode, setCountryCode] = useState('+91');
   const [categories, setCategories] = useState([]);
   const [fileList, setFileList] = useState({
@@ -125,7 +122,7 @@ const SellerPage = () => {
       fullName: '',
       mobile: '',
       countryCode: '+91',
-      mobileVerified: false,
+      mobileVerified: true, // Auto-verified
       store_details: {
         store_name: '',
         store_description: '',
@@ -223,6 +220,7 @@ const SellerPage = () => {
         const response = await axios.get('https://kotiboxglobaltech.online/api/categories');
         setCategories(response.data.hierarchy);
       } catch (error) {
+        console.error('Error fetching categories:', error);
       }
     };
     fetchCategories();
@@ -317,39 +315,6 @@ const SellerPage = () => {
     },
   });
 
-  const sendOtp = async () => {
-    const mobile = getValues('mobile');
-    if (!mobile || !/^\d{10}$/.test(mobile)) {
-      setError('mobile', { type: 'manual', message: 'Invalid mobile number' });
-      return toast.error('Invalid mobile number');
-    }
-    const fullMobile = `${countryCode}${mobile}`;
-    try {
-      await axios.post('https://kotiboxglobaltech.online/api/auth/otp/send', { mobile: fullMobile });
-      setOtpSent(true);
-      toast.success('OTP sent!');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Error sending OTP');
-    }
-  };
-
-  const verifyOtp = async () => {
-    const mobile = getValues('mobile');
-    if (!otp || !/^\d{4,6}$/.test(otp)) {
-      toast.error('Invalid OTP');
-      return;
-    }
-    const fullMobile = `${countryCode}${mobile}`;
-    try {
-      await axios.post('https://kotiboxglobaltech.online/api/auth/otp/verify', { mobile: fullMobile, otp });
-      setMobileVerified(true);
-      setValue('mobileVerified', true, { shouldValidate: true });
-      toast.success('Mobile verified!');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Error verifying OTP');
-    }
-  };
-
   const nextStep = async () => {
     const fieldsToValidate = {
       0: ['email', 'password', 'confirmPassword'],
@@ -381,10 +346,6 @@ const SellerPage = () => {
   };
 
   const onSubmit = async (data) => {
-    if (!mobileVerified) {
-      toast.error('Please verify your mobile number');
-      return;
-    }
     if (!data.documents.identity_proof || !data.documents.address_proof) {
       toast.error('Required documents missing');
       return;
@@ -394,7 +355,7 @@ const SellerPage = () => {
       toast.error('You must agree to the terms and conditions');
       return;
     }
-    mutation.mutate({ ...data, countryCode, mobileVerified });
+    mutation.mutate({ ...data, countryCode, mobileVerified: true });
   };
 
   const steps = [
@@ -417,27 +378,26 @@ const SellerPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <motion.div
+      
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Left Sidebar Stepper - Fixed Position */}
+          <div className="lg:col-span-3">
+              <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mr-4">
-              <ShopOutlined className="text-white text-xl" />
-            </div>
+           
             <Title level={1} className="text-4xl font-bold text-gray-900 mb-0">
               Vendor Registration
             </Title>
           </div>
-          <Text className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Join Xoto as a premium vendor. Complete the registration process to start selling your products.
-          </Text>
+          
         </motion.div>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar Stepper */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-8 shadow-lg border-0 rounded-2xl" bodyStyle={{ padding: '24px' }}>
+            <Card className="sticky top-8 shadow-lg border-0 rounded-2xl h-fit" bodyStyle={{ padding: '24px' }}>
               <div className="text-center mb-6">
                 <Progress
                   type="circle"
@@ -448,23 +408,56 @@ const SellerPage = () => {
                 />
                 <Text className="block mt-2 text-gray-600 font-medium">Progress</Text>
               </div>
-              <Steps direction="vertical" current={activeStep} size="small">
-                {steps.map((step, index) => (
-                  <AntStep
-                    key={step.label}
-                    title={<Text className={index <= activeStep ? 'text-blue-600 font-medium' : 'text-gray-500'}>{step.label}</Text>}
-                    description={<Text className="text-xs text-gray-400">{step.description}</Text>}
-                    icon={step.icon}
-                  />
-                ))}
-              </Steps>
+              
+              <div className="max-h-[500px] overflow-y-auto pr-2">
+                <Steps direction="vertical" current={activeStep} size="small">
+                  {steps.map((step, index) => (
+                    <AntStep
+                      key={step.label}
+                      title={
+                        <Text className={index <= activeStep ? 'text-blue-600 font-medium' : 'text-gray-500'}>
+                          {step.label}
+                        </Text>
+                      }
+                      description={
+                        <Text className="text-xs text-gray-400">
+                          {step.description}
+                        </Text>
+                      }
+                      icon={
+                        <div className={`flex items-center justify-center w-6 h-6 rounded-full ${
+                          index <= activeStep ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
+                        }`}>
+                          {step.icon}
+                        </div>
+                      }
+                    />
+                  ))}
+                </Steps>
+              </div>
+              
+              {/* Progress Info */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <Text className="text-sm text-blue-700 block text-center">
+                  Step {activeStep + 1} of {steps.length}
+                </Text>
+                <Text className="text-xs text-blue-600 block text-center mt-1">
+                  {steps[activeStep].description}
+                </Text>
+              </div>
             </Card>
           </div>
-          {/* Main Content */}
-          <div className="lg:col-span-3">
+
+          {/* Main Content Area */}
+          <div className="lg:col-span-9">
             <Form form={form} layout="vertical" onFinish={handleSubmit(onSubmit)} className="h-full">
               <Card className="shadow-2xl border-0 rounded-2xl h-full" bodyStyle={{ padding: '32px' }}>
-                <motion.div key={activeStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
+                <motion.div 
+                  key={activeStep} 
+                  initial={{ opacity: 0, x: 20 }} 
+                  animate={{ opacity: 1, x: 0 }} 
+                  transition={{ duration: 0.3 }}
+                >
                   {/* Step 1: Account Setup */}
                   {activeStep === 0 && (
                     <div className="space-y-6">
@@ -546,6 +539,7 @@ const SellerPage = () => {
                       </Row>
                     </div>
                   )}
+
                   {/* Step 2: Business Information */}
                   {activeStep === 1 && (
                     <div className="space-y-6">
@@ -641,7 +635,7 @@ const SellerPage = () => {
                             />
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        {/* <Col span={12}>
                           <Form.Item label="Website">
                             <Controller
                               name="store_details.website"
@@ -657,9 +651,9 @@ const SellerPage = () => {
                               )}
                             />
                           </Form.Item>
-                        </Col>
+                        </Col> */}
                       </Row>
-                      <Form.Item label="Store Logo">
+                      {/* <Form.Item label="Store Logo">
                         <Controller
                           name="store_details.logo"
                           control={control}
@@ -674,9 +668,10 @@ const SellerPage = () => {
                         {fileList['store_details.logo'].length > 0 && (
                           <Alert message={fileList['store_details.logo'][0].name} type="success" showIcon className="mt-2" />
                         )}
-                      </Form.Item>
+                      </Form.Item> */}
                     </div>
                   )}
+
                   {/* Step 3: Contact & Address */}
                   {activeStep === 2 && (
                     <div className="space-y-6">
@@ -686,13 +681,9 @@ const SellerPage = () => {
                         </Title>
                         <Text className="text-gray-600">Your business location and contact information</Text>
                       </div>
-                      <Alert
-                        message="Mobile Verification Required"
-                        description="You need to verify your mobile number to complete registration"
-                        type="warning"
-                        showIcon
-                        className="mb-6"
-                      />
+                      
+                   
+                      
                       <Row gutter={16}>
                         <Col span={8}>
                           <Form.Item label="Country Code">
@@ -710,7 +701,7 @@ const SellerPage = () => {
                             </Select>
                           </Form.Item>
                         </Col>
-                        <Col span={10}>
+                        <Col span={16}>
                           <Form.Item
                             label={<span>Mobile Number <span className="text-red-500">*</span></span>}
                             validateStatus={errors.mobile || backendErrors.mobile ? 'error' : ''}
@@ -732,57 +723,8 @@ const SellerPage = () => {
                             />
                           </Form.Item>
                         </Col>
-                        <Col span={6}>
-                          <Form.Item label=" ">
-                            {!otpSent && !mobileVerified && (
-                              <Button
-                                type="primary"
-                                size="large"
-                                onClick={sendOtp}
-                                className="w-full rounded-lg h-10"
-                              >
-                                Send OTP
-                              </Button>
-                            )}
-                          </Form.Item>
-                        </Col>
                       </Row>
-                      {otpSent && !mobileVerified && (
-                        <Row gutter={16}>
-                          <Col span={16}>
-                            <Form.Item label="Enter OTP">
-                              <Input
-                                size="large"
-                                placeholder="Enter OTP received"
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                className="rounded-lg"
-                              />
-                            </Form.Item>
-                          </Col>
-                          <Col span={8}>
-                            <Form.Item label=" ">
-                              <Button
-                                type="primary"
-                                size="large"
-                                onClick={verifyOtp}
-                                className="w-full rounded-lg h-10"
-                              >
-                                Verify OTP
-                              </Button>
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      )}
-                      {mobileVerified && (
-                        <Alert
-                          message="Mobile Number Verified"
-                          description="Your mobile number has been successfully verified"
-                          type="success"
-                          showIcon
-                          className="mb-4"
-                        />
-                      )}
+
                       <Form.Item
                         label={<span>Store Address <span className="text-red-500">*</span></span>}
                         validateStatus={errors.store_details?.store_address ? 'error' : ''}
@@ -825,75 +767,10 @@ const SellerPage = () => {
                           </Form.Item>
                         </Col>
                       </Row>
-                      <Divider orientation="left">Contact Persons</Divider>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Card size="small" title="Primary Contact" className="rounded-lg">
-                            <Controller
-                              name="contacts.primary_contact.name"
-                              control={control}
-                              render={({ field }) => (
-                                <Input {...field} placeholder="Name" className="rounded-lg mb-2" />
-                              )}
-                            />
-                            <Controller
-                              name="contacts.primary_contact.designation"
-                              control={control}
-                              render={({ field }) => (
-                                <Input {...field} placeholder="Designation" className="rounded-lg mb-2" />
-                              )}
-                            />
-                            <Controller
-                              name="contacts.primary_contact.email"
-                              control={control}
-                              render={({ field }) => (
-                                <Input {...field} placeholder="Email" className="rounded-lg mb-2" />
-                              )}
-                            />
-                            <Controller
-                              name="contacts.primary_contact.mobile"
-                              control={control}
-                              render={({ field }) => (
-                                <Input {...field} placeholder="Mobile" className="rounded-lg" />
-                              )}
-                            />
-                          </Card>
-                        </Col>
-                        <Col span={12}>
-                          <Card size="small" title="Support Contact" className="rounded-lg">
-                            <Controller
-                              name="contacts.support_contact.name"
-                              control={control}
-                              render={({ field }) => (
-                                <Input {...field} placeholder="Name" className="rounded-lg mb-2" />
-                              )}
-                            />
-                            <Controller
-                              name="contacts.support_contact.designation"
-                              control={control}
-                              render={({ field }) => (
-                                <Input {...field} placeholder="Designation" className="rounded-lg mb-2" />
-                              )}
-                            />
-                            <Controller
-                              name="contacts.support_contact.email"
-                              control={control}
-                              render={({ field }) => (
-                                <Input {...field} placeholder="Email" className="rounded-lg mb-2" />
-                              )}
-                            />
-                            <Controller
-                              name="contacts.support_contact.mobile"
-                              control={control}
-                              render={({ field }) => (
-                                <Input {...field} placeholder="Mobile" className="rounded-lg" />
-                              )}
-                            />
-                          </Card>
-                        </Col>
-                      </Row>
+                    
                     </div>
                   )}
+
                   {/* Step 4: Tax & Registration */}
                   {activeStep === 3 && (
                     <div className="space-y-6">
@@ -957,7 +834,7 @@ const SellerPage = () => {
                           )}
                         />
                       </Form.Item>
-                      <Form.Item label="Shop Act License">
+                      {/* <Form.Item label="Shop Act License">
                         <Controller
                           name="registration.shop_act_license"
                           control={control}
@@ -972,9 +849,10 @@ const SellerPage = () => {
                         {fileList['registration.shop_act_license'].length > 0 && (
                           <Alert message={fileList['registration.shop_act_license'][0].name} type="success" showIcon className="mt-2" />
                         )}
-                      </Form.Item>
+                      </Form.Item> */}
                     </div>
                   )}
+
                   {/* Step 5: Bank Details */}
                   {activeStep === 4 && (
                     <div className="space-y-6">
@@ -1050,7 +928,7 @@ const SellerPage = () => {
                             />
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        {/* <Col span={12}>
                           <Form.Item label="UPI ID">
                             <Controller
                               name="bank_details.upi_id"
@@ -1065,7 +943,7 @@ const SellerPage = () => {
                               )}
                             />
                           </Form.Item>
-                        </Col>
+                        </Col> */}
                       </Row>
                       <Form.Item label="Preferred Currency">
                         <Controller
@@ -1087,6 +965,7 @@ const SellerPage = () => {
                       </Form.Item>
                     </div>
                   )}
+
                   {/* Step 6: Documents Upload */}
                   {activeStep === 5 && (
                     <div className="space-y-6">
@@ -1184,6 +1063,7 @@ const SellerPage = () => {
                       </Row>
                     </div>
                   )}
+
                   {/* Step 7: Product Categories */}
                   {activeStep === 6 && (
                     <div className="space-y-6">
@@ -1208,10 +1088,7 @@ const SellerPage = () => {
                               treeData={categories.map(category => ({
                                 title: category.name,
                                 value: category._id,
-                                children: category.children.map(child => ({
-                                  title: child.name,
-                                  value: child._id,
-                                })),
+                               
                               }))}
                               multiple
                               treeCheckable
@@ -1223,6 +1100,7 @@ const SellerPage = () => {
                       </Form.Item>
                     </div>
                   )}
+
                   {/* Step 8: Operations */}
                   {activeStep === 7 && (
                     <div className="space-y-6">
@@ -1250,7 +1128,7 @@ const SellerPage = () => {
                           )}
                         />
                       </Form.Item>
-                      <Form.Item label="Average Delivery Time (days)">
+                      {/* <Form.Item label="Average Delivery Time (days)">
                         <Controller
                           name="operations.avg_delivery_time_days"
                           control={control}
@@ -1264,9 +1142,10 @@ const SellerPage = () => {
                             />
                           )}
                         />
-                      </Form.Item>
+                      </Form.Item> */}
                     </div>
                   )}
+
                   {/* Step 9: Agreement & Verification */}
                   {activeStep === 8 && (
                     <div className="space-y-6">
@@ -1276,13 +1155,13 @@ const SellerPage = () => {
                         </Title>
                         <Text className="text-gray-600">Review and submit your application</Text>
                       </div>
-                      <Alert
+                      {/* <Alert
                         message="Final Verification"
                         description="Please review all information before submission. You will receive confirmation within 24-48 hours."
                         type="info"
                         showIcon
                         className="mb-6"
-                      />
+                      /> */}
                       <Card className="rounded-lg">
                         <div className="mb-6">
                           <Title level={4}>Terms & Conditions</Title>
@@ -1340,6 +1219,7 @@ const SellerPage = () => {
                     </div>
                   )}
                 </motion.div>
+                
                 {/* Navigation Buttons */}
                 <Divider />
                 <div className="flex justify-between mt-8">

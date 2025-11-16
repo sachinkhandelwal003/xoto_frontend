@@ -310,9 +310,11 @@ const AdminLogin = () => {
               message={
                 <div style={{ fontSize: 13, lineHeight: 1.6 }}>
                   <strong>Test Accounts:</strong><br />
-                  SuperAdmin: <Text code>Super1@gmail.com</Text> / Super1@gmail.com<br />
-                  Admin: <Text code>admin@xoto.com</Text> / admin123
+                  Email: <Text code>Super1@gmail.com</Text>  <br/> 
+                                    Password: <Text code>Super1@gmail.com</Text>  
+
                 </div>
+                
               }
               type="info"
               showIcon

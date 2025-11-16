@@ -2,38 +2,41 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import homeimage from "../../assets/img/homeXOTO.jpg";
-
+import { 
+  ShoppingBag, 
+  Trees, 
+  Sparkles, 
+  Home, 
+  Palette, 
+  Flower2 
+} from "lucide-react";
 const HeroSection = () => {
   const features = [
-    {
-      id: 1,
-      title: "Interior E-commerce",
-      description:
-        "Shop premium furniture, décor, and design accessories — all in one place.",
-      icon: "Sofa",
-      link: "/ecommerce/b2c",
-      buttonText: "Start Shopping",
-    },
-    {
-      id: 2,
-      title: "Landscaping Solutions",
-      description:
-        "Plan and execute beautiful outdoor spaces with expert design and AI-guided tools.",
-      icon: "Leaf",
-      link: "/landscaping",
-      buttonText: "Explore Landscaping",
-    },
-    {
-      id: 3,
-      title: "AI Interior",
-      description:
-        "Redesign any room instantly using advanced AI visualization tools.",
-      icon: "Sparkles",
-      link: "/aiInterior",
-      buttonText: "Try AI Design",
-    },
-   
-  ];
+  {
+    id: 1,
+    title: "Interior E-commerce",
+    description: "Shop premium furniture, décor, and design accessories — all in one place.",
+    icon: <ShoppingBag className="w-12 h-12 text-purple-400" />,
+    link: "/ecommerce/b2c",
+    buttonText: "Start Shopping",
+  },
+  {
+    id: 2,
+    title: "Landscaping Solutions",
+    description: "Plan and execute beautiful outdoor spaces with expert design and AI-guided tools.",
+    icon: <Trees className="w-12 h-12 text-green-400" />,
+    link: "/landscaping",
+    buttonText: "Explore Landscaping",
+  },
+  {
+    id: 3,
+    title: "AI Interior",
+    description: "Redesign any room instantly using advanced AI visualization tools.",
+    icon: <Sparkles className="w-12 h-12 text-yellow-400" />,
+    link: "/aiInterior",
+    buttonText: "Try AI Design",
+  },
+];
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -150,7 +153,7 @@ const HeroSection = () => {
               >
                 <div>
                   <div className="text-3xl sm:text-4xl mb-3">{feature.icon}</div>
-                  <h3 className="text-xl sm:text-2xl font-semibold mb-2">
+                  <h3 className="text-xl sm:text-xl font-semibold mb-2">
                     {feature.title}
                   </h3>
                   <p className="text-xs sm:text-sm opacity-90">{feature.description}</p>
