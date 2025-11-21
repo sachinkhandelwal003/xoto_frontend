@@ -5,6 +5,7 @@ import axios from "axios";
 
 // Set base URL globally
 const API_BASE = 'https://kotiboxglobaltech.online/api';
+// const API_BASE = 'http://localhost:5000/api';
 
 // Load from localStorage
 const loadInitialState = () => {
@@ -42,25 +43,33 @@ const loadInitialState = () => {
 // LOGIN - Using the correct endpoint
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async ({ email, password, endpoint = "/auth/login" }, { rejectWithValue }) => {
+  async ({ payload, endpoint }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(endpoint, { email, password });
+      const response = await axios.post(endpoint, payload); // ← Use payload directly
       const data = response.data;
 
-      if (!data.success) return rejectWithValue(data);
+      if (!data.success && !data.token) {
+        return rejectWithValue(data.message || data.error || "Login failed");
+      }
 
-      localStorage.setItem("token", data.token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-      
-      const decoded = jwtDecode(data.token);
-      return { user: decoded, token: data.token, message: data.message };
+      const token = data.token;
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      const decoded = jwtDecode(token);
+
+      return {
+        user: decoded,
+        token,
+        message: data.message || "Login successful",
+      };
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data || { message: "Network error", errors: [] }
-      );
+      const errorMsg = err.response?.data?.message || err.response?.data?.error || "Login failed";
+      return rejectWithValue(errorMsg);
     }
   }
 );
+
 
 // LOGOUT
 export const logoutUser = createAsyncThunk(

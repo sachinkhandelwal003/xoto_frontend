@@ -11,7 +11,7 @@ import PersistLogin from './manageApi/context/PersistLogin';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { CartProvider } from './manageApi/context/CartContext';
+// import { CartProvider } from './manageApi/context/CartContext';
 
 // Create a QueryClient instance
 const queryClient = new QueryClient({
@@ -33,10 +33,8 @@ createRoot(document.getElementById('root')).render(
         <AuthProvider>
           <BrowserRouter>
             <PersistLogin>
-              <CartProvider>
                 <App />
                 <ToastContainer position="top-right" autoClose={3000} />
-              </CartProvider>
             </PersistLogin>
           </BrowserRouter>
         </AuthProvider>

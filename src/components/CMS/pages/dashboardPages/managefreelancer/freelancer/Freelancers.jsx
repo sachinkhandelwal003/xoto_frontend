@@ -166,12 +166,7 @@ setFreelancers(res.freelancers)
   // Table Columns
   const columns = useMemo(
     () => [
-      {
-        title: "S.No",
-        key: "sno",
-        width: 80,
-        render: (_, r) => <span className="font-medium">{r.sno}</span>,
-      },
+     
       {
         title: "Freelancer",
         width: 250,

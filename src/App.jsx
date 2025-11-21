@@ -10,7 +10,7 @@ import QuoteModal from "./components/modal/QuoteModal.jsx";
 import ScrollToTop from "./components/ScrollToTop.js";
 import Loader from "./components/Loader.jsx";
 import FreelancerNavbar from "./components/navbar/FreelancerNavbar.jsx";
-import EcommerceNavbar from "./components/navbar/EcommerceNavbar.jsx";
+// import EcommerceNavbar from "./components/navbar/EcommerceNavbar.jsx";
 import ProductFilterPage from "./components/ecommerce/ProductFilterPage.jsx";
 import Freelisting from "./components/freelancers/Listing/Free-listing.jsx";
 import Category from "./components/freelancers/Category.jsx";
@@ -206,7 +206,7 @@ function LayoutWrapper({ children }) {
     <div className="min-h-screen relative">
       {!hideNavbar && <Navbar />}
       {showFreelancerNavbar && <FreelancerNavbar />}
-      {showEcommerceNavbar && <EcommerceNavbar />}
+      {showEcommerceNavbar }
       {children}
       {!hideFooter && <Footer />}
       {/* {!hideFloatingIcons && <FloatingIcons />} */}
@@ -309,7 +309,7 @@ function App() {
             path="/dashboard/:roleSlug/*"
             element={
               <PrivateRoute
-                allowedRoles={["0", "1", "2", "3", "6", "5", "8", "7", "11"]}
+                allowedRoles={["0", "1", "2", "3", "6", "5", "8", "7", "11","12"]}
               >
                 <CmsApp />
               </PrivateRoute>

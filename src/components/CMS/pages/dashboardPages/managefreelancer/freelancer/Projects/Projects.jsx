@@ -10,7 +10,10 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   BankOutlined,
-  UserAddOutlined,PlusCircleOutlined,PlusOutlined
+  UserAddOutlined,
+  PlusCircleOutlined,
+  PlusOutlined,
+  MessageOutlined
 } from "@ant-design/icons";
 import {
   Button,
@@ -39,6 +42,7 @@ import {
   Statistic,
   Select,
   Image,
+  message
 } from "antd";
 import {
   showSuccessAlert,
@@ -76,16 +80,16 @@ const Projects = () => {
   /* -------------------------- STATE -------------------------- */
   const [projects, setProjects] = useState([]);
   const [freelancers, setFreelancers] = useState([]);
-  const [accountants, setAccountants] = useState([]); // NEW
+  const [accountants, setAccountants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingFreelancers, setLoadingFreelancers] = useState(false);
-  const [loadingAccountants, setLoadingAccountants] = useState(false); // NEW
-
+  const [loadingAccountants, setLoadingAccountants] = useState(false);
+const [selectedFreelancerIds, setSelectedFreelancerIds] = useState([]);
   const [milestoneDrawerOpen, setMilestoneDrawerOpen] = useState(false);
   const [dailyUpdatesDrawerOpen, setDailyUpdatesDrawerOpen] = useState(false);
   const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
   const [assignDrawerOpen, setAssignDrawerOpen] = useState(false);
-  const [moveDrawerOpen, setMoveDrawerOpen] = useState(false); // NEW
+  const [moveDrawerOpen, setMoveDrawerOpen] = useState(false);
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedMilestone, setSelectedMilestone] = useState(null);
@@ -96,7 +100,7 @@ const Projects = () => {
   const [addingMilestone, setAddingMilestone] = useState(false);
   const [addingDailyUpdate, setAddingDailyUpdate] = useState(false);
   const [assigning, setAssigning] = useState(false);
-  const [moving, setMoving] = useState(false); // NEW
+  const [moving, setMoving] = useState(false);
 
   const [activeTab, setActiveTab] = useState("projects");
 
@@ -120,16 +124,17 @@ const Projects = () => {
         if (filters.status) params.status = filters.status;
         if (filters.search) params.search = filters.search;
 
-        const { projects, pagination: pag } = await apiService.get(
+        const response = await apiService.get(
           "/freelancer/projects",
           params
         );
-        setProjects(projects || []);
+        
+        setProjects(response.projects || []);
         setPagination({
-          currentPage: pag?.page || 1,
-          totalPages: pag?.totalPages || 1,
-          totalResults: pag?.total || 0,
-          itemsPerPage: pag?.limit || 10,
+          currentPage: response.pagination?.page || 1,
+          totalPages: response.pagination?.totalPages || 1,
+          totalResults: response.pagination?.total || 0,
+          itemsPerPage: response.pagination?.limit || 10,
         });
       } catch (err) {
         showToast(err?.response?.data?.message || "Failed to load projects", "error");
@@ -137,15 +142,15 @@ const Projects = () => {
         setLoading(false);
       }
     },
-    [token]
+    []
   );
 
   /* -------------------------- FETCH FREELANCERS -------------------------- */
   const fetchFreelancers = async () => {
     setLoadingFreelancers(true);
     try {
-      const { freelancers } = await apiService.get("/freelancer");
-      setFreelancers(freelancers);
+      const response = await apiService.get("/freelancer");
+      setFreelancers(response.freelancers || []);
     } catch (err) {
       showToast("Failed to load freelancers", "error");
     } finally {
@@ -154,24 +159,27 @@ const Projects = () => {
   };
 
   /* -------------------------- FETCH ACCOUNTANTS -------------------------- */
-  const fetchAccountants = async () => {
-    setLoadingAccountants(true);
-    try {
-      const { accountants } = await apiService.get("/accountant");
-      setAccountants(accountants || []);
-    } catch (err) {
-      showToast("Failed to load accountants", "error");
-    } finally {
-      setLoadingAccountants(false);
-    }
-  };
+ const fetchAccountants = async () => {
+  setLoadingAccountants(true);
+  try {
+    const response = await apiService.get("/users?role=accountant");
+
+    // Backend returns "data"
+    setAccountants(response.data || []);
+  } catch (err) {
+    showToast("Failed to load accountants", "error");
+  } finally {
+    setLoadingAccountants(false);
+  }
+};
+
 
   useEffect(() => {
     if (token) {
       fetchProjects();
       if (isAdmin) {
         fetchFreelancers();
-        fetchAccountants(); // NEW
+        fetchAccountants();
       }
     }
   }, [token, fetchProjects, isAdmin]);
@@ -207,26 +215,32 @@ const Projects = () => {
     setAssignDrawerOpen(true);
   };
 
-  const assignFreelancer = async (freelancerId) => {
-    if (!selectedProject) return;
-    setAssigning(true);
-    try {
-      await apiService.post(
-        `/freelancer/projects/${selectedProject._id}/assign`,
-        { freelancerId }
-      );
-      showSuccessAlert("Assigned", "Freelancer assigned successfully");
-      setAssignDrawerOpen(false);
-      fetchProjects();
-    } catch (err) {
-      showErrorAlert(
-        "Error",
-        err?.response?.data?.message || "Failed to assign freelancer"
-      );
-    } finally {
-      setAssigning(false);
-    }
-  };
+const assignSelectedFreelancers = async () => {
+  if (!selectedProject || selectedFreelancerIds.length === 0) return;
+
+  setAssigning(true);
+  try {
+    const response = await apiService.post(
+      `/freelancer/projects/${selectedProject._id}/assign`,
+      {
+        freelancers: selectedFreelancerIds, // now sends array
+      }
+    );
+
+    message.success("Freelancers assigned successfully!");
+    setAssignDrawerOpen(false);
+    setSelectedFreelancerIds([]); // clear selection
+    fetchProjects(); // refresh list
+  } catch (err) {
+    const msg =
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      "Failed to assign freelancers";
+    message.error(msg);
+  } finally {
+    setAssigning(false);
+  }
+};
 
   /* -------------------------- MOVE TO ACCOUNTANT -------------------------- */
   const openMoveDrawer = (project) => {
@@ -259,10 +273,10 @@ const Projects = () => {
   const fetchMilestones = async (projectId) => {
     setLoadingMilestones(true);
     try {
-      const { milestones } = await apiService.get(
+      const response = await apiService.get(
         `/freelancer/projects/${projectId}/milestones`
       );
-      setMilestones(milestones || []);
+      setMilestones(response.milestones || []);
     } catch (err) {
       showToast("Failed to load milestones", "error");
     } finally {
@@ -270,65 +284,98 @@ const Projects = () => {
     }
   };
 
-  /* ---------- ADD MILESTONE – FINAL CORRECTED VERSION ---------- */
-  const addMilestone = async (values) => {
+  /* ---------- ADD MILESTONE – FIXED VERSION ---------- */
+ /* ---------- ADD MILESTONE – FINAL FIXED VERSION ---------- */
+const addMilestone = async (values) => {
+  console.log("🔍 addMilestone() submitted:", values);
+
   if (!selectedProject) {
     message.error("No project selected");
     return;
   }
 
-  const startDate = moment(values.start_date);
-  const endDate = moment(values.end_date);
+  // Dates come as Day.js/Moment objects
+const startMoment = moment(values.start_date?.toDate?.() || values.start_date);
+const endMoment = moment(values.end_date?.toDate?.() || values.end_date);
 
-  // Validate dates
-  if (!startDate.isValid() || !endDate.isValid()) {
-    message.error("Please select valid dates");
-    return;
+
+  if (!startMoment.isValid() || !endMoment.isValid()) {
+    return message.error("Please select valid dates");
   }
 
-  if (startDate.isSameOrAfter(endDate)) {
-    message.error("Start date must be before end date");
-    return;
+  if (startMoment.isSameOrAfter(endMoment)) {
+    return message.error("Start date must be before end date");
+  }
+
+  // Optional: validate inside project period
+  const projectStart = moment(selectedProject.start_date);
+  const projectEnd = moment(selectedProject.end_date);
+
+  if (startMoment.isBefore(projectStart) || endMoment.isAfter(projectEnd)) {
+    return message.error(
+      `Dates must be between ${projectStart.format("DD MMM YYYY")} and ${projectEnd.format("DD MMM YYYY")}`
+    );
   }
 
   setAddingMilestone(true);
 
-  const formData = new FormData();
-
-  // Required fields
-  formData.append("title", values.title.trim());
-  formData.append("amount", values.amount);
-  formData.append("start_date", startDate.format("YYYY-MM-DD"));
-  formData.append("end_date", endDate.format("YYYY-MM-DD"));
-  formData.append("description", values.description?.trim() || "");
-
-  // Optional photos
-  if (values.photos && values.photos.length > 0) {
-    values.photos.forEach((file) => {
-      if (file.originFileObj) {
-        formData.append("photos", file.originFileObj);
-      }
-    });
-  }
-
   try {
+    const formData = new FormData();
+
+    // Required fields
+    formData.append("title", values.title.trim());
+    formData.append("amount", values.amount);
+    formData.append("start_date", startMoment.format("YYYY-MM-DD"));
+    formData.append("end_date", endMoment.format("YYYY-MM-DD"));
+
+    // Optional
+    if (values.description) {
+      formData.append("description", values.description.trim());
+    }
+
+    // Photos (AntD Upload)
+    if (values.photos && Array.isArray(values.photos)) {
+      values.photos.forEach((file) => {
+        if (file.originFileObj) {
+          formData.append("photos", file.originFileObj);
+        }
+      });
+    }
+
+    // Debugging FormData
+    console.log("📦 FormData contents:");
+    for (let pair of formData.entries()) {
+      console.log(" →", pair[0], ":", pair[1]);
+    }
+
+    // Send request
     const response = await apiService.upload(
       `/freelancer/projects/${selectedProject._id}/milestones`,
       formData
     );
 
-
-    message.success("Milestone added successfully!");
-    milestoneForm.resetFields();
-    await fetchMilestones(selectedProject._id); // Refresh list
+    if (response.success) {
+      message.success("Milestone added successfully!");
+      milestoneForm.resetFields();
+      await fetchMilestones(selectedProject._id);
+    } else {
+      message.error(response.message || "Failed to add milestone");
+    }
   } catch (error) {
-    console.error("Failed to add milestone:", error);
-    const msg = error?.response?.data?.message || "Failed to add milestone";
-    message.error(msg);
+    console.error("❌ Error adding milestone:", error);
+
+    const errorMsg =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      error.message ||
+      "Failed to add milestone";
+
+    message.error(errorMsg);
   } finally {
     setAddingMilestone(false);
   }
 };
+
 
   const updateMilestoneProgress = async (milestoneId, progress) => {
     try {
@@ -360,7 +407,7 @@ const Projects = () => {
       await apiService.put(
         `/freelancer/projects/${selectedProject._id}/milestones/${milestoneId}/approve`
       );
-      showSuccessAlert("Success", "Milestone approved & invoice generated");
+      showSuccessAlert("Success", "Milestone approved");
       await fetchMilestones(selectedProject._id);
     } catch (err) {
       showErrorAlert(
@@ -374,10 +421,10 @@ const Projects = () => {
   const fetchDailyUpdates = async (projectId, milestoneId) => {
     setLoadingDailyUpdates(true);
     try {
-      const { daily_updates } = await apiService.get(
+      const response = await apiService.get(
         `/freelancer/projects/${projectId}/milestones/${milestoneId}/daily`
       );
-      setDailyUpdates(daily_updates || []);
+      setDailyUpdates(response.daily_updates || []);
     } catch (err) {
       showToast("Failed to load daily updates", "error");
     } finally {
@@ -457,7 +504,18 @@ const Projects = () => {
   /* -------------------------- TABLE COLUMNS -------------------------- */
   const columns = useMemo(
     () => [
-     
+      {
+        key: "code",
+        title: "Code",
+        render: (_, record) => (
+          <Tooltip title={record.Code}>
+            <Text strong style={{ color: "#1890ff" }}>
+              {record.Code}
+            </Text>
+          </Tooltip>
+        ),
+        width: 120,
+      },
       {
         key: "title",
         title: "Title",
@@ -480,10 +538,10 @@ const Projects = () => {
         width: 150,
       },
       {
-        key: "project_type",
-        title: "Type",
-        render: (v) => <Tag>{v}</Tag>,
-        width: 100,
+        key: "category",
+        title: "Category",
+        render: (_, r) => r.category?.name || "N/A",
+        width: 120,
       },
       {
         key: "budget",
@@ -491,33 +549,47 @@ const Projects = () => {
         render: (v) => `$${Number(v).toLocaleString()}`,
         width: 120,
       },
-      {
-        key: "status",
-        title: "Status",
-        render: (v, r) => (
-          <Space direction="vertical" size={0}>
-            <Tag
-              color={
-                v === "completed"
-                  ? "green"
-                  : v === "assigned"
-                  ? "blue"
-                  : v === "in_progress"
-                  ? "orange"
-                  : "default"
-              }
-            >
-              {v?.toUpperCase()}
-            </Tag>
-            {v === "completed" && (
-              <Button size="small" type="link" icon={<BankOutlined />}>
-                In Accounts
-              </Button>
-            )}
-          </Space>
-        ),
-        width: 130,
-      },
+    {
+  key: "status",
+  title: "Status",
+  width: 150,
+  render: (_, r) => {
+    const status = r.status;
+
+    // Accountant (safe access)
+    const acc = r.accountant;
+    const fullName = acc
+      ? `${acc?.name?.first_name || ""} ${acc?.name?.last_name || ""}`.trim()
+      : null;
+
+    return (
+      <Space direction="vertical" size={4}>
+        {/* Status Tag */}
+        <Tag
+          color={
+            status === "completed"
+              ? "green"
+              : status === "assigned"
+              ? "blue"
+              : status === "in_progress"
+              ? "orange"
+              : "default"
+          }
+        >
+          {status?.toUpperCase()}
+        </Tag>
+
+        {/* Accountant Tag */}
+        {fullName ? (
+          <Tag color="purple">Accountant: {fullName}</Tag>
+        ) : (
+          <Tag color="red">No Accountant Assigned</Tag>
+        )}
+      </Space>
+    );
+  },
+}
+,
       {
         key: "milestones",
         title: "Milestones",
@@ -539,19 +611,35 @@ const Projects = () => {
         },
         width: 150,
       },
-      {
-        key: "freelancer",
-        title: "Freelancer",
-        render: (_, r) =>
-          r.freelancer ? (
-            <Tooltip title={r.freelancer.email}>
-              {`${r.freelancer.name?.first_name} ${r.freelancer.name?.last_name}`}
+  {
+  key: "freelancer",
+  title: "Freelancer(s)",
+  render: (_, r) => {
+    const flArray = r.freelancers || [];  // MULTIPLE
+
+    // CASE 1: MULTIPLE FREELANCERS
+    if (flArray.length > 0) {
+      return (
+        <>
+          {flArray.map((f) => (
+            <Tooltip key={f._id} title={f.email}>
+              <Tag color="blue" style={{ marginBottom: 4 }}>
+                {`${f.name?.first_name} ${f.name?.last_name}`}
+              </Tag>
             </Tooltip>
-          ) : (
-            <Tag color="red">Not Assigned</Tag>
-          ),
-        width: 150,
-      },
+          ))}
+        </>
+      );
+    }
+
+  
+
+    // CASE 3: NONE ASSIGNED
+    return <Tag color="red">Not Assigned</Tag>;
+  },
+  width: 180,
+}
+,
       {
         key: "actions",
         title: "Actions",
@@ -576,7 +664,6 @@ const Projects = () => {
                   />
                 </Tooltip>
 
-                {/* NEW: Move to Accountant */}
                 <Tooltip title="Move to Accountant">
                   <Button
                     size="small"
@@ -628,47 +715,98 @@ const Projects = () => {
       </Tabs>
 
       {/* ---------- ASSIGN FREELANCER DRAWER ---------- */}
-      <Drawer
-        title="Assign Freelancer"
-        open={assignDrawerOpen}
-        onClose={() => setAssignDrawerOpen(false)}
-        width={550}
-        destroyOnClose
-      >
-        <Spin spinning={loadingFreelancers}>
-          <List
-            dataSource={freelancers}
-            renderItem={(f) => (
-              <List.Item
-                actions={[
-                  <Button
-                    type="primary"
-                    size="small"
-                    loading={assigning && selectedProject?.freelancer?._id === f._id}
-                    onClick={() => assignFreelancer(f._id)}
-                  >
-                    Assign
-                  </Button>,
-                ]}
-              >
-                <List.Item.Meta
-                  title={`${f.name?.first_name} ${f.name?.last_name}`}
-                  description={
-                    <Space direction="vertical" size={0}>
-                      <div>Email: {f.email}</div>
-                      <div>Mobile: {f.mobile}</div>
-                      <Tag color="blue">
-                        {f.skills?.join(", ") || "No skills"}
-                      </Tag>
-                    </Space>
-                  }
-                />
-              </List.Item>
-            )}
-            locale={{ emptyText: "No freelancers available" }}
+    {/* ---------- ASSIGN FREELANCER DRAWER (MULTI-SELECT) ---------- */}
+<Drawer
+  title="Assign Freelancer(s)"
+  open={assignDrawerOpen}
+  onClose={() => {
+    setAssignDrawerOpen(false);
+    setSelectedFreelancerIds([]); // clear selection on close
+  }}
+  width={600}
+  destroyOnClose
+>
+  <Spin spinning={loadingFreelancers}>
+    {selectedProject && (
+      <>
+        {/* Show already assigned freelancers */}
+        {selectedProject.freelancers && selectedProject.freelancers.length > 0 && (
+          <Alert
+            message="Currently Assigned"
+            description={
+              <Space wrap>
+                {selectedProject.freelancers.map(f => (
+                  <Tag key={f._id} color="blue">
+                    {f.name?.first_name} {f.name?.last_name}
+                  </Tag>
+                ))}
+              </Space>
+            }
+            type="info"
+            showIcon
+            style={{ marginBottom: 16 }}
           />
-        </Spin>
-      </Drawer>
+        )}
+
+        <Form layout="vertical">
+          <Form.Item label="Select Freelancers to Assign">
+            <Select
+              mode="multiple"
+              placeholder="Search and select freelancers..."
+              showSearch
+              optionFilterProp="children"
+              loading={loadingFreelancers}
+              value={selectedFreelancerIds}
+              onChange={setSelectedFreelancerIds}
+              style={{ width: "100%" }}
+            >
+              {freelancers.map((f) => {
+                const isAlreadyAssigned = selectedProject.freelancers?.some(
+                  (assigned) => assigned._id === f._id
+                );
+
+                return (
+                  <Option
+                    key={f._id}
+                    value={f._id}
+                    disabled={isAlreadyAssigned} // prevent re-selecting already assigned
+                  >
+                    <div>
+                      <strong>{f.name?.first_name} {f.name?.last_name}</strong>
+                      <br />
+                      <small>{f.email} • {f.mobile || "No mobile"}</small>
+                      {isAlreadyAssigned && (
+                        <Tag color="green" size="small" style={{ marginLeft: 8 }}>
+                          Already Assigned
+                        </Tag>
+                      )}
+                    </div>
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              size="large"
+              block
+              loading={assigning}
+              disabled={selectedFreelancerIds.length === 0}
+              onClick={assignSelectedFreelancers}
+              icon={<UserAddOutlined />}
+            >
+              {assigning
+                ? "Assigning..."
+                : `Assign ${selectedFreelancerIds.length} Freelancer(s)`}
+            </Button>
+          </Form.Item>
+        </Form>
+      </>
+    )}
+  </Spin>
+</Drawer>
 
       {/* ---------- MOVE TO ACCOUNTANT DRAWER ---------- */}
       <Drawer
@@ -687,7 +825,7 @@ const Projects = () => {
                   <Button
                     type="primary"
                     size="small"
-                    loading={moving && selectedProject?.accountant?._id === a._id}
+                    loading={moving}
                     onClick={() => moveProjectToAccountant(a._id)}
                   >
                     Move
@@ -723,12 +861,12 @@ const Projects = () => {
           <div>
             <Descriptions title="Basic Information" bordered column={2}>
               <Descriptions.Item label="Project ID">
-                {selectedProject.project_id || selectedProject._id?.slice(-6)}
+                {selectedProject.code || selectedProject._id?.slice(-6)}
               </Descriptions.Item>
               <Descriptions.Item label="Title">{selectedProject.title}</Descriptions.Item>
               <Descriptions.Item label="Client">{selectedProject.client_name}</Descriptions.Item>
               <Descriptions.Item label="Company">{selectedProject.client_company || "—"}</Descriptions.Item>
-              <Descriptions.Item label="Type">{selectedProject.project_type}</Descriptions.Item>
+              <Descriptions.Item label="Category">{selectedProject.category?.name || "N/A"}</Descriptions.Item>
               <Descriptions.Item label="Status">
                 <Tag
                   color={
@@ -749,6 +887,9 @@ const Projects = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Overview" span={2}>
                 {selectedProject.overview || "—"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Project Dates" span={2}>
+                {moment(selectedProject.start_date).format("DD MMM YYYY")} - {moment(selectedProject.end_date).format("DD MMM YYYY")}
               </Descriptions.Item>
             </Descriptions>
 
@@ -793,7 +934,7 @@ const Projects = () => {
         destroyOnClose
       >
         {/* ---- ADD MILESTONE (Admin only) ---- */}
-      {isAdmin && (
+     {isAdmin && (
   <Card
     title="Add New Milestone"
     style={{ marginBottom: 24 }}
@@ -814,23 +955,25 @@ const Projects = () => {
             label="Milestone Title"
             rules={[{ required: true, message: "Please enter milestone title" }]}
           >
-            <Input size="large" placeholder="e.g. Site Survey & Design" />
+            <Input size="large" placeholder="e.g. Foundation, Plumbing, Roofing" />
           </Form.Item>
         </Col>
 
         <Col xs={24} md={12}>
           <Form.Item
             name="amount"
-            label="Amount (₹)"
+            label="Amount"
             rules={[{ required: true, message: "Please enter amount" }]}
           >
             <InputNumber
               min={1}
-              style={{ width: "100%" }}
               size="large"
-              formatter={(value) => `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              parser={(value) => value.replace(/₹\s?|(,*)/g, "")}
-              placeholder="500000"
+              style={{ width: "100%" }}
+              placeholder="15000"
+              formatter={(value) =>
+                `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
             />
           </Form.Item>
         </Col>
@@ -843,43 +986,68 @@ const Projects = () => {
             label="Start Date"
             rules={[{ required: true, message: "Start date is required" }]}
           >
-            <DatePicker style={{ width: "100%" }} size="large" format="DD MMM YYYY" />
+            <DatePicker
+              size="large"
+              style={{ width: "100%" }}
+              format="YYYY-MM-DD"
+              disabledDate={(current) => {
+                if (!selectedProject) return false;
+                const ps = moment(selectedProject.start_date);
+                const pe = moment(selectedProject.end_date);
+                return current && (current < ps || current > pe);
+              }}
+            />
           </Form.Item>
         </Col>
+
         <Col xs={24} sm={8}>
           <Form.Item
             name="end_date"
             label="End Date"
             rules={[{ required: true, message: "End date is required" }]}
           >
-            <DatePicker style={{ width: "100%" }} size="large" format="DD MMM YYYY" />
+            <DatePicker
+              size="large"
+              style={{ width: "100%" }}
+              format="YYYY-MM-DD"
+              disabledDate={(current) => {
+                if (!selectedProject) return false;
+                const ps = moment(selectedProject.start_date);
+                const pe = moment(selectedProject.end_date);
+                return current && (current < ps || current > pe);
+              }}
+            />
           </Form.Item>
         </Col>
-        
+
+        <Col xs={24} sm={8}>
+          <div style={{ paddingTop: "30px" }}>
+            <Alert
+              message="Project Period"
+              description={`${moment(selectedProject?.start_date).format("DD MMM YYYY")} → ${moment(selectedProject?.end_date).format("DD MMM YYYY")}`}
+              type="info"
+              showIcon
+            />
+          </div>
+        </Col>
       </Row>
 
       <Form.Item name="description" label="Description (Optional)">
-        <Input.TextArea
-          rows={3}
-          placeholder="Brief description of work in this milestone..."
-        />
+        <Input.TextArea rows={3} placeholder="Short description of this milestone…" />
       </Form.Item>
 
       <Form.Item
         name="photos"
-        label="Upload Photos (Optional, max 10)"
+        label="Upload Photos (Optional)"
         valuePropName="fileList"
-        getValueFromEvent={(e) => {
-          if (Array.isArray(e)) return e;
-          return e && e.fileList;
-        }}
+        getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
       >
         <Upload
           listType="picture-card"
           multiple
           accept="image/*"
           maxCount={10}
-          beforeUpload={() => false} // Prevent auto upload
+          beforeUpload={() => false} // prevent auto upload
         >
           <div>
             <PlusOutlined />
@@ -897,12 +1065,13 @@ const Projects = () => {
           block
           icon={<PlusCircleOutlined />}
         >
-          {addingMilestone ? "Adding Milestone..." : "Add Milestone"}
+          {addingMilestone ? "Adding Milestone…" : "Add Milestone"}
         </Button>
       </Form.Item>
     </Form>
   </Card>
 )}
+
 
         {/* ---- LIST OF MILESTONES ---- */}
         <Spin spinning={loadingMilestones}>
@@ -915,7 +1084,7 @@ const Projects = () => {
                   <div style={{ flex: 1 }}>
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex items-center">
-                        <strong>{m.title}</strong>
+                        <strong>#{m.milestone_number} - {m.title}</strong>
                         {m.daily_updates_count > 0 && (
                           <Badge
                             count={m.daily_updates_count - m.approved_updates}
@@ -951,8 +1120,8 @@ const Projects = () => {
                     {m.description && <div className="mb-2 text-gray-600">{m.description}</div>}
 
                     <div className="mb-2">
-                      <span className="font-medium">Due:</span>{" "}
-                      {moment(m.due_date).format("YYYY-MM-DD")} |{" "}
+                      <span className="font-medium">Period:</span>{" "}
+                      {moment(m.start_date).format("DD MMM YYYY")} - {moment(m.end_date).format("DD MMM YYYY")} |{" "}
                       <span className="font-medium ml-2">Amount:</span> $
                       {Number(m.amount).toLocaleString()}
                     </div>
@@ -1110,23 +1279,25 @@ const Projects = () => {
                         <span className="font-medium">Notes:</span> {du.notes}
                       </div>
                     )}
- {du.photos && du.photos.length > 0 && (
-        <div className="mb-2">
-          <span className="font-medium block mb-1">Photos:</span>
-          <div className="flex flex-wrap gap-2">
-            {du.photos.map((photo, index) => (
-              <Image
-                key={index}
-                width={120}
-                height={120}
-                src={`http://localhost:5000/${photo}`}
-                alt={`Daily update photo ${index + 1}`}
-                style={{ objectFit: "cover", borderRadius: 8 }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+
+                    {du.photos && du.photos.length > 0 && (
+                      <div className="mb-2">
+                        <span className="font-medium block mb-1">Photos:</span>
+                        <div className="flex flex-wrap gap-2">
+                          {du.photos.map((photo, index) => (
+                            <Image
+                              key={index}
+                              width={120}
+                              height={120}
+                              src={`http://localhost:5000/${photo}`}
+                              alt={`Daily update photo ${index + 1}`}
+                              style={{ objectFit: "cover", borderRadius: 8 }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {du.rejection_reason && (
                       <Alert
                         message="Rejection Reason"

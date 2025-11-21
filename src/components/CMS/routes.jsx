@@ -34,23 +34,37 @@ import Tax from "./pages/settings/Tax";
 import ProductReview from "./pages/dashboardPages/manageProducts/ProductReview";
 import ProductProfile from "../ecommerce/B2C/products/ProductProfile";
 import VendorProfile from "./pages/dashboardPages/managevendor/VendorProfile";
+import UsersRoleList from "./pages/dashboardPages/users/UsersRoleList";
+import LeadsList from "./pages/dashboardPages/leads/LeadsList";
+import SupervisorDashboard from "./pages/SupervisorDashboard";
+import AssignedLeadsList from "./pages/dashboardPages/leads/AssignedLeadsList";
+import QuatationLeadsList from "./pages/dashboardPages/leads/QuatationLeadsList";
+import Myestimates from "./pages/dashboardPages/leads/Myestimates";
+import Leads from "./pages/dashboardPages/leads/Leads";
+import Customerdashboard from "./pages/Customerdashboard";
 
 const roleSlugMap = {
   0: "superadmin",
   1: "admin",
+    2: "customer",
   5: "vendor-b2c",
   6: "vendor-b2b",
   7: "freelancer",
   11: "accountant",
+    12: "supervisor",
+
 };
 
 const dashboardMap = {
   0: <Dashboard />,
   1: <Dashboard />,
+  2:<Customerdashboard/>,
   5: <VendorDashboard />,
   6: <VendorDashboard />,
   7: <Freelancerdashboard />,
   11: <AccountantDashboard />,
+    12: <SupervisorDashboard />,
+
 };
 
 const componentMap = {
@@ -66,6 +80,8 @@ const componentMap = {
   projects: <Projects />,
   myProjects: <MyProjects />,
   accountant: <Accountant />,
+    users: <UsersRoleList />,
+
   addProjects: <AddProjects />,
   categories: <AddCategory />,
   material: <AddMaterial />,
@@ -74,6 +90,12 @@ const componentMap = {
   brands: <AddBrand />,
   "products/my": <VendorProducts />,
   "products/add": <AddProducts />,
+  "leads/requested":<LeadsList/>,
+  "leads/assigned":<AssignedLeadsList/>,
+    "request/quatation":<QuatationLeadsList/>,
+  "estimates/my":<Myestimates/>,
+  deals: <Leads />,
+
 };
 
 // Placeholder for missing components

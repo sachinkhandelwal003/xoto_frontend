@@ -6,20 +6,35 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import logoNew from "../../../assets/img/logoNew.png";
 import aaImage from "../../../assets/img/aa.jpg";
+import home from "../../../assets/img/logo/logohome.png";
+import connect from "../../../assets/img/logo/logoconnect.png";
+import blitz from "../../../assets/img/logo/logoblitz.png";
+
+import grid from "../../../assets/img/logo/logogrid.png";
+import vault from "../../../assets/img/logo/logovault.png";
 
 const ecosystemData = [
   {
-    title: "Xoto Connect",
+    logo:home,
     description:
       "The XOTO Home empowers customers to plan and perfect your landscaping journey, from concept to creation, all in one intuitive platform.",
   },
   {
-    title: "Xoto Pro",
+    logo:connect,
     description:
       "Designed for professionals, Xoto Pro connects landscapers and contractors with customers through a powerful digital ecosystem.",
   },
   {
-    title: "Xoto Hub",
+    logo: blitz,
+    description:
+      "A central hub that synchronizes tools, schedules, and services to simplify management across teams and projects.",
+  },
+   {
+    logo: grid,
+    description:
+      "A central hub that synchronizes tools, schedules, and services to simplify management across teams and projects.",
+  }, {
+    logo: vault,
     description:
       "A central hub that synchronizes tools, schedules, and services to simplify management across teams and projects.",
   },
@@ -40,9 +55,9 @@ export default function EcosystemSlider() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-8xl">
         {/* Title */}
-        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-8 sm:mb-10 md:mb-12 lg:mb-16 drop-shadow-xl tracking-tight">
+        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-8 sm:mb-10 md:mb-12 lg:mb-16 drop-shadow-xl tracking-tight">
           Our Tech Ecosystem
         </h2>
 
@@ -71,66 +86,56 @@ export default function EcosystemSlider() {
     }}
     className="!pb-10 sm:!pb-12 md:!pb-14 lg:!pb-16"
   >
-    {ecosystemData.map((item, index) => (
-      <SwiperSlide key={index}>
-        {({ isActive }) => (
-          <div
-            className={`
-              group relative flex flex-col sm:flex-row items-center gap-4 sm:gap-6 md:gap-8 lg:gap-10
-              mx-auto w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md md:max-w-3xl lg:max-w-5xl
-              rounded-2xl sm:rounded-3xl
-              px-5 py-6 sm:px-8 sm:py-8 md:px-12 md:py-12 lg:px-16 lg:py-16
-              transition-all duration-500 ease-out
-              shadow-xl backdrop-blur-xl border border-white/10
-              ${isActive
-                ? "scale-100 sm:scale-105 bg-gradient-to-br from-[#500286] via-black to-[#500286] text-white ring-4 ring-purple-500/30"
-                : "scale-90 sm:scale-95 bg-gradient-to-br from-[#500286] via-black to-[#500286] text-gray-200 opacity-75"}
-            `}
-          >
-            <div className="flex-shrink-0 p-2">
-              <div className="relative">
-                <img
-                  src={logoNew}
-                  alt={`${item.title} Logo`}
-                  className={`w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36 object-contain drop-shadow-2xl transition-transform duration-500 ${isActive ? "scale-110" : "scale-100"}`}
-                />
-                {isActive && <div className="absolute inset-0 rounded-full bg-white/20 blur-xl animate-pulse"></div>}
-              </div>
-            </div>
+   {ecosystemData.map((item, index) => (
+  <SwiperSlide key={index}>
+    {({ isActive }) => (
+      <div
+        className={`
+          group relative flex flex-col sm:flex-row items-center justify-center sm:items-start
+          gap-4 sm:gap-6 md:gap-8 lg:gap-10
+          mx-auto w-full max-w-[230px] xs:max-w-[320px] sm:max-w-md md:max-w-3xl lg:max-w-6xl
+          rounded-4xl
+          px-5 py-6 sm:px-8 sm:py-8 md:px-12 md:py-12 lg:px-16 lg:py-16
+          transition-all duration-500 ease-out
+          shadow-xl  border border-white/10
+          ${isActive
+            ? "scale-100 sm:scale-105 bg-gradient-to-br from-[#500286] via-black to-[#500286] text-white  "
+            : "scale-90 sm:scale-95 bg-gradient-to-br from-[#500286] via-black to-[#500286] text-gray-200 opacity-75"}
+        `}
+      >
 
-            <div className="flex flex-col text-center sm:text-left flex-1 space-y-2 sm:space-y-3 md:space-y-4">
-              <h3 className="font-extrabold tracking-tight text-white text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-                {item.title}
-              </h3>
-              <p className="leading-relaxed opacity-90 max-w-xl mx-auto sm:mx-0 text-xs xs:text-sm sm:text-base md:text-lg lg:text-lg text-gray-100">
-                {item.description}
-              </p>
-            </div>
+        {/* LEFT: Logo */}
+        <div className=" ">
+          <div className="relative">
+            <img
+              src={item.logo}
+              alt="Logo"
+              className={`w-40 h-25`}
+            />
+           
           </div>
-        )}
-      </SwiperSlide>
-    ))}
+        </div>
+
+        {/* RIGHT: Description ONLY */}
+        <div className="flex flex-col text-center justify-center  h-25 sm:text-left flex-1 space-y-2 sm:space-y-3 md:space-y-4  ">
+          <p className="leading-relaxed opacity-90 font-bold max-w-xl mx-auto sm:mx-0 text-xs xs:text-sm sm:text-base md:text-lg lg:text-lg text-gray-100">
+            {item.description}
+          </p>
+        </div>
+      </div>
+    )}
+  </SwiperSlide>
+))}
+
   </Swiper>
 
-  <div className="flex justify-center items-center gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
-    <button className="custom-swiper-button-prev w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/40 text-white flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110 border border-white/30">
-      <svg className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-      </svg>
-    </button>
-
-    <button className="custom-swiper-button-next w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/40 text-white flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110 border border-white/30">
-      <svg className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-      </svg>
-    </button>
-  </div>
+  
 
   <div className="swiper-pagination !static !bottom-0 !mt-4"></div>
 </div>
 
 
       </div>
-    </section>
+    </section>  
   );
 }

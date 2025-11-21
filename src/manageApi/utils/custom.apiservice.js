@@ -4,6 +4,8 @@ import { showToast } from './toast';
 
 const API_BASE_URL = 'https://kotiboxglobaltech.online/api/';
 
+// const API_BASE_URL = 'http://localhost:5000/api/';
+
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,

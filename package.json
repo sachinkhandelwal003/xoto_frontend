@@ -86,6 +86,7 @@
     "react-tooltip": "^5.29.1",
     "react-use": "^17.6.0",
     "reactflow": "^11.11.4",
+    "recharts": "^3.4.1",
     "redux-persist": "^6.0.0",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.19",
@@ -93,7 +94,7 @@
     "swiper": "^11.2.6",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.4",
-    "three": "^0.150.0",
+    "three": "^0.181.1",
     "tinymce": "^7.9.1",
     "yup": "^1.7.0"
   },

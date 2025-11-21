@@ -63,6 +63,11 @@ const CustomTable = ({
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
+  // Calculate serial number for each row
+  const getSerialNumber = (index) => {
+    return startItem + index;
+  };
+
   const renderPaginationButtons = () => {
     const buttons = [];
     const maxVisibleButtons = 5;
@@ -201,6 +206,13 @@ const CustomTable = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              {/* SNo Column Header */}
+              <th
+                scope="col"
+                className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap tracking-wider"
+              >
+                SNo
+              </th>
               {columns.map((column) => (
                 <th
                   key={column.key}
@@ -225,7 +237,7 @@ const CustomTable = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-12 text-center">
+                <td colSpan={columns.length + 1} className="px-6 py-12 text-center">
                   <div className="flex justify-center items-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <span className="ml-3 text-gray-600">Loading...</span>
@@ -235,6 +247,10 @@ const CustomTable = ({
             ) : data.length > 0 ? (
               data.map((item, index) => (
                 <tr key={item._id || index} className="hover:bg-gray-50 transition-colors">
+                  {/* SNo Column Data */}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                    {getSerialNumber(index)}
+                  </td>
                   {columns.map((column) => (
                     <td
                       key={`${item._id}-${column.key}`}
@@ -247,7 +263,7 @@ const CustomTable = ({
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-8 text-center text-sm text-gray-500">
+                <td colSpan={columns.length + 1} className="px-6 py-8 text-center text-sm text-gray-500">
                   No records found
                 </td>
               </tr>

@@ -14,7 +14,6 @@ import { motion } from "framer-motion";
 import Dreamspacking from './Dreamspacking';
 import Eco from './Eco';
 import { Link } from "react-router-dom";
-
 import {
   TreePine,
   Home,
@@ -39,9 +38,13 @@ import {
   Rocket,
 } from "lucide-react";
 import EcoSmartSection from "./Eco";
+import QuoteModal from "../modal/QuoteModal";
 
 export default function Landspackng() {
-  const [formData, setFormData] = useState({
+const [quoteModalOpen, setQuoteModalOpen] = useState(false); 
+
+
+const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -198,7 +201,7 @@ export default function Landspackng() {
 
   return (
     <>
-      {/* === HERO SECTION === */}
+<QuoteModal isOpen={quoteModalOpen} onClose={() => setQuoteModalOpen(false)} />      {/* === HERO SECTION === */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -258,17 +261,18 @@ export default function Landspackng() {
 
 
           <div className="flex items-center justify-center gap-4 mt-6">
-  <motion.button
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ delay: 0.8 }}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-3 rounded-full text-lg font-bold shadow-xl transition-all flex items-center"
-  >
-    Get a free estimate
-    <ArrowRight className="ml-2 w-3 h-3" />
-  </motion.button>
+<motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+onClick={() => setQuoteModalOpen(true)}         
+     className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-4 rounded-full text-lg font-bold shadow-xl transition-all flex items-center gap-3"
+            >
+              Get a free estimate
+              <ArrowRight className="w-5 h-5" />
+            </motion.button>
 
 <Link to='/aiPlanner'>
   <motion.button

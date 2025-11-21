@@ -13,6 +13,7 @@ import {
 export const AuthContext = createContext();
 
 const API_BASE = 'https://kotiboxglobaltech.online/api';
+// const API_BASE = 'http://localhost:5000/api';
 
 export const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
@@ -64,17 +65,19 @@ export const AuthProvider = ({ children }) => {
 
 
   // Enhanced login function that accepts dynamic endpoint
-  const login = async (email, password, endpointPath = '/auth/login') => {
-    const fullEndpoint = `${API_BASE}${endpointPath}`;
-    
-    return await dispatch(
-      loginUser({
-        email,
-        password,
-        endpoint: fullEndpoint,
-      })
-    ).unwrap();
-  };
+// Enhanced login function that accepts dynamic endpoint AND full payload
+const login = async (endpoint, credentials) => {
+  const fullEndpoint = `${API_BASE}${endpoint}`;
+
+  // Use credentials directly — don't force email/password structure
+  return await dispatch(
+    loginUser({
+      payload: credentials,        // ← Now supports { mobile }, { email, password }, etc.
+      endpoint: fullEndpoint,
+    })
+  ).unwrap();
+};
+
 
   // Logout with optional backend call
   const logout = async (logoutEndpoint = '/auth/logout') => {

@@ -1,193 +1,233 @@
-import { useContext } from 'react';
+import { useState } from 'react';
+import {
+  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
 
 const Dashboard = () => {
+  const [timeRange, setTimeRange] = useState('7d');
+
+  // === CHART DATA ===
+  const salesData = [
+    { name: 'Mon', sales: 2400, orders: 24 },
+    { name: 'Tue', sales: 3210, orders: 32 },
+    { name: 'Wed', sales: 2800, orders: 28 },
+    { name: 'Thu', sales: 3980, orders: 40 },
+    { name: 'Fri', sales: 4500, orders: 45 },
+    { name: 'Sat', sales: 5200, orders: 52 },
+    { name: 'Sun', sales: 3800, orders: 38 },
+  ];
+
+  const categoryData = [
+    { name: 'Garden Tools', value: 35, color: '#10b981' },
+    { name: 'Plants & Seeds', value: 28, color: '#8b5cf6' },
+    { name: 'Outdoor Decor', value: 20, color: '#f59e0b' },
+    { name: 'Irrigation', value: 12, color: '#3b82f6' },
+    { name: 'Services', value: 5, color: '#6b7280' },
+  ];
+
+  const freelancerStats = [
+    { month: 'Jan', active: 45, completed: 120 },
+    { month: 'Feb', active: 52, completed: 138 },
+    { month: 'Mar', active: 48, completed: 142 },
+    { month: 'Apr', active: 61, completed: 165 },
+    { month: 'May', active: 72, completed: 180 },
+    { month: 'Jun', active: 68, completed: 192 },
+  ];
+
+  // === QUICK STATS ===
   const stats = [
-    { label: 'Total Users', value: '5,678', change: '+15%', icon: 'fas fa-users', trend: 'up' },
-    { label: 'E-Commerce Sales', value: '$34,567', change: '+22%', icon: 'fas fa-shopping-cart', trend: 'up' },
-    { label: 'Active Freelancers', value: '342', change: '+8%', icon: 'fas fa-user-tie', trend: 'up' },
-    { label: 'AI Designs Generated', value: '1,245', change: '+45%', icon: 'fas fa-robot', trend: 'up' },
-    { label: 'Social Posts', value: '876', change: '+12%', icon: 'fas fa-share-alt', trend: 'up' },
-    { label: 'Avg. Session', value: '3m 12s', change: '+5%', icon: 'fas fa-chart-line', trend: 'up' },
+    { label: 'Total Revenue', value: '$48,921', change: '+18.2%', trend: 'up', icon: 'fas fa-dollar-sign' },
+    { label: 'Active Freelancers', value: '68', change: '+12%', trend: 'up', icon: 'fas fa-user-hard-hat' },
+    { label: 'E-Commerce Orders', value: '1,234', change: '+22%', trend: 'up', icon: 'fas fa-shopping-cart' },
+    { label: 'Landscaping Projects', value: '342', change: '+28%', trend: 'up', icon: 'fas fa-tree' },
+    { label: 'Avg. Project Value', value: '$1,280', change: '+9%', trend: 'up', icon: 'fas fa-chart-line' },
+    { label: 'Customer Ratings', value: '4.8★', change: '+0.3', trend: 'up', icon: 'fas fa-star' },
   ];
 
   const recentActivity = [
-    { action: 'New e-commerce order #4567', user: 'Customer', time: '15 mins ago', icon: 'fas fa-shopping-bag', color: 'text-green-500' },
-    { action: 'Completed freelance project', user: 'Designer', time: '1 hour ago', icon: 'fas fa-palette', color: 'text-blue-500' },
-    { action: 'Generated AI design template', user: 'AI System', time: '2 hours ago', icon: 'fas fa-robot', color: 'text-purple-500' },
-    { action: 'Scheduled social media post', user: 'Marketer', time: '5 hours ago', icon: 'fas fa-calendar-alt', color: 'text-yellow-500' },
-    { action: 'New user registration', user: 'System', time: '1 day ago', icon: 'fas fa-user-plus', color: 'text-indigo-500' },
+    { action: 'New landscaping project in Mumbai', user: 'Rajesh Kumar', time: '10 mins ago', icon: 'fas fa-seedling', color: 'text-green-600' },
+    { action: 'Order #7892 - Garden Kit Delivered', user: 'Priya Sharma', time: '25 mins ago', icon: 'fas fa-truck', color: 'text-blue-600' },
+    { action: 'Freelancer completed lawn design', user: 'Amit Patel', time: '1 hr ago', icon: 'fas fa-check-circle', color: 'text-purple-600' },
+    { action: 'New review: 5★ for irrigation setup', user: 'Neha Gupta', time: '2 hrs ago', icon: 'fas fa-star', color: 'text-yellow-600' },
+    { action: 'Bulk plant order #4451 processed', user: 'System', time: '3 hrs ago', icon: 'fas fa-box-open', color: 'text-indigo-600' },
   ];
 
   const quickActions = [
-    { title: 'Add Product', icon: 'fas fa-plus', path: '/ecommerce/products/new' },
-    { title: 'Create Project', icon: 'fas fa-project-diagram', path: '/freelancers/projects/new' },
-    { title: 'Generate Design', icon: 'fas fa-magic', path: '/ai-design/generator' },
-    { title: 'Schedule Post', icon: 'fas fa-calendar-plus', path: '/social/scheduler' },
+    { title: 'Add Product', icon: 'fas fa-plus-circle', path: '/ecommerce/products/new', bg: 'bg-green-100', iconColor: 'text-green-600' },
+    { title: 'Post Job', icon: 'fas fa-bullhorn', path: '/freelance/jobs/new', bg: 'bg-purple-100', iconColor: 'text-purple-600' },
+    { title: 'View Orders', icon: 'fas fa-clipboard-list', path: '/ecommerce/orders', bg: 'bg-blue-100', iconColor: 'text-blue-600' },
+    { title: 'Manage Team', icon: 'fas fa-users-cog', path: '/admin/team', bg: 'bg-yellow-100', iconColor: 'text-yellow-600' },
   ];
 
+  const COLORS = ['#10b981', '#8b5cf6', '#f59e0b', '#3b82f6', '#6b7280'];
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Dashboard Overview
-        </h1>
-        <div className="flex space-x-2">
-          <button className="px-3 py-1 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-            Export Report
-          </button>
-          <button className="px-3 py-1 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200">
-            Refresh Data
-          </button>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {quickActions.map((action, index) => (
-          <a
-            key={index}
-            href={action.path}
-            className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex flex-col items-center justify-center text-center"
-          >
-            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
-              <i className={`${action.icon} text-indigo-600`}></i>
-            </div>
-            <span className="text-sm font-medium text-gray-700">{action.title}</span>
-          </a>
-        ))}
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {stats.map((stat, index) => (
-          <div
-            key={index}
-            className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
-          >
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{stat.label}</p>
-                <p className="text-xl font-bold text-gray-800 mt-1">{stat.value}</p>
-              </div>
-              <div className={`w-10 h-10 rounded-lg bg-${stat.trend === 'up' ? 'green' : 'red'}-50 flex items-center justify-center`}>
-                <i className={`${stat.icon} text-${stat.trend === 'up' ? 'green' : 'red'}-500`}></i>
-              </div>
-            </div>
-            <div className="mt-3 flex items-center">
-              <span className={`text-xs font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                {stat.change}
-              </span>
-              <span className="text-xs text-gray-500 ml-2">vs last week</span>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* === PURPLE HEADER === */}
+      <header className="bg-gradient-to-r from-purple-700 to-purple-900 text-white shadow-lg">
+        <div className="px-6 py-5 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">Super Admin Dashboard</h1>
+            <p className="text-purple-200 text-sm mt-1">Landscaping Freelance & E-Commerce Platform</p>
           </div>
-        ))}
-      </div>
-
-      {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* E-Commerce Summary */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-800">E-Commerce Performance</h2>
-            <select className="mt-2 sm:mt-0 px-3 py-1 text-sm border border-gray-300 rounded-lg text-gray-600 bg-white">
-              <option>Last 7 Days</option>
-              <option>Last 30 Days</option>
-              <option>Last Quarter</option>
+          <div className="flex items-center space-x-4">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="bg-purple-800 text-white px-4 py-2 rounded-lg text-sm border border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            >
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="90d">Last Quarter</option>
             </select>
-          </div>
-          <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <svg
-                className="w-24 h-24 text-gray-300 mx-auto"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-              <p className="mt-2 text-gray-500">Sales performance chart</p>
-            </div>
+            <button className="bg-white text-purple-700 px-4 py-2 rounded-lg font-medium text-sm hover:bg-purple-50 transition">
+              <i className="fas fa-download mr-2"></i> Export
+            </button>
+            <button className="bg-purple-600 px-4 py-2 rounded-lg font-medium text-sm hover:bg-purple-500 transition flex items-center">
+              <i className="fas fa-sync-alt mr-2"></i> Refresh
+            </button>
           </div>
         </div>
+      </header>
 
-        {/* Platform Distribution */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-800 mb-6">Platform Distribution</h2>
-          <div className="flex flex-col items-center">
-            <div className="relative w-40 h-40 mb-6">
-              <svg
-                className="w-40 h-40 text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1"
-                  d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1"
-                  d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
-                />
-              </svg>
+      <div className="p-6 space-y-6 max-w-7xl mx-auto">
+        {/* === QUICK ACTIONS === */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {quickActions.map((action, i) => (
+            <a
+              key={i}
+              href={action.path}
+              className="bg-white p-5 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col items-center text-center group"
+            >
+              <div className={`w-12 h-12 rounded-full ${action.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                <i className={`${action.icon} ${action.iconColor} text-xl`}></i>
+              </div>
+              <span className="text-sm font-semibold text-gray-800">{action.title}</span>
+            </a>
+          ))}
+        </div>
+
+        {/* === STATS CARDS === */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {stats.map((stat, i) => (
+            <div
+              key={i}
+              className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-2xl font-bold text-gray-800 mt-1">{stat.value}</p>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center">
+                  <i className={`${stat.icon} text-green-600 text-lg`}></i>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center">
+                <span className="text-sm font-semibold text-green-600">{stat.change}</span>
+                <span className="text-xs text-gray-500 ml-2">vs last period</span>
+              </div>
             </div>
-            
-            <div className="w-full space-y-3">
-              {[
-                { platform: 'E-Commerce', percentage: 35, color: 'bg-indigo-500' },
-                { platform: 'Freelancers', percentage: 25, color: 'bg-green-500' },
-                { platform: 'AI Design', percentage: 20, color: 'bg-purple-500' },
-                { platform: 'Social Media', percentage: 15, color: 'bg-yellow-500' },
-                { platform: 'Other', percentage: 5, color: 'bg-gray-500' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between">
+          ))}
+        </div>
+
+        {/* === CHARTS ROW === */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Sales & Orders Line Chart */}
+          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Revenue & Orders Trend</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={salesData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="sales" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6' }} name="Revenue ($)" />
+                <Line type="monotone" dataKey="orders" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981' }} name="Orders" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Category Pie Chart */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Sales by Category</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {categoryData.map((entry, i) => (
+                    <Cell key={`cell-${i}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-2">
+              {categoryData.map((item, i) => (
+                <div key={i} className="flex items-center justify-between text-sm">
                   <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full mr-2 ${item.color}`} />
-                    <p className="text-sm text-gray-600">{item.platform}</p>
+                    <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
+                    <span className="text-gray-600">{item.name}</span>
                   </div>
-                  <p className="text-sm font-medium text-gray-800">{item.percentage}%</p>
+                  <span className="font-medium text-gray-800">{item.value}%</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-800">Recent Activity</h2>
-          <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-            View All Activity
-          </button>
+        {/* === FREELANCER GROWTH BAR CHART === */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Freelancer Growth (Last 6 Months)</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={freelancerStats}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="active" fill="#8b5cf6" name="Active Freelancers" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="completed" fill="#10b981" name="Projects Completed" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-        
-        <div className="space-y-4">
-          {recentActivity.map((item, i) => (
-            <div key={i} className="flex items-start pb-4 border-b border-gray-100 last:border-0">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${item.color} bg-opacity-10 mr-3`}>
-                <i className={`${item.icon} ${item.color} text-lg`}></i>
+
+        {/* === RECENT ACTIVITY === */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-5">
+            <h3 className="text-lg font-semibold text-gray-800">Recent Activity</h3>
+            <a href="/activity" className="text-purple-600 hover:text-purple-700 text-sm font-medium">
+              View All <i className="fas fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+          <div className="space-y-4">
+            {recentActivity.map((act, i) => (
+              <div key={i} className="flex items-start space-x-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+                <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-50 ${act.color}`}>
+                  <i className={`${act.icon} text-sm`}></i>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-800 font-medium truncate">
+                    <span className="font-semibold">{act.user}</span>{' '}
+                    <span className="font-normal text-gray-600">{act.action}</span>
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">{act.time}</p>
+                </div>
+                <button className="text-gray-400 hover:text-gray-600">
+                  <i className="fas fa-ellipsis-h text-xs"></i>
+                </button>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-800">
-                  {item.user} <span className="font-normal text-gray-600">{item.action}</span>
-                </p>
-                <p className="text-xs text-gray-500 mt-1">{item.time}</p>
-              </div>
-              <button className="text-gray-400 hover:text-gray-600">
-                <i className="fas fa-ellipsis-v"></i>
-              </button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>

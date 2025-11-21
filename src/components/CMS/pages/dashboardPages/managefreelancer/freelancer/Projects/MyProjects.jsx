@@ -175,14 +175,14 @@ const MyProjects = () => {
   };
 
   const openDailyDrawer = (milestone) => {
-    if (!canAddDailyUpdate(milestone)) {
-      const start = moment(milestone.start_date).format("DD MMM YYYY");
-      const end = moment(milestone.end_date).format("DD MMM YYYY");
-      message.warning(
-        `Milestone active only from ${start} to ${end}. You may have already submitted today.`
-      );
-      return;
-    }
+    // if (!canAddDailyUpdate(milestone)) {
+    //   const start = moment(milestone.start_date).format("DD MMM YYYY");
+    //   const end = moment(milestone.end_date).format("DD MMM YYYY");
+    //   message.warning(
+    //     `Milestone active only from ${start} to ${end}. You may have already submitted today.`
+    //   );
+    //   return;
+    // }
     setSelectedMilestone(milestone);
     setDailyErrors([]);
     dailyForm.resetFields();
@@ -521,7 +521,7 @@ const MyProjects = () => {
                               size="small"
                               icon={<PlusOutlined />}
                               onClick={() => openDailyDrawer(mil)}
-                              disabled={!canAdd}
+                              // disabled={!canAdd}
                             >
                               Add Daily Update
                             </Button>
@@ -541,11 +541,11 @@ const MyProjects = () => {
 
                             {mil.progress === 100 && mil.status === "in_progress" && (
                               <Popconfirm
-                                title="Request payment release?"
+                                title="Request for approval?"
                                 onConfirm={() => requestPaymentRelease(selectedProject._id, mil._id)}
                               >
                                 <Button type="dashed" size="small" icon={<DollarOutlined />}>
-                                  Request Payment
+                                  Approval Request
                                 </Button>
                               </Popconfirm>
                             )}

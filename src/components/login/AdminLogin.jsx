@@ -27,17 +27,15 @@ const getDashboardPath = (roleCode) => {
 
 const AdminLogin = () => {
   const [form] = Form.useForm();
-  const [fieldErrors, setFieldErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const [attemptCount, setAttemptCount] = useState(0);
   const [lockUntil, setLockUntil] = useState(null);
   const hasRedirected = useRef(false);
 
-  const { user, token, loading, login, isAuthenticated } = useContext(AuthContext);
+  const { login, isAuthenticated, user, token, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Lock countdown
+  // Lock countdown timer
   useEffect(() => {
     if (!lockUntil) return;
     const timer = setInterval(() => {
@@ -49,117 +47,93 @@ const AdminLogin = () => {
     return () => clearInterval(timer);
   }, [lockUntil]);
 
-  // Auto redirect + role-based TOAST
+  // Auto redirect after successful login
   useEffect(() => {
     if (isAuthenticated && user && token && !hasRedirected.current) {
       hasRedirected.current = true;
-      const roleCode = user?.role?.code?.toString();
+      const roleCode = user?.role?.code?.toString() || user?.role;
       const roleName = roleCode === '0' ? 'SuperAdmin' : 'Admin';
       const userName = user?.name || user?.email?.split('@')[0] || 'Admin';
 
-      setSuccessMessage(`Login successful! Welcome back, ${roleName} ${userName}`);
-
-      // Role-Based Toast with Custom Colors
-      if (roleCode === '0') {
-        // SuperAdmin → Purple & Gold
-        toast.success(`Welcome back, SuperAdmin ${userName}!`, {
-          position: "top-center",
-          autoClose: 4000,
-          style: {
-            background: "linear-gradient(135deg, #5C039B, #8E44AD)",
-            color: "#FFD700",
-            fontSize: "18px",
-            fontWeight: "bold",
-            borderRadius: "16px",
-            padding: "16px",
-            boxShadow: "0 10px 30px rgba(92, 3, 155, 0.6)",
-          },
-          icon: "Crown",
-        });
-      } else {
-        // Regular Admin → Blue & White
-        toast.success(`Welcome back, Admin ${userName}!`, {
-          position: "top-center",
-          autoClose: 4000,
-          style: {
-            background: "#03A4F4",
-            color: "#FFFFFF",
-            fontSize: "17px",
-            fontWeight: "bold",
-            borderRadius: "16px",
-            padding: "16px",
-            boxShadow: "0 10px 30px rgba(3, 164, 244, 0.4)",
-          },
-          icon: "Key",
-        });
-      }
+      // Epic Role-Based Toast
+      toast.success(`Welcome back, ${roleName} ${userName}!`, {
+        position: "top-center",
+        autoClose: 4000,
+        style: {
+          background: roleCode === '0' 
+            ? "linear-gradient(135deg, #5C039B, #8E44AD)" 
+            : "#03A4F4",
+          color: roleCode === '0' ? "#FFD700" : "#FFFFFF",
+          fontSize: "18px",
+          fontWeight: "bold",
+          borderRadius: "16px",
+          padding: "16px",
+          boxShadow: `0 10px 30px rgba(${roleCode === '0' ? '92, 3, 155' : '3, 164, 244'}, 0.5)`,
+        },
+        icon: roleCode === '0' ? "Crown" : "Key",
+      });
 
       setTimeout(() => {
         navigate(getDashboardPath(roleCode), { replace: true });
-      }, 1800);
+      }, 1500);
     }
   }, [isAuthenticated, user, token, navigate]);
 
   const onFinish = async (values) => {
-    setFieldErrors({});
     setGeneralError('');
-    setSuccessMessage('');
-    hasRedirected.current = false;
 
+    // Check lock
     if (lockUntil && Date.now() < lockUntil) {
       const seconds = Math.ceil((lockUntil - Date.now()) / 1000);
-      toast.warn(`Too many attempts. Please wait ${seconds}s`, {
+      toast.warn(`Too many attempts. Wait ${seconds}s`, {
         style: { background: "#ff4d4f", color: "white" },
       });
       return;
     }
 
-    const result = await login(values.email.trim(), values.password, '/auth/login');
+    try {
+      // Use the NEW flexible login with endpoint + payload
+      await login("/auth/login", {
+        email: values.email.trim(),
+        password: values.password,
+      });
 
-    if (result.success) {
+      // Success → reset attempts
       setAttemptCount(0);
       setLockUntil(null);
-      return;
+
+    } catch (err) {
+      const errorMsg = typeof err === 'string' ? err : err?.message || "Login failed";
+      const newCount = attemptCount + 1;
+      setAttemptCount(newCount);
+
+      // Lock after 5 failed attempts
+      if (newCount >= 5) {
+        const lockTime = Date.now() + 5 * 60 * 1000; // 5 minutes
+        setLockUntil(lockTime);
+        toast.error('Account locked for 5 minutes due to too many attempts', {
+          autoClose: 10000,
+          style: { background: "#ff4d4f", color: "white", fontWeight: "bold" },
+        });
+        setGeneralError("Too many failed attempts. Account locked for 5 minutes.");
+        return;
+      }
+
+      // Friendly error messages
+      let displayError = "Invalid email or password";
+      if (errorMsg.toLowerCase().includes("inactive") || errorMsg.toLowerCase().includes("deactivated")) {
+        displayError = "Your account is deactivated. Contact support.";
+      } else if (errorMsg.toLowerCase().includes("verify")) {
+        displayError = "Please verify your email first.";
+      } else if (errorMsg.toLowerCase().includes("not found") || errorMsg.toLowerCase().includes("credentials")) {
+        displayError = "Incorrect email or password";
+      } else if (errorMsg.includes("Network") || errorMsg.includes("failed to fetch")) {
+        displayError = "No internet connection";
+      }
+
+      setGeneralError(displayError);
+      toast.error(displayError);
     }
-
-    const newCount = attemptCount + 1;
-    setAttemptCount(newCount);
-
-    if (newCount >= 5) {
-      const lockTime = Date.now() + 5 * 60 * 1000;
-      setLockUntil(lockTime);
-      toast.error('Account locked for 5 minutes due to too many attempts', {
-        autoClose: 8000,
-        style: { background: "#ff4d4f", color: "white" },
-      });
-    }
-
-    const errorMsg = result.error || 'Login failed';
-    const raw = result.raw;
-
-    const errors = {};
-
-    if (raw?.errors?.length) {
-      raw.errors.forEach(err => {
-        errors[err.field] = err.message;
-      });
-    }
-
-    if (errorMsg.includes('Invalid') || errorMsg.includes('credentials')) {
-      errors.general = 'Incorrect email or password';
-    } else if (errorMsg.includes('inactive')) {
-      errors.general = 'Your account is deactivated';
-    } else if (errorMsg.includes('verify')) {
-      errors.general = 'Please verify your email first';
-    } else if (errorMsg.includes('Network') || errorMsg.includes('fetch')) {
-      setGeneralError('No internet connection');
-      toast.error('Connection failed');
-      return;
-    } else {
-      errors.general = errorMsg;
-    }
-
-    setFieldErrors(errors);
   };
 
   const getLockMessage = () => {
@@ -200,29 +174,24 @@ const AdminLogin = () => {
           </div>
 
           <div style={{ padding: '40px 32px' }}>
-            {/* Success Message */}
-            {successMessage && (
-              <Alert
-                message={successMessage}
-                type="success"
-                showIcon
-                style={{
-                  marginBottom: 20,
-                  fontWeight: 'bold',
-                  borderRadius: 12,
-                  background: "#64EF0A",
-                  color: "#020202",
-                  border: "none",
-                }}
-              />
-            )}
-
             {/* Lock Alert */}
             {lockUntil && (
               <Alert
                 message={getLockMessage()}
                 type="warning"
                 showIcon
+                style={{ marginBottom: 20, borderRadius: 12, fontWeight: "bold" }}
+              />
+            )}
+
+            {/* General Error */}
+            {generalError && !lockUntil && (
+              <Alert
+                message={generalError}
+                type="error"
+                showIcon
+                closable
+                onClose={() => setGeneralError('')}
                 style={{ marginBottom: 20, borderRadius: 12 }}
               />
             )}
@@ -230,7 +199,7 @@ const AdminLogin = () => {
             {/* Loading */}
             {loading && (
               <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <Spin size="large" tip="Signing you in..." style={{ color: "#5C039B" }} />
+                <Spin size="large" tip="Signing you in..." />
               </div>
             )}
 
@@ -243,8 +212,6 @@ const AdminLogin = () => {
               <Form.Item
                 label={<span style={{ color: "#5C039B", fontWeight: 600 }}>Email Address</span>}
                 name="email"
-                validateStatus={fieldErrors.email ? 'error' : ''}
-                help={fieldErrors.email}
                 rules={[
                   { required: true, message: 'Email is required' },
                   { type: 'email', message: 'Invalid email format' },
@@ -260,8 +227,6 @@ const AdminLogin = () => {
               <Form.Item
                 label={<span style={{ color: "#5C039B", fontWeight: 600 }}>Password</span>}
                 name="password"
-                validateStatus={fieldErrors.password ? 'error' : ''}
-                help={fieldErrors.password}
                 rules={[
                   { required: true, message: 'Password is required' },
                   { min: 6, message: 'Minimum 6 characters' },
@@ -296,8 +261,9 @@ const AdminLogin = () => {
                     fontSize: 18,
                     fontWeight: 'bold',
                     background: "#5C039B",
-                    borderColor: "#5C039B",
+                    border: "none",
                     borderRadius: 16,
+                    boxShadow: "0 8px 20px rgba(92, 3, 155, 0.4)",
                   }}
                 >
                   {loading ? 'Signing In...' : 'Login as Admin'}
@@ -305,25 +271,23 @@ const AdminLogin = () => {
               </Form.Item>
             </Form>
 
-            {/* Test Credentials */}
+            {/* Test Credentials - FIXED */}
             <Alert
               message={
-                <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+                <div style={{ fontSize: 13, lineHeight: 1.8 }}>
                   <strong>Test Accounts:</strong><br />
-                  Email: <Text code>Super1@gmail.com</Text>  <br/> 
-                                    Password: <Text code>Super1@gmail.com</Text>  
-
+                  SuperAdmin: <Text code>Super1@gmail.com</Text> → Password: <Text code>123456</Text><br />
+                  Admin: <Text code>admin@xoto.com</Text> → Password: <Text code>admin123</Text>
                 </div>
-                
               }
               type="info"
               showIcon
-              style={{ marginTop: 20, borderRadius: 12 }}
+              style={{ marginTop: 20, borderRadius: 12, fontSize: 13 }}
             />
 
             <div style={{ textAlign: 'center', marginTop: 24 }}>
               <a href="/login" style={{ color: "#03A4F4", fontWeight: 600 }}>
-                Back to User Login
+                ← Back to User Login
               </a>
             </div>
           </div>

@@ -1,205 +1,123 @@
+// components/layout/Topbar.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../../manageApi/store/authSlice";
 import { useCmsContext } from "../../contexts/CmsContext";
-import SearchBar from "../ui/SearchBar";
 import { FiBell, FiMenu, FiSettings, FiLogOut, FiUser } from "react-icons/fi";
-import Box from "@mui/material/Box";
-import Avatar from "@mui/material/Avatar";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Tooltip from "@mui/material/Tooltip";
 import { getRoleColors } from "../../../../manageApi/utils/roleColors";
 
 const Topbar = () => {
-  const { toggleSidebar, sidebarCollapsed } = useCmsContext();
+  const { toggleSidebar, sidebarCollapsed, isMobile } = useCmsContext();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth?.user);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const user = useSelector((s) => s.auth?.user);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const colors = getRoleColors(user?.role?.code);
 
-  // Determine profile URL based on role code
   const getProfileUrl = () => {
-    const roleCode = user?.role?.code;
-    switch (roleCode) {
-      case "0":
-        return "/superadmin/myprofile";
-      case "1":
-        return "/admin/myprofile";
-      case "2":
-        return "/customer/myprofile";
-      case "3":
-        return "/employee/myprofile";
-      case "6":
-        return "/seller/b2b/myprofile";
-      case "5":
-        return "/dashboard/vendor-b2c/profile";
-      case "8":
-        return "/business/myprofile";
-      case "7":
-        return "/dashboard/freelancer/myprofile";
-      default:
-        return "/profile";
-    }
-  };
-
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleProfileClick = () => {
-    const profileUrl = getProfileUrl();
-    navigate(profileUrl);
-    handleMenuClose();
+    const map = {
+      "0": "/superadmin/myprofile",
+      "1": "/admin/myprofile",
+      "5": "/dashboard/vendor-b2c/profile",
+      "6": "/seller/b2b/myprofile",
+      "7": "/dashboard/freelancer/myprofile",
+    };
+    return map[user?.role?.code] ?? "/profile";
   };
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
     navigate("/");
-    handleMenuClose();
   };
+
+  const headerLeft = isMobile || sidebarCollapsed ? "left-0" : "left-64";
 
   return (
     <header
-      className={`fixed top-0 right-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 h-16 
-      transition-all duration-300 ease-in-out
-      ${sidebarCollapsed ? "left-20 lg:left-20" : "left-64 lg:left-64"}`}
+      className={`
+        fixed top-0 right-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 h-16
+        transition-all duration-300 ${headerLeft}
+      `}
     >
-      <div className="flex justify-between items-center w-full h-full px-6">
-        <div className="flex items-center space-x-4">
+      <div className="flex justify-between items-center h-full px-4 sm:px-6">
+        {/* Left */}
+        <div className="flex items-center gap-3">
           <button
             onClick={toggleSidebar}
-            className="text-gray-500 hover:bg-gray-100 p-2 rounded-lg transition-all duration-200 hover:shadow-sm"
-            aria-label="Toggle sidebar"
+            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <FiMenu className="w-5 h-5" />
           </button>
-          <SearchBar />
+          <div className="hidden sm:block w-64">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
         </div>
-        <div className="flex items-center space-x-4">
-          <button
-            className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors duration-200 hover:shadow-sm"
-            aria-label="Notifications"
-          >
+
+        {/* Right */}
+        <div className="flex items-center gap-3">
+          <button className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-full">
             <FiBell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 inline-flex items-center justify-center w-3 h-3 text-[10px] font-bold text-white bg-red-500 rounded-full">
+            <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">
               3
             </span>
           </button>
-          <Box
-            sx={{ display: "flex", alignItems: "center", textAlign: "center" }}
-          >
-            <Tooltip title="Account settings">
-              <IconButton
-                onClick={handleMenuClick}
-                size="small"
-                sx={{ ml: 2 }}
-                aria-controls={open ? "account-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
+
+          <div className="relative">
+            <button
+              onClick={() => setDropdownOpen(v => !v)}
+              className="flex items-center gap-2 hover:bg-gray-100 p-1 rounded-lg"
+            >
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold"
+                style={{ backgroundColor: colors.primary }}
               >
-                <Avatar
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    bgcolor: colors.primary,
-                    fontSize: "0.875rem",
-                    transition: "all 0.2s",
-                    "&:hover": {
-                      transform: "scale(1.1)",
-                    },
-                  }}
+                {user?.name?.charAt(0) ?? "U"}
+              </div>
+              <div className="hidden md:block text-left">
+                <p className="text-sm font-medium">{user?.name}</p>
+                <p className="text-xs text-gray-500">{user?.role?.name}</p>
+              </div>
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-xl border py-2 z-50">
+                <button
+                  onClick={() => { navigate(getProfileUrl()); setDropdownOpen(false); }}
+                  className="w-full px-4 py-2.5 flex items-center gap-3 text-sm hover:bg-gray-50"
                 >
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
-                </Avatar>
-                <Box
-                  sx={{
-                    ml: 1,
-                    display: { xs: "none", md: "flex" },
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                  }}
+                  <FiUser /> My Profile
+                </button>
+                <button
+                  onClick={() => setDropdownOpen(false)}
+                  className="w-full px-4 py-2.5 flex items-center gap-3 text-sm hover:bg-gray-50"
                 >
-                  <Typography sx={{ fontSize: "0.875rem", fontWeight: 500 }}>
-                    {user?.name || "User"}
-                  </Typography>
-                  <Typography
-                    sx={{ fontSize: "0.75rem", color: "text.secondary" }}
-                  >
-                    {user?.role?.name || "Unknown Role"}
-                  </Typography>
-                </Box>
-              </IconButton>
-            </Tooltip>
-          </Box>
-          <Menu
-            anchorEl={anchorEl}
-            id="account-menu"
-            open={open}
-            onClose={handleMenuClose}
-            onClick={handleMenuClose}
-            slotProps={{
-              paper: {
-                elevation: 0,
-                sx: {
-                  overflow: "visible",
-                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                  mt: 1.5,
-                  "& .MuiAvatar-root": {
-                    width: 32,
-                    height: 32,
-                    ml: -0.5,
-                    mr: 1,
-                  },
-                  "&::before": {
-                    content: '""',
-                    display: "block",
-                    position: "absolute",
-                    top: 0,
-                    right: 14,
-                    width: 10,
-                    height: 10,
-                    bgcolor: "background.paper",
-                    transform: "translateY(-50%) rotate(45deg)",
-                    zIndex: 0,
-                  },
-                },
-              },
-            }}
-            transformOrigin={{ horizontal: "right", vertical: "top" }}
-            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-          >
-            <MenuItem onClick={handleProfileClick} sx={{ py: 1.5 }}>
-              <Avatar sx={{ bgcolor: colors.primary }} />
-              <Typography component="span" sx={{ ml: 1 }}>
-                My Profile
-              </Typography>
-            </MenuItem>
-            <MenuItem onClick={handleMenuClose} sx={{ py: 1.5 }}>
-              <FiSettings style={{ marginRight: "12px" }} />
-              <Typography component="span">Settings</Typography>
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={handleLogout} sx={{ py: 1.5 }}>
-              <ListItemIcon>
-                <FiLogOut fontSize="small" />
-              </ListItemIcon>
-              Logout
-            </MenuItem>
-          </Menu>
+                  <FiSettings /> Settings
+                </button>
+                <hr className="my-1" />
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-red-600 hover:bg-red-50"
+                >
+                  <FiLogOut /> Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+      </div>
+
+      <div className="sm:hidden px-4 pb-3">
+        <input
+          type="text"
+          placeholder="Search..."
+          className="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
       </div>
     </header>
   );
