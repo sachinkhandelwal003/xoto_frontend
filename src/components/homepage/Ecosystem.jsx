@@ -44,54 +44,47 @@ export default function XotoLandingPage() {
   ];
 
   return (
-    <main className="w-full overflow-hidden">
+    <>
 
-      {/* ================= HERO SECTION ================= */}
-      <section className="relative w-full h-screen overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${huuuImage})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
-        <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center text-white">
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight max-w-5xl">
-            One Ecosystem. Infinite Opportunities.
-          </h1>
-          <p className="mt-4 text-lg md:text-xl max-w-3xl opacity-90">
-            XOTO empowers every stakeholder in the property lifecycle with AI-driven tools to
-            simplify operations, increase revenue, and create seamless experiences for customers.
-          </p>
+   {/* ================= HERO SECTION ================= */}
+<section className="relative w-full h-[546px] overflow-hidden">\
+    {/* Bottom Decorative Shapes - Hidden on mobile */}
+      <div className="hidden lg:block absolute bottom-0 left-0 w-70 h-10 bg-white z-[5] clip-left-shape"></div>
+      <div className="hidden lg:block absolute bottom-0 right-0 w-70 h-10 bg-white z-[5] clip-right-shape"></div>
 
-        <Link
-  to="/login"
-  className="mt-8 px-8 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 flex items-center gap-2"
->
-  Join The Xoto Partner Ecosystem
-  <ArrowRight className="w-5 h-5" />
-</Link>
-        </div>
+      <style>{`
+        .clip-left-shape {
+          clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
+        }
+        .clip-right-shape {
+          clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+      `}</style>
+  {/* Background Image using img tag */}
+  <img
+    src={huuuImage}
+    alt="Hero Background"
+    className="w-full h-full object-cover object-center"
+  />
+  
+  {/* Content */}
+  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center h-full px-6 text-center text-white">
+    <h1 className="text-5xl md:text-6xl font-bold leading-tight max-w-6xl">
+      One Ecosystem. Infinite Opportunities.
+    </h1>
+    <p className="mt-4 text-lg md:text-xl max-w-3xl opacity-90">
+      XOTO empowers every stakeholder in the property lifecycle with AI-driven tools to
+      simplify operations, increase revenue, and create seamless experiences for customers.
+    </p>
 
-        {/* Bottom Blue Line with X */}
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center items-center h-16 pointer-events-none">
-          <div className="relative w-full max-w-4xl">
-            <div className="absolute inset-x-0 bottom-8 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-              X
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Curved White Shape */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-white">
-          <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path fill="#ffffff" d="M0,160 C360,320 1080,0 1440,160 L1440,320 L0,320 Z" />
-          </svg>
-        </div>
-
-        {/* Top Blue Border */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600" />
-      </section>
-
+    <Link
+      to="/login"
+      className="mt-8 px-8 py-3 bg-[var(--color-primary)] text-white font-semibold rounded-lg shadow-lg transition-all duration-300 flex items-center gap-2"
+    >
+      Join The Xoto Partner Ecosystem
+    </Link>
+  </div>
+</section>
       {/* ================= WHY PARTNER SECTION ================= */}
      <Partner/>
 
@@ -105,6 +98,6 @@ export default function XotoLandingPage() {
       {/* ================= GROW. EARN. XOTO ================= */}
      <Grow/>
 
-    </main>
+    </>
   );
 }

@@ -1,123 +1,162 @@
-import React, { useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const partners = [
-  {
-    title: "Contractors",
-    subtitle: "Elite Contractors Network",
-    icon: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", // replace with your icon
-  },
-  {
-    title: "Developers",
-    subtitle: "Property Development Partners",
-    icon: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-  },
-  {
-    title: "Agents",
-    subtitle: "Real Estate Professionals",
-    icon: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-  },
-];
+import wave1 from "../../assets/img/wave/wave1.png";
+import round from "../../assets/img/home/round.png";
+import rating from "../../assets/icons/Homeicons/rating.png";
+import partner from "../../assets/icons/Homeicons/partners.png";
+import vector from "../../assets/icons/Homeicons/Vector.png";
+import dollar from "../../assets/icons/Homeicons/dollar.png";
+import finance from "../../assets/icons/Homeicons/finance.png";
+import target from "../../assets/icons/Homeicons/target.png";
 
 const PartnerEcosystem = () => {
-  const [index, setIndex] = useState(0);
+  const cards = [
+    {
+      icon: rating,
+      title: "For Customers",
+      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+    },
+    {
+      icon: vector,
+      title: "For Business Associates",
+      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+    },
+    {
+      icon: partner,
+      title: "For Execution Partner",
+      desc: "Unlock new growth opportunities through seamless integrations and partner solutions.",
+    },
+    {
+      icon: dollar,
+      title: "For Strategic Alliances",
+      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+    },
+    {
+      icon: target,
+      title: "For Developers",
+      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+    },
+    {
+      icon: finance,
+      title: "For Financial Institutions",
+      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+    },
+  ];
 
-  const prev = () =>
-    setIndex((prevIndex) =>
-      prevIndex === 0 ? partners.length - 1 : prevIndex - 1
-    );
-  const next = () =>
-    setIndex((prevIndex) =>
-      prevIndex === partners.length - 1 ? 0 : prevIndex + 1
-    );
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // ✅ Detect screen width dynamically
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const nextSlide = () => {
+    const limit = isMobile ? cards.length - 1 : cards.length - 2;
+    if (currentIndex < limit) setCurrentIndex((prev) => prev + 1);
+  };
+
+  const prevSlide = () => {
+    if (currentIndex > 0) setCurrentIndex((prev) => prev - 1);
+  };
 
   return (
-    <section className="relative w-full overflow-hidden bg-gradient-to-b from-white to-[#f5f1ff] pb-32">
-      {/* Decorative wave background */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 320"
-          className="w-full"
-        >
-          <path
-            fill="url(#grad)"
-            fillOpacity="1"
-            d="M0,256L60,229.3C120,203,240,149,360,122.7C480,96,600,96,720,106.7C840,117,960,139,1080,138.7C1200,139,1320,117,1380,106.7L1440,96L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"
-          ></path>
-          <defs>
-            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#03A4F4" />
-              <stop offset="100%" stopColor="#64EF0A" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
+    <section className="relative bg-[var(--color-body)]  overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
+         <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
+               <img
+                 src={wave1}
+                 alt=""
+                 className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
+               />
+             </div>
+      <div className="relative z-10 max-w-7xl mx-auto">
+     
+        {/* Section Title */}
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12 lg:mb-16">
+Our Partner Ecosystem        </h2>
 
-      {/* Heading */}
-      <div className="text-center pt-20 mb-12 relative z-10">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-          Our Partner Ecosystem
-        </h2>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-center gap-12 px-6">
-        {/* Left Circular Graphic */}
-        <div className="relative flex justify-center items-center">
-          <div className="relative w-64 h-64 rounded-full bg-gradient-to-r from-[#03A4F4] to-[#64EF0A] flex items-center justify-center">
-            <div className="w-28 h-28 bg-purple-700 rounded-full flex items-center justify-center">
-              <img
-                src={partners[index].icon}
-                alt="Partner Icon"
-                className="w-10 h-10 invert"
+        {/* Main Content - Round image on left, slider on right */}
+        <div className="flex flex-col lg:flex-row items-center justify-between   ">
+          
+          {/* Left: Round Image */}
+          <div className="w-full lg:w-1/2 flex justify-start items-start lg:justify-start  mb-10">
+            <div className="relative w-60 h-60 sm:w-80 sm:h-80 lg:w-96 lg:h-96 mx-auto">
+              <img 
+                src={round} 
+                alt="Round decoration" 
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
-          {/* circular ring */}
-          <div className="absolute inset-0 border-[10px] border-transparent rounded-full border-t-[#03A4F4]/40 border-l-[#64EF0A]/40"></div>
-        </div>
 
-        {/* Right Cards */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={prev}
-            className="bg-white border border-gray-300 p-2 rounded-md shadow hover:bg-gray-50 transition"
-          >
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
-          </button>
-
-          <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
-            {partners.slice(index, index + 2).map((partner, idx) => (
+          {/* Right: Cards Slider */}
+          <div className="w-full lg:w-1/2 flex flex-col ">
+            <div className="relative w-full max-w-sm lg:max-w-lg overflow-hidden">
               <div
-                key={idx}
-                className="min-w-[260px] bg-white border border-gray-200 rounded-xl p-6 flex justify-between items-center shadow-sm hover:shadow-md transition"
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{
+                  transform: `translateX(-${currentIndex * (isMobile ? 100 : 50)}%)`,
+                }}
               >
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900">
-                    {partner.title}
-                  </h4>
-                  <p className="text-sm text-blue-600 font-medium">
-                    {partner.subtitle}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-r from-[#03A4F4] to-[#64EF0A] rounded-full flex items-center justify-center">
-                  <img
-                    src={partner.icon}
-                    alt="icon"
-                    className="w-6 h-6 invert"
-                  />
-                </div>
+                {cards.map((card, index) => (
+                  <div
+                    key={index}
+                    className={`w-full flex-shrink-0 bg-white rounded-xl  p-6 mx-2 transition-all ${
+                      currentIndex === index ||
+                      (!isMobile && currentIndex + 1 === index)
+                        ? " shadow-xl scale-100"
+                        : "opacity-70 scale-95"
+                    }`}
+                    style={{
+                      width: isMobile ? '100%' : 'calc(90% - 100px)'
+                    }}
+                  >
+                    <div>
+                      <div className="flex justify-between items-center ">
+                        <h3 className="text-2xl font-bold text-gray-900">
+                          {card.title}
+                        </h3>
+                        <div className="bg-[var(--color-primary)] p-2 rounded-full">
+                          <img 
+                            src={card.icon} 
+                            alt={`${card.title} icon`}
+                            className="w-6 h-6 object-contain"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        {card.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
 
-          <button
-            onClick={next}
-            className="bg-purple-700 p-2 rounded-md text-white shadow hover:bg-purple-800 transition"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+            {/* Navigation Arrows */}
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={prevSlide}
+                className="p-3 rounded-sm border border-gray-300 hover:bg-gray-100 transition disabled:opacity-40"
+                disabled={currentIndex === 0}
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-700" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="p-3 rounded-sm bg-[var(--color-primary)] hover:bg-purple-800 transition disabled:opacity-40"
+                disabled={
+                  currentIndex >= (isMobile ? cards.length - 1 : cards.length - 2)
+                }
+              >
+                <ChevronRight className="w-5 h-5 text-white" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

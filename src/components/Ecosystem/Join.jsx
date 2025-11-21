@@ -1,10 +1,26 @@
 import React from "react";
 // import partnerImage from "../../assets/img/partner.png"; // replace with your actual image path
 import joinImage from "../../assets/img/join.png";
+import wave1 from "../../assets/img/wave/wave1.png";
+
 const PartnerEcosystemSection = () => {
   return (
-    <section className="w-full bg-white py-16 md:py-20 px-6 md:px-12">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+<section className="w-full relative bg-[var(--color-body)] py-16 md:py-20 px-6 md:px-12 z-10">
+
+ <div className="absolute top-[-20px] lg:top-[-150px] left-0 w-full z-0 overflow-hidden">
+       <img
+  src={wave1}
+  alt=""
+  className="
+    w-full min-w-[140%] -ml-[20%] scale-[1.8] 
+    lg:scale-100 lg:min-w-full lg:ml-0 
+    pointer-events-none select-none
+    transform rotate-180
+  "
+/>
+
+      </div>
+<div className="relative z-20 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         {/* LEFT SIDE */}
         <div className="flex flex-col justify-center">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
