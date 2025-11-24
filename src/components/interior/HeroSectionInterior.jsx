@@ -4,7 +4,8 @@ import React from "react";
 import { ArrowRight } from "lucide-react";
 import mainbgImage from "../../assets/img/mainbg.jpg"; // ← change your image path
 
-export default function HeroSection() {
+export default function HeroSectionInterior
+() {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-slate-100">
       {/* Background Image */}

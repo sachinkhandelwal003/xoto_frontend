@@ -15,16 +15,16 @@ import Dreamspacking from './Dreamspacking';
 import Eco from './Eco';
 import bbImage from '../../assets/img/bb.png';
 import  Fifth from '../Service/Fifth'
-import Hero1 from '../../components/Interior/Hero1'
-import Builder from '../../components/Interior/Builder'
-import Book from '../../components/Interior/Book'
-import Ourport from '../../components/Interior/Ourport'
+import Builder from '../../components/interior/Builder'
+import Book from '../../components/interior/Book'
+import Ourport from '../../components/interior/Ourport'
 import yyyImage from '../../assets/img/yyy.png';
+import HeroSectionInterior from '../interior/HeroSectionInterior';
 export default function App() {
   return (
     <>
       {/* ────────────────────── HERO SECTION ────────────────────── */}
-      <Hero1/>
+      <HeroSectionInterior/>
 
       {/* ────────────────────── INTERACTIVE BUILDER ────────────────────── */}
      <Builder/>
