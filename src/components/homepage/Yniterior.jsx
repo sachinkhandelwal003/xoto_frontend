@@ -15,7 +15,7 @@ import Dreamspacking from './Dreamspacking';
 import Eco from './Eco';
 import bbImage from '../../assets/img/bb.png';
 import  Fifth from '../Service/Fifth'
-import Hero from '../../components/Interior/Hero1'
+import Hero1 from '../../components/Interior/Hero1'
 import Builder from '../../components/Interior/Builder'
 import Book from '../../components/Interior/Book'
 import Ourport from '../../components/Interior/Ourport'
@@ -24,7 +24,7 @@ export default function App() {
   return (
     <>
       {/* ────────────────────── HERO SECTION ────────────────────── */}
-      <Hero/>
+      <Hero1/>
 
       {/* ────────────────────── INTERACTIVE BUILDER ────────────────────── */}
      <Builder/>
