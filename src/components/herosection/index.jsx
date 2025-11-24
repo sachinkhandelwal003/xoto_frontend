@@ -140,7 +140,7 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start pt-2">
             <Link
               to=""
-              className="bg-[var(--color-primary)] text-white font-semibold px-6 py-3 sm:px-8 sm:py-4 rounded-md hover:bg-[var(--color-hoverbtn)] transition-all duration-300 shadow-lg text-center text-sm sm:text-base"
+              className="bg-[var(--color-primary)] text-white font-semibold px-6 py-3 sm:px-8 sm:py-4 rounded-md  transition-all duration-300 shadow-lg text-center text-sm sm:text-base"
             >
               Design My Space
             </Link>
@@ -207,7 +207,7 @@ const HeroSection = () => {
                   </div>
                   <Link
                     to={feature.link}
-                    className="mt-4 sm:mt-5 inline-block bg-white text-[var(--color-text-dark)] font-semibold px-5 py-3 rounded-md hover:bg-[var(--color-hoverbtn)] hover:text-white transition text-center text-sm sm:text-base w-full"
+                    className="mt-4 sm:mt-5 inline-block bg-white text-[var(--color-text-dark)] font-semibold px-5 py-3 rounded-md hover:bg-[var(--color-primary)]  hover:text-white transition text-center text-sm sm:text-base w-full"
                   >
                     {feature.buttonText}
                   </Link>

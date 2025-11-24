@@ -311,7 +311,7 @@ const Navbar = () => {
               </div>
 
               <Link to="/contact">
-                <button className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold text-sm rounded-xl shadow-md hover:shadow-xl hover:from-purple-700 hover:to-purple-800 transform hover:scale-105 transition-all duration-200">
+                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl  hover:from-purple-700  transform hover:scale-105 transition-all duration-200">
                   Contact Us
                 </button>
               </Link>

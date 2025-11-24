@@ -60,10 +60,10 @@ const Footer = () => {
 
   return (
     <footer
-      className="pt-16 relative z-20 border-t border-purple-700/30"
-      style={{
-        background: "linear-gradient(174.96deg, #5C039B 4.05%, #1F0135 99.75%)",
-      }}
+      className="pt-16 relative z-20 border-t border-purple-700/30 main-gradient-color"
+      // style={{
+      //   background: "linear-gradient(174.96deg, #5C039B 4.05%, #1F0135 99.75%)",
+      // }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Section */}

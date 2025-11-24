@@ -276,8 +276,7 @@ const AdminLogin = () => {
               message={
                 <div style={{ fontSize: 13, lineHeight: 1.8 }}>
                   <strong>Test Accounts:</strong><br />
-                  SuperAdmin: <Text code>Super1@gmail.com</Text> → Password: <Text code>123456</Text><br />
-                  Admin: <Text code>admin@xoto.com</Text> → Password: <Text code>admin123</Text>
+                  SuperAdmin: <Text code>Super1@gmail.com</Text> <br/>Password: <Text code>Super1@gmail.com</Text><br />
                 </div>
               }
               type="info"

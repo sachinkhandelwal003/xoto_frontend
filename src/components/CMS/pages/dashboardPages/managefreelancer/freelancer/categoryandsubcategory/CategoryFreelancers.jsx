@@ -4,20 +4,14 @@ import {
   Button,
   Tag,
   Tooltip,
-  Spin,
-  Typography,
   Space,
   Modal,
   Form,
   Input,
   Select,
-  message,
   Tabs,
 } from 'antd';
-import {
-  EditOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { FiTrash2, FiArrowLeft } from 'react-icons/fi';
 import {
   FaLaptopCode, FaMobileAlt, FaPaintBrush, FaBullhorn, FaCamera, FaPenFancy,
@@ -72,8 +66,20 @@ const CategoryFreelancers = () => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
 
-  const [catPagination, setCatPagination] = useState({ currentPage: 1, itemsPerPage: 10, totalItems: 0 });
-  const [subPagination, setSubPagination] = useState({ currentPage: 1, itemsPerPage: 10, totalItems: 0 });
+  const [catPagination, setCatPagination] = useState({
+    currentPage: 1,
+    itemsPerPage: 10,
+    totalItems: 0,
+  });
+
+  const [subPagination, setSubPagination] = useState({
+    currentPage: 1,
+    itemsPerPage: 10,
+    totalItems: 0,
+  });
+
+  // Keep track of current subcategory filter
+  const [subcategoryFilter, setSubcategoryFilter] = useState({});
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -83,16 +89,21 @@ const CategoryFreelancers = () => {
   const fetchCategories = useCallback(async (page = 1, limit = 10) => {
     setLoading(true);
     try {
-      const params = { page, limit, is_deleted: showTrash.toString() };
-      const res = await apiService.get('/freelancer/category', { params });
-      setCategories(res.categories || []);
+      const params = {
+        page,
+        limit,
+        active: true,
+        is_deleted: showTrash,
+      };
+
+      const res = await apiService.get('/freelancer/category', params);
+      setCategories(res.data || []);
       setCatPagination({
-        currentPage: res.pagination.page,
-        itemsPerPage: res.pagination.limit,
-        totalItems: res.pagination.total,
+        currentPage: res.data.pagination.page,
+        itemsPerPage: res.data.pagination.limit,
+        totalItems: res.data.pagination.total,
       });
     } catch (err) {
-      showToast(err.response?.data?.message || 'Failed to load categories', 'error');
     } finally {
       setLoading(false);
     }
@@ -103,35 +114,42 @@ const CategoryFreelancers = () => {
     setLoading(true);
     try {
       const params = {
-        page, limit,
-        is_deleted: showTrash.toString(),
-        ...(filters.category && { category: filters.category }),
+        page,
+        limit,
+        active: true,
+        is_deleted: showTrash,
+        ...filters,
       };
-      const res = await apiService.get('/freelancer/subcategory', { params });
-      setSubcategories(res.subcategories || []);
+
+      const res = await apiService.get('/freelancer/subcategory', params);
+      setSubcategories(res.data || []);
       setSubPagination({
-        currentPage: res.pagination.page,
-        itemsPerPage: res.pagination.limit,
-        totalItems: res.pagination.total,
+        currentPage: res.data.pagination.page,
+        itemsPerPage: res.data.pagination.limit,
+        totalItems: res.data.pagination.total,
       });
     } catch (err) {
-      showToast(err.response?.data?.message || 'Failed to load subcategories', 'error');
     } finally {
       setLoading(false);
     }
   }, [showTrash]);
 
+  // Initial load + tab/trash change
   useEffect(() => {
     if (token) {
       localStorage.setItem('token', token);
-      if (activeTab === 'categories') fetchCategories();
-      else fetchSubcategories();
+      if (activeTab === 'categories') {
+        fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
+      } else {
+        fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage, subcategoryFilter);
+      }
     }
   }, [token, activeTab, showTrash, fetchCategories, fetchSubcategories]);
 
   const handleTabChange = (key) => {
     setActiveTab(key);
     setShowTrash(false);
+    setSubcategoryFilter({});
   };
 
   const openAddModal = () => {
@@ -164,17 +182,28 @@ const CategoryFreelancers = () => {
     try {
       if (editingItem) {
         await apiService.put(`/freelancer/${isSub ? 'subcategory' : 'category'}/${editingItem._id}`, {
-          name, description, icon, ...(isSub && { category })
+          name,
+          description,
+          icon,
+          ...(isSub && category && { category }),
         });
         showToast('Updated successfully', 'success');
       } else {
         await apiService.post(`/freelancer/${isSub ? 'subcategory' : 'category'}`, {
-          name, description, icon, ...(isSub && { category })
+          name,
+          description,
+          icon,
+          ...(isSub && category && { category }),
         });
         showToast('Created successfully', 'success');
       }
+
       closeModal();
-      isSub ? fetchSubcategories() : fetchCategories();
+      if (isSub) {
+        fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage, subcategoryFilter);
+      } else {
+        fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
+      }
     } catch (err) {
       showToast(err.response?.data?.message || 'Operation failed', 'error');
     }
@@ -190,7 +219,9 @@ const CategoryFreelancers = () => {
     try {
       await apiService.delete(`/freelancer/${activeTab === 'subcategories' ? 'subcategory' : 'category'}/${item._id}`);
       showToast('Moved to trash', 'success');
-      activeTab === 'categories' ? fetchCategories() : fetchSubcategories();
+      activeTab === 'categories'
+        ? fetchCategories(catPagination.currentPage, catPagination.itemsPerPage)
+        : fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage, subcategoryFilter);
     } catch (err) {
       showToast(err.response?.data?.message || 'Delete failed', 'error');
     }
@@ -206,7 +237,9 @@ const CategoryFreelancers = () => {
     try {
       await apiService.put(`/freelancer/${activeTab === 'subcategories' ? 'subcategory' : 'category'}/${item._id}/restore`);
       showToast('Restored successfully', 'success');
-      activeTab === 'categories' ? fetchCategories() : fetchSubcategories();
+      activeTab === 'categories'
+        ? fetchCategories(catPagination.currentPage, catPagination.itemsPerPage)
+        : fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage, subcategoryFilter);
     } catch (err) {
       showToast(err.response?.data?.message || 'Restore failed', 'error');
     }
@@ -241,7 +274,7 @@ const CategoryFreelancers = () => {
           <div className="font-bold text-gray-900">{item.name}</div>
           {activeTab === 'subcategories' && item.category && (
             <div className="text-xs text-purple-600 mt-1">
-              {item.category.name || item.category}
+              {item.category?.name || item.category}
             </div>
           )}
         </div>
@@ -285,9 +318,8 @@ const CategoryFreelancers = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
-      <div className="max-w-7xl mx-auto ">
-        {/* Header */}
-        <div className="bg-white  shadow-2xl p-8 mb-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white shadow-2xl p-8 mb-8 rounded-2xl">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -325,7 +357,10 @@ const CategoryFreelancers = () => {
                 totalItems={catPagination.totalItems}
                 currentPage={catPagination.currentPage}
                 itemsPerPage={catPagination.itemsPerPage}
-                onPageChange={(p, s) => fetchCategories(p, s)}
+                onPageChange={(page, pageSize) => {
+                  fetchCategories(page, pageSize);
+                  setCatPagination(prev => ({ ...prev, currentPage: page, itemsPerPage: pageSize }));
+                }}
               />
             </Tabs.TabPane>
 
@@ -334,20 +369,28 @@ const CategoryFreelancers = () => {
                 <Select
                   placeholder="Filter by Parent Category"
                   allowClear
-                  style={{ width: 320 }}
+                  style={{ width: 340 }}
                   size="large"
-                  onChange={(value) => fetchSubcategories(1, subPagination.itemsPerPage, { category: value })}
+                  onChange={(value) => {
+                    const filter = value ? { category: value } : {};
+                    setSubcategoryFilter(filter);
+                    fetchSubcategories(1, subPagination.itemsPerPage, filter);
+                    setSubPagination(prev => ({ ...prev, currentPage: 1 }));
+                  }}
                 >
-                  {categories.filter(c => c.is_active && !c.is_deleted).map(c => (
-                    <Option key={c._id} value={c._id}>
-                      <div className="flex items-center gap-3">
-                        {getIconComponent(c.icon)}
-                        <span>{c.name}</span>
-                      </div>
-                    </Option>
-                  ))}
+                  {categories
+                    .filter(c => c.is_active && !c.is_deleted)
+                    .map(c => (
+                      <Option key={c._id} value={c._id}>
+                        <div className="flex items-center gap-3">
+                          {getIconComponent(c.icon || 'FaLaptopCode')}
+                          <span className="font-medium">{c.name}</span>
+                        </div>
+                      </Option>
+                    ))}
                 </Select>
               </div>
+
               <CustomTable
                 columns={columns}
                 data={subcategories}
@@ -355,7 +398,10 @@ const CategoryFreelancers = () => {
                 totalItems={subPagination.totalItems}
                 currentPage={subPagination.currentPage}
                 itemsPerPage={subPagination.itemsPerPage}
-                onPageChange={(p, s) => fetchSubcategories(p, s)}
+                onPageChange={(page, pageSize) => {
+                  fetchSubcategories(page, pageSize, subcategoryFilter);
+                  setSubPagination(prev => ({ ...prev, currentPage: page, itemsPerPage: pageSize }));
+                }}
               />
             </Tabs.TabPane>
           </Tabs>
@@ -376,16 +422,18 @@ const CategoryFreelancers = () => {
         >
           <Form form={form} layout="vertical" onFinish={handleSubmit}>
             {activeTab === 'subcategories' && (
-              <Form.Item name="category" label="Parent Category" rules={[{ required: true }]}>
+              <Form.Item name="category" label="Parent Category" rules={[{ required: true, message: 'Please select a parent category' }]}>
                 <Select size="large" placeholder="Select parent category">
-                  {categories.filter(c => c.is_active && !c.is_deleted).map(c => (
-                    <Option key={c._id} value={c._id}>
-                      <div className="flex items-center gap-3">
-                        {getIconComponent(c.icon || 'FaLaptopCode')}
-                        <span className="font-medium">{c.name}</span>
-                      </div>
-                    </Option>
-                  ))}
+                  {categories
+                    .filter(c => c.is_active && !c.is_deleted)
+                    .map(c => (
+                      <Option key={c._id} value={c._id}>
+                        <div className="flex items-center gap-3">
+                          {getIconComponent(c.icon || 'FaLaptopCode')}
+                          <span className="font-medium">{c.name}</span>
+                        </div>
+                      </Option>
+                    ))}
                 </Select>
               </Form.Item>
             )}

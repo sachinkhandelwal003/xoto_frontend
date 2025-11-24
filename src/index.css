@@ -41,6 +41,14 @@
 
 /* ---- Reusable Global Gradient Button ---- */
 @layer components {
+ .main-gradient-color {
+    background: linear-gradient(180deg, #5C039B 0%, #1F0135 100%);
+
+}
+ .banner-gradient-color {
+  background: linear-gradient(180deg, #03A4F4 0%, #5C039B 100%);
+}
+
   .btn-gradient {
     @apply text-white font-semibold px-6 py-3 rounded-full transition-all duration-300 ease-in-out shadow-md;
     background: var(--color-gradient--btn-blue-green);

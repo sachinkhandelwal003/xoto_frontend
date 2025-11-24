@@ -48,20 +48,42 @@ const languageOptions = [
 
 /* ---------- API helpers ---------- */
 const fetchCategories = async () => {
-  const { data } = await axios.get(
+  const res = await axios.get(
     "https://kotiboxglobaltech.online/api/freelancer/category?active=true"
   );
-  if (!data.success) throw new Error("Failed to load categories");
-  return data.categories.map((c) => ({ value: c._id, label: c.name }));
+
+  console.log(res.data.data); // this prints the categories array
+
+
+  if (!data.success) {
+    throw new Error("Failed to load categories");
+  }
+
+  return data.data.map((c) => ({
+    value: c._id,
+    label: c.name,
+  }));
 };
 
+
 const fetchSubcategories = async (catId) => {
-  const { data } = await axios.get(
+  const res = await axios.get(
     `https://kotiboxglobaltech.online/api/freelancer/subcategory?category=${catId}`
   );
-  if (!data.success) throw new Error("Failed to load subcategories");
-  return data.subcategories.map((s) => ({ value: s._id, label: s.name }));
+
+
+  const data = res.data; // FIX: Define data correctly
+
+  if (!data.success) {
+    throw new Error("Failed to load subcategories");
+  }
+
+  return data.data.map((s) => ({
+    value: s._id,
+    label: s.name,
+  }));
 };
+
 
 /* ---------- Main Component ---------- */
 const Registration = () => {
