@@ -15,9 +15,9 @@ import Dreamspacking from './Dreamspacking';
 import Eco from './Eco';
 import bbImage from '../../assets/img/bb.png';
 import  Fifth from '../Service/Fifth'
-import Builder from '../../components/interior/Builder'
-import Book from '../../components/interior/Book'
-import Ourport from '../../components/interior/Ourport'
+import Builder from '../interior/Builder'
+import Book from '../interior/Book'
+import Ourport from '../interior/Ourport'
 import yyyImage from '../../assets/img/yyy.png';
 import HeroSectionInterior from '../interior/HeroSectionInterior';
 export default function App() {
