@@ -1,165 +1,194 @@
 import { useRef } from 'react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import image from "../../assets/img/wave/wave1.png";
 
 export default function TestimonialsSection() {
   const scrollContainerRef = useRef(null);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.firstChild?.offsetWidth || 300;
+      const cardWidth =
+        scrollContainerRef.current.firstChild?.offsetWidth || 320;
       scrollContainerRef.current.scrollBy({
-        left: -cardWidth - 24, // 24 = gap-6 (1.5rem)
-        behavior: 'smooth'
+        left: -(cardWidth + 24),
+        behavior: "smooth",
       });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.firstChild?.offsetWidth || 300;
+      const cardWidth =
+        scrollContainerRef.current.firstChild?.offsetWidth || 320;
       scrollContainerRef.current.scrollBy({
         left: cardWidth + 24,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
 
+  const testimonials = [
+    {
+      title: "Found amazing place",
+      text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
+      name: "Shubham",
+      location: "Pune, Maharashtra",
+      image: null,
+    },
+    {
+      title: "Found amazing place",
+      text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
+      name: "Punit",
+      location: "Pune, Maharashtra",
+      image: null,
+    },
+    {
+      title: "Amazing neighborhood!",
+      text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
+      name: "Harsh",
+      location: "HSR Layout, Bangalore",
+      image: null,
+    },
+    {
+      title: "Found amazing place",
+      text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
+      name: "Shubham",
+      location: "Pune, Maharashtra",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    },
+    {
+      title: "Amazing place",
+      text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
+      name: "Jai Mathur",
+      location: "Pune, Maharashtra",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    },
+     {
+      title: "Amazing place",
+      text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
+      name: " Madhur",
+      location: "Pune, Maharashtra",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    },
+     {
+      title: "Amazing place",
+      text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
+      name: "Avn",
+      location: "Pune, Maharashtra",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    },
+     {
+      title: "Amazing place",
+      text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
+      name: "Sam",
+      location: "Pune, Maharashtra",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    },
+  ];
+
   return (
-    <section className="relative bg-gradient-to-b from-purple-50 to-pink-50 py-16 md:py-24 overflow-hidden">
-      <div className="absolute inset-0 -z-10 pointer-events-none">
-        <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
-          <path
-            fill="url(#wave-gradient)"
-            fillOpacity="0.2"
-            d="M0,100 C300,200 400,50 720,100 C1000,150 1140,50 1440,100 L1440,0 L0,0 Z"
-          />
-          <defs>
-            <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#34d399" />
-              <stop offset="100%" stopColor="#3b82f6" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
+    // <section className="relative overflow-hidden bg-white min-h-screen w-full min-w-full S flex items-center">
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <h2 className="text-center text-4xl md:text-5xl font-bold text-gray-900 mb-16">
-          What Our Clients Say
-        </h2>
+    //   {/* Full-width container (NO max-width limit) */}
+    //   <div className="relative  w-full z-10">
 
-        {/* Scrollable Container */}
-        <div className="relative">
+    //     {/* Heading */}
+    //     <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900">
+    //       What Our Clients Say
+    //     </h2>
+
+    <section className="relative overflow-hidden bg-white min-h-screen w-full flex items-center">
+  
+  <div className="relative w-full z-10 px-20 box-border">
+
+    <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900">
+      What Our Clients Say
+    </h2>
+
+        {/* Scrollable Wrapper */}
+        <div className="relative h-[420px] flex items-center justify-center">
+
+          {/* Scrollable Cards */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory h-full items-center w-full"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {/* Hide scrollbar */}
-            <style jsx>{`
-              .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
+            {testimonials.map((t, index) => (
+              <div
+                key={index}
+                className="flex-none w-80 bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center text-center snap-center hover:scale-105 transition-transform duration-300"
+              >
+                {/* Profile Image */}
+                {t.image ? (
+                  <img
+                    src={t.image}
+                    alt={t.name}
+                    className="w-20 h-20 rounded-full object-cover ring-4 ring-purple-100 mb-4"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-teal-400 mb-4" />
+                )}
 
-            {/* Card 1 */}
-            <div className="bg-white rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex-shrink-0 w-80 snap-center">
-              <h3 className="font-semibold text-gray-900 text-lg mb-2">Seamless Design Experience</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                The team at XOTO transformed our outdated apartment into a modern masterpiece. Their attention to detail and use of premium materials exceeded expectations.
-              </p>
-              <div className="flex gap-1 mb-3">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                ))}
-              </div>
-              <div className="h-1 bg-gradient-to-r from-cyan-400 to-green-400 rounded-full mb-3"></div>
-              <p className="font-semibold text-gray-800">Priya Sharma</p>
-              <p className="text-sm text-gray-500">Dubai Marina</p>
-            </div>
+                {/* Stars */}
+                <div className="flex gap-1 mb-5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < 4
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
 
-            {/* Card 2 */}
-            <div className="bg-white rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex-shrink-0 w-80 snap-center">
-              <h3 className="font-semibold text-gray-900 text-lg mb-2">On-Time & On-Budget</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                From concept to completion, the project was delivered on schedule and within budget. The 3D previews helped us visualize the final outcome perfectly.
-              </p>
-              <div className="flex gap-1 mb-3">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                ))}
-              </div>
-              <div className="h-1 bg-gradient-to-r from-cyan-400 to-green-400 rounded-full mb-3"></div>
-              <p className="font-semibold text-gray-800">Ahmed Al-Mansoori</p>
-              <p className="text-sm text-gray-500">Jumeirah, Dubai</p>
-            </div>
+                {/* Title */}
+                <h3 className="text-lg font-bold text-gray-900 mb-3">{t.title}</h3>
 
-            {/* Card 3 */}
-            <div className="bg-white rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex-shrink-0 w-80 snap-center">
-              <h3 className="font-semibold text-gray-900 text-lg mb-2">Luxury Redefined</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                Our villa now feels like a 5-star resort. The smart home integration and sustainable materials make it both luxurious and eco-friendly.
-              </p>
-              <div className="flex gap-1 mb-3">
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                <Star className="w-4 h-4 text-gray-300" />
-              </div>
-              <div className="h-1 bg-gradient-to-r from-cyan-400 to-green-400 rounded-full mb-3"></div>
-              <p className="font-semibold text-gray-800">Fatima Khan</p>
-              <p className="text-sm text-gray-500">Palm Jumeirah</p>
-            </div>
+                {/* Review Text */}
+                <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow">
+                  {t.text}
+                </p>
 
-            {/* Card 4 */}
-            <div className="relative bg-white rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex-shrink-0 w-80 snap-center">
-              <div className="absolute -top-10 right-4 w-16 h-16 rounded-full overflow-hidden ring-4 ring-white shadow-xl">
-                <img
-                //   src="https://randomuser.me/api/portraits/men/32.jpg"
-                  alt="Rahul"
-                  className="w-full h-full object-cover"
-                />
+                {/* Name */}
+                <div className="border-t border-gray-200 pt-4 w-full">
+                  <p className="font-semibold text-gray-900">{t.name}</p>
+                  <p className="text-sm text-gray-500">{t.location}</p>
+                </div>
               </div>
-              <h3 className="font-semibold text-gray-900 text-lg mb-2 mt-6">Dream Home Realized</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                The modular kitchen and wardrobe solutions are both beautiful and functional. XOTO made our dream home a reality with zero stress.
-              </p>
-              <div className="flex gap-1 mb-3">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                ))}
-              </div>
-              <div className="h-1 bg-gradient-to-r from-cyan-400 to-green-400 rounded-full mb-3"></div>
-              <p className="font-semibold text-gray-800">Rahul Desai</p>
-              <p className="text-sm text-gray-500">Abu Dhabi</p>
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* Navigation Arrows */}
+        {/* Bottom Buttons */}
+        <div className="flex justify-center gap-6 mt-10">
           <button
             onClick={scrollLeft}
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:shadow-lg transition-all z-10"
+            className="bg-white shadow-xl rounded-full p-3 hover:bg-gray-100 transition-all"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
+            <ChevronLeft className="w-7 h-7 text-black" />
           </button>
+
           <button
             onClick={scrollRight}
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-purple-600 rounded-full p-2 shadow-md hover:shadow-lg transition-all z-10"
+            className="bg-[#5C039B] shadow-xl rounded-full p-3 hover:bg-purple-700 transition-all"
           >
-            <ChevronRight className="w-5 h-5 text-white" />
+            <ChevronRight className="w-7 h-7 text-white" />
           </button>
         </div>
 
-        {/* Optional: Dots Indicator */}
-        <div className="flex justify-center gap-2 mt-8">
-          {[0, 1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="w-2 h-2 rounded-full bg-gray-300 transition-all"
-              // You can add active state with more logic
-            />
-          ))}
-        </div>
+      </div>
+
+      {/* Full-width Wave Background */}
+      <div className="absolute -bottom-40 left-0 w-full z-0 pointer-events-none select-none">
+        <img src={image} alt="wave-bg" className="w-full object-cover" />
       </div>
     </section>
   );

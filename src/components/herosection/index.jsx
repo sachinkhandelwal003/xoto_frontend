@@ -6,6 +6,7 @@ import calender from "../../assets/icons/Homeicons/Calendar.png";
 import clock from "../../assets/icons/Homeicons/Clock.png";
 import gurantee from "../../assets/icons/Homeicons/Guarantee.png";
 import map from "../../assets/icons/Homeicons/Map-pin.png";
+import video from "../../assets/video/mortgage.mp4";
 
 import { 
   ShoppingBag, 
@@ -98,14 +99,18 @@ const HeroSection = () => {
 
   return (
     <section
-      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center text-white py-8 lg:py-0"
-      style={{
-        backgroundImage: `url(${homeimage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
+        className="relative w-full min-h-screen overflow-hidden flex items-center justify-center text-white py-8 lg:py-0"
+
     >
+      <video
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="absolute top-0 left-0 w-full h-full object-cover z-0"
+  >
+    <source src={video} type="video/mp4" />
+  </video>
       {/* Enhanced Overlay for better text readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50" />
 
