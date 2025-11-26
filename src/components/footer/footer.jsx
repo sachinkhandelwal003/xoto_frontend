@@ -22,7 +22,7 @@ const footerData = {
   resources: [
     { label: "Xoto Properties", path: "/properties" },
     { label: "Explore Xoto", path: "/explore" },
-    { label: "AI Driven", path: "/blog" },
+    { label: "AI Driven", path: "/ai" },
     { label: "Free Consultation", path: "/consultation" },
     { label: "Hire Freelancers", path: "/freelancers" },
   ],

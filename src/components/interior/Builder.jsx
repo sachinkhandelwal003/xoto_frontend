@@ -3,11 +3,18 @@
   import React from "react";
   import heImage from "../../assets/img/he.png";
   import waveint from "../../assets/img/wave/wave1.png";
+import wave2 from "../../assets/img/wave/wave2.png";
 
   export default function InteractiveBuilderSection() {
     return (
-      <section className="relative bg-white py-16 md:py-24 overflow-hidden">
-
+      <section className="relative bg-[var(--color-body)]  py-16 md:py-24 overflow-hidden">
+  <div className="absolute bottom-[-20px] lg:bottom-[-605px] left-0 w-full z-0 overflow-hidden">
+        <img
+          src={wave2}
+          alt=""
+          className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
+        />
+      </div>
         {/* CONTENT CONTAINER */}
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
@@ -46,13 +53,7 @@
         </div>
 
         {/* BOTTOM WAVE BACKGROUND IMAGE */}
-        <div className="absolute -bottom-180 left-0 w-full z-0 pointer-events-none select-none">
-          <img
-            src={waveint}
-            alt=""
-            className="w-full object-cover"
-          />
-        </div>
+     
 
         {/* LEFT TOP LINE DECORATION */}
 

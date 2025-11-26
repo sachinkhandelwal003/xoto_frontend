@@ -45,6 +45,7 @@ import Page3 from "./components/homepage/Page3";
 import Page from "./components/homepage/Page";
 import AIPlanner from "./components/homepage/AiPlanner/AIPlanner";
 import Interior from "./components/homepage/Interior/Interior";
+import Ai from "./components/AII/Ai";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -245,6 +246,8 @@ function App() {
               </DndProvider>
             }
           />
+                    <Route path="/ai" element={<Ai />} />
+
           <Route path="/Services" element={<Service />} />
           <Route path="/properties" element={<Page2 />} />
           <Route path="/explore" element={<Page3 />} />

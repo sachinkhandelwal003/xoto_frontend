@@ -13,6 +13,8 @@ import interImage from "../../assets/img/inter.png";
 import { motion } from "framer-motion";
 import Dreamspacking from './Dreamspacking';
 import Eco from './Eco';
+import wave1 from "../../assets/img/wave/wave1.png";
+
 import { Link } from "react-router-dom";
 import {
   TreePine,
@@ -40,6 +42,9 @@ import {
 import EcoSmartSection from "./Eco";
 import QuoteModal from "../modal/QuoteModal";
 import TestimonialsSection from "../Service/Fifth";
+import wave2 from "../../assets/img/wave/wave2.png";
+import Servicelandspacing from "./Servicelandspacing";
+import Consultation from "./Consultation";
 
 export default function Landspackng() {
 const [quoteModalOpen, setQuoteModalOpen] = useState(false); 
@@ -295,201 +300,60 @@ onClick={() => setQuoteModalOpen(true)}
 
       {/* === NEW: SCIENCE & TECHNOLOGY INNOVATION SECTION === */}
        {/* ────────────────────── INTERACTIVE BUILDER ────────────────────── */}
-            <section className="relative  bg-[var(--color-body)] py-16 md:py-24 overflow-hidden">
-              <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-                  <div className="space-y-6">
-                    <div className="inline-block  border-cyan-500 p-1">
-                      <h2 className="text-3xl font-bold text-gray-900 md:text-4xl lg:text-5xl">
-                        Bring your vision to life with our{' '}
-                        <span className="text-cyan-600">interactive builder</span>
-                      </h2>
-                    </div>
-                    <p className="text-lg text-gray-600">
-                      Upload your space or choose a template, and get instant AI-powered design previews.
-                    </p>
-                    <p className="text-sm text-gray-500">531 x 165</p>
-                    <button className="rounded-full bg-purple-600 px-8 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
-                      Take a first step
-                    </button>
-                  </div>
-      
-                  <div className="flex justify-center">
-                    <img
-                      src={interImage}
-                      alt="3D rendered modern living room"
-                      className="w-full max-w-lg drop-shadow-2xl"
-                    />
-                  </div>
-                </div>
-              </div>
-      
-              <div className="absolute inset-x-0 bottom-0 -z-10 overflow-hidden">
-                <svg viewBox="0 0 1440 320" className="w-full text-green-50" preserveAspectRatio="none">
-                  <path
-                    fill="currentColor"
-                    d="M0,160L48,176C96,192,192,224,288,224C384,224,480,192,576,160C672,128,768,96,864,112C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-                  />
-                </svg>
-              </div>
-      
-              <div className="absolute top-0 left-0 h-32 w-px bg-gradient-to-b from-cyan-400 to-transparent"></div>
-            </section>
-      
-      {/* === BOOK CONSULTATION === */}
-     
-     <section className="relative py-20 md:py-32 bg-gradient-to-b from-white to-purple-50 overflow-hidden">
-  {/* Background Image with Gradient Overlay */}
-  <div className="absolute inset-0">
+       <section className="relative z-20 bg-[var(--color-body)] pt-24 overflow-hidden">
+  {/* Wave Background - z-index 0 to stay behind content */}
+  <div className="absolute bottom-[-20px] lg:bottom-[-550px] left-0 w-full z-0 overflow-hidden">
     <img
-      src={ffImage}
-      alt="Luxury outdoor space"
-      className="w-full h-full object-cover"
+      src={wave2}
+      alt=""
+      className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
     />
-    {/* 🔥 Gradient overlay as requested */}
-    <div
-      className="absolute inset-0"
-      style={{
-        background:
-          "linear-gradient(180deg, rgba(92, 3, 155, 0.8) 19.27%, rgba(3, 164, 244, 0.8) 93.91%)",
-      }}
-    ></div>
   </div>
-
-  {/* Content */}
-  <div className="relative max-w-7xl mx-auto px-6">
-    <div className="grid lg:grid-cols-2 gap-12 items-center">
-      {/* Left text content */}
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-white"
-      >
-        <h2 className="text-4xl md:text-5xl font-bold mb-4">
-          Book Consultation
-        </h2>
-        <p className="text-lg mb-6 opacity-90">
-          One simple form to connect with XOTO experts for tailored landscaping
-          advice and project planning.
+              
+  <div className="mx-auto relative z-20 max-w-7xl px-6 lg:px-8">
+    <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+      {/* Left Content Column */}
+      <div className="space-y-6  p-10 pb-25">
+        <div className="inline-block border-cyan-500 p-1">
+          <h2 className="text-3xl font-bold text-gray-900 md:text-4xl lg:text-5xl">
+            Bring your vision to life with our
+          interactive builder
+          </h2>
+        </div>
+        <p className="text-lg text-gray-600">
+          Upload your space or choose a template, and get instant AI-powered design previews.
         </p>
-      </motion.div>
-
-      {/* Right form */}
-      <motion.div
-        initial={{ opacity: 0, x: 50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
-        className="bg-white rounded-3xl shadow-2xl p-8 max-w-lg mx-auto lg:mx-0"
-      >
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                First Name*
-              </label>
-              <input
-                required
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm"
-                placeholder="John"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Last Name*
-              </label>
-              <input
-                required
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm"
-                placeholder="Doe"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Email address*
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
-              <input
-                required
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm"
-                placeholder="john@example.com"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Number*
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
-              <input
-                required
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm"
-                placeholder="+1 (555) 123-4567"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Message*
-            </label>
-            <div className="relative">
-              <MessageSquare className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
-              <textarea
-                required
-                name="message"
-                rows={3}
-                value={formData.message}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm resize-none"
-                placeholder="Tell us about your project..."
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-full font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-lg"
-          >
-            <Calendar className="w-5 h-5 mr-2" />
-            Book Free Consultation
-          </button>
-        </form>
-      </motion.div>
+        <button className="rounded-md bg-[var(--color-primary)] px-8 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
+          Take a first step
+        </button>
+      </div>
+      
+      {/* Right Image Column - Modified to increase size and touch bottom */}
+      <div className="flex justify-center  self-stretch">
+        <img
+          src={interImage}
+          alt="3D rendered modern living room"
+          className="w-full h-full object-cover max-w-none drop-shadow-2xl"
+        />
+      </div>
     </div>
   </div>
 </section>
+      
+      {/* === BOOK CONSULTATION === */}
+     
+   <Consultation/>
 
       {/* === OUR SERVICES PORTFOLIO === */}
-      <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg
-            viewBox="0 0 1440 320"
-            className="w-full h-32 md:h-48 fill-purple-100 opacity-50"
-            preserveAspectRatio="none"
-          >
-            <path d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-          </svg>
-        </div>
-
+      {/* <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
+      
+ <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
+        <img
+          src={wave1}
+          alt=""
+          className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
+        />
+      </div>
         <div className="relative z-10 container mx-auto px-4 py-16 md:py-24">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-purple-900 mb-16">
             Our Services Portfolio
@@ -554,7 +418,8 @@ onClick={() => setQuoteModalOpen(true)}
             </p>
           </div>
         </div>
-      </section>
+      </section> */}
+      <Servicelandspacing/>
 {/* exploreeee */}
 <Dreamspacking/>
 

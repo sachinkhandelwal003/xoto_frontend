@@ -1,64 +1,145 @@
-'use client';
+import React from "react";
 
-import React from 'react';
+// Icons + Loop Image
+import iconAI from "../../assets/img/icons123/icon1.png";
+import iconCost from "../../assets/img/icons123/icon2.png";
+import iconGuide from "../../assets/img/icons123/icon3.png";
+import iconFast from "../../assets/img/icons123/icon4.png";
+import loopImg from "../../assets/img/icons123/loop.png";
+
+// Label Component
+function LoopLabel({ title, text, align = "left" }) {
+  return (
+    <div className={`w-60 ${align === "right" ? "text-right" : "text-left"}`}>
+      {/* Title bubble */}
+      <p
+        className="
+          font-semibold
+          text-[#020202]
+          bg-white
+          px-4 py-1
+          rounded-lg
+          inline-block
+          shadow-[0_0_20px_rgba(0,0,0,0.1)]
+          border border-gray-200
+        "
+      >
+        {title}
+      </p>
+
+      {/* Description */}
+      <p className="text-gray-600 text-sm mt-2 leading-relaxed">{text}</p>
+    </div>
+  );
+}
 
 export default function OurPartners() {
-  const partners = [
-    { name: 'UBE RTIES', color: 'text-red-600' },
-    { name: 'DAMAC', color: 'text-black' },
-    { name: 'SOBHA REALTY', color: 'text-black' },
-    { name: 'DANUBE PROPERTIES', color: 'text-red-600' },
-    { name: 'DAMAC', color: 'text-black' },
-    { name: 'SOBHA REALTY', color: 'text-black' },
-    { name: 'DANUBE PROPERTIES', color: 'text-red-600' },
-    // { name: 'DAMAC', color: 'text-black' },
-  ];
-
   return (
-    <>
-      <div className="relative overflow-hidden bg-gradient-to-r from-purple-50 via-pink-50 to-purple-50 py-16">
-        {/* Wavy Background SVG */}
-        <svg
-          className="absolute inset-0 w-full h-full -z-10"
-          preserveAspectRatio="none"
-          viewBox="0 0 1440 320"
-          xmlns="http://www.w3.org/2000/svg"
+    <section className="w-full bg-white  px-6 md:px-12 p-5 lg:px-20 pb-20 relative ">
+
+      {/* ================= TITLE ================= */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 mb-24">
+        <h2 className="text-4xl md:text-5xl font-extrabold leading-tight text-[#0b1739]">
+          We Make Lenders <br /> Work for You
+        </h2>
+
+        <p className="text-gray-600 text-lg leading-relaxed max-w-md">
+          Xoto partners with leading banks and institutions so you get
+          access to exclusive mortgage offers — faster, easier, and with full
+          transparency.
+        </p>
+      </div>
+
+      {/* ================= INFINITY LOOP ================= */}
+      <div className="relative w-full max-w-6xl mx-auto">
+
+        {/* LOOP SVG */}
+        <img
+          src={loopImg}
+          alt="Infinity Loop"
+          className="w-140 max-w-6xl mx-auto pointer-events-none select-none"
+        />
+
+        {/* ---- TOP LEFT ---- */}
+        <div
+          className="absolute flex items-start gap-4"
+          style={{
+            top: "-10px",
+            left: "11%",
+          }}
         >
-          <path
-            fill="url(#waveGradient)"
-            fillOpacity="0.3"
-            d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+          <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-60 -mt-5">
+            <img src={iconAI} className="w-8 h-8" alt="AI" />
+          </div>
+<div className="absolute -mx-31">
+          <LoopLabel
+            title="AI Matched Offers"
+            text="We match you to mortgage plans suited to your income, property, and goals."
           />
-          <defs>
-            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#dbeafe" />
-              <stop offset="50%" stopColor="#f9e2f6" />
-              <stop offset="100%" stopColor="#e9d5ff" />
-            </linearGradient>
-          </defs>
-        </svg>
+          </div>
+        </div>
 
-        <div className="container mx-auto px-6 relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16">
-            Our Partners
-          </h2>
+        {/* ---- TOP RIGHT ---- */}
+        <div
+          className="absolute flex items-start gap-4 mx-60 mb-10 "
+          style={{
+            top: "-10px",
+            right: "11%",
+          }}
+        >
+         <div className="absolute mx-80">
+          <LoopLabel
+            title="Transparent Cost"
+            text="All fees, interest, and charges are shown upfront — no last-minute surprises."
+            
+          />
+          </div>
 
-          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 lg:gap-12">
-            {partners.map((partner, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-center w-32 h-32 md:w-40 md:h-40 bg-white rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100"
-              >
-                <p
-                  className={`text-sm md:text-base font-semibold tracking-wider uppercase ${partner.color} text-center leading-tight px-2`}
-                >
-                  {partner.name}
-                </p>
-              </div>
-            ))}
+          <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-10 -mt-5">
+            <img src={iconCost} className="w-8 h-8" alt="Cost" />
+          </div>
+        </div>
+
+        {/* ---- BOTTOM LEFT ---- */}
+        <div
+          className="absolute flex items-start gap-4"
+          style={{
+            bottom: "-15px",
+            left: "11%",
+          }}
+        >
+          <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-60 -mt-5">
+            <img src={iconGuide} className="w-8 h-8" alt="Guide" />
+          </div>
+<div className="absolute -mx-31">
+          <LoopLabel
+            title="Personal Guidance"
+            text="Our mortgage experts help guide you through every step, including paperwork."
+          />
+          </div>
+        </div>
+
+        {/* ---- BOTTOM RIGHT ---- */}
+        <div
+          className="absolute flex items-start gap-4 "
+          style={{
+            bottom: "-15px",
+            right: "11%",
+          }}
+        >
+            <div className="absolute mx-140 ">
+          <LoopLabel
+            title="Fast Process"
+            text="Fastest Pre approval to disbursement."
+            
+          />
+          </div>
+
+          <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-70 -mt-5">
+            <img src={iconFast} className="w-8 h-8" alt="Fast" />
           </div>
         </div>
       </div>
-    </>
+    </section>
   );
 }

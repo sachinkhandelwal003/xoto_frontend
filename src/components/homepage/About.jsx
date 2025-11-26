@@ -1,19 +1,23 @@
 import React from 'react'
-import Powered from '../Aboutt/Powered'
-import Second from '../Aboutt/Second'
-// import Vision from '../../components/aboutt/Vision.jsx'
-import Mission from '../Aboutt/Mission'
-// import Dna from '../../components/aboutt/Dna.jsx'
-// import { SecurityRounded } from '@mui/icons-material'
+import Article1 from '../Aboutt/Article1'
+import Article2 from '../Aboutt/Article2'
+import Article3 from '../Aboutt/Article3'
+import Article4 from '../Aboutt/Article4'
+import Article5 from '../Aboutt/Article5'
+// import Second from '../Aboutt/Second'
 
 const About = () => {
   return (
     <div>
-      <Powered/>
-      <Second/>
-      {/* <Vision/> */}
-      <Mission/>
-{/* <Dna/> */}
+      <Article1/>
+    
+      <Article2/>
+      
+      <Article3/>
+      
+      <Article4/>
+      
+      <Article5/>
     </div>
   )
 }

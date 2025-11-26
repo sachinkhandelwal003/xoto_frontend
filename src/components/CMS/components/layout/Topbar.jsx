@@ -64,7 +64,6 @@ const Topbar = () => {
           >
             <FiMenu className="w-5 h-5" />
           </button>
-
           <div className="hidden sm:block w-64">
             <input
               type="text"
@@ -112,7 +111,6 @@ const Topbar = () => {
                 >
                   <FiUser /> My Profile
                 </button>
-
                 <button
                   onClick={() => setDropdownOpen(false)}
                   className="w-full px-4 py-2.5 flex items-center gap-3 text-sm hover:bg-gray-50"

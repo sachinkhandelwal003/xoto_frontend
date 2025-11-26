@@ -1,130 +1,159 @@
-// src/components/MortgageSteps.jsx
-'use client';
+import React from "react";
+import logo from "../../assets/img/xoto vault.png"
+import maskgroup from "../../assets/img/Maskgroup1.png";
+import rentimg from "../../assets/img/rental-home1.png";
+import personimg from "../../assets/img/rent-person.png" ;
 
-import React from 'react';
-import logo from '../../assets/img/logoNew.png';
 
-// Your step images (inside circles)
-import step1 from '../../assets/img/banner.png';
-import step2 from '../../assets/img/add.png';
-import step3 from '../../assets/img/3design.png';
-import step4 from '../../assets/img/BANNER2.png';
+const Step = ({ number, title, subtitle, icon }) => (
+  <div className="relative flex-1 min-w-0">
+    {/* circle icon */}
+    <div className="flex items-start gap-4">
+      <div className="w-20 h-20 rounded-full bg-[#3b0c66] flex items-center justify-center shadow-lg translate-y-2">
+        <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#12c5b6] to-[#00a7e6] flex items-center justify-center">
+          {/* icon (svg) */}
+          <img src={logo} alt="" className="w-6 h-6" />
+        </div>
+      </div>
+
+      <div className="ml-3">
+        <div className="text-xs text-[#7ef3d4] font-bold tracking-wide">STEP {number.toString().padStart(2, "0")}</div>
+        <h3 className="text-lg md:text-xl font-bold text-white mt-1 leading-tight">{title}</h3>
+        <p className="text-sm text-white/90 mt-2 max-w-xs">{subtitle}</p>
+      </div>
+    </div>
+  </div>
+);
 
 export default function Third() {
-  const steps = [
-    {
-      title: 'Consultation & Pre-Check',
-      desc: 'We assess your finances and suggest options.',
-      color: 'from-cyan-400 to-blue-500',
-      icon: step1,
-    },
-    {
-      title: 'Offer Comparison',
-      desc: 'Multiple lenders evaluated for best fit.',
-      color: 'from-green-400 to-emerald-500',
-      icon: step2,
-    },
-    {
-      title: 'Select & Apply',
-      desc: 'Choose your offer, we handle documentation.',
-      color: 'from-purple-500 to-indigo-600',
-      icon: step3,
-    },
-    {
-      title: 'Approval & Disbursement',
-      desc: 'Funds released with our support.',
-      color: 'from-pink-500 to-rose-500',
-      icon: step4,
-    },
-  ];
+ 
+    return (
+    <section
+      aria-label="Four step mortgage flow"
+      className="relative w-full overflow-hidden"
+      style={{
+        backgroundImage: `url(${maskgroup})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* purple --> teal overlay to match image tone */}
+      <div className="absolute inset-0 bg-gradient-to-b from-purple-800/85 via-purple-700/45 to-cyan-500/30 pointer-events-none" />
 
-  return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-      <div className="max-w-7xl mx-auto">
+      <div className="relative max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24">
+        {/* top row: title + circular logo badge */}
+        <div className="flex items-start justify-between">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight max-w-2xl">
+            Your Mortgage, <br className="md:hidden" /> Simplified in 4 Steps
+          </h2>
 
-        {/* Logo + Title */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-purple-600 shadow-xl mb-6 p-3">
-            <img
-              src={logo}
-              alt="Xoto Vault"
-              className="w-full h-full rounded-full object-contain"
-            />
-          </div>
-          <p className="text-2xl font-semibold text-gray-700">
-            Your Mortgage, Simplified in 4 Steps
-          </p>
-        </div>
-
-        {/* Steps */}
-        <div className="relative">
-          {/* Progress Line (Desktop) */}
-          <div className="absolute top-12 left-0 right-0 h-1 bg-gradient-to-r from-cyan-300 via-green-300 to-purple-300 hidden md:block"></div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
-            {steps.map((step, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-center text-center group"
-              >
-                {/* Step Circle */}
-                <div
-                  className={`
-                    relative w-24 h-24 rounded-full flex items-center justify-center
-                    shadow-lg transition-all duration-300 ease-out
-                    group-hover:scale-110 group-hover:shadow-2xl
-                    bg-gradient-to-br ${step.color} p-2
-                  `}
-                >
-                  <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
-                  <span className="absolute inset-0 rounded-full border-4 border-white/60"></span>
-                  <img
-                    src={step.icon}
-                    alt={step.title}
-                    className="w-16 h-16 rounded-full object-cover z-10"
-                  />
-                </div>
-
-                {/* Mobile Connector */}
-                {index < steps.length - 1 && (
-                  <div className="md:hidden w-1 h-20 bg-gradient-to-b from-cyan-300 to-green-300 mx-auto mt-6"></div>
-                )}
-
-                {/* Title & Description */}
-                <div className="mt-8 max-w-xs">
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-3 leading-tight">
-                    {step.title}
-                  </h3>
-                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                    {step.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
+          {/* circular logo at top-right (matches screenshot) */}
+          <div className="hidden md:flex items-center justify-center">
+            <div className="w-20 h-20 md:w-40 md:h-40 rounded-full bg-[#5C039B] flex items-center justify-center shadow-xl translate-y-0">
+              {/* replace with your real logo image if available */}
+              <img src={logo} alt="" className="w-30 h-25" />
+              {/* <span className="text-white font-extrabold text-lg md:text-xl">Xoto<br /><span className="text-xs">VAULT</span></span> */}
+            </div>
           </div>
         </div>
 
-        {/* Wave Background */}
-        <div className="mt-20 -mb-40 overflow-hidden">
-          <svg
-            viewBox="0 0 1440 320"
-            className="w-full h-80 text-cyan-50"
-            preserveAspectRatio="none"
-          >
-            <path
-              fill="currentColor"
-              d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,133.3C672,117,768,139,864,170.7C960,203,1056,245,1152,245.3C1248,245,1344,203,1392,181.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-              opacity="0.6"
-            />
-            <path
-              fill="currentColor"
-              d="M0,220L48,210C96,200,192,180,288,176C384,171,480,181,576,197.3C672,213,768,235,864,229.3C960,224,1056,192,1152,181.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-              opacity="0.4"
-            />
-          </svg>
-        </div>
+     {/* ================= TIMELINE SECTION ================= */}
+<div className="relative w-full mt-20">
 
+  {/* Horizontal Line Behind Steps */}
+  <div className="absolute top-20 left-0 right-0 hidden md:flex justify-center">
+    <div className="w-full max-w-5xl h-[2px] bg-white/40"></div>
+  </div>
+
+  {/* Steps */}
+  <div className="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-12 text-center flex flex-col items-center translate-x-[-75px]">
+
+    {/* ========== STEP 01 (BIG ICON) ========== */}
+    <div className="flex flex-col items-center">
+      
+      <span className="text-green-300 font-semibold tracking-wider md-2  ">
+        STEP 01
+      </span>
+
+      <div className="w-28 h-28 rounded-full bg-[#6800A8] flex items-center justify-center shadow-xl border border-purple-300">
+        <img src={rentimg} alt="step 1" className="w-14 h-14" />
       </div>
+
+      <h3 className="text-white font-semibold mt-4 text-lg ">
+        Consultation & Pre-Check
+      </h3>
+      <p className="text-white/70 text-sm mt-1 leading-relaxed max-w-[200px]">
+        We assess your finances and suggest options.
+      </p>
+    </div>
+
+    {/* ========== STEP 02 ========== */}
+    <div className="flex flex-col items-center">
+
+      <span className="text-green-300 font-semibold tracking-wider mb-2">
+        STEP 02
+      </span>
+
+      <div className="w-14 h-14 rounded-full bg-[#5C039B] flex items-center justify-center shadow-lg border border-purple-300">
+        <img src={personimg} alt="step 2" className="w-6 h-6" />
+      </div>
+
+      <h3 className="text-white font-semibold mt-4 text-lg">
+        Offer Comparison
+      </h3>
+      <p className="text-white/70 text-sm mt-1 leading-relaxed max-w-[200px]">
+        Multiple lenders evaluated for best fit.
+      </p>
+    </div>
+
+    {/* ========== STEP 03 (DOT ONLY) ========== */}
+    <div className="flex flex-col items-center">
+
+      <span className="text-green-300 font-semibold tracking-wider mb-2">
+        STEP 03
+      </span>
+
+      {/* Small Purple Dot */}
+      <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-[#5C039B] shadow-lg border border-purple-300"></div>
+
+      <h3 className="text-white font-semibold mt-4 text-lg">
+        Select & Apply
+      </h3>
+      <p className="text-white/70 text-sm mt-1 leading-relaxed max-w-[200px]">
+        Choose your offer; we handle documentation.
+      </p>
+    </div>
+
+    {/* ========== STEP 04 ========== */}
+    <div className="flex flex-col items-center">
+
+      <span className="text-green-300 font-semibold tracking-wider mb-2">
+        STEP 04
+      </span>
+
+      <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-[#5C039B] flex items-center justify-center shadow-lg border border-purple-300 ">
+        {/* <div className="w-5 h-5 bg-purple-300 rounded-full"></div> */}
+      </div>
+
+      <h3 className="text-white font-semibold mt-4 text-lg">
+        Approval & Disbursement
+      </h3>
+      <p className="text-white/70 text-sm mt-1 leading-relaxed max-w-[200px]">
+        Funds released with our support.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+
+
+        {/* bottom spacing to mimic cutout */}
+        <div className="mt-10 md:mt-14" />
+      </div>
+
+      {/* decorative bottom fade to white (so next section overlaps nicely) */}
+      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white/0 md:h-36" />
     </section>
   );
 }
