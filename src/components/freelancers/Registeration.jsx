@@ -184,7 +184,7 @@ const Registration = () => {
     };
 
     try {
-      await axios.post("http://localhost:5000/api/freelancer", payload, {
+      await axios.post("https://kotiboxglobaltech.online/api/freelancer", payload, {
         headers: { "Content-Type": "application/json" },
       });
       setSuccess(true);
