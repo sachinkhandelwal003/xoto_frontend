@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import interiorImage from "../../assets/img/interior.jpg";
 import interio2Image from "../../assets/img/interio2.png";
@@ -47,10 +45,10 @@ import Servicelandspacing from "./Servicelandspacing";
 import Consultation from "./Consultation";
 
 export default function Landspackng() {
-const [quoteModalOpen, setQuoteModalOpen] = useState(false); 
+  const [quoteModalOpen, setQuoteModalOpen] = useState(false);
 
 
-const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -207,7 +205,7 @@ const [formData, setFormData] = useState({
 
   return (
     <>
-<QuoteModal isOpen={quoteModalOpen} onClose={() => setQuoteModalOpen(false)} />      {/* === HERO SECTION === */}
+      <QuoteModal isOpen={quoteModalOpen} onClose={() => setQuoteModalOpen(false)} />      {/* === HERO SECTION === */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -217,11 +215,11 @@ const [formData, setFormData] = useState({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
         </div>
-      <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape "></div>
-      <div className="absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape"></div>
+        <div className="absolute bottom-0 left-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-left-shape "></div>
+        <div className="absolute bottom-0 right-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-right-shape"></div>
 
-      {/* Custom clip paths */}
-      <style>{`
+        {/* Custom clip paths */}
+        <style>{`
         .clip-left-shape {
           clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
         }
@@ -241,108 +239,105 @@ const [formData, setFormData] = useState({
             <span className="text-white">Outdoor Solution</span>
           </motion.h1>
 
-      <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.3 }}
-  className="grid grid-cols-2 gap-4 max-w-5xl mx-auto mb-10"
->
-  {services.map((service, i) => (
-    <motion.div
-      key={i}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.4 + i * 0.1 }}
-      className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-2"
-    >
-      <div className="flex items-center gap-3">
-        <h3 className="text-sm font-semibold text-white">
-          {service.title}
-        </h3>
-      </div>
-    </motion.div>
-  ))}
-</motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="grid grid-cols-2 gap-4 max-w-5xl mx-auto mb-10 items-end "
+          >
+            {services.map((service, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: i < 2 ? 0.9 : 1 }}
+                transition={{ delay: 0.4 + i * 0.1 }}
+                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2  flex-col inline-flex"
+              >
+                <div className="flex items-center justify-center">
+                  <h3 className="text-lg font-semibold text-white">{service.title}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
 
 
 
           <div className="flex items-center justify-center gap-4 mt-6">
-<motion.button
+            <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.8 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-onClick={() => setQuoteModalOpen(true)}         
-     className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-4 rounded-full text-lg font-bold shadow-xl transition-all flex items-center gap-3"
+              onClick={() => setQuoteModalOpen(true)}
+              className="bg-[var(--color-primary)] hover:bg-purple-700 text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center gap-3"
             >
               Get a free estimate
-              <ArrowRight className="w-5 h-5" />
             </motion.button>
 
-<Link to='/aiPlanner'>
-  <motion.button
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ delay: 0.9 }}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-3 rounded-full text-lg font-bold shadow-xl transition-all flex items-center"
-  >
-    AI Planner
-    <ArrowRight className="ml-2 w-3 h-3" />
-  </motion.button>
-</Link>
-</div>
+            <Link to='/aiPlanner'>
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-[var(--color-primary)] hover:bg-purple-700 text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center"
+              >
+                AI Planner
+              </motion.button>
+            </Link>
+          </div>
 
         </div>
       </section>
 
       {/* === NEW: SCIENCE & TECHNOLOGY INNOVATION SECTION === */}
-       {/* ────────────────────── INTERACTIVE BUILDER ────────────────────── */}
-       <section className="relative z-20 bg-[var(--color-body)] pt-24 overflow-hidden">
-  {/* Wave Background - z-index 0 to stay behind content */}
-  <div className="absolute bottom-[-20px] lg:bottom-[-550px] left-0 w-full z-0 overflow-hidden">
-    <img
-      src={wave2}
-      alt=""
-      className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
-    />
-  </div>
-              
-  <div className="mx-auto relative z-20 max-w-7xl px-6 lg:px-8">
-    <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-      {/* Left Content Column */}
-      <div className="space-y-6  p-10 pb-25">
-        <div className="inline-block border-cyan-500 p-1">
-          <h2 className="text-3xl font-bold text-gray-900 md:text-4xl lg:text-5xl">
-            Bring your vision to life with our
-          interactive builder
-          </h2>
+      {/* ────────────────────── INTERACTIVE BUILDER ────────────────────── */}
+      <section className="relative z-20 bg-[#f5f5f5] pt-24 overflow-hidden">
+        {/* Wave Background - z-index 0 to stay behind content */}
+        <div className="absolute bottom-[-20px] lg:bottom-[-500px] left-0 w-full z-0 overflow-hidden">
+          <img
+            src={wave2}
+            alt=""
+            className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
+          />
         </div>
-        <p className="text-lg text-gray-600">
-          Upload your space or choose a template, and get instant AI-powered design previews.
-        </p>
-        <button className="rounded-md bg-[var(--color-primary)] px-8 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
-          Take a first step
-        </button>
-      </div>
-      
-      {/* Right Image Column - Modified to increase size and touch bottom */}
-      <div className="flex justify-center  self-stretch">
-        <img
-          src={interImage}
-          alt="3D rendered modern living room"
-          className="w-full h-full object-cover max-w-none drop-shadow-2xl"
-        />
-      </div>
-    </div>
-  </div>
-</section>
-      
+
+        <div className="mx-auto relative z-20 max-w-7xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+            {/* Left Content Column */}
+            <div className="space-y-6  p-10 pb-25">
+              <div className="inline-block border-cyan-500 p-1">
+                <h2 className="text-3xl font-bold text-gray-900 md:text-5xl lg:text-5xl drop-shadow-lg">
+                  Bring your vision to life with our
+                  interactive builder
+                </h2>
+
+              </div>
+              <p className="text-2xl text-[#547593]">
+                Upload your space or choose a template, and get instant AI-powered design previews.
+              </p>
+              <button className="rounded-md bg-[var(--color-primary)] px-15 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
+                Take a first step
+              </button>
+            </div>
+
+            {/* Right Image Column - Modified to increase size and touch bottom */}
+            <div className="flex justify-center  self-stretch">
+              <img
+                src={interImage}
+                alt="3D rendered modern living room"
+                className="w-full h-full object-cover max-w-none drop-shadow-2xl"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* === BOOK CONSULTATION === */}
-     
-   <Consultation/>
+
+      <Consultation />
 
       {/* === OUR SERVICES PORTFOLIO === */}
       {/* <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
@@ -419,15 +414,15 @@ onClick={() => setQuoteModalOpen(true)}
           </div>
         </div>
       </section> */}
-      <Servicelandspacing/>
-{/* exploreeee */}
-<Dreamspacking/>
+      <Servicelandspacing />
+      {/* exploreeee */}
+      <Dreamspacking />
 
       {/* === WHAT OUR CLIENTS SAY === */}
-     <TestimonialsSection/>
+      <TestimonialsSection />
 
       {/* === EXPLORE CURATED DREAM SPACES === */}
-    <Eco/>
+      <Eco />
     </>
   );
-} 
+}

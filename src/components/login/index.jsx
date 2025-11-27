@@ -105,6 +105,7 @@ const Login = () => {
     }
   };
 
+  // Fixed error handling - ensure we always return a string
   const onFinishNormal = async (values) => {
     setLoading(true);
     setGeneralError("");
@@ -118,7 +119,11 @@ const Login = () => {
 
       await login(endpoint, { email: values.email, password: values.password });
     } catch (err) {
-      setGeneralError(err || "Invalid credentials");
+      // Ensure we always set a string, not an object
+      const errorMessage = typeof err === 'object' 
+        ? err.message || err.status || 'Invalid credentials' 
+        : err || 'Invalid credentials';
+      setGeneralError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -131,9 +136,14 @@ const Login = () => {
       const mobile = values.mobile.toString();
       await login("/users/login/customer", { mobile });
     } catch (err) {
-      const msg = err.includes("not found")
+      // Ensure we always set a string, not an object
+      const errorMessage = typeof err === 'object' 
+        ? err.message || err.status || 'Login failed'
+        : err || 'Login failed';
+      
+      const msg = errorMessage.includes("not found")
         ? "Customer not found. Please register first."
-        : err;
+        : errorMessage;
       setGeneralError(msg);
     } finally {
       setLoading(false);
@@ -170,6 +180,102 @@ const Login = () => {
     return { xs: 12, sm: 8, md: 8 };
   };
 
+  // Fixed: Ensure all rendered content returns valid React elements
+  const renderAccountTypeCards = () => (
+    <Radio.Group 
+      value={userType} 
+      onChange={(e) => setUserType(e.target.value)} 
+      style={{ width: "100%" }}
+    >
+      <Row gutter={[8, 8]}>
+        {accountTypes.map((type) => (
+          <Col xs={24} key={type.value}>
+            <Card
+              hoverable
+              onClick={() => setUserType(type.value)}
+              style={{
+                textAlign: "center",
+                borderRadius: "10px",
+                border: userType === type.value ? "2px solid #5C039B" : "1px solid #ddd",
+                boxShadow: userType === type.value ? "0 0 10px rgba(92,3,155,0.2)" : "none",
+                padding: "10px",
+              }}
+              bodyStyle={{ padding: "12px 8px" }}
+            >
+              <Text 
+                strong 
+                style={{ 
+                  color: userType === type.value ? "#5C039B" : "#333",
+                  fontSize: "14px"
+                }}
+              >
+                {type.label}
+              </Text>
+              <br />
+              <Text 
+                type="secondary" 
+                style={{ 
+                  fontSize: "11px",
+                  lineHeight: "1.3"
+                }}
+              >
+                {type.desc}
+              </Text>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Radio.Group>
+  );
+
+  const renderDesktopAccountTypeCards = () => (
+    <Radio.Group 
+      value={userType} 
+      onChange={(e) => setUserType(e.target.value)} 
+      style={{ width: "100%" }}
+    >
+      <Row gutter={[12, 12]}>
+        {accountTypes.map((type) => (
+          <Col {...getAccountTypeColProps()} key={type.value}>
+            <Card
+              hoverable
+              onClick={() => setUserType(type.value)}
+              style={{
+                textAlign: "center",
+                borderRadius: "12px",
+                border: userType === type.value ? "2px solid #5C039B" : "1px solid #ddd",
+                boxShadow: userType === type.value ? "0 0 15px rgba(92,3,155,0.2)" : "none",
+                padding: isMobile ? "8px" : "12px",
+                height: "100%",
+              }}
+              bodyStyle={{ padding: isMobile ? "8px" : "12px" }}
+            >
+              <Text 
+                strong 
+                style={{ 
+                  color: userType === type.value ? "#5C039B" : "#333",
+                  fontSize: isMobile ? "12px" : "14px"
+                }}
+              >
+                {type.label}
+              </Text>
+              <br />
+              <Text 
+                type="secondary" 
+                style={{ 
+                  fontSize: isMobile ? "10px" : "0.8rem",
+                  lineHeight: isMobile ? "1.2" : "1.4"
+                }}
+              >
+                {type.desc}
+              </Text>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Radio.Group>
+  );
+
   return (
     <div
       style={{
@@ -190,43 +296,43 @@ const Login = () => {
       />
 
       {/* Success Welcome Banner (Appears after login) */}
-     {showSuccessBanner && welcomeUser && (
-  <motion.div
-    initial={{ y: -100, opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    exit={{ y: -100, opacity: 0 }}
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 9999,
-      padding: isMobile ? "0.8rem" : "1rem",
-      background: "#ffffff",                    // ← white background
-      color: "#1f1f1f",                         // ← dark text for contrast
-      textAlign: "center",
-      fontWeight: "bold",
-      fontSize: isMobile ? "0.9rem" : "1.3rem",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-      borderBottom: "4px solid #64EF0A",        // ← green accent line to keep some brand color
-    }}
-  >
-    <CheckCircleFilled style={{
-      fontSize: isMobile ? "1.2rem" : "1.8rem",
-      marginRight: isMobile ? "6px" : "12px",
-      color: "#64EF0A",                         // ← green check icon
-    }} />
-    Welcome back, {welcomeUser.name}! ({welcomeUser.role})
-    <br />
-    <Text style={{
-      fontSize: isMobile ? "0.75rem" : "1rem",
-      opacity: 0.8,
-      color: "#333333",
-    }}>
-      Redirecting you to your dashboard...
-    </Text>
-  </motion.div>
-)}
+      {showSuccessBanner && welcomeUser && (
+        <motion.div
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -100, opacity: 0 }}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 9999,
+            padding: isMobile ? "0.8rem" : "1rem",
+            background: "#ffffff",
+            color: "#1f1f1f",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: isMobile ? "0.9rem" : "1.3rem",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+            borderBottom: "4px solid #64EF0A",
+          }}
+        >
+          <CheckCircleFilled style={{
+            fontSize: isMobile ? "1.2rem" : "1.8rem",
+            marginRight: isMobile ? "6px" : "12px",
+            color: "#64EF0A",
+          }} />
+          Welcome , {welcomeUser.name}! ({welcomeUser.role})
+          <br />
+          <Text style={{
+            fontSize: isMobile ? "0.75rem" : "1rem",
+            opacity: 0.8,
+            color: "#333333",
+          }}>
+            Redirecting you to your dashboard...
+          </Text>
+        </motion.div>
+      )}
 
       {/* Mobile Layout: Text on Top, Form Below */}
       {isMobile ? (
@@ -244,57 +350,52 @@ const Login = () => {
             textAlign: "center",
             flexShrink: 0,
           }}>
-        <motion.div
-  initial={{ opacity: 0, y: -20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
-  style={{
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",      // center horizontally
-    justifyContent: "center",  // center vertically
-    gap: "1rem",               // spacing between elements
-    padding: "1.5rem"
-  }}
->
-
-  <img
-    src={logoNew}
-    alt="Logo"
-    style={{
-      width: logoSize,
-      height: "auto",
-      filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.4))",
-    }}
-  />
-
-  <Title
-    level={2}
-    style={{
-      color: "#03A4F4",
-      fontSize: "1.8rem",
-      fontWeight: 800,
-      margin: 0,
-      lineHeight: 1.2
-    }}
-  >
-    Welcome !
-  </Title>
-
-  <Text
-    style={{
-      fontSize: "0.95rem",
-      opacity: 0.9,
-      display: "block"
-    }}
-  >
-    {activeStep === 0
-      ? "Choose your role to get started"
-      : `Logging in as ${getDisplayName()}`}
-  </Text>
-
-</motion.div>
-
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "1rem",
+                padding: "1.5rem"
+              }}
+            >
+              <img
+                src={logoNew}
+                alt="Logo"
+                style={{
+                  width: logoSize,
+                  height: "auto",
+                  filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.4))",
+                }}
+              />
+              <Title
+                level={2}
+                style={{
+                  color: "#03A4F4",
+                  fontSize: "1.8rem",
+                  fontWeight: 800,
+                  margin: 0,
+                  lineHeight: 1.2
+                }}
+              >
+                Welcome !
+              </Title>
+              <Text
+                style={{
+                  fontSize: "0.95rem",
+                  opacity: 0.9,
+                  display: "block"
+                }}
+              >
+                {activeStep === 0
+                  ? "Choose your role to get started"
+                  : `Logging in as ${getDisplayName()}`}
+              </Text>
+            </motion.div>
           </div>
 
           {/* Form Section - Scrollable */}
@@ -418,50 +519,7 @@ const Login = () => {
                       {isRegisterMode ? "Choose Account Type" : "Select Your Role"}
                     </Title>
 
-                    <Radio.Group 
-                      value={userType} 
-                      onChange={(e) => setUserType(e.target.value)} 
-                      style={{ width: "100%" }}
-                    >
-                      <Row gutter={[8, 8]}>
-                        {accountTypes.map((type) => (
-                          <Col xs={24} key={type.value}>
-                            <Card
-                              hoverable
-                              onClick={() => setUserType(type.value)}
-                              style={{
-                                textAlign: "center",
-                                borderRadius: "10px",
-                                border: userType === type.value ? "2px solid #5C039B" : "1px solid #ddd",
-                                boxShadow: userType === type.value ? "0 0 10px rgba(92,3,155,0.2)" : "none",
-                                padding: "10px",
-                              }}
-                              bodyStyle={{ padding: "12px 8px" }}
-                            >
-                              <Text 
-                                strong 
-                                style={{ 
-                                  color: userType === type.value ? "#5C039B" : "#333",
-                                  fontSize: "14px"
-                                }}
-                              >
-                                {type.label}
-                              </Text>
-                              <br />
-                              <Text 
-                                type="secondary" 
-                                style={{ 
-                                  fontSize: "11px",
-                                  lineHeight: "1.3"
-                                }}
-                              >
-                                {type.desc}
-                              </Text>
-                            </Card>
-                          </Col>
-                        ))}
-                      </Row>
-                    </Radio.Group>
+                    {renderAccountTypeCards()}
 
                     <Button
                       type="primary"
@@ -639,14 +697,15 @@ const Login = () => {
                 initial={{ opacity: 0, x: -100 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
- style={{
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",      // center horizontally
-    justifyContent: "center",  // center vertically
-    gap: "1rem",               // spacing between elements
-    padding: "1.5rem"
-  }}              >
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "1rem",
+                  padding: "1.5rem"
+                }}
+              >
                 <img
                   src={logoNew}
                   alt="Logo"
@@ -657,12 +716,10 @@ const Login = () => {
                     filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.4))",
                   }}
                 />
-
                 <Title level={titleLevel} style={{ color: "#03A4F4", fontSize: "3rem", fontWeight: 800 }}>
                   Welcome
                 </Title>
-
-                <Text style={{ fontSize: "1.3rem", opacity: 0.9,color:"white" }}>
+                <Text style={{ fontSize: "1.3rem", opacity: 0.9, color: "white" }}>
                   {activeStep === 0
                     ? "Choose your role to get started"
                     : `Logging in as ${getDisplayName()}`}
@@ -695,305 +752,258 @@ const Login = () => {
                   }}
                   bodyStyle={{ padding: cardPadding }}
                 >
-                 
-              {/* Back button for mobile step 1 */}
-              {isMobile && activeStep === 1 && (
-                <Button 
-                  onClick={handleBack}
-                  type="text"
-                  style={{ 
-                    marginBottom: "1rem",
-                    padding: "4px 0",
-                    height: "auto"
-                  }}
-                >
-                  ← Back
-                </Button>
-              )}
-
-              {/* Toggle Login/Register */}
-              <div style={{ 
-                textAlign: "center", 
-                marginBottom: isMobile ? "1rem" : "1.5rem" 
-              }}>
-                <Button.Group 
-                  size="large" 
-                   style={{
-      width: "100%",
-      display: "flex",        // make group full width
-    }}
-                >
-                  <Button
-                    type={!isRegisterMode ? "primary" : "default"}
-                    onClick={() => {
-                      setIsRegisterMode(false);
-                      setActiveStep(0);
-                    }}
-                    style={{
-                      flex: 1,
-                      borderRadius: isMobile ? "12px 0 0 12px" : "12px 0 0 12px",
-                      background: !isRegisterMode ? "#5C039B" : "#f0f0f0",
-                      border: "none",
-                      height: isMobile ? "44px" : "50px",
-                      fontWeight: "bold",
-                      fontSize: isMobile ? "14px" : "16px",
-                    }}
-                  >
-                    Login
-                  </Button>
-                  <Button
-                    type={isRegisterMode ? "primary" : "default"}
-                    onClick={() => setIsRegisterMode(true)}
-                    style={{
-                      flex: 1,
-                      borderRadius: isMobile ? "0 12px 12px 0" : "0 12px 12px 0",
-                      background: isRegisterMode ? "#5C039B" : "#f0f0f0",
-                      border: "none",
-                      height: isMobile ? "44px" : "50px",
-                      fontWeight: "bold",
-                      fontSize: isMobile ? "14px" : "16px",
-                    }}
-                  >
-                    Register
-                  </Button>
-                </Button.Group>
-              </div>
-
-              {generalError && (
-                <Alert
-                  message={generalError}
-                  type="error"
-                  showIcon
-                  closable
-                  onClose={() => setGeneralError("")}
-                  style={{ 
-                    marginBottom: isMobile ? "1rem" : "1.5rem", 
-                    borderRadius: "10px",
-                    fontSize: isMobile ? "13px" : "14px"
-                  }}
-                />
-              )}
-
-              {/* Step 0: Role Selection */}
-              {activeStep === 0 ? (
-                <>
-                  <Title 
-                    level={isMobile ? 5 : 4} 
-                    style={{ 
-                      textAlign: "center", 
-                      color: "#5C039B",
-                      marginBottom: isMobile ? "0.5rem" : "1rem"
-                    }}
-                  >
-                    {isRegisterMode ? "Choose Account Type" : "Select Your Role"}
-                  </Title>
-
-                  <Radio.Group 
-                    value={userType} 
-                    onChange={(e) => setUserType(e.target.value)} 
-                    style={{ 
-                      width: "100%", 
-                      marginTop: isMobile ? "0.5rem" : "1rem" 
-                    }}
-                  >
-                    <Row gutter={[12, 12]}>
-                      {accountTypes.map((type) => (
-                        <Col {...getAccountTypeColProps()} key={type.value}>
-                          <Card
-                            hoverable
-                            onClick={() => setUserType(type.value)}
-                            style={{
-                              textAlign: "center",
-                              borderRadius: "12px",
-                              border: userType === type.value ? "2px solid #5C039B" : "1px solid #ddd",
-                              boxShadow: userType === type.value ? "0 0 15px rgba(92,3,155,0.2)" : "none",
-                              padding: isMobile ? "8px" : "12px",
-                              height: "100%",
-                            }}
-                            bodyStyle={{ 
-                              padding: isMobile ? "8px" : "12px" 
-                            }}
-                          >
-                            <Text 
-                              strong 
-                              style={{ 
-                                color: userType === type.value ? "#5C039B" : "#333",
-                                fontSize: isMobile ? "12px" : "14px"
-                              }}
-                            >
-                              {type.label}
-                            </Text>
-                            <br />
-                            <Text 
-                              type="secondary" 
-                              style={{ 
-                                fontSize: isMobile ? "10px" : "0.8rem",
-                                lineHeight: isMobile ? "1.2" : "1.4"
-                              }}
-                            >
-                              {type.desc}
-                            </Text>
-                          </Card>
-                        </Col>
-                      ))}
-                    </Row>
-                  </Radio.Group>
-
-                  <Button
-                    type="primary"
-                    size="large"
-                    block
-                    onClick={isRegisterMode ? handleRegisterRedirect : handleNext}
-                    disabled={!userType}
-                    style={{
-                      marginTop: isMobile ? "1.5rem" : "2rem",
-                      height: isMobile ? "44px" : "50px",
-                      background: "#5C039B",
-                      borderRadius: "12px",
-                      fontWeight: "bold",
-                      fontSize: isMobile ? "14px" : "16px",
-                    }}
-                  >
-                    {isRegisterMode ? "Continue to Register" : "Next"}
-                  </Button>
-                </>
-              ) : (
-                /* Login Form */
-                <>
-                  <Title 
-                    level={isMobile ? 5 : 4} 
-                    style={{ 
-                      textAlign: "center", 
-                      color: "#5C039B",
-                      marginBottom: isMobile ? "1rem" : "1.5rem"
-                    }}
-                  >
-                    Sign In as {getDisplayName()}
-                  </Title>
-
-                  {isCustomer ? (
-                    <Form form={form} onFinish={onFinishCustomer} layout="vertical">
-                      <Form.Item
-                        name="mobile"
-                        label={<span style={{ color: "#5C039B", fontWeight: 600 }}>Mobile Number</span>}
-                        rules={[{ required: true }, { pattern: /^\d{10}$/, message: "10 digits required" }]}
+                  {/* Toggle Login/Register */}
+                  <div style={{ 
+                    textAlign: "center", 
+                    marginBottom: "1.5rem" 
+                  }}>
+                    <Button.Group 
+                      size="large" 
+                      style={{ width: "100%", display: "flex" }}
+                    >
+                      <Button
+                        type={!isRegisterMode ? "primary" : "default"}
+                        onClick={() => {
+                          setIsRegisterMode(false);
+                          setActiveStep(0);
+                        }}
+                        style={{
+                          flex: 1,
+                          borderRadius: "12px 0 0 12px",
+                          background: !isRegisterMode ? "#5C039B" : "#f0f0f0",
+                          border: "none",
+                          height: "50px",
+                          fontWeight: "bold",
+                          fontSize: "16px",
+                        }}
                       >
-                        <InputNumber
-                          controls={false}
-                          placeholder="9876543210"
-                          style={{ 
-                            width: "100%", 
-                            height: isMobile ? "44px" : "48px", 
-                            borderRadius: "10px" 
-                          }}
-                        />
-                      </Form.Item>
-
-                      <div style={{ 
-                        display: "flex", 
-                        gap: "12px", 
-                        marginTop: isMobile ? "0.5rem" : "1rem",
-                        flexDirection: isMobile ? "column" : "row"
-                      }}>
-                        {!isMobile && (
-                          <Button 
-                            onClick={handleBack} 
-                            style={{ 
-                              flex: 1, 
-                              height: isMobile ? "42px" : "48px" 
-                            }}
-                          >
-                            Back
-                          </Button>
-                        )}
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          loading={loading}
-                          style={{ 
-                            flex: isMobile ? 1 : 2, 
-                            height: isMobile ? "44px" : "48px", 
-                            background: "#5C039B", 
-                            borderRadius: "10px",
-                            fontSize: isMobile ? "14px" : "16px"
-                          }}
-                        >
-                          Login Now
-                        </Button>
-                      </div>
-                    </Form>
-                  ) : (
-                    <Form form={form} onFinish={onFinishNormal} layout="vertical">
-                      <Form.Item 
-                        name="email" 
-                        label="Email" 
-                        rules={[{ required: true, type: "email" }]}
+                        Login
+                      </Button>
+                      <Button
+                        type={isRegisterMode ? "primary" : "default"}
+                        onClick={() => setIsRegisterMode(true)}
+                        style={{
+                          flex: 1,
+                          borderRadius: "0 12px 12px 0",
+                          background: isRegisterMode ? "#5C039B" : "#f0f0f0",
+                          border: "none",
+                          height: "50px",
+                          fontWeight: "bold",
+                          fontSize: "16px",
+                        }}
                       >
-                        <Input 
-                          size="large" 
-                          placeholder="you@example.com" 
-                          style={{ 
-                            borderRadius: "10px", 
-                            height: isMobile ? "44px" : "48px",
-                            fontSize: isMobile ? "14px" : "16px"
-                          }} 
-                        />
-                      </Form.Item>
-                      <Form.Item 
-                        name="password" 
-                        label="Password" 
-                        rules={[{ required: true }]}
-                      >
-                        <Input.Password 
-                          size="large" 
-                          placeholder="••••••••" 
-                          style={{ 
-                            borderRadius: "10px", 
-                            height: isMobile ? "44px" : "48px",
-                            fontSize: isMobile ? "14px" : "16px"
-                          }} 
-                        />
-                      </Form.Item>
+                        Register
+                      </Button>
+                    </Button.Group>
+                  </div>
 
-                      <div style={{ 
-                        display: "flex", 
-                        gap: "12px", 
-                        marginTop: isMobile ? "0.5rem" : "1rem",
-                        flexDirection: isMobile ? "column" : "row"
-                      }}>
-                        {!isMobile && (
-                          <Button 
-                            onClick={handleBack} 
-                            style={{ 
-                              flex: 1, 
-                              height: isMobile ? "42px" : "48px" 
-                            }}
-                          >
-                            Back
-                          </Button>
-                        )}
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          loading={loading}
-                          style={{ 
-                            flex: isMobile ? 1 : 2, 
-                            height: isMobile ? "44px" : "48px", 
-                            background: "#5C039B", 
-                            borderRadius: "10px",
-                            fontSize: isMobile ? "14px" : "16px"
-                          }}
-                        >
-                          {loading ? "Signing In..." : "Login Now"}
-                        </Button>
-                      </div>
-                    </Form>
+                  {generalError && (
+                    <Alert
+                      message={generalError}
+                      type="error"
+                      showIcon
+                      closable
+                      onClose={() => setGeneralError("")}
+                      style={{ 
+                        marginBottom: "1.5rem", 
+                        borderRadius: "10px",
+                        fontSize: "14px"
+                      }}
+                    />
                   )}
-                </>
-              )}
 
-             
-        
+                  {/* Step 0: Role Selection */}
+                  {activeStep === 0 ? (
+                    <>
+                      <Title 
+                        level={4} 
+                        style={{ 
+                          textAlign: "center", 
+                          color: "#5C039B",
+                          marginBottom: "1rem"
+                        }}
+                      >
+                        {isRegisterMode ? "Choose Account Type" : "Select Your Role"}
+                      </Title>
+
+                      {renderDesktopAccountTypeCards()}
+
+                      <Button
+                        type="primary"
+                        size="large"
+                        block
+                        onClick={isRegisterMode ? handleRegisterRedirect : handleNext}
+                        disabled={!userType}
+                        style={{
+                          marginTop: "2rem",
+                          height: "50px",
+                          background: "#5C039B",
+                          borderRadius: "12px",
+                          fontWeight: "bold",
+                          fontSize: "16px",
+                        }}
+                      >
+                        {isRegisterMode ? "Continue to Register" : "Next"}
+                      </Button>
+                    </>
+                  ) : (
+                    /* Login Form */
+                    <>
+                      <Title 
+                        level={4} 
+                        style={{ 
+                          textAlign: "center", 
+                          color: "#5C039B",
+                          marginBottom: "1.5rem"
+                        }}
+                      >
+                        Sign In as {getDisplayName()}
+                      </Title>
+
+                      {isCustomer ? (
+                        <Form form={form} onFinish={onFinishCustomer} layout="vertical">
+                          <Form.Item
+                            name="mobile"
+                            label={<span style={{ color: "#5C039B", fontWeight: 600 }}>Mobile Number</span>}
+                            rules={[{ required: true }, { pattern: /^\d{10}$/, message: "10 digits required" }]}
+                          >
+                            <InputNumber
+                              controls={false}
+                              placeholder="9876543210"
+                              style={{ 
+                                width: "100%", 
+                                height: "48px", 
+                                borderRadius: "10px" 
+                              }}
+                            />
+                          </Form.Item>
+
+                          <div style={{ 
+                            display: "flex", 
+                            gap: "12px", 
+                            marginTop: "1rem",
+                            flexDirection: "row"
+                          }}>
+                            <Button 
+                              onClick={handleBack} 
+                              style={{ 
+                                flex: 1, 
+                                height: "48px" 
+                              }}
+                            >
+                              Back
+                            </Button>
+                            <Button
+                              type="primary"
+                              htmlType="submit"
+                              loading={loading}
+                              style={{ 
+                                flex: 2, 
+                                height: "48px", 
+                                background: "#5C039B", 
+                                borderRadius: "10px",
+                                fontSize: "16px"
+                              }}
+                            >
+                              Login Now
+                            </Button>
+                          </div>
+                        </Form>
+                      ) : (
+                        <Form form={form} onFinish={onFinishNormal} layout="vertical">
+                          <Form.Item 
+                            name="email" 
+                            label="Email" 
+                            rules={[{ required: true, type: "email" }]}
+                          >
+                            <Input 
+                              size="large" 
+                              placeholder="you@example.com" 
+                              style={{ 
+                                borderRadius: "10px", 
+                                height: "48px",
+                                fontSize: "16px"
+                              }} 
+                            />
+                          </Form.Item>
+                          <Form.Item 
+                            name="password" 
+                            label="Password" 
+                            rules={[{ required: true }]}
+                          >
+                            <Input.Password 
+                              size="large" 
+                              placeholder="••••••••" 
+                              style={{ 
+                                borderRadius: "10px", 
+                                height: "48px",
+                                fontSize: "16px"
+                              }} 
+                            />
+                          </Form.Item>
+
+                          <div style={{ 
+                            display: "flex", 
+                            gap: "12px", 
+                            marginTop: "1rem",
+                            flexDirection: "row"
+                          }}>
+                            <Button 
+                              onClick={handleBack} 
+                              style={{ 
+                                flex: 1, 
+                                height: "48px" 
+                              }}
+                            >
+                              Back
+                            </Button>
+                            <Button
+                              type="primary"
+                              htmlType="submit"
+                              loading={loading}
+                              style={{ 
+                                flex: 2, 
+                                height: "48px", 
+                                background: "#5C039B", 
+                                borderRadius: "10px",
+                                fontSize: "16px"
+                              }}
+                            >
+                              {loading ? "Signing In..." : "Login Now"}
+                            </Button>
+                          </div>
+                        </Form>
+                      )}
+                    </>
+                  )}
+
+                  <Divider style={{ margin: "1.5rem 0" }} />
+                  <Text 
+                    type="secondary" 
+                    style={{ 
+                      display: "block", 
+                      textAlign: "center",
+                      fontSize: "14px"
+                    }}
+                  >
+                    {isRegisterMode ? "Already have an account? " : "Don't have an account? "}
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        setIsRegisterMode(!isRegisterMode);
+                        setActiveStep(0);
+                        setUserType("");
+                      }}
+                      style={{ 
+                        color: "#5C039B", 
+                        fontWeight: "bold",
+                        padding: "0 4px",
+                        height: "auto"
+                      }}
+                    >
+                      {isRegisterMode ? "Login Here" : "Register Now"}
+                    </Button>
+                  </Text>
                 </Card>
               </motion.div>
             </div>

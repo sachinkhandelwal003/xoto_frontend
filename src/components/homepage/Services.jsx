@@ -1,6 +1,6 @@
 import React from 'react'
 import First from '../Service/First'
-import Second from '../Service/Second (1)'
+import Second from '../Service/Second'
 import Third from '../Service/Third'
 import  FOurth from '../Service/FOurth'
 // import {  ChevronLeft, ChevronRight,  Star  } from 'lucide-react';

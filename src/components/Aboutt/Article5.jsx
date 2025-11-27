@@ -4,7 +4,7 @@ import waveBottom from "../../assets/img/1.png";
 
 const Article5 = () => {
   return (
-    <section className="relative w-full bg-gradient-to-b from-white to-[#F8FDF8] overflow-hidden mt-10">
+    <section className="relative  bg-gradient-to-b from-white to-[#F8FDF8] overflow-hidden mt-10 ">
       {/* Green wave at bottom - unchanged */}
       <img
         src={waveBottom}
@@ -32,18 +32,17 @@ const Article5 = () => {
         {/* Image + Paragraphs in One Grid Container */}
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start max-w-5xl  my-[90px]">
           {/* Left: Image */}
-          <div className="flex justify-center lg:justify-end">
-            ...
+          <div className="flex justify-center lg:justify-start w-full">
             <img
               src={greenHouse}
               alt="Sustainable modern home"
-              style={{ transform: "translateX(-30px)", marginTop:"50px", height:"350PX", width:"650PX" }}
+              className="w-[627px] h-auto mt-[60px] -translate-x-[20px] object-contain"
             />
           </div>
 
           {/* Right: All Text Content */}
           <div className="w-[711px] mr-10 space-y-7 font-medium text-[#547593] text-[24px] leading-[33px] tracking-normal ">
-            <p >
+            <p>
               At XOTO, we believe sustainability isn’t a choice — it’s the
               foundation of future living. In a world where conscious living
               defines progress, embracing sustainable practices means creating
@@ -53,7 +52,7 @@ const Article5 = () => {
               solution is designed to minimize impact and maximize value.
             </p>
 
-            <p >
+            <p>
               Through our integrated approach, we help property owners,
               developers, and partners align with global sustainability goals —
               enhancing not just aesthetics, but long-term property worth and

@@ -264,9 +264,10 @@ const Leads = () => {
               {record.customer_email}
             </div>
             <div className="text-xs text-gray-500 truncate">
-              <PhoneOutlined className="mr-1" />
-              {record.customer_mobile}
-            </div>
+  <PhoneOutlined className="mr-1" />
+  {record?.customer_mobile?.country_code} {record?.customer_mobile?.number}
+</div>
+
           </div>
         </div>
       )

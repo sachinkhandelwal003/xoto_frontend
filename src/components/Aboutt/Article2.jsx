@@ -1,130 +1,145 @@
 import React, { useState } from "react";
 import xotoLogo from "../../assets/img/image_109-removebg-preview.png";
-import waveUrl from "../../assets/img/Mask group.png";
-import wave1 from "../../assets/img/wave/wave1.png";
+import wave1 from "../../assets/img/wave/waveint2.png";
 
 const Article2 = () => {
   const [active, setActive] = useState("vision");
 
   return (
     <div>
-      <section className="relative w-full bg-[var(--color-body)]  overflow-hidden pb-32 pt-20">
+      <section className="relative w-full bg-[var(--color-body)] min-h-screen overflow-hidden pb-32 pt-20">
         {/* Wave Background */}
-       
-       <div>
-  <div className="absolute bottom-0 lg:bottom-0 left-0 w-full z-0 overflow-hidden">
-          <img
-            src={wave1}
-            alt=""
-            className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
-          />
-        </div>
-        {/* MAIN CONTENT */}
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-start justify-between gap-10 relative z-10">
-          {/* LEFT CONTENT */}
-         
-        <div className="max-w-[595px] w-full">
-  <h2
-    className="
-      font-semibold 
-      mt-[60px] mb-6
-      text-[#020202]
-      leading-[1.1]
-      tracking-[-0.03em]
-      font-dmSans
-      text-5xl
-    "
-  >
-    About XOTO
-  </h2>
 
-  <p
-    className="
-      font-medium 
-      text-center lg:text-left
-      text-[#547593]
-      leading-[1.4]
-      font-dmSans
-      text-xl
-      mt-[50px]
-    "
-  >
-    XOTO is an AI-powered platform that simplifies the entire property
-    journey—from discovery and design to financing and landscaping—while
-    connecting homeowners, agents, and freelancers. It creates a seamless,
-    one-stop ecosystem that enhances experiences, boosts efficiency, and
-    unlocks earning opportunities for all stakeholders.
-  </p>
-</div>
-
-
-          {/* RIGHT SIDE CIRCLE */}
-          <div className="flex justify-center lg:justify-end w-full lg:w-auto">
-            <div
-              className="rounded-full flex items-center justify-center flex-shrink-0"
+        <div>
+          <div className="absolute bottom-0 lg:bottom-0 left-0 w-full z-0 overflow-hidden">
+            <img
+              src={wave1}
+              alt=""
+              className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none translate-y-3"
               style={{
-                width: "clamp(280px, 45vw, 380px)",
-                height: "clamp(280px, 45vw, 380px)",
-                background: "#4F0FA4",
-                borderRadius: "50%",
-                boxShadow:
-                  "0px 30px 80px rgba(79,15,164,0.3), 0 12px 30px rgba(0,0,0,0.2)",
-                marginBottom: "130px",
+                height: "400px",
+
+                transform: "translateY(-5px)",
               }}
-            >
-              <img
-                src={xotoLogo}
-                alt="Xoto Logo"
-                className="object-contain"
-                style={{ width: "75%", height: "75%" }}
-              />
+            />
+          </div>
+          {/* MAIN CONTENT */}
+          <div className="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-start justify-between gap-10 relative z-10">
+            {/* LEFT CONTENT */}
+
+            <div className="max-w-[595px] w-full">
+              <h2
+                className="
+    font-dmSans 
+    font-semibold
+    text-[60px]
+    leading-[55px]
+    tracking-[-0.03em]
+    text-[#020202]
+    mt-[60px]
+    mb-6
+  "
+              >
+                About XOTO
+              </h2>
+
+              <p
+                className="
+    font-dmSans 
+    font-medium 
+    text-[24px] 
+    leading-[33px] 
+    tracking-[0em]
+    text-[#547593]
+    max-w-[595px]
+    text-left
+    mt-[50px]
+  "
+              >
+                XOTO is an AI-powered platform that simplifies the entire
+                property journey—from discovery and design to financing and
+                landscaping—while connecting homeowners, agents, and
+                freelancers. It creates a seamless, one-stop ecosystem that
+                enhances experiences, boosts efficiency, and unlocks earning
+                opportunities for all stakeholders.
+              </p>
+            </div>
+
+            {/* RIGHT SIDE CIRCLE */}
+            <div className="flex justify-center lg:justify-end w-full lg:w-auto">
+              <div
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  width: "clamp(288px,45vw,380px)",
+                  height: "clamp(288px,45vw,380px)",
+                  padding: "2px",
+                  background: "linear-gradient(180deg,#03A4F4 0%,#64EF0A 100%)",
+                  boxShadow:
+                    "0px 30px 80px rgba(92,3,155,0.28), 0 12px 30px rgba(0,0,0,0.18)",
+                }}
+              >
+                <div
+                  className="rounded-full flex items-center justify-center overflow-hidden"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    background: "#5C039B",
+                    boxShadow:
+                      "inset 0 -6px 18px rgba(0,0,0,0.08), 0 8px 20px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  <img
+                    src={xotoLogo}
+                    alt="Xoto Logo"
+                    className="object-contain"
+                    style={{ width: "72%", height: "72%" }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-</div>
         {/* BOTTOM BUTTON GROUP - EXACT SAME POSITION AS BEFORE */}
- 
-  
 
-   <div className="p-2 max-w-xl  bg-gradient-to-r from-[#03A4F4] to-[#64EF0A] absolute bottom-0 left-140 rounded-lg shadow-xl py-2 px-2">
-  <div 
-    className="
-      flex flex-col sm:flex-row 
-      justify-start items-start
-      space-y-2 sm:space-y-0 sm:space-x-3
-      bg-gradient-to-r from-[#03A4F4] to-[#64EF0A]
-      rounded-lg
-    "
-  >
-    <button
-      onClick={() => setActive("vision")}
-      className={`px-8 sm:px-10 py-3 rounded-lg border border-white text-white font-medium
-        transition-all duration-300 min-w-[140px]
-        ${active === "vision"
-          ? "bg-[#5C039B] shadow-md"
-          : "bg-transparent hover:bg-[#5C039B]/70"
+        <div
+          className="p-3 max-w-xl bg-[linear-gradient(180deg,#03A4F4_0%,#64EF0A_100%)]
+              absolute bottom-0 left-140 rounded-lg shadow-xl py-py-[8px] px-[16px] border-1"
+        >
+          <div
+            className="
+            flex flex-col sm:flex-row 
+            justify-start items-start
+            space-y-2 sm:space-y-0 sm:space-x-3
+            rounded-lg"
+          >
+            <button
+              onClick={() => setActive("vision")}
+              className={`px-8 sm:px-15 py-4 rounded-lg border border-white text-white font-medium
+             transition-all duration-300 min-w-[140px]
+        ${
+          active === "vision"
+            ? "bg-[#5C039B] shadow-md"
+            : "bg-transparent hover:bg-[#5C039B]/70"
         }`}
-    >
-      Vision
-    </button>
+            >
+              Vision
+            </button>
 
-    <button
-      onClick={() => setActive("mission")}
-      className={`px-8 sm:px-10 py-3 rounded-lg border border-white text-white font-medium
+            <button
+              onClick={() => setActive("mission")}
+              className={`px-8 sm:px-15 py-4 rounded-lg border border-white text-white font-medium
         transition-all duration-300 min-w-[140px]
-        ${active === "mission"
-          ? "bg-[#5C039B] shadow-md"
-          : "bg-transparent hover:bg-[#5C039B]/70"
+        ${
+          active === "mission"
+            ? "bg-[#5C039B] shadow-md"
+            : "bg-transparent hover:bg-[#5C039B]/70"
         }`}
-    >
-      Mission
-    </button>
-
-  </div>
-</div>
+            >
+              Mission
+            </button>
+          </div>
+        </div>
       </section>
-  
-
     </div>
   );
 };

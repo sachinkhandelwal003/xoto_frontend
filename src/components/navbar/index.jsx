@@ -247,17 +247,24 @@ const Navbar = () => {
           scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"
         }`}
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-8xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-12">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center group">
-              <img
-                src={logoNew}
-                alt="Sawtar Logo"
-                className="h-10 w-auto transition-transform group-hover:scale-105"
-              />
-            </Link>
+          <div className="flex flex-col items-center justify-center text-center ">
+  <Link to="/" className="flex items-center justify-center group">
+    <img
+      src={logoNew}
+      alt="Sawtar Logo"
+      className="h-14 w-auto transition-transform group-hover:scale-105"
+    />
+  </Link>
+
+  <span className="text-gray-900" style={{fontSize:"10px"}}>
+    Powered by AI. Inspired by you.
+  </span>
+</div>
+
 
             {/* Desktop Nav */}
             <div className="hidden lg:flex items-center space-x-1">

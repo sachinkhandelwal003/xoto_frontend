@@ -2,23 +2,36 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Phone } from 'lucide-react';
+import { FaWhatsapp } from "react-icons/fa";
 import logoNewImage from "../../assets/img/logoNew.png";
 
 const footerData = {
   company: {
     logo: logoNewImage,
-    slogan: "Transforming spaces with stunning interior designs.",
-    description:
-      "We create beautiful, functional spaces tailored to your lifestyle and preferences.",
+    slogan: (
+      <p>
+        A Unified Ecosystem <br />
+        Creating life time <br /> property Value.
+      </p>
+    ),
+    description: (
+      <p>
+        Scalable. AI–powered. <br />Asset–light.
+      </p>
+    ),
   },
-  quickLinks: [
-    { label: "Interior Design", path: "/services/interior-design" },
-    { label: "Architecture", path: "/services/architecture" },
-    { label: "Home Staging", path: "/services/home-staging" },
-    { label: "Space Planning", path: "/services/space-planning" },
-    { label: "3D Rendering", path: "/services/3d-rendering" },
+
+  offerings: [
+    { label: "Landscaping", path: "/landscaping" },
+    { label: "Interiors", path: "/interiors" },
+    { label: "Rentals", path: "/rentals" },
+    { label: "Buy", path: "/buy" },
+    { label: "Sell", path: "/sell" },
+    { label: "Mortgages", path: "/mortgages" },
+    { label: "Maintenance", path: "/maintenance" },
   ],
+
   resources: [
     { label: "Xoto Properties", path: "/properties" },
     { label: "Explore Xoto", path: "/explore" },
@@ -26,20 +39,16 @@ const footerData = {
     { label: "Free Consultation", path: "/consultation" },
     { label: "Hire Freelancers", path: "/freelancers" },
   ],
-  ecommerce: [
-    { label: "Furniture Shop", path: "/shop/furniture" },
-    { label: "Lighting", path: "/shop/lighting" },
-    { label: "Decor", path: "/shop/decor" },
-    { label: "Materials", path: "/shop/materials" },
-    { label: "Sale Items", path: "/shop/sale" },
+
+  knowledge: [
+    { label: "Knowledge Centre", path: "/knowledge-centre" },
+    { label: "Our Sustainability Focus", path: "/sustainability" },
+    { label: "Submit Your Feedback", path: "/feedback" },
+    { label: "Contact Us", path: "/contact" },
+    { label: "Privacy Policy", path: "/privacy" },
+    { label: "Terms Of Use", path: "/terms" },
   ],
-  support: [
-    { label: "Raise Issue", path: "/support/raise-issue" },
-    { label: "My Issues", path: "/support/my-issues" },
-    { label: "Contact Us", path: "/support/contact" },
-    { label: "FAQ", path: "/support/faq" },
-    { label: "Live Chat", path: "/support/chat" },
-  ],
+
   legal: [
     { label: "Privacy Policy", path: "/privacy" },
     { label: "Terms & Conditions", path: "/terms" },
@@ -47,109 +56,119 @@ const footerData = {
     { label: "Shipping Policy", path: "/shipping" },
     { label: "Return Policy", path: "/returns" },
   ],
+
   social: [
-    { name: "Facebook", icon: <Facebook size={18} />, url: "#" },
-    { name: "Instagram", icon: <Instagram size={18} />, url: "#" },
-    { name: "Twitter", icon: <Twitter size={18} />, url: "#" },
-    { name: "Linkedin", icon: <Linkedin size={18} />, url: "#" },
+    { name: "Facebook", icon: <Facebook size={16} />, url: "#" },
+    { name: "Instagram", icon: <Instagram size={16} />, url: "#" },
+    { name: "Twitter", icon: <Twitter size={16} />, url: "#" },
+    { name: "Linkedin", icon: <Linkedin size={16} />, url: "#" },
   ],
 };
 
 const Footer = () => {
-  const { company, quickLinks, resources, ecommerce, support, legal, social } = footerData;
+  const { company, offerings, resources, knowledge, legal, social } = footerData;
 
   return (
     <footer
-      className="pt-16 relative z-20 border-t border-purple-700/30 main-gradient-color"
-      // style={{
-      //   background: "linear-gradient(174.96deg, #5C039B 4.05%, #1F0135 99.75%)",
-      // }}
+      className=" border-purple-700/30 main-gradient-color"
+     
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 pb-12">
-          {/* Company Info */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <img
-                src={company.logo}
-                alt="Company Logo"
-                className="h-16 w-auto object-contain"
-              />
-              <h2 className="text-2xl font-bold text-white">
-                {company.name}
-              </h2>
-            </div>
+      <div className="max-w-10xl   px-40 pt-12">
 
-            <p className="text-purple-200 mt-3">{company.slogan}</p>
-            <p className="text-purple-300 mt-2 text-sm">{company.description}</p>
+        {/* GRID MATCHING UI */}
+        <div className="grid grid-cols-1 md:grid-cols-6  pb-10">
 
-            {/* Social Media */}
-            <div className="mt-6">
-              <h4 className="font-medium text-purple-100 mb-3">Follow Us</h4>
-              <div className="flex gap-3">
-                {social.map((item, idx) => (
-                  <a
-                    key={idx}
-                    href={item.url}
-                    aria-label={item.name}
-                    className="text-purple-300 hover:text-white transition-colors p-2 bg-white/10 rounded-full hover:bg-white/20 backdrop-blur-sm"
-                  >
-                    {item.icon}
-                  </a>
-                ))}
-              </div>
-            </div>
+          {/* Company Section */}
+          <div className="col-span-2">
+            <img src={company.logo} className="h-20 object-contain mb-4" alt="Xoto logo" />
+
+            <p className="text-white font-semibold text-xl leading-tight">{company.slogan}</p>
+            <p className="text-purple-200 mt-3 text-sm leading-relaxed">{company.description}</p>
           </div>
 
-          {/* Sections (Services, Resources, Shop, Support) */}
-          {[
-            { title: "Services", items: quickLinks },
-            { title: "Resources", items: resources },
-            { title: "Shop", items: ecommerce },
-            { title: "Support", items: support },
-          ].map((section, idx) => (
-            <div key={idx}>
-              <h4 className="font-semibold text-purple-100 mb-4 uppercase text-sm tracking-wider">
-                {section.title}
-              </h4>
-              <ul className="space-y-3">
-                {section.items.map((item, i) => (
-                  <li key={i}>
-                    <Link
-                      to={item.path}
-                      className="text-purple-200 hover:text-[#C45A34] transition-colors text-sm"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          {/* Our Offerings */}
+          <div>
+            <h4 className="text-white mb-4 font-semibold text-sm uppercase">Our Offerings</h4>
+            <ul className="space-y-2">
+              {offerings.map((item, i) => (
+                <li key={i}>
+                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Partner Ecosystem */}
+          <div>
+            <h4 className="text-white mb-4 font-semibold text-sm uppercase">Partner Ecosystem</h4>
+            <ul className="space-y-2">
+              {resources.map((item, i) => (
+                <li key={i}>
+                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Knowledge Centre */}
+          <div>
+            <h4 className="text-white mb-4 font-semibold text-sm uppercase">About Us</h4>
+            <ul className="space-y-2">
+              {knowledge.map((item, i) => (
+                <li key={i}>
+                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Location/Email/Contact icons */}
+          <div className="flex flex-col gap-4">
+
+            <div>
+              <h4 className="text-white mb-3 font-semibold text-sm uppercase">Locations</h4>
+              <p className="text-purple-200 text-sm">India | UAE | Saudi Arabia</p>
             </div>
-          ))}
+
+            <div>
+              <h4 className="text-white mb-2 font-semibold text-sm uppercase">Email</h4>
+              <p className="text-purple-200 text-sm">
+                For Partners: <span className="text-white">connect@xoto.ae</span>
+              </p>
+              <p className="text-purple-200 text-sm mt-1">
+                For Customers: <span className="text-white">care@xoto.ae</span>
+              </p>
+            </div>
+
+            <div className="flex flex-col items-end gap-3 mt-3">
+              <a href="https://wa.me/1234567890" className="bg-green-500 p-3 rounded-full shadow-md text-white hover:bg-green-600">
+                <FaWhatsapp size={18} />
+              </a>
+
+              <a href="tel:1234567890" className="bg-blue-500 p-3 rounded-full shadow-md text-white hover:bg-blue-600">
+                <Phone size={18} />
+              </a>
+            </div>
+          </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="border-t border-purple-500/30 py-6 flex flex-col md:flex-row justify-between items-center">
-          <div className="text-sm text-purple-300 mb-4 md:mb-0">
-            <p>
-              © {new Date().getFullYear()} {company.name}. All rights reserved.
-            </p>
-          </div>
+        {/* Bottom Row */}
+        
 
-          <div className="flex flex-wrap gap-4 text-sm">
-            {legal.map((item, idx) => (
-              <Link
-                key={idx}
-                to={item.path}
-                className="text-purple-300 hover:text-[#C45A34] transition-colors"
-              >
-                {item.label}
-              </Link>
+      </div>
+      <div className='w-full border-t border-purple-500/20'>
+      <div className=" max-w-6xl mx-auto  py-6 flex justify-between items-center">
+          <p className="text-purple-300 text-sm">©2025 Xoto. All rights reserved</p>
+
+          <div className="flex gap-5">
+            {social.map((item, i) => (
+              <a key={i} href={item.url} className="text-purple-300  hover:text-white transition">
+                {item.icon}
+              </a>
             ))}
           </div>
         </div>
-      </div>
+        </div>
     </footer>
   );
 };

@@ -1,48 +1,67 @@
 import React, { useState } from "react";
 import HouseChart from "../../assets/img/mortgage.png";
-import Wave from '../../assets/img/Mask.png'
+import Wave from "../../assets/img/Mask.png";
+
+
+
 const MortgageCalculator = () => {
   const [active, setActive] = useState("borrow");
+
+  const dmSans = {
+  fontFamily: "'DM Sans', sans-serif",
+};
+
   return (
-    <div>
-      <section className="w-full py-15 bg-white relative overflow-hidden">
-       <img
-              src={Wave}
-              alt=""
-              className="absolute bottom-0 left-0 w-full pointer-events-none opacity-70 z-10"
-              style={{ transform: "translateY(810px)" }} // keep your current position
-            />
-        {/* Title */}
-        <h2 className="text-center text-4xl md:text-5xl font-bold text-[#020202] mb-12">
+
+      <section className="w-full relative  py-15 bg-[var(--color-body)] relative overflow-hidden" style={dmSans}>
+        
+        {/* WAVE IMAGE */}
+        <div className="absolute bottom-[-20px] lg:bottom-[-705px] left-0 w-full z-0 overflow-hidden">
+               <img
+                 src={Wave}
+                 alt=""
+                 className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
+               />
+             </div>
+
+        {/* TITLE */}
+        <h2
+          className="text-center text-4xl md:text-5xl font-bold text-[#020202] mb-12"
+          style={dmSans}
+        >
           Plan Your Mortgage with Confidence
         </h2>
 
-        {/* Buttons (background sized to content and centered) */}
+        {/* MODE BUTTONS */}
         <div
-          className="w-max flex justify-center items-center gap-4
+          className="w-max flex  gap-4
              bg-[linear-gradient(to_right,#03AAF4,#64EF0A)]
              py-2 px-2 rounded-lg mx-auto"
+          style={dmSans}
         >
           <button
             onClick={() => setActive("borrow")}
-            className={`px-8 py-3 text-white font-medium rounded-xl border border-white transition-all duration-300
-              ${active === "borrow" ? "bg-[#5C039B]" : "bg-[#5C039B]"}`}
+            className={`px-13 py-3  text-white font-medium rounded-xl border border-white transition-all duration-300
+            ${active === "borrow" ? "bg-[var(--color-primary)]" : "bg-[#5C039B]"}`}
+            style={dmSans}
           >
             How Much Can I Borrow?
           </button>
 
           <button
             onClick={() => setActive("estimate")}
-            className={`px-8 py-3 text-white font-medium rounded-xl border border-white transition-all duration-300
-              ${active === "estimate" ? "bg-[#5C039B]" : "bg-transparent hover:bg-[#5C039B]"}`}
+            className={`px-13 py-3 text-white font-medium rounded-xl border border-white transition-all duration-300
+            ${active === "estimate" ? "bg-[#5C039B]" : "bg-transparent hover:bg-[#5C039B]"}`}
+            style={dmSans}
           >
             Monthly Payment Estimate
           </button>
 
           <button
             onClick={() => setActive("check")}
-            className={`px-8 py-3 text-white font-medium rounded-xl border border-white transition-all duration-300
-              ${active === "check" ? "bg-[#5C039B]" : "bg-transparent hover:bg-[#5C039B]"}`}
+            className={`px-13 py-3 text-white font-medium rounded-xl border border-white transition-all duration-300
+            ${active === "check" ? "bg-[#5C039B]" : "bg-transparent hover:bg-[#5C039B]"}`}
+            style={dmSans}
           >
             Affordability Check
           </button>
@@ -57,13 +76,16 @@ const MortgageCalculator = () => {
           />
         </div>
 
-        {/* Progress bar */}
+        {/* PROGRESS BAR */}
         <div className="w-full max-w-4xl mx-auto h-2 bg-gray-200 rounded-full">
           <div className="h-2 w-1/4 bg-green-500 rounded-full"></div>
         </div>
 
-        {/* Features */}
-        <div className="grid grid-cols-2 md:grid-cols-4 text-center mt-8 max-w-4xl mx-auto gap-6">
+        {/* FEATURES */}
+        <div
+          className="grid grid-cols-2 md:grid-cols-4 relative z-20 text-center mt-8 max-w-4xl mx-auto gap-6"
+          style={dmSans}
+        >
           <div>
             <p className="text-xs text-gray-400 mb-1">Feature 1</p>
             <h3 className="text-lg font-semibold text-purple-700 leading-tight">
@@ -82,7 +104,6 @@ const MortgageCalculator = () => {
             <p className="text-xs text-gray-400 mb-1">Feature 3</p>
             <h3 className="text-lg font-semibold text-gray-700 leading-tight">
               Term
-              
             </h3>
           </div>
 
@@ -94,19 +115,23 @@ const MortgageCalculator = () => {
           </div>
         </div>
 
-        {/* CTA Button */}
+        {/* CTA BUTTON */}
         <div className="flex justify-center mt-12">
-          <button className="px-26 py-3 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition-all z-[999]">
+          <button
+            className="px-32 py-3 bg-[var(--color-primary)] text-white font-semibold rounded-lg hover:bg-purple-800 transition-all z-[999]"
+            style={dmSans}
+          >
             Get Pre-Approved
           </button>
         </div>
 
-        {/* Disclaimer */}
-        <p className="text-center mt-4 text-sm italic text-purple-600 ">
+        {/* DISCLAIMER */}
+        <p className="text-center relative z-20  mt-4 text-md italic text-[var(--color-primary)]" style={dmSans}>
           Estimates are indicative. Final terms subject to credit approval.
         </p>
+        
       </section>
-    </div>
+    
   );
 };
 

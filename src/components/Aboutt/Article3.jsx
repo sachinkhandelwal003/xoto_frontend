@@ -2,6 +2,8 @@ import React from "react";
 import waveImg from "../../assets/img/wv1.png";
 import missionImg from "../../assets/img/image 108.png";
 
+
+
 const Check = ({ className = "" }) => (
   <span
     className={`inline-flex items-center justify-center rounded-full flex-shrink-0 ${className}`}
@@ -52,108 +54,126 @@ const Article3 = () => {
         <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16">
           
           {/* LEFT: CIRCLE IMAGE - Responsive but fixed 320px on desktop */}
-          <div className="w-full lg:w-2/5 flex justify-center lg:justify-start">
-            <div
-              className="rounded-full overflow-hidden flex items-center justify-center"
-              style={{
-                width: "clamp(280px, 80vw, 320px)",
-                height: "clamp(280px, 80vw, 320px)",
-                position: "relative",
-                boxShadow: "0 20px 50px rgba(0,0,0,0.12)",
-                flexShrink: 0,
-              }}
-            >
-              <img
-                src={missionImg}
-                alt="Mission"
-                className="w-full h-full object-cover"
-              />
+        <div className="w-full lg:w-2/5 flex justify-center lg:justify-start">
+  <div
+    className="relative flex items-center justify-center overflow-hidden rounded-full"
+    style={{
+      width: "398px",
+      height: "398px",
+      borderRadius: "50%",
+      boxShadow: "0px 25px 60px rgba(0,0,0,0.18)",
+      flexShrink: 0,
+    }}
+  >
+    {/* Image inside masked circle */}
+    <img
+      src={missionImg}
+      alt="Mission"
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+      }}
+    />
 
-              {/* "Mission" Text Overlay */}
-              <div
-                style={{
-                  position: "absolute",
-                  color: "#fff",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "clamp(36px, 10vw, 48px)",
-                  fontWeight: 700,
-                  letterSpacing: "-0.03em",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  textShadow: "0 4px 10px rgba(0,0,0,0.3)",
-                }}
-              >
-                Mission
-              </div>
-            </div>
-          </div>
+    {/* Mission Text (exact Figma values) */}
+    <div
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        color: "#FFFFFF",
+        fontFamily: "'DM Sans', sans-serif",
+        fontWeight: 700,
+        fontSize: "48px",
+        lineHeight: "55px",
+        letterSpacing: "-0.03em",
+        textShadow: "0px 4px 15px rgba(0,0,0,0.25)",
+        whiteSpace: "nowrap",
+      }}
+    >
+      Mission
+    </div>
+  </div>
+</div>
+
 
           {/* RIGHT: TEXT LIST */}
-          <div className="w-full lg:w-3/5">
-            <ul className="space-y-8 lg:space-y-10 pl-0">
-              {/* ITEM 1 */}
-              <li className="flex gap-5 lg:gap-6 items-start">
-                <Check />
-                <p
-                  className="text-justify lg:text-left leading-relaxed"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "clamp(18px, 4vw, 24px)",
-                    lineHeight: "1.4",
-                    letterSpacing: "0.012em",
-                    fontWeight: 500,
-                    color: "#547593",
-                    margin: 0,
-                  }}
-                >
-                  Establish ourselves as one of the leading technology-driven
-                  distribution company focusing on Home Upgrades, Real Estate &
-                  Mortgages in the UAE
-                </p>
-              </li>
+         {/* RIGHT SIDE LIST - Pixel-perfect to Figma */}
+<div className="w-full lg:w-3/5">
+  <ul style={{ paddingLeft: 0, margin: 0 }} className="space-y-8 lg:space-y-10">
+    {/* ITEM 1 */}
+    <li className="flex items-start gap-5 lg:gap-6">
+      <div style={{ marginTop: 6 /* align check with first text line */ }}>
+        <Check />
+      </div>
 
-              {/* ITEM 2 */}
-              <li className="flex gap-5 lg:gap-6 items-start">
-                <Check />
-                <p
-                  className="text-justify lg:text-left leading-relaxed"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "clamp(18px, 4vw, 24px)",
-                    lineHeight: "1.4",
-                    letterSpacing: "0.012em",
-                    fontWeight: 500,
-                    color: "#547593",
-                    margin: 0,
-                  }}
-                >
-                  Build and maintain the largest network of agents and freelancers
-                  in the market.
-                </p>
-              </li>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: "'DM Sans', sans-serif",
+          fontWeight: 500,           // Medium (500)
+          fontSize: "24px",          // exact Figma size
+          lineHeight: "33px",        // exact Figma line-height
+          letterSpacing: "0.012em",  // 1.2% shown in Figma
+          color: "#547593",          // exact color
+          maxWidth: "614px",         // Figma text box width (from screenshot)
+          textAlign: "left",
+        }}
+      >
+        Establish ourselves as one of the leading technology-driven distribution company focusing on Home Upgrades, Real Estate & Mortgages in the UAE
+      </p>
+    </li>
 
-              {/* ITEM 3 */}
-              <li className="flex gap-5 lg:gap-6 items-start">
-                <Check />
-                <p
-                  className="text-justify lg:text-left leading-relaxed"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "clamp(18px, 4vw, 24px)",
-                    lineHeight: "1.4",
-                    letterSpacing: "0.012em",
-                    fontWeight: 500,
-                    color: "#547593",
-                    margin: 0,
-                  }}
-                >
-                  Harness Technology & AI to drive scalability and enable seamless
-                  expansion
-                </p>
-              </li>
-            </ul>
-          </div>
+    {/* ITEM 2 */}
+    <li className="flex items-start gap-5 lg:gap-6">
+      <div style={{ marginTop: 6 }}>
+        <Check />
+      </div>
+
+      <p
+        style={{
+          margin: 0,
+          fontFamily: "'DM Sans', sans-serif",
+          fontWeight: 500,
+          fontSize: "24px",
+          lineHeight: "33px",
+          letterSpacing: "0.012em",
+          color: "#547593",
+          maxWidth: "614px",
+          textAlign: "left",
+        }}
+      >
+        Build and maintain the largest network of agents and freelancers in the market.
+      </p>
+    </li>
+
+    {/* ITEM 3 */}
+    <li className="flex items-start gap-5 lg:gap-6">
+      <div style={{ marginTop: 6 }}>
+        <Check />
+      </div>
+
+      <p
+        style={{
+          margin: 0,
+          fontFamily: "'DM Sans', sans-serif",
+          fontWeight: 500,
+          fontSize: "24px",
+          lineHeight: "33px",
+          letterSpacing: "0.012em",
+          color: "#547593",
+          maxWidth: "614px",
+          textAlign: "left",
+        }}
+      >
+        Harness Technology & AI to drive scalability and enable seamless expansion
+      </p>
+    </li>
+  </ul>
+</div>
+
         </div>
       </div>
     </section>

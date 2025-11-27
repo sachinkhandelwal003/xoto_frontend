@@ -16,7 +16,7 @@ import CategoryFreelancers from "./pages/dashboardPages/managefreelancer/freelan
 import Freelancers from "./pages/dashboardPages/managefreelancer/freelancer/Freelancers";
 import FreelancerProfile from "./pages/dashboardPages/managefreelancer/freelancer/FreelancerProfile";
 import MyprofileFreelancer from "./pages/dashboardPages/managefreelancer/freelancer/MyprofileFreelancer";
-import UpdateFreelncerProfile from "./pages/dashboardPages/managefreelancer/freelancer/UpdateFreelncerProfile";
+import UpdateFreelncerProfile from "./pages/dashboardPages/managefreelancer/freelancer/UpdateFreelancerProfile";
 import Projects from "./pages/dashboardPages/managefreelancer/freelancer/Projects/Projects";
 import MyProjects from "./pages/dashboardPages/managefreelancer/freelancer/Projects/MyProjects";
 import Accountant from "./pages/dashboardPages/manageaccountant/Accountant";
@@ -45,6 +45,7 @@ import Customerdashboard from "./pages/Customerdashboard";
 import MyProfileB2C from "./pages/dashboardPages/managevendor/vendorprofile/Vendorb2c-Myprofile";
 import MyProfileb2b from "./pages/dashboardPages/managevendor/vendorprofile/Vendorb2b-MyProfile";
 import MyProfile from "./pages/dashboardPages/Profiles/MyProfile";
+import UpdateFreelancerProfile from "./pages/dashboardPages/managefreelancer/freelancer/UpdateFreelancerProfile";
 
 const roleSlugMap = {
   0: "superadmin",
@@ -172,7 +173,7 @@ const CmsRoutes = () => {
 <Route path="freelancer" element={<FreelancerProfile />} />
 
       <Route path="freelancer/myprofile" element={<MyprofileFreelancer />} />
-      <Route path="/update/:id" element={<UpdateFreelncerProfile />} />
+      <Route path="/update" element={<UpdateFreelancerProfile />} />
 
       {/* Catch-all fallback */}
     </Routes>

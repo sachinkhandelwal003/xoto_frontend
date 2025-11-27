@@ -1,10 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Typography, message } from 'antd';
-import { Form, Input, Select, Button as AntButton } from 'antd';
+import { 
+  Form, 
+  Input, 
+  Select, 
+  Button, 
+  Typography, 
+  message,
+  Card,
+  Space,
+  Divider,
+  Row,
+  Col
+} from 'antd';
+import { 
+  UserOutlined, 
+  MailOutlined, 
+  PhoneOutlined, 
+  CloseOutlined,
+  ToolOutlined,
+  FileTextOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons';
 import { apiService } from '../../manageApi/utils/custom.apiservice';
+import { showSuccessAlert } from '../../manageApi/utils/sweetAlert';
 
 const { Title, Text } = Typography;
+const { Option } = Select;
+const { TextArea } = Input;
+
+const countryCodes = [
+  { value: "+91", label: "+91 India" },
+  { value: "+971", label: "+971 UAE" },
+  { value: "+966", label: "+966 Saudi Arabia" },
+  { value: "+1", label: "+1 USA/Canada" },
+  { value: "+44", label: "+44 UK" },
+  { value: "+61", label: "+61 Australia" },
+];
 
 const QuoteModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
@@ -13,11 +45,12 @@ const QuoteModal = ({ isOpen, onClose }) => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [fetchingSubcat, setFetchingSubcat] = useState(false);
+  const [countryCode, setCountryCode] = useState("+971");
+  const [mobileNumber, setMobileNumber] = useState("");
 
-  // Load Categories when modal opens
+  // Load Categories
   useEffect(() => {
     if (!isOpen) return;
-
     const loadCategories = async () => {
       try {
         const res = await apiService.get("/freelancer/category?active=true");
@@ -31,12 +64,11 @@ const QuoteModal = ({ isOpen, onClose }) => {
     loadCategories();
   }, [isOpen]);
 
-  // Handle category change
+  // Load Subcategories
   const handleCategoryChange = async (value) => {
     setSelectedCategory(value);
     setSubcategories([]);
     form.setFieldsValue({ subcategories: undefined });
-
     if (!value) return;
 
     setFetchingSubcat(true);
@@ -52,42 +84,56 @@ const QuoteModal = ({ isOpen, onClose }) => {
     }
   };
 
-  // Close & reset
   const closeModal = () => {
     onClose?.();
     form.resetFields();
     setSubcategories([]);
     setSelectedCategory(null);
+    setMobileNumber("");
+    setCountryCode("+971");
   };
 
-  // Submit form
-  const onFinish = async (values) => {
-    setLoading(true);
-    const payload = {
-      customer_name: values.customer_name.trim(),
-      customer_email: values.customer_email.trim().toLowerCase(),
-      customer_mobile: values.customer_mobile.trim(),
-      category: values.category,
-      subcategories: values.subcategories || [],
-      description: values.description?.trim() || "No details provided"
-    };
+ const onFinish = async (values) => {
+  if (!mobileNumber || mobileNumber.length < 8) {
+    return message.error("Please enter a valid mobile number");
+  }
 
-    try {
-      const res = await apiService.post("/estimates/submit", payload);
-      console.log(res)
-      if (res) {
-        message.success("Thank you! Your request has been sent. We'll call you soon!");
-        form.resetFields();
-        setTimeout(closeModal, 1800);
-      } else {
-        throw new Error(res.data?.message || "Submission failed");
-      }
-    } catch (err) {
-      message.error(err.response?.data?.message || "Please try again");
-    } finally {
-      setLoading(false);
-    }
+  setLoading(true);
+
+  const payload = {
+    customer_name: values.customer_name.trim(),
+    customer_email: values.customer_email.trim().toLowerCase(),
+    customer_mobile: {
+      country_code: countryCode,
+      number: mobileNumber.replace(/\D/g, "").slice(0, 15)
+    },
+    category: values.category,
+    subcategories: values.subcategories || [],
+    description: values.description?.trim() || "No details provided"
   };
+
+  try {
+    const res = await apiService.post("/estimates/submit", payload);
+
+    // ✅ Replace Ant message with custom sweet alert
+    showSuccessAlert(
+      "Success!",
+      "Thank you! Your estimate request has been submitted successfully. We'll contact you soon!"
+    );
+
+    // Reset form
+    form.resetFields();
+    setMobileNumber("");
+
+    setTimeout(closeModal, 2000);
+
+  } catch (err) {
+    const errorMsg = err.response?.data?.message || "Submission failed. Please try again.";
+    message.error(errorMsg);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <AnimatePresence>
@@ -100,7 +146,7 @@ const QuoteModal = ({ isOpen, onClose }) => {
           onClick={closeModal}
         >
           <motion.div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto overflow-hidden relative"
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl mx-auto overflow-hidden relative"
             initial={{ scale: 0.9, y: 50 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 50 }}
@@ -108,99 +154,237 @@ const QuoteModal = ({ isOpen, onClose }) => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
-            <button
+            <Button
+              type="text"
+              icon={<CloseOutlined />}
               onClick={closeModal}
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-2xl hover:bg-red-50 hover:text-red-600 transition"
-              aria-label="Close"
-            >
-              ×
-            </button>
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition"
+              style={{ border: 'none' }}
+            />
 
-            {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-8 text-white text-center">
-              <Title level={2} className="!text-white !text-3xl lg:!text-4xl !mb-2">
-                Get Your Free Quote Now
-              </Title>
-              <Text className="!text-white/90 text-lg">
-                100% Free • Response in 24 Hours
-              </Text>
+            {/* Header - Purple Theme */}
+            <div className="bg-gradient-to-r from-purple-700 to-purple-900 p-8 text-white text-center">
+              <Space direction="vertical" size="middle" className="w-full">
+                <CheckCircleOutlined className="text-4xl text-white" />
+                <Title level={2} className="!text-white !text-3xl lg:!text-4xl !mb-0">
+                  Get Your Free Estimate
+                </Title>
+                <Text className="!text-white/90 text-lg">
+                  Fill out the form below and get quotes from top professionals
+                </Text>
+              </Space>
             </div>
 
             {/* Form Body */}
-            <div className="p-6 lg:p-10 bg-gray-50">
-              <div className="max-w-3xl mx-auto">
-                <Form form={form} layout="vertical" onFinish={onFinish} className="space-y-5">
+            <div className="p-6 lg:p-3">
+              <div className="max-w-5xl mx-auto">
+                <Form 
+                  form={form} 
+                  layout="vertical" 
+                  onFinish={onFinish}
+                  size="large"
+                  className="space-y-2"
+                >
+                  <Row gutter={[16, 0]}>
+                    {/* Personal Information */}
+                    <Col xs={24} lg={8}>
+                      <Card 
+                        title={
+                          <Space>
+                            <UserOutlined />
+                            <span>Personal Information</span>
+                          </Space>
+                        } 
+                        size="small"
+                        className="shadow-sm h-full"
+                      >
+                        <Space direction="vertical" className="w-full" size="middle">
+                          <Form.Item 
+                            name="customer_name" 
+                            label="Full Name" 
+                            rules={[{ required: true, message: "Please enter your full name" }]}
+                            className="mb-0"
+                          >
+                            <Input 
+                              placeholder="John Doe" 
+                              prefix={<UserOutlined className="text-gray-400" />}
+                              className="rounded-lg"
+                              allowClear
+                            />
+                          </Form.Item>
 
-                  {/* Row 1: Name + Email */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <Form.Item name="customer_name" label="Full Name" rules={[{ required: true }]}>
-                      <Input placeholder="Your name" className="h-12 rounded-xl" />
-                    </Form.Item>
-                    <Form.Item name="customer_email" label="Email" rules={[{ required: true, type: 'email' }]}>
-                      <Input placeholder="your@email.com" className="h-12 rounded-xl" />
-                    </Form.Item>
-                  </div>
+                          <Form.Item 
+                            name="customer_email" 
+                            label="Email Address" 
+                            rules={[
+                              { required: true, message: "Please enter your email" },
+                              { type: 'email', message: "Please enter a valid email address" }
+                            ]}
+                            className="mb-0"
+                          >
+                            <Input 
+                              placeholder="john@example.com" 
+                              prefix={<MailOutlined className="text-gray-400" />}
+                              className="rounded-lg"
+                              allowClear
+                            />
+                          </Form.Item>
 
-                  {/* Row 2: Mobile + Category */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <Form.Item name="customer_mobile" label="Mobile Number" rules={[{ required: true, pattern: /^[6-9]\d{9}$/, message: 'Invalid number' }]}>
-                      <Input placeholder="10-digit number" maxLength={10} className="h-12 rounded-xl" />
-                    </Form.Item>
-                    <Form.Item name="category" label="Service Category" rules={[{ required: true }]}>
-                      <Select
-                        showSearch
-                        placeholder="Select category"
-                        options={categories}
-                        onChange={handleCategoryChange}
-                        loading={categories.length === 0}
-                        className="h-12"
+                          <Form.Item label="Mobile Number" required className="mb-0">
+                            <Space.Compact className="w-full">
+                              <Select
+                                value={countryCode}
+                                onChange={setCountryCode}
+                                style={{ width: '120px' }}
+                                showSearch
+                                optionFilterProp="children"
+                              >
+                                {countryCodes.map(c => (
+                                  <Option key={c.value} value={c.value}>
+                                    {c.label}
+                                  </Option>
+                                ))}
+                              </Select>
+                              <Input
+                                value={mobileNumber}
+                                onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ""))}
+                                placeholder="501234567"
+                                maxLength={15}
+                                prefix={<PhoneOutlined className="text-gray-400" />}
+                                className="rounded-lg flex-1"
+                                allowClear
+                              />
+                            </Space.Compact>
+                            {mobileNumber && mobileNumber.length < 8 && (
+                              <Text type="warning" className="text-xs">
+                                Mobile number should be at least 8 digits
+                              </Text>
+                            )}
+                          </Form.Item>
+                        </Space>
+                      </Card>
+                    </Col>
+
+                    {/* Service Information */}
+                    <Col xs={24} lg={16}>
+                      <Card 
+                        title={
+                          <Space>
+                            <ToolOutlined />
+                            <span>Service Information</span>
+                          </Space>
+                        } 
+                        size="small"
+                        className="shadow-sm h-full"
+                      >
+                        <Space direction="vertical" className="w-full" size="middle">
+                          <Form.Item 
+                            name="category" 
+                            label="Service Category" 
+                            rules={[{ required: true, message: "Please select a service category" }]}
+                            className="mb-0"
+                          >
+                            <Select
+                              showSearch
+                              placeholder="Select service category"
+                              optionFilterProp="label"
+                              onChange={handleCategoryChange}
+                              loading={categories.length === 0}
+                              className="rounded-lg"
+                              allowClear
+                            >
+                              {categories.map(category => (
+                                <Option key={category.value} value={category.value} label={category.label}>
+                                  {category.label}
+                                </Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+
+                          <Form.Item 
+                            name="subcategories" 
+                            label="Specific Services"
+                            className="mb-0"
+                          >
+                            <Select
+                              mode="multiple"
+                              placeholder="Choose relevant services"
+                              className="rounded-lg"
+                              loading={fetchingSubcat}
+                              disabled={!selectedCategory}
+                              allowClear
+                              maxTagCount="responsive"
+                            >
+                              {subcategories.map(subcategory => (
+                                <Option key={subcategory.value} value={subcategory.value}>
+                                  {subcategory.label}
+                                </Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+
+ <Card 
+                    title={
+                      <Space>
+                        <FileTextOutlined />
+                        <span>Project Details</span>
+                      </Space>
+                    } 
+                    size="small"
+                    className="shadow-sm"
+                  >
+                    <Form.Item 
+                      name="description" 
+                      rules={[{ required: true, message: "Please describe your project" }]}
+                      className="mb-0"
+                    >
+                      <TextArea
+                        placeholder="Please describe your project in detail. Include:
+                        - Type of service needed
+                        - Area size or dimensions  
+                        - Specific requirements
+                        - Preferred timeline
+                        - Budget range (if any)
+                        - Any special considerations"
+                        className="rounded-lg resize-none"
+                        showCount
+                        maxLength={200}
                       />
                     </Form.Item>
-                  </div>
+                  </Card>
 
-                  {/* Row 3: Subcategory + Description */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <Form.Item name="subcategories" label="Subcategories (Optional)">
-                      <Select
-                        mode="multiple"
-                        placeholder="Select services"
-                        options={subcategories}
-                        loading={fetchingSubcat}
-                        disabled={!selectedCategory}
-                        allowClear
-                        className="h-12"
-                      />
-                    </Form.Item>
-                    <Form.Item name="description" label="Project Details">
-                      <Input.TextArea
-                        rows={3}
-                        placeholder="e.g., 2BHK interior in Delhi, swimming pool, etc."
-                        className="rounded-xl resize-none"
-                      />
-                    </Form.Item>
-                  </div>
+                        </Space>
+                      </Card>
+                    </Col>
+                  </Row>
+
+                  {/* Project Description */}
+                 
+
+                  <Divider />
 
                   {/* Submit Button */}
-                  <Form.Item className="mb-3">
-                    <AntButton
-                      type="primary"
-                      htmlType="submit"
-                      block
-                      size="large"
-                      loading={loading}
-                      className="h-14 text-lg font-bold rounded-xl shadow-lg"
-                      style={{
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        border: "none"
-                      }}
-                    >
-                      {loading ? "Sending..." : "Get Free Quote Instantly"}
-                    </AntButton>
+                  <Form.Item className="mb-0 text-center">
+                    <Space direction="vertical" size="large" className="w-full">
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        size="large"
+                        loading={loading}
+                        icon={<CheckCircleOutlined />}
+                        className="h-14 text-lg font-bold rounded-xl shadow-lg w-full max-w-md mx-auto"
+                        style={{
+                          backgroundColor: '#7e22ce',
+                          borderColor: '#7e22ce',
+                          boxShadow: '0 8px 25px rgba(126, 34, 206, 0.3)'
+                        }}
+                      >
+                        {loading ? "Submitting Your Request..." : "Submit Estimate Request"}
+                      </Button>
+                      
+                     
+                    </Space>
                   </Form.Item>
-
-                  <Text type="secondary" className="block text-center text-sm">
-                    We never spam • Your info is 100% safe with us
-                  </Text>
                 </Form>
               </div>
             </div>

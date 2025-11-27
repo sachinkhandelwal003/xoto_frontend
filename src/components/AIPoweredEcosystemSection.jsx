@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Pool from "./../assets/img/home/Pool.png";
-import wavemap from "./../assets/img/home/wavemap.png";
+import wavemap from "./../assets/img/home/wavemap1.png";
 
 export default function HomeJourneySection() {
   // small-screen toggle: 'both' | 'text' | 'image'
@@ -15,10 +15,10 @@ export default function HomeJourneySection() {
         <img
           src={Pool}
           alt="Luxury modern villa at night"
-          className="w-full h-full object-cover brightness-75"
+          className="w-full h-full object-cover "
         />
         {/* gradient overlay for contrast */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/20" />
+        {/* <div className="absolute " /> */}
       </div>
 
 
@@ -34,11 +34,11 @@ export default function HomeJourneySection() {
               ${mobileView === 'image' ? 'hidden' : 'block'}
             `}
           >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-black mb-4 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-black mb-4 leading-relax">
               Your AI-Powered Home Journey
             </h1>
 
-            <p className="text-lg md:text-xl leading-relaxed mb-6 text-black">
+            <p className="text-lg md:text-xl leading-relaxed mb-6 text-black font-medium">
               From discovery and design to financing and maintenance — XOTO personalizes every step so you can build and care for your dream home on one seamless platform.
             </p>
 

@@ -3,30 +3,21 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
-import Select from "react-select";
 import {
-  User,
-  Mail,
-  Phone,
-  Lock,
-  Briefcase,
-  Wrench,
-  Plus,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Check,
-  ArrowRight,
+  User, Mail, Phone, Lock, Briefcase, Wrench,
+  Plus, Trash2, ChevronLeft, ChevronRight, Check, ArrowRight,
 } from "lucide-react";
+import { Form, Input, Select, Button, Checkbox, message, Spin } from "antd";
 import registerimage from "../../assets/img/registergarden.jpg";
-import { showToast } from "../../manageApi/utils/toast";
 import { apiService } from "../../manageApi/utils/custom.apiservice";
 
-// Keep country codes
+const { Option } = Select;
+
+// Options (unchanged)
 const countryCodes = [
   { value: "+91", label: "+91 India" },
   { value: "+971", label: "+971 UAE" },
-  { value: "+966", label: "+966 Saudi" },
+  { value: "+966", label: "+966 Saudi Arabia" },
   { value: "+1", label: "+1 USA/Canada" },
 ];
 
@@ -41,145 +32,120 @@ const paymentOptions = [
 ];
 
 const languageOptions = [
-  { value: "English", label: "English" },
-  { value: "Arabic", label: "Arabic" },
-  { value: "Hindi", label: "Hindi" },
-  { value: "French", label: "French" },
+  { value: "english", label: "English" },
+  { value: "arabic", label: "Arabic" },
+  { value: "hindi", label: "Hindi" },
+  { value: "french", label: "French" },
 ];
 
-/* ---------- API helpers ---------- */
+const uaeLocations = [
+  "Dubai", "Abu Dhabi", "Sharjah", "Ajman",
+  "Ras Al Khaimah", "Fujairah", "Umm Al Quwain", "Al Ain",
+];
+
+/* API */
 const fetchCategories = async () => {
-  try {
-    const response = await apiService.get(
-      "/freelancer/category?active=true"
-    );
-
-    const data = response.data; 
-    console.log("API Response:", data);  // <-- Your 5-array will appear here
-
-   
-
-    // FIX: Map `data.data` (the actual array)
-    return data.map((c) => ({
-      value: c._id,
-      label: c.name,
-    }));
-  } catch (error) {
-    console.error("Category Fetch Error:", error);
-    throw error;
-  }
+  const res = await apiService.get("/freelancer/category?active=true");
+  return res.data.map(c => ({ value: c._id, label: c.name }));
 };
-
-
 
 const fetchSubcategories = async (catId) => {
-  try {
-    const response = await apiService.get(
-      `/freelancer/subcategory?category=${catId}`
-    );
-
-    const data = response.data;
-
-    
-
-    return data.map((s) => ({
-      value: s._id,
-      label: s.name,
-    }));
-  } catch (error) {
-    console.error("Subcategory Fetch Error:", error);
-    throw error;
-  }
+  if (!catId) return [];
+  const res = await apiService.get(`/freelancer/subcategory?category=${catId}`);
+  return res.data.map(s => ({ value: s._id, label: s.name }));
 };
 
-
-/* ---------- Main Component ---------- */
 const Registration = () => {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
-  // Keep country code & mobile state
   const [countryCode, setCountryCode] = useState("+971");
   const [mobileNumber, setMobileNumber] = useState("");
-
-  const [services, setServices] = useState([
-    { category: "", subcategory: "", description: "" },
-  ]);
+  const [services, setServices] = useState([{
+    category: "",
+    subcategories: [],
+    description: "",
+    unit: "per job"
+  }]);
   const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const [apiErrors, setApiErrors] = useState({});
 
   const {
-    register,
-    handleSubmit,
     control,
+    handleSubmit,
     setValue,
-    watch,
+    trigger,
     formState: { errors },
-  } = useForm();
+  } = useForm({ mode: "onChange" });
 
-  const mobile = watch("mobile");
+  useEffect(() => setValue("is_mobile_verified", true), [setValue]);
 
-  // Auto-set mobile verified = true (bypass OTP for testing)
   useEffect(() => {
-    setValue("is_mobile_verified", true);
-  }, [setValue]);
-
-  // Sync full mobile number with selected country code
-  useEffect(() => {
-    const cleaned = mobileNumber.replace(/\D/g, "").slice(0, 15);
-    const fullMobile = cleaned ? `${countryCode}${cleaned}` : "";
-    setValue("mobile", fullMobile);
+    const num = mobileNumber.replace(/\D/g, "").slice(0, 15);
+    if (num) {
+      setValue("mobile", { country_code: countryCode, number: num });
+    }
   }, [countryCode, mobileNumber, setValue]);
 
-  /* ----- Queries ----- */
   const { data: categories = [], isLoading: catLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: fetchCategories,
     staleTime: Infinity,
   });
 
-  const firstCat = services[0]?.category;
-  const { data: subcategories = [], isLoading: subLoading } = useQuery({
-    queryKey: ["subcategories", firstCat],
-    queryFn: () => fetchSubcategories(firstCat),
-    enabled: !!firstCat,
+  const firstCatId = services[0]?.category;
+  const { data: subcategories = [] } = useQuery({
+    queryKey: ["subcats", firstCatId],
+    queryFn: () => fetchSubcategories(firstCatId),
+    enabled: !!firstCatId,
   });
 
-  /* ----- Navigation ----- */
-  const next = () => setStep((s) => s + 1);
-  const back = () => setStep((s) => s - 1);
+  const next = async () => {
+    const fields = step === 0
+      ? ["first_name", "last_name", "email", "password", "confirmPassword"]
+      : ["experience_years", "bio", "city", "state"];
 
-  const addService = () => {
-    setServices((prev) => [
-      ...prev,
-      { category: "", subcategory: "", description: "" },
-    ]);
+    const ok = await trigger(fields);
+    if (ok) setStep(s => s + 1);
   };
 
-  const removeService = (idx) => {
-    setServices((prev) => prev.filter((_, i) => i !== idx));
+  const back = () => setStep(s => s - 1);
+
+  const addService = () => {
+    setServices(prev => [...prev, {
+      category: "", subcategories: [], description: "", unit: "per job"
+    }]);
+  };
+
+  const removeService = (i) => {
+    setServices(prev => prev.filter((_, idx) => idx !== i));
   };
 
   const updateService = (idx, field, value) => {
-    setServices((prev) => {
-      const copy = [...prev];
-      copy[idx][field] = value;
-      return copy;
+    setServices(prev => {
+      const newServices = [...prev];
+      if (field === "subcategories") {
+        newServices[idx].subcategories = value || [];
+      } else {
+        newServices[idx][field] = value;
+      }
+      return newServices;
     });
   };
 
-  /* ----- Submit ----- */
   const onSubmit = async (data) => {
     if (data.password !== data.confirmPassword) {
-      showToast("Passwords do not match", "error");
-      return;
+      return message.error("Passwords do not match");
     }
-    if (!data.agreed_to_terms) {
-      showToast("You must agree to terms", "error");
-      return;
+    if (selectedLanguages.length === 0) {
+      return message.error("Please select at least one language");
+    }
+    if (services.some(s => !s.category || s.subcategories.length === 0 || !s.description)) {
+      return message.error("Please complete all required service fields");
     }
 
     setLoading(true);
+    setApiErrors({});
 
     const payload = {
       email: data.email,
@@ -190,76 +156,69 @@ const Registration = () => {
         last_name: data.last_name,
       },
       mobile: data.mobile,
-      is_mobile_verified: true, // Always true in test mode
-      professional: {
-        experience_years: Number(data.experience_years) || 0,
-        bio: data.bio || "",
-        skills: [],
-      },
+      is_mobile_verified: true,
       location: {
         city: data.city,
-        state: data.state || "",
-        country: data.country || "UAE",
-        pincode: data.pincode || "",
+        state: data.state,
+        country: "UAE",
+      },
+      professional: {
+        experience_years: Number(data.experience_years),
+        bio: data.bio,
+        skills: [],
+        availability: "Full-time",
+      },
+      services_offered: services.map(s => ({
+        category: s.category,
+        subcategories: s.subcategories,
+        description: s.description,
+        unit: s.unit,
+      })),
+      payment: {
+        preferred_method: data.preferred_method,
       },
       languages: selectedLanguages,
-      services_offered: services
-        .filter((s) => s.category && s.subcategory && s.description)
-        .map((s) => ({
-          category: s.category,
-          subcategory: s.subcategory,
-          description: s.description,
-        })),
-      payment: { preferred_method: data.preferred_method.value },
-      meta: { agreed_to_terms: true },
+      meta: {
+        agreed_to_terms: true,
+      },
     };
 
     try {
-      await axios.post("https://kotiboxglobaltech.online/api/freelancer", payload, {
+      await axios.post("http://localhost:5000/api/freelancer", payload, {
         headers: { "Content-Type": "application/json" },
       });
-
       setSuccess(true);
-      showToast("Registration successful! Await admin approval.", "success");
+      message.success("Registration successful! Awaiting admin approval.");
     } catch (err) {
       const res = err.response?.data;
       if (res?.errors?.length) {
-        showToast(`${res.errors[0].field}: ${res.errors[0].message}`, "error");
+        const errMap = {};
+        res.errors.forEach(e => { errMap[e.field] = e.message; });
+        setApiErrors(errMap);
+        message.error(res.errors[0].message);
       } else {
-        showToast(res?.message || "Registration failed", "error");
+        message.error(res?.message || "Registration failed");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  /* ----- Success Screen ----- */
   if (success) {
     return (
-      <div
-        className="min-h-screen bg-cover bg-center flex items-center justify-center p-6"
-        style={{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${registerimage})`,
-        }}
-      >
+      <div className="min-h-screen bg-cover bg-center flex items-center justify-center p-6"
+        style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${registerimage})` }}>
         <div className="bg-white rounded-2xl shadow-2xl p-10 max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
+          <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-12 h-12 text-purple-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-3">
-            Registration Successful!
-          </h1>
+          <h1 className="text-3xl font-bold mb-4">Registration Successful!</h1>
           <p className="text-gray-600 mb-8">
-            Your request has been sent to the <strong>Super-Admin</strong>.
-            <br />
+            Your request has been sent to the <strong>Super-Admin</strong>.<br />
             You will receive an email once approved.
           </p>
-          <a
-            href="/login"
-            className="inline-flex items-center gap-2 bg-teal-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-teal-700 transition"
-          >
-            Go to Login
-            <ArrowRight className="w-5 h-5" />
+          <a href="/login" className="inline-flex items-center gap-2 bg-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-purple-700 transition">
+            Go to Login <ArrowRight className="w-5 h-5" />
           </a>
         </div>
       </div>
@@ -267,324 +226,199 @@ const Registration = () => {
   }
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center flex items-center justify-center p-6"
-      style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${registerimage})`,
-      }}
-    >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden">
+    <div className="min-h-screen bg-cover bg-center flex items-center justify-center p-6"
+      style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${registerimage})` }}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-4">
-          {/* Sidebar */}
-          <div className="main-gradient-color text-white p-8">
+          {/* Sidebar - Updated to Purple */}
+          <div className="bg-gradient-to-b from-purple-700 to-purple-900 text-white p-8">
             <h3 className="text-2xl font-bold mb-2">Join as a Pro</h3>
-            <p className="text-teal-100 mb-8">Grow your landscaping business</p>
+            <p className="text-purple-200 mb-8">Grow your landscaping business</p>
             <div className="space-y-6">
-              <div className={`flex items-center gap-3 ${step >= 0 ? "text-white" : "text-teal-300"}`}>
-                <User className="w-5 h-5" /> Basic Info
-              </div>
-              <div className={`flex items-center gap-3 ${step >= 1 ? "text-white" : "text-teal-300"}`}>
-                <Briefcase className="w-5 h-5" /> Professional
-              </div>
-              <div className={`flex items-center gap-3 ${step >= 2 ? "text-white" : "text-teal-300"}`}>
-                <Wrench className="w-5 h-5" /> Services
-              </div>
+              <div className={`flex items-center gap-3 ${step >= 0 ? "text-white" : "text-purple-300"}`}><User className="w-6 h-6" /> Basic Info</div>
+              <div className={`flex items-center gap-3 ${step >= 1 ? "text-white" : "text-purple-300"}`}><Briefcase className="w-6 h-6" /> Professional</div>
+              <div className={`flex items-center gap-3 ${step >= 2 ? "text-white" : "text-purple-300"}`}><Wrench className="w-6 h-6" /> Services</div>
             </div>
-            <p className="text-white text-sm mt-8">
-              Already have an account? <a href="/login" className="underline font-medium">Sign in</a>
-            </p>
           </div>
 
           {/* Form */}
-          <div className="lg:col-span-3 p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              Landscaper Registration
-            </h2>
-            <p className="text-gray-600">Step {step + 1} of 3</p>
+          <div className="lg:col-span-3 p-10">
+            <h2 className="text-4xl font-bold text-gray-800 mb-2">Execution Partner Registration</h2>
+            <p className="text-gray-600 mb-8">Step {step + 1} of 3</p>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+            <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
 
-              {/* STEP 0: Basic Info */}
+              {/* STEP 0 */}
               {step === 0 && (
-                <div className="space-y-5">
-                  {/* Name Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          {...register("first_name", { required: "Required" })}
-                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          placeholder="John"
-                        />
-                      </div>
-                      {errors.first_name && <p className="text-red-500 text-xs mt-1">{errors.first_name.message}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          {...register("last_name", { required: "Required" })}
-                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          placeholder="Doe"
-                        />
-                      </div>
-                      {errors.last_name && <p className="text-red-500 text-xs mt-1">{errors.last_name.message}</p>}
-                    </div>
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Form.Item label="First Name" required validateStatus={errors.first_name ? "error" : ""} help={errors.first_name?.message || apiErrors.first_name}>
+                      <Controller name="first_name" control={control} rules={{ required: "Required" }} render={({ field }) => <Input prefix={<User />} size="large" {...field} />} />
+                    </Form.Item>
+                    <Form.Item label="Last Name" required validateStatus={errors.last_name ? "error" : ""} help={errors.last_name?.message || apiErrors.last_name}>
+                      <Controller name="last_name" control={control} rules={{ required: "Required" }} render={({ field }) => <Input prefix={<User />} size="large" {...field} />} />
+                    </Form.Item>
                   </div>
 
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                      <input
-                        {...register("email", {
-                          required: "Required",
-                          pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
-                        })}
-                        className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                        placeholder="john@example.com"
-                      />
+                  <Form.Item label="Email" required validateStatus={errors.email ? "error" : ""} help={errors.email?.message || apiErrors.email}>
+                    <Controller name="email" control={control} rules={{ required: "Required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email" } }} render={({ field }) => <Input prefix={<Mail />} size="large" {...field} />} />
+                  </Form.Item>
+
+                  <Form.Item label="Mobile Number" required help={apiErrors.mobile}>
+                    <div className="flex gap-3">
+                      <Select value={countryCode} onChange={setCountryCode} style={{ width: 140 }} size="large">
+                        {countryCodes.map(c => <Option key={c.value} value={c.value}>{c.label}</Option>)}
+                      </Select>
+                      <Input prefix={<Phone />} value={mobileNumber} onChange={e => setMobileNumber(e.target.value.replace(/\D/g, ""))} placeholder="501234567" size="large" style={{ flex: 1 }} />
                     </div>
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                  </Form.Item>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Form.Item label="Password" required validateStatus={errors.password ? "error" : ""} help={errors.password?.message}>
+                      <Controller name="password" control={control} rules={{ required: "Required", minLength: { value: 6, message: "Min 6 characters" } }} render={({ field }) => <Input.Password prefix={<Lock />} size="large" {...field} />} />
+                    </Form.Item>
+                    <Form.Item label="Confirm Password" required>
+                      <Controller name="confirmPassword" control={control} rules={{ required: "Required" }} render={({ field }) => <Input.Password prefix={<Lock />} size="large" {...field} />} />
+                    </Form.Item>
                   </div>
 
-                  {/* Mobile with Country Code Select (OTP Removed) */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-                    <div className="flex gap-2">
-                      <Select
-                        value={countryCodes.find(c => c.value === countryCode)}
-                        onChange={(opt) => setCountryCode(opt.value)}
-                        options={countryCodes}
-                        className="w-40"
-                        classNamePrefix="react-select"
-                      />
-                      <div className="flex-1 relative">
-                        <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400 z-10" />
-                        <input
-                          value={mobileNumber}
-                          onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 15))}
-                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                          placeholder="501234567"
-                        />
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Full: {mobile || "—"} (Auto-verified in test mode)
-                    </p>
+                  <div className="text-right mt-8">
+                    <Button type="primary" size="large" onClick={next}
+                      style={{ backgroundColor: '#5C039B', borderColor: '#5C039B' }}>
+                      Next <ChevronRight className="inline" />
+                    </Button>
                   </div>
-
-                  {/* Passwords */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="password"
-                          {...register("password", {
-                            required: "Required",
-                            minLength: { value: 6, message: "Min 6 chars" },
-                          })}
-                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                        />
-                      </div>
-                      {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="password"
-                          {...register("confirmPassword", { required: "Required" })}
-                          className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Next Button - Always enabled (no OTP needed) */}
-                  <div className="text-right">
-                    <button
-                      type="button"
-                      onClick={next}
-                      className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white px-6 py-2 rounded-lg"
-                    >
-                      Next <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
+                </>
               )}
 
-              {/* Step 1 & 2 are exactly same as your original (just removed isMobileVerified checks) */}
+              {/* STEP 1 */}
               {step === 1 && (
-                <div className="space-y-5">
-                  {/* Same as your original Step 1 */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                    <Controller
-                      name="experience_years"
-                      control={control}
-                      rules={{ required: "Required" }}
-                      render={({ field }) => (
-                        <Select {...field} options={experienceOptions} placeholder="Select experience" classNamePrefix="react-select" />
-                      )}
-                    />
-                    {errors.experience_years && <p className="text-red-500 text-xs mt-1">{errors.experience_years.message}</p>}
+                <>
+                  <Form.Item label="Years of Experience" required validateStatus={errors.experience_years ? "error" : ""} help={errors.experience_years?.message}>
+                    <Controller name="experience_years" control={control} rules={{ required: "Required" }} render={({ field }) => (
+                      <Select size="large" placeholder="Select years" {...field}>
+                        {experienceOptions.map(o => <Option key={o.value} value={o.value}>{o.label}</Option>)}
+                      </Select>
+                    )} />
+                  </Form.Item>
+
+                  <Form.Item label="Professional Bio" required validateStatus={errors.bio ? "error" : ""} help={errors.bio?.message}>
+                    <Controller name="bio" control={control} rules={{ required: "Required" }} render={({ field }) => <Input.TextArea rows={5} size="large" {...field} />} />
+                  </Form.Item>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Form.Item label="City" required>
+                      <Controller name="city" control={control} rules={{ required: "Required" }} render={({ field }) => (
+                        <Select size="large" placeholder="Select city" {...field}>
+                          {uaeLocations.map(city => <Option key={city} value={city}>{city}</Option>)}
+                        </Select>
+                      )} />
+                    </Form.Item>
+                    <Form.Item label="State/Emirate" required>
+                      <Controller name="state" control={control} rules={{ required: "Required" }} render={({ field }) => (
+                        <Select size="large" placeholder="Select state" {...field}>
+                          {uaeLocations.map(state => <Option key={state} value={state}>{state}</Option>)}
+                        </Select>
+                      )} />
+                    </Form.Item>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                    <textarea
-                      {...register("bio", { required: "Required" })}
-                      rows={4}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                      placeholder="I specialize in..."
-                    />
-                    {errors.bio && <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>}
+                  <div className="flex justify-between mt-8">
+                    <Button size="large" onClick={back}><ChevronLeft /> Back</Button>
+                    <Button type="primary" size="large" onClick={next}
+                      style={{ backgroundColor: '#5C039B', borderColor: '#5C039B' }}>
+                      Next <ChevronRight />
+                    </Button>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                      <input {...register("city", { required: "Required" })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Dubai" />
-                      {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                      <input {...register("state")} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="Dubai" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                      <input {...register("pincode")} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="123456" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Working Radius (km)</label>
-                      <input {...register("working_radius")} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500" placeholder="50" />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <button type="button" onClick={back} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800">
-                      <ChevronLeft className="w-5 h-5" /> Back
-                    </button>
-                    <button type="button" onClick={next} className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white px-6 py-2 rounded-lg ">
-                      Next <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
+                </>
               )}
 
-              {/* Step 2: Services (unchanged) */}
+              {/* STEP 2 */}
               {step === 2 && (
-                <div className="space-y-6">
+                <Spin spinning={loading}>
                   {services.map((svc, i) => (
-                    <div key={i} className="border border-gray-200 rounded-lg p-5">
+                    <div key={i} className="border border-gray-300 rounded-lg p-6 mb-6">
                       <div className="flex justify-between items-center mb-4">
-                        <h4 className="font-medium">Service {i + 1}</h4>
-                        {services.length > 1 && (
-                          <button type="button" onClick={() => removeService(i)} className="text-red-600 hover:text-red-700">
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        )}
+                        <h3 className="text-lg font-semibold">Service {i + 1}</h3>
+                        {services.length > 1 && <Button danger onClick={() => removeService(i)}><Trash2 className="w-5 h-5" /></Button>}
                       </div>
-                      <div className="space-y-4">
+
+                      <Form.Item label="Category" required>
+                        <Select loading={catLoading} value={svc.category} onChange={v => updateService(i, "category", v)} placeholder="Select category" size="large">
+                          {categories.map(c => <Option key={c.value} value={c.value}>{c.label}</Option>)}
+                        </Select>
+                      </Form.Item>
+
+                      <Form.Item label="Subcategories (Multiple)" required>
                         <Select
-                          isLoading={catLoading}
-                          placeholder="Category"
-                          value={categories.find(c => c.value === svc.category)}
-                          onChange={(opt) => updateService(i, "category", opt.value)}
-                          options={categories}
-                          classNamePrefix="react-select"
-                        />
-                        <Select
-                          isLoading={subLoading}
-                          placeholder="Subcategory"
-                          value={subcategories.find(s => s.value === svc.subcategory)}
-                          onChange={(opt) => updateService(i, "subcategory", opt.value)}
-                          options={subcategories}
-                          isDisabled={!svc.category}
-                          classNamePrefix="react-select"
-                        />
-                        <textarea
-                          placeholder="Description"
+                          mode="multiple"
+                          value={svc.subcategories}
+                          onChange={v => updateService(i, "subcategories", v)}
+                          placeholder="Select subcategories"
+                          size="large"
+                          disabled={!svc.category}
+                        >
+                          {subcategories.map(s => <Option key={s.value} value={s.value}>{s.label}</Option>)}
+                        </Select>
+                      </Form.Item>
+
+                      <Form.Item label="Description" required>
+                        <Input.TextArea
                           value={svc.description}
-                          onChange={(e) => updateService(i, "description", e.target.value)}
-                          rows={2}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                          onChange={e => updateService(i, "description", e.target.value)}
+                          rows={3}
+                          size="large"
                         />
-                      </div>
+                      </Form.Item>
                     </div>
                   ))}
 
-                  <button
-                    type="button"
-                    onClick={addService}
-                    className="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 flex items-center justify-center gap-2 text-gray-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-                  >
-                    <Plus className="w-5 h-5" /> Add Another Service
-                  </button>
+                  <Button type="dashed" onClick={addService} block size="large" className="mb-6">
+                    <Plus /> Add Another Service
+                  </Button>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Languages</label>
-                    <Select
-                      isMulti
-                      value={languageOptions.filter(l => selectedLanguages.includes(l.value))}
-                      onChange={(opts) => setSelectedLanguages(opts.map(o => o.value))}
-                      options={languageOptions}
-                      classNamePrefix="react-select"
-                    />
-                  </div>
+                  <Form.Item label="Languages Spoken" required>
+                    <Select mode="multiple" value={selectedLanguages} onChange={setSelectedLanguages} size="large">
+                      {languageOptions.map(l => <Option key={l.value} value={l.value}>{l.label}</Option>)}
+                    </Select>
+                  </Form.Item>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                  <Form.Item label="Payment Method" required>
                     <Controller
                       name="preferred_method"
                       control={control}
                       rules={{ required: "Required" }}
                       render={({ field }) => (
-                        <Select {...field} options={paymentOptions} placeholder="Select payment method" classNamePrefix="react-select" />
+                        <Select size="large" placeholder="Select method" {...field}>
+                          {paymentOptions.map(p => <Option key={p.value} value={p.value}>{p.label}</Option>)}
+                        </Select>
                       )}
                     />
-                    {errors.preferred_method && <p className="text-red-500 text-xs mt-1">{errors.preferred_method.message}</p>}
-                  </div>
+                  </Form.Item>
 
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      {...register("agreed_to_terms", { required: "You must agree" })}
-                      className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+                  <Form.Item>
+                    <Controller
+                      name="agreed_to_terms"
+                      control={control}
+                      rules={{ required: "You must agree" }}
+                      render={({ field }) => (
+                        <Checkbox checked={field.value} onChange={e => field.onChange(e.target.checked)}>
+                          I agree to <a href="#" className="text-purple-600 font-medium">Terms</a> & <a href="#" className="text-purple-600 font-medium">Privacy Policy</a>
+                        </Checkbox>
+                      )}
                     />
-                    <label className="ml-2 text-sm text-gray-700">
-                      I agree to the <a href="#" className="text-[var(--color-primary)] underline">Terms</a> and <a href="#" className="text-[var(--color-primary)] underline">Privacy Policy</a>
-                    </label>
-                  </div>
-                  {errors.agreed_to_terms && <p className="text-red-500 text-xs">{errors.agreed_to_terms.message}</p>}
+                  </Form.Item>
 
-                  <div className="flex justify-between">
-                    <button type="button" onClick={back} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800">
-                      <ChevronLeft className="w-5 h-5" /> Back
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white px-6 py-2 rounded-lg  disabled:opacity-50"
-                    >
-                      {loading ? "Submitting..." : "Complete Registration"}
-                      <Check className="w-5 h-5" />
-                    </button>
+                  <div className="flex justify-between mt-10">
+                    <Button size="large" onClick={back}><ChevronLeft /> Back</Button>
+                    <Button type="primary" htmlType="submit" loading={loading} size="large"
+                      style={{ backgroundColor: '#5C039B', borderColor: '#5C039B' }}>
+                      Complete Registration <Check className="inline ml-2" />
+                    </Button>
                   </div>
-                </div>
+                </Spin>
               )}
-            </form>
+            </Form>
           </div>
         </div>
       </div>

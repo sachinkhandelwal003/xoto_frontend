@@ -3,19 +3,18 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useCmsContext } from '../../contexts/CmsContext';
-import { FiSettings, FiX, FiChevronDown } from 'react-icons/fi';
+import { FiSettings, FiX, FiChevronDown, FiAlertCircle } from 'react-icons/fi';
 import logoNew from '../../../../assets/img/logoNew.png';
 
 const roleSlugMap = {
   '0': 'superadmin',
   '1': 'admin',
-    '2': "customer",
+  '2': "customer",
   '5': 'vendor-b2c',
   '6': 'vendor-b2b',
   '7': 'freelancer',
   '11': 'accountant',
-    '12': 'supervisor',
-
+  '12': 'supervisor',
 };
 
 const ROLE_MODULE_ORDER = {
@@ -25,8 +24,7 @@ const ROLE_MODULE_ORDER = {
   '6': ['Dashboard', 'Products', 'Projects', 'Inventory', 'Payout'],
   '7': ['Dashboard', 'My Projects', 'All Projects', 'Add Projects', 'Payout'],
   '11': ['Dashboard', 'All accountant', 'Requested Projects', 'Payout'],
-    '12': ['Dashboard', 'All accountant', 'Requested Projects', 'Payout'],
-
+  '12': ['Dashboard', 'All accountant', 'Requested Projects', 'Payout'],
 };
 
 const Sidebar = () => {
@@ -36,13 +34,12 @@ const Sidebar = () => {
   const [openModule, setOpenModule] = useState(null);
   const sidebarRef = useRef(null);
 
-  console.log(permissions)
   // Close on route change (mobile)
   useEffect(() => {
     if (isMobile && sidebarOpen) closeSidebar();
   }, [location.pathname, isMobile, sidebarOpen, closeSidebar]);
 
-  // Close on outside click (mobile)
+  // Close on outside click
   useEffect(() => {
     const handleOutside = (e) => {
       if (isMobile && sidebarOpen && sidebarRef.current && !sidebarRef.current.contains(e.target)) {
@@ -58,10 +55,20 @@ const Sidebar = () => {
   const roleCode = user.role.code.toString();
   const roleSlug = roleSlugMap[roleCode] ?? 'dashboard';
   const basePath = `/dashboard/${roleSlug}`;
-  const customOrder = ROLE_MODULE_ORDER[roleCode] || [];
+
+  // FREELANCER PENDING APPROVAL CHECK
+  const isFreelancer = roleCode === '7';
+  const isPendingApproval = isFreelancer && user.status !== 1;
 
   const navTree = useMemo(() => {
+    // Always show Dashboard
     const tree = [{ title: 'Dashboard', icon: 'fas fa-home', to: basePath, exact: true, submenus: [] }];
+
+    // If freelancer not approved → show nothing else
+    if (isPendingApproval) {
+      return tree;
+    }
+
     const modulesMap = {};
 
     Object.entries(permissions ?? {}).forEach(([key, p]) => {
@@ -80,24 +87,23 @@ const Sidebar = () => {
     Object.values(modulesMap).forEach(m => m.submenus.sort((a, b) => a.title.localeCompare(b.title)));
 
     const ordered = [];
+    const customOrder = ROLE_MODULE_ORDER[roleCode] || [];
     customOrder.forEach(t => modulesMap[t] && ordered.push(modulesMap[t]) && delete modulesMap[t]);
     ordered.push(...Object.values(modulesMap));
 
     return [...tree, ...ordered];
-  }, [permissions, basePath, customOrder]);
+  }, [permissions, basePath, isPendingApproval]);
 
   const toggleModule = (mod) => setOpenModule(openModule === mod ? null : mod);
   const isParentActive = (item) => item.submenus.some(s => location.pathname.startsWith(s.to));
   const handleNavClick = () => isMobile && closeSidebar();
 
-  // Dynamic sidebar width: 256px (20%) or 0px
   const sidebarWidth = isMobile
     ? (sidebarOpen ? 'w-64' : '-translate-x-full')
     : (sidebarCollapsed ? 'w-0' : 'w-64');
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobile && sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40" onClick={closeSidebar} />
       )}
@@ -119,45 +125,52 @@ const Sidebar = () => {
             background: rgba(168, 85, 247, 0.3); border-radius: 10px;
           }
           .sidebar-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.5); }
-          @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-          .animate-slideDown { animation: slideDown 0.2s ease-out; }
         `}</style>
 
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-purple-800/50">
-         <div className="flex flex-col items-center gap-3 flex-1 min-w-0">
-  <img
-    src={logoNew}
-    alt="Logo"
-    className={`transition-all duration-300 
-    }`}
-  />
-
-  {!sidebarCollapsed && (
-    <div className="flex-1 min-w-0 flex flex-col items-center">
-      <div className="text-xs uppercase tracking-widest text-purple-300/80 truncate">
-        Welcome
-      </div>
-      <div className="text-sm font-bold text-purple-200 truncate">
-        {user.role?.name}
-      </div>
-    </div>
-  )}
-</div>
-
+          <div className="flex flex-col items-center gap-3 flex-1">
+            <img src={logoNew} alt="Logo" className="h-12" />
+            {!sidebarCollapsed && (
+              <div className="text-center">
+                <div className="text-xs uppercase tracking-widest text-purple-300/80">Welcome</div>
+                <div className="text-sm font-bold text-purple-200">{user.role?.name || 'User'}</div>
+              </div>
+            )}
+          </div>
           {isMobile && sidebarOpen && (
-            <button onClick={closeSidebar} className="p-2 text-purple-300 hover:text-purple-100 hover:bg-purple-800/30 rounded-lg">
-              <FiX className="w-4 h-4" />
+            <button onClick={closeSidebar} className="p-2 text-purple-300 hover:text-white">
+              <FiX className="w-5 h-5" />
             </button>
           )}
         </div>
 
-        {/* Nav */}
+        {/* PENDING APPROVAL CARD - ONLY FOR FREELANCER */}
+        {isPendingApproval && (
+          <div className="mx-4 mt-6 mb-4">
+            <div className="bg-gradient-to-r from-orange-600/20 to-red-600/20 border border-orange-500/50 rounded-xl p-5 text-center">
+              <FiAlertCircle className="w-12 h-12 text-orange-400 mx-auto mb-3" />
+              <h3 className="text-white font-bold text-lg mb-2">Account Under Review</h3>
+              <p className="text-purple-200 text-sm">
+                Your freelancer account is being reviewed by our team.<br />
+                <strong>You'll be notified via email once approved.</strong>
+              </p>
+              <div className="mt-4 text-xs text-purple-300">
+                Usually takes 24–48 hours
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 sidebar-scrollbar">
           {navTree.map((item) => {
             const hasSub = item.submenus.length > 0;
             const active = location.pathname === item.to || (hasSub && isParentActive(item));
             const expanded = openModule === item.title;
+
+            // Hide all except Dashboard if pending approval
+            if (isPendingApproval && item.title !== 'Dashboard') return null;
 
             return (
               <div key={item.title}>
@@ -167,55 +180,45 @@ const Sidebar = () => {
                     end={item.exact}
                     onClick={handleNavClick}
                     className={({ isActive }) => `
-                      flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 group
-                      ${isActive ? 'bg-purple-600/50 text-purple-50 shadow-lg shadow-purple-500/20' : 'text-purple-300 hover:bg-purple-800/30 hover:text-purple-100'}
+                      flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group
+                      ${isActive 
+                        ? 'bg-purple-600/50 text-white shadow-lg shadow-purple-500/20' 
+                        : 'text-purple-300 hover:bg-purple-800/30 hover:text-white'
+                      }
                     `}
                   >
-                    <i className={`${item.icon} text-lg w-5 text-center flex-shrink-0`} />
-                    {!sidebarCollapsed && <span className="truncate flex-1">{item.title}</span>}
-                    {sidebarCollapsed && (
-                      <div className="absolute left-full ml-3 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50 shadow-lg">
-                        {item.title}
-                      </div>
-                    )}
+                    <i className={`${item.icon} w-5 text-center`} />
+                    {!sidebarCollapsed && <span className="truncate">{item.title}</span>}
                   </NavLink>
                 ) : (
                   <div>
                     <button
                       onClick={() => toggleModule(item.title)}
                       className={`
-                        w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 group
-                        ${active || expanded ? 'text-purple-100 bg-purple-800/20' : 'text-purple-300 hover:text-purple-100 hover:bg-purple-800/20'}
+                        w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium
+                        ${active || expanded ? 'text-white bg-purple-800/30' : 'text-purple-300 hover:text-white hover:bg-purple-800/20'}
                       `}
                     >
-                      <i className={`${item.icon} text-lg w-5 text-center flex-shrink-0`} />
-                      {!sidebarCollapsed && (
-                        <>
-                          <span className="truncate flex-1 text-left">{item.title}</span>
-                          <FiChevronDown className={`transition-transform ${expanded ? 'rotate-180' : ''}`} />
-                        </>
-                      )}
-                      {sidebarCollapsed && (
-                        <div className="absolute left-full ml-3 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap z-50 shadow-lg">
-                          {item.title}
-                        </div>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <i className={`${item.icon} w-5`} />
+                        {!sidebarCollapsed && <span className="truncate">{item.title}</span>}
+                      </div>
+                      {!sidebarCollapsed && <FiChevronDown className={`transition-transform ${expanded ? 'rotate-180' : ''}`} />}
                     </button>
 
                     {expanded && !sidebarCollapsed && (
-                      <div className="mt-1 ml-3 pl-3 space-y-1 border-l border-purple-800/30 animate-slideDown">
+                      <div className="mt-1 ml-8 space-y-1 border-l border-purple-700/30 pl-4">
                         {item.submenus.map(sub => (
                           <NavLink
                             key={sub.to}
                             to={sub.to}
                             onClick={handleNavClick}
                             className={({ isActive }) => `
-                              flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200
-                              ${isActive ? 'bg-purple-600/30 text-purple-50 font-medium' : 'text-purple-300 hover:bg-purple-800/20 hover:text-purple-100'}
+                              block py-2 px-3 rounded-lg text-sm transition
+                              ${isActive ? 'text-purple-100 font-medium' : 'text-purple-300 hover:text-white'}
                             `}
                           >
-                            <i className={`${sub.icon} text-xs w-4 text-center flex-shrink-0`} />
-                            <span className="truncate">{sub.title}</span>
+                            {sub.title}
                           </NavLink>
                         ))}
                       </div>
@@ -228,13 +231,8 @@ const Sidebar = () => {
         </nav>
 
         {/* Footer */}
-        <div className="p-3 border-t border-purple-900/40">
-          <div className={`flex items-center justify-between text-xs text-purple-400/60 transition-all ${!sidebarCollapsed ? 'opacity-100' : 'opacity-0'}`}>
-            <span>v2.0.0</span>
-            <button className={`p-2 rounded-xl hover:bg-purple-900/30 transition-all group ${sidebarCollapsed ? 'w-full flex justify-center' : ''}`}>
-              <FiSettings className="w-4 h-4 text-purple-400 group-hover:text-purple-200 group-hover:rotate-90 transition-all duration-300" />
-            </button>
-          </div>
+        <div className="p-4 border-t border-purple-900/40 text-center text-xs text-purple-400">
+          <span>v2.0.0</span>
         </div>
       </aside>
     </>

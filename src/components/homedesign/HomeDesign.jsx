@@ -10,7 +10,7 @@ const HomeDesign = () => {
       <div className="w-full relative">
 
         {/* ---------- WAVE BEHIND EVERYTHING ---------- */}
-        <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
+        <div className="absolute bottom-[-30px] lg:bottom-[-110px] left-0 w-full z-0 overflow-hidden">
           <img
             src={wave1}
             alt=""
@@ -22,10 +22,10 @@ const HomeDesign = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center relative z-10">
 
           {/* LEFT CONTENT (should appear first on mobile) */}
-          <div className="order-first lg:order-none space-y-6 px-4 sm:px-8 lg:ps-25 lg:pr-10">
-            <h2 className="text-4xl sm:text-5xl font-extrabold leading-tight text-black">
+          <div className=" space-y-8 px-4 sm:px-8 lg:ps-40 lg:pr-10 ">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-semibold text-black mb-4 leading-relax">
               Your Space, <br />
-              <span className="text-black">Redefined Instantly.</span>
+              <span className="text-black font-semibold">Redefined Instantly.</span>
             </h2>
 
             <p className="text-gray-700 text-lg leading-relaxed max-w-md">
@@ -37,7 +37,7 @@ const HomeDesign = () => {
 
             <Link
               to=""
-              className="relative z-20 inline-block bg-[var(--color-primary)] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#5533d8] transition-all shadow-md"
+              className="relative z-20 inline-block bg-[var(--color-primary)] text-white px-15 py-4 rounded-lg font-semibold"
             >
               Get Free Estimate Now
             </Link>

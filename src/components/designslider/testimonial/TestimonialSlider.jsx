@@ -74,7 +74,7 @@ export default function EcosystemSlider() {
               nextEl: ".custom-swiper-button-next" 
             }}
             autoplay={{
-              delay: 1000, // 1 second auto-slide
+              delay: 5000, // 1 second auto-slide
               disableOnInteraction: false,
             }}
             centeredSlides={true}

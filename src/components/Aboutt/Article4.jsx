@@ -4,15 +4,14 @@ import roomImage from '../../assets/img/ui-ux-design_1197721-139046 1.png'
 const Article4= () => {
   return (
     <div>
-       <section className="ai-dna-section bg-[linear-gradient(to_bottom,#5C039B,#03A4F4) h-[500px]]
-">
+       <section className="ai-dna-section bg-[linear-gradient(to_bottom,#5C039B,#03A4F4) h-[500px]] h-150">
       <div className="ai-dna-container">
 
         {/* LEFT SIDE */}
         <div className="ai-dna-left">
           <h2 className="ai-dna-title">AI In Our DNA</h2>
 
-          <p className="ai-dna-body">
+          <p className="ai-dna-body font-dmSans">
             At XOTO, artificial intelligence powers every touchpoint, making
             property discovery, design, financing, and management smarter,
             faster, and more personalized for every stakeholder.

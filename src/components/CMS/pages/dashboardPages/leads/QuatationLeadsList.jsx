@@ -480,7 +480,10 @@ const handleSubmitQuotation = async (values) => {
               <Row gutter={[16, 8]}>
                 <Col span={12}><strong>Name:</strong> {selectedLead.customer_name}</Col>
                 <Col span={12}><strong>Email:</strong> {selectedLead.customer_email}</Col>
-                <Col span={12}><strong>Mobile:</strong> {selectedLead.customer_mobile}</Col>
+<Col span={12}>
+  <strong>Mobile:</strong> 
+  {selectedLead?.customer_mobile?.country_code} {selectedLead?.customer_mobile?.number}
+</Col>
                 <Col span={12}><strong>Submitted:</strong> {new Date(selectedLead.submitted_at).toLocaleString()}</Col>
               </Row>
             </Card>

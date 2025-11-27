@@ -943,7 +943,9 @@ const AssignedLeadsList = () => {
                             <Descriptions column={1} size="small">
                                 <Descriptions.Item label="Name">{selectedLead.customer_name}</Descriptions.Item>
                                 <Descriptions.Item label="Email">{selectedLead.customer_email}</Descriptions.Item>
-                                <Descriptions.Item label="Mobile">{selectedLead.customer_mobile}</Descriptions.Item>
+<Descriptions.Item label="Mobile">
+  {selectedLead?.customer_mobile?.country_code} {selectedLead?.customer_mobile?.number}
+</Descriptions.Item>
                                 <Descriptions.Item label="Submitted">
                                     {new Date(selectedLead.submitted_at).toLocaleString()}
                                 </Descriptions.Item>
@@ -1380,7 +1382,9 @@ const AssignedLeadsList = () => {
                                     description={
                                         <div>
                                             <p className="text-sm">{freelancer.email}</p>
-                                            <p className="text-sm">{freelancer.mobile}</p>
+<p className="text-sm">
+  {freelancer?.mobile?.country_code} {freelancer?.mobile?.number}
+</p>
                                             <div className="mt-1">
                                                 <p className="text-xs text-gray-500">
                                                     Services: {freelancer.services_offered?.map(service => 
