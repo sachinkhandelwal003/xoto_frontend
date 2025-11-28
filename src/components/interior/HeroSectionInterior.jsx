@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import mainbgImage from "../../assets/img/mainbg.jpg"; // ← change your image path
 
 export default function HeroSectionInterior
-() {
+  () {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-slate-100">
       {/* Background Image */}
@@ -22,25 +22,26 @@ export default function HeroSectionInterior
       {/* Hero Content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16">
         <div className="max-w-4xl text-center">
-          <h1 className="mb-6 text-4xl font-bold text-white drop-shadow-lg sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="mb-6 text-6xl font-bold text-white drop-shadow-lg sm:text-5xl md:text-6xl lg:text-6xl">
             Interiors That Reflect You
           </h1>
 
-          <p className="mb-8 text-base text-gray-100 drop-shadow-md sm:text-lg md:text-xl lg:text-2xl">
+          <p className="mb-8 text-2xl text-gray-100 drop-shadow-md sm:text-lg md:text-xl lg:text-2xl max-w-[700px] ml-2">
             Tailored designs, smart solutions, and expert execution for every
             corner of your home.
           </p>
 
-          <button className="group inline-flex items-center gap-3 rounded-full bg-[#5C039B] px-6 py-3 text-sm font-medium text-white shadow-xl transition-all sm:px-8 sm:py-4 sm:text-base hover:bg-purple-700 hover:shadow-2xl hover:-translate-y-1">
-            <span>Get a free estimate</span>
-            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          <button className="group inline-flex items-center gap-3 rounded-md bg-[#5C039B] px-6 py-4 text-xl font-semibold text-white shadow-xl transition-all hover:bg-purple-700 hover:shadow-2xl hover:-translate-y-1">
+            <span className="text-2xl sm:text-xl">Get a free estimate</span>
+            <ArrowRight className="h-7 w-7 transition-transform group-hover:translate-x-1" />
           </button>
+
         </div>
       </div>
-<div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape "></div>
+      <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape "></div>
       <div className="absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape"></div>
 
-       <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape "></div>
+      <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape "></div>
       <div className="absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape"></div>
 
       {/* Custom clip paths */}
@@ -53,6 +54,6 @@ export default function HeroSectionInterior
         }
       `}</style>
     </div>
-    
+
   );
 }

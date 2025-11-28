@@ -73,14 +73,14 @@ const HeroSection = () => {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
             <Link
-              to=""
+              to="/aiPlanner"
               className="bg-[var(--color-primary)] text-white font-semibold px-8 py-4 rounded-md shadow-lg"
             >
               Design My Space
             </Link>
 
             <Link
-              to=""
+              to="/marketplace"
               className="border-2 border-white text-white font-semibold px-8 py-4 rounded-md hover:bg-white hover:text-black transition-all"
             >
               Explore Homes
@@ -88,7 +88,7 @@ const HeroSection = () => {
           </div>
 
           {/* Features Grid */}
-        <div className="flex flex-wrap justify-between mt-4 lg:mt-10">
+        <div className="flex flex-wrap w-[460px] justify-between mt-4 lg:mt-10">
   {[
     { icon: gurantee, line1: "One Stop", line2: "Solution" },
     { icon: clock, line1: "Faster Turn", line2: "Around Time" },

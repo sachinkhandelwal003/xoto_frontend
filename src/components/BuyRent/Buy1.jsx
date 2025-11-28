@@ -22,65 +22,88 @@ export default function HeroSection() {
         style={{ backgroundImage: `url(${Imagemain})` }}
         aria-hidden="true"
       >
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-black/40" />
       </div>
 
       {/* ---------- Content ---------- */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center text-white">
 
         {/* Heading with DM Sans Extra-Bold */}
-        <h1 className="mx-auto mb-8 max-w-5xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-          Transforming the Way You Rent, Buy, &amp; Sell Your Home.
-        </h1>
+       <h1
+  className="
+    mx-auto mb-8 max-w-5xl
+    text-white
+    font-extrabold
+    leading-[76px]
+    tracking-[0px]
+    text-[40px]
+    sm:text-[48px]
+    md:text-[60px]
+  "
+>
+  Transforming the Way You <br/> Rent, Buy, & Sell Your Home.
+</h1>
+
 
      
           <div className="flex items-center gap-3 flex-wrap justify-center">
 
       {/* Left Button - Solid Purple */}
-      <button
-        onClick={() => alert("Get Pre-Approved clicked")}
-        className="
-          px-8 py-3 
-          bg-[#5C039B] 
-          text-white 
-          font-semibold 
-          rounded-md 
-          shadow-sm
-          hover:bg-[#4A0080]
-          transition
-        "
-      >
-            Rent a Home
-      </button>
+   <button
+  
+  className="
+    px-8 md:px-10 lg:px-12   /* horizontal padding */
+    py-3 md:py-4             /* vertical padding */
+    bg-[#5C039B]             /* purple fill */
+    text-white
+    font-extrabold
+    text-base md:text-lg
+    rounded-lg
+    shadow-md
+    hover:bg-[#4A0080]
+    transition-colors duration-200
+    focus:outline-none focus:ring-2 focus:ring-[#5C039B]/40
+  "
+>
+  Rent a Home
+</button>
+
 
       {/* Right Button - Transparent */}
       <button
-        onClick={() => alert("Calculate Mortgage clicked")}
+       
         className="
-          px-8 py-3 
-          bg-transparent
-          border border-white/60
-          text-white 
-          font-semibold 
-          rounded-md
-          hover:bg-white hover:text-[#5C039B]
-          transition
-        "
+    px-8 md:px-10 lg:px-12   /* horizontal padding */
+    py-3 md:py-4             /* vertical padding */
+    bg-transparent
+    border-2            /* purple fill */
+    text-white
+    font-extrabold
+    text-base md:text-lg
+    rounded-lg
+    shadow-md
+    hover:bg-white hover:text-[#5C039B]
+    transition-colors duration-200
+    focus:outline-none focus:ring-2 focus:ring-[#5C039B]/40
+  "
       >
             Find a Home
       </button>
   <button
-        onClick={() => alert("Calculate Mortgage clicked")}
-        className="
-          px-8 py-3 
-          bg-transparent
-          border border-white/60
-          text-white 
-          font-semibold 
-          rounded-md
-          hover:bg-white hover:text-[#5C039B]
-          transition
-        "
+         className="
+    px-8 md:px-10 lg:px-12   /* horizontal padding */
+    py-3 md:py-4             /* vertical padding */
+    bg-transparent
+    border-2          /* purple fill */
+    text-white
+    font-extrabold
+    text-base md:text-lg
+    rounded-lg
+    shadow-md
+    hover:bg-white hover:text-[#5C039B]
+    transition-colors duration-200
+    focus:outline-none focus:ring-2 focus:ring-[#5C039B]/40
+  "
       >
             Sell a Home
       </button>

@@ -774,7 +774,6 @@ const endMoment = moment(values.end_date?.toDate?.() || values.end_date);
                     <div>
                       <strong>{f.name?.first_name} {f.name?.last_name}</strong>
                       <br />
-                      <small>{f.email} • {f.mobile || "No mobile"}</small>
                       {isAlreadyAssigned && (
                         <Tag color="green" size="small" style={{ marginLeft: 8 }}>
                           Already Assigned
@@ -837,7 +836,6 @@ const endMoment = moment(values.end_date?.toDate?.() || values.end_date);
                   description={
                     <Space direction="vertical" size={0}>
                       <div>Email: {a.email}</div>
-                      <div>Mobile: {a.mobile}</div>
                       <div>Firm: {a.firm_name}</div>
                       <Tag color="purple">{a.qualifications?.join(", ")}</Tag>
                     </Space>

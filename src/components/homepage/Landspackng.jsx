@@ -263,7 +263,7 @@ export default function Landspackng() {
 
 
           <div className="flex items-center justify-center gap-4 mt-6">
-            <motion.button
+            {/* <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.8 }}
@@ -273,9 +273,9 @@ export default function Landspackng() {
               className="bg-[var(--color-primary)] hover:bg-purple-700 text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center gap-3"
             >
               Get a free estimate
-            </motion.button>
+            </motion.button> */}
 
-            <Link to='/aiPlanner'>
+            {/* <Link to='/aiPlanner'>
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -285,6 +285,18 @@ export default function Landspackng() {
                 className="bg-[var(--color-primary)] hover:bg-purple-700 text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center"
               >
                 AI Planner
+              </motion.button>
+            </Link> */}
+                <Link to='/estimate/calculator'>
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-[var(--color-primary)] hover:bg-purple-700 text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center"
+              >
+              Get a free estimate
               </motion.button>
             </Link>
           </div>
@@ -318,9 +330,11 @@ export default function Landspackng() {
               <p className="text-2xl text-[#547593]">
                 Upload your space or choose a template, and get instant AI-powered design previews.
               </p>
-              <button className="rounded-md bg-[var(--color-primary)] px-15 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
-                Take a first step
-              </button>
+            <Link to="/aiPlanner">
+  <button className="rounded-md bg-[var(--color-primary)] px-15 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
+    Take a first step
+  </button>
+</Link>
             </div>
 
             {/* Right Image Column - Modified to increase size and touch bottom */}

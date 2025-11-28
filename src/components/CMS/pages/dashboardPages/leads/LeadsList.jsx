@@ -126,9 +126,7 @@ const LeadsList = () => {
   render: (_, r) => (
     <div>
       <div className="text-sm">{r.customer_email}</div>
-      <div className="text-xs text-gray-500">
-        {r.customer_mobile?.country_code} {r.customer_mobile?.number}
-      </div>
+      
     </div>
   )
 }
@@ -317,9 +315,7 @@ const LeadsList = () => {
               <h4 className="font-semibold">Lead Details</h4>
               <p className="mt-2"><strong>{selectedLead.customer_name}</strong></p>
               <p>{selectedLead.customer_email}</p>
-<p>
-  {selectedLead?.customer_mobile?.country_code} {selectedLead?.customer_mobile?.number}
-</p>
+
               <p className="text-sm text-gray-600 mt-2">{selectedLead.category?.name}</p>
             </div>
 

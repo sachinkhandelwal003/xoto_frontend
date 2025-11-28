@@ -184,9 +184,7 @@ const Registration = () => {
     };
 
     try {
-      await axios.post("https://kotiboxglobaltech.online/api/freelancer", payload, {
-        headers: { "Content-Type": "application/json" },
-      });
+      await apiService.post("/freelancer", payload);
       setSuccess(true);
       message.success("Registration successful! Awaiting admin approval.");
     } catch (err) {

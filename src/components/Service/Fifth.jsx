@@ -1,31 +1,9 @@
-import { useRef } from 'react';
-import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
-import image from "../../assets/img/wave/wave1.png";
+import { useRef } from "react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import image from "../../assets/img/wave/wave2.png";;
 
 export default function TestimonialsSection() {
-  const scrollContainerRef = useRef(null);
-
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      const cardWidth =
-        scrollContainerRef.current.firstChild?.offsetWidth || 320;
-      scrollContainerRef.current.scrollBy({
-        left: -(cardWidth + 24),
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      const cardWidth =
-        scrollContainerRef.current.firstChild?.offsetWidth || 320;
-      scrollContainerRef.current.scrollBy({
-        left: cardWidth + 24,
-        behavior: "smooth",
-      });
-    }
-  };
+  const scrollRef = useRef(null);
 
   const testimonials = [
     {
@@ -33,21 +11,24 @@ export default function TestimonialsSection() {
       text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
       name: "Shubham",
       location: "Pune, Maharashtra",
-      image: null,
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     },
     {
       title: "Found amazing place",
       text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
       name: "Punit",
       location: "Pune, Maharashtra",
-      image: null,
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     },
     {
       title: "Amazing neighborhood!",
       text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
       name: "Harsh",
       location: "HSR Layout, Bangalore",
-      image: null,
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     },
     {
       title: "Found amazing place",
@@ -65,15 +46,15 @@ export default function TestimonialsSection() {
       image:
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     },
-     {
+    {
       title: "Amazing place",
       text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
-      name: " Madhur",
+      name: "Madhur",
       location: "Pune, Maharashtra",
       image:
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     },
-     {
+    {
       title: "Amazing place",
       text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
       name: "Avn",
@@ -81,7 +62,7 @@ export default function TestimonialsSection() {
       image:
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     },
-     {
+    {
       title: "Amazing place",
       text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
       name: "Sam",
@@ -91,103 +72,98 @@ export default function TestimonialsSection() {
     },
   ];
 
+  const slide = (direction) => {
+    if (!scrollRef.current) return;
+    // cardWidth is calculated to include the gap (24px for gap-6)
+    const cardWidth = scrollRef.current.firstChild.offsetWidth + 24; 
+    scrollRef.current.scrollBy({ left: direction * cardWidth, behavior: "smooth" });
+  };
+
   return (
-    // <section className="relative overflow-hidden bg-white min-h-screen w-full min-w-full S flex items-center">
+    <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 min-h-screen w-full flex items-center pt-16">
+      <div className="relative w-full z-10 px-6 md:px-20">
 
-    //   {/* Full-width container (NO max-width limit) */}
-    //   <div className="relative  w-full z-10">
+        <h2 className="text-3xl md:text-5xl font-bold text-center mb-12 text-gray-900">
+          What Our Clients Say
+        </h2>
 
-    //     {/* Heading */}
-    //     <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900">
-    //       What Our Clients Say
-    //     </h2>
-
-    <section className="relative overflow-hidden bg-white min-h-screen w-full flex items-center">
-  
-  <div className="relative w-full z-10 px-20 box-border">
-
-    <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900">
-      What Our Clients Say
-    </h2>
-
-        {/* Scrollable Wrapper */}
-        <div className="relative h-[420px] flex items-center justify-center">
-
-          {/* Scrollable Cards */}
+        {/* SCROLL AREA */}
+        <div className="relative h-[420px] flex items-center">
           <div
-            ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory h-full items-center w-full"
+            ref={scrollRef}
+            className="flex overflow-x-scroll gap-6 snap-x snap-mandatory scroll-smooth w-full scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {testimonials.map((t, index) => (
+            {testimonials.map((t, i) => (
               <div
-                key={index}
-                className="flex-none w-80 bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center text-center snap-center hover:scale-105 transition-transform duration-300"
+                key={i}
+                className="snap-start bg-white flex-none w-[22%] min-w-[220px] rounded-2xl p-6 text-center 
+                         transition-transform duration-300
+                         
+                         /* Custom Shadow using 5C039B */
+                         shadow-[0_4px_15px_rgba(92,3,155,0.2)] 
+                         hover:shadow-[0_8px_25px_rgba(92,3,155,0.3)]
+                         hover:-translate-y-2"
               >
-                {/* Profile Image */}
-                {t.image ? (
-                  <img
-                    src={t.image}
-                    alt={t.name}
-                    className="w-20 h-20 rounded-full object-cover ring-4 ring-purple-100 mb-4"
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-teal-400 mb-4" />
-                )}
+                {/* IMAGE */}
+                <img
+                  src={t.image}
+                  alt={t.name}
+                  className="w-20 h-20 rounded-full object-cover mx-auto border-4 border-white shadow-md mb-4"
+                />
 
-                {/* Stars */}
-                <div className="flex gap-1 mb-5">
-                  {[...Array(5)].map((_, i) => (
+                {/* TITLE */}
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{t.title}</h3>
+
+                {/* TEXT */}
+                <p className="text-[#547593] text-sm mb-4 leading-relaxed">
+                  {t.text}
+                </p>
+
+                {/* STARS */}
+                <div className="flex justify-center gap-1 mb-4">
+                  {[...Array(5)].map((_, j) => (
                     <Star
-                      key={i}
-                      className={`w-5 h-5 ${
-                        i < 4
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-gray-300"
-                      }`}
+                      key={j}
+                      // Changed logic slightly: fill 4 stars, leave 5th unfilled (common pattern)
+                      className={`w-4 h-4 ${j < 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
                     />
                   ))}
                 </div>
 
-                {/* Title */}
-                <h3 className="text-lg font-bold text-gray-900 mb-3">{t.title}</h3>
+                {/* COLOR LINE */}
+                <div className="w-full h-[4px] rounded-full bg-gradient-to-r from-[#03A4F4] to-[#64EF0A]" />
 
-                {/* Review Text */}
-                <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow">
-                  {t.text}
-                </p>
-
-                {/* Name */}
-                <div className="border-t border-gray-200 pt-4 w-full">
-                  <p className="font-semibold text-gray-900">{t.name}</p>
-                  <p className="text-sm text-gray-500">{t.location}</p>
+                {/* NAME */}
+                <div className="pt-3">
+                  <p className="font-medium text-gray-900">{t.name}</p>
+                  <p className="text-xs text-gray-500">{t.location}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Bottom Buttons */}
-        <div className="flex justify-center gap-6 mt-10">
+        {/* BUTTONS */}
+        <div className="flex justify-center gap-6 mt-12 mb-4">
           <button
-            onClick={scrollLeft}
-            className="bg-white shadow-xl rounded-full p-3 hover:bg-gray-100 transition-all"
+            onClick={() => slide(-1)}
+            className="bg-white border rounded-md p-3 shadow-md hover:scale-110 transition-transform"
           >
             <ChevronLeft className="w-7 h-7 text-black" />
           </button>
 
           <button
-            onClick={scrollRight}
-            className="bg-[#5C039B] shadow-xl rounded-full p-3 hover:bg-purple-700 transition-all"
+            onClick={() => slide(1)}
+            className="bg-[#5C039B] rounded-md p-3 shadow-md hover:bg-purple-700 hover:scale-110 transition-transform"
           >
             <ChevronRight className="w-7 h-7 text-white" />
           </button>
         </div>
-
       </div>
 
-      {/* Full-width Wave Background */}
-      <div className="absolute -bottom-40 left-0 w-full z-0 pointer-events-none select-none">
+      {/* BACKGROUND */}
+      <div className="absolute -bottom-90 left-0 w-full z-0">
         <img src={image} alt="wave-bg" className="w-full object-cover" />
       </div>
     </section>

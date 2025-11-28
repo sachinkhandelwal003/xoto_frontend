@@ -5,7 +5,7 @@ import wave1 from "../../assets/img/wave/wave1.png";
 const CtaSection = () => {
   return (
     <section className="relative w-full flex justify-center items-center py-12 px-6 h-[450px]">
-        <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
+        <div className="absolute bottom-[-20px] lg:bottom-[-70px] left-0 w-full z-0 overflow-hidden">
                 <img
                   src={wave1}
                   alt=""

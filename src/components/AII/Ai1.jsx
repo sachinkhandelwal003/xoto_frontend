@@ -1,5 +1,5 @@
 import React from "react";
-import Picture from "../../assets/img/image.jpg";
+import Picture from "../../assets/img/Ai.png";
 import AvatarImage from "../../assets/img/img.png";
 
 const Ai1 = () => {
@@ -15,7 +15,19 @@ const Ai1 = () => {
   "
         style={{ backgroundImage: `url(${Picture})` }}
       >
-        <div className="absolute inset-0 bg-black/10"></div>``
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="hidden lg:block absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape"></div>
+      <div className="hidden lg:block absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape"></div>
+
+      <style>{`
+        .clip-left-shape {
+          clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
+          
+        }
+        .clip-right-shape {
+          clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+      `}</style>
         <div
           className="
     relative z-10 h-full 
@@ -37,7 +49,7 @@ const Ai1 = () => {
             className="
             flex flex-col 
             lg:flex-row lg:items-center lg:justify-between 
-            gap-8 lg:gap-8
+            gap-8 lg:gap-35
             
           "
           >
@@ -48,11 +60,12 @@ const Ai1 = () => {
               }}
               className="
               text-white font-bold 
-              text-4xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl 
-              leading-tight 
-              tracking-tight 
+              text-4xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-4xl 
+              leading-relax
+              tracking-relax
               // max-w-3xl
-               max-w-full
+              //  max-w-full
+              w-600
             "
             >
               Exploring Luxury RealEstate Markets...
@@ -61,8 +74,8 @@ const Ai1 = () => {
             {/* Author */}
             <div className="flex items-center gap-4 text-white">
               {/* Avatar */}
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 p-[2px]">
-                <div className="w-full h-full rounded-full overflow-hidden bg-black">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 p-[2px] ">
+                <div className="w-max h-full rounded-full overflow-hidden bg-black">
                   <img
                     src={AvatarImage}
                     alt="Silicaman"

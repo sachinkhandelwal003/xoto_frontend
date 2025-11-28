@@ -51,9 +51,7 @@ export default function EcoSmartLiving() {
 
         <p className="mt-4 text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
           At XOTO, EcoSmart Living means creating landscapes that balance
-          beauty, sustainability, and technology. Our designs use smart
-          automation and eco-friendly solutions to make outdoor spaces
-          efficient, self-sustaining, and effortlessly modern.
+          beauty, sustainability, and technology.
         </p>
 
         <h2 className="text-4xl font-semibold mt-10 text-black">
@@ -62,32 +60,55 @@ export default function EcoSmartLiving() {
 
         {/* Features Grid */}
         <div className="mt-14 flex flex-col items-center gap-10">
-          
+
           {/* Row 1 */}
           <div className="flex flex-wrap justify-center gap-20">
-            
-            {/* Gradient Circle */}
-            <div className="w-50 h-50 rounded-full flex flex-col items-center justify-center text-center 
-              text-white font-semibold shadow-xl bg-gradient-to-br 
-              from-purple-600 via-blue-500 to-cyan-400 border-[6px] 
-              border-purple-500 hover:scale-105 hover:shadow-2xl transition-all duration-300">
-              
-              <span className="text-lg font-bold">Smart Irrigation</span>
-              <p className="text-xs mt-1 px-3 opacity-90">
-                Sensor-based watering systems that conserve water.
-              </p>
+
+            {/* Smart Irrigation */}
+            <div className="
+              rounded-full p-[12px] 
+              ring-4 ring-transparent
+              hover:ring-[#5C039B]
+              hover:ring-4
+              transition-all duration-300
+            ">
+              <div
+                className="
+                  w-[200px] h-[200px] rounded-full 
+                  flex flex-col items-center justify-center text-center
+                  text-white font-semibold shadow-xl
+                  bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400
+                  hover:scale-105 hover:shadow-2xl transition-all duration-300
+                "
+              >
+                <span className="text-lg font-bold">Smart Irrigation</span>
+                <p className="text-xs mt-1 px-3 opacity-90">
+                  Sensor-based watering systems that conserve water.
+                </p>
+              </div>
             </div>
 
+            {/* Solar + Low Water */}
             {features.slice(1, 3).map((item, i) => (
-              <div
-                key={i}
-                className="w-44 h-44 rounded-full shadow-lg bg-cover bg-center
-                hover:scale-110 hover:shadow-2xl transition-all duration-300
-                flex items-center justify-center"
-                style={{ backgroundImage: `url(${item.image})` }}
-              >
-                <div className="bg-black/40 w-full h-full rounded-full flex items-center justify-center px-2 text-center text-white font-semibold">
-                  {item.title}
+              <div key={i}
+                className="
+                  rounded-full p-[12px]
+                  ring-4 ring-transparent
+                  hover:ring-[#5C039B]
+                  hover:ring-4
+                  transition-all duration-300
+                ">
+                <div
+                  className="
+                    w-[200px] h-[200px] rounded-full bg-cover bg-center shadow-lg
+                    flex items-center justify-center
+                    hover:scale-105 hover:shadow-2xl transition-all duration-300
+                  "
+                  style={{ backgroundImage: `url(${item.image})` }}
+                >
+                  <div className="bg-black/40 w-full h-full rounded-full flex items-center justify-center px-2 text-center text-white font-semibold">
+                    {item.title}
+                  </div>
                 </div>
               </div>
             ))}
@@ -96,15 +117,25 @@ export default function EcoSmartLiving() {
           {/* Row 2 */}
           <div className="flex flex-wrap justify-center gap-20">
             {features.slice(3).map((item, i) => (
-              <div
-                key={i}
-                className="w-44 h-44 rounded-full shadow-lg bg-cover bg-center
-                hover:scale-110 hover:shadow-2xl transition-all duration-300
-                flex items-center justify-center"
-                style={{ backgroundImage: `url(${item.image})` }}
-              >
-                <div className="bg-black/40 w-full h-full rounded-full flex items-center justify-center px-2 text-center text-white font-semibold">
-                  {item.title}
+              <div key={i}
+                className="
+                  rounded-full p-[12px]
+                  ring-4 ring-transparent
+                  hover:ring-[#5C039B]
+                  hover:ring-4
+                  transition-all duration-300
+                ">
+                <div
+                  className="
+                    w-[200px] h-[200px] rounded-full bg-cover bg-center shadow-lg
+                    flex items-center justify-center
+                    hover:scale-105 hover:shadow-2xl transition-all duration-300
+                  "
+                  style={{ backgroundImage: `url(${item.image})` }}
+                >
+                  <div className="bg-black/40 w-full h-full rounded-full flex items-center justify-center px-2 text-center text-white font-semibold">
+                    {item.title}
+                  </div>
                 </div>
               </div>
             ))}

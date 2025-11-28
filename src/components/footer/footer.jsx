@@ -49,50 +49,51 @@ const footerData = {
     { label: "Terms Of Use", path: "/terms" },
   ],
 
-  legal: [
-    { label: "Privacy Policy", path: "/privacy" },
-    { label: "Terms & Conditions", path: "/terms" },
-    { label: "Cookie Policy", path: "/cookies" },
-    { label: "Shipping Policy", path: "/shipping" },
-    { label: "Return Policy", path: "/returns" },
-  ],
-
   social: [
-    { name: "Facebook", icon: <Facebook size={16} />, url: "#" },
-    { name: "Instagram", icon: <Instagram size={16} />, url: "#" },
-    { name: "Twitter", icon: <Twitter size={16} />, url: "#" },
-    { name: "Linkedin", icon: <Linkedin size={16} />, url: "#" },
+    { name: "Facebook", icon: <Facebook size={18} />, url: "#" },
+    { name: "Instagram", icon: <Instagram size={18} />, url: "#" },
+    { name: "Twitter", icon: <Twitter size={18} />, url: "#" },
+    { name: "Linkedin", icon: <Linkedin size={18} />, url: "#" },
   ],
 };
 
 const Footer = () => {
-  const { company, offerings, resources, knowledge, legal, social } = footerData;
+  const { company, offerings, resources, knowledge, social } = footerData;
 
   return (
-    <footer
-      className=" border-purple-700/30 main-gradient-color"
-     
-    >
-      <div className="max-w-10xl   px-40 pt-12">
+    <footer className="border-purple-700/30 main-gradient-color overflow-hidden">
+      <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-24 xl:px-36 pt-12">
 
-        {/* GRID MATCHING UI */}
-        <div className="grid grid-cols-1 md:grid-cols-6  pb-10">
+        {/* GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-10 pb-14">
 
           {/* Company Section */}
-          <div className="col-span-2">
-            <img src={company.logo} className="h-20 object-contain mb-4" alt="Xoto logo" />
+          <div className="lg:col-span-2">
+            <img
+              src={company.logo}
+              className="h-16 sm:h-20 object-contain mb-4"
+              alt="Xoto logo"
+            />
 
-            <p className="text-white font-semibold text-xl leading-tight">{company.slogan}</p>
-            <p className="text-purple-200 mt-3 text-sm leading-relaxed">{company.description}</p>
+            <p className="text-white font-semibold text-lg sm:text-xl leading-tight">
+              {company.slogan}
+            </p>
+            <p className="text-purple-200 mt-3 text-sm leading-relaxed">
+              {company.description}
+            </p>
           </div>
 
           {/* Our Offerings */}
           <div>
-            <h4 className="text-white mb-4 font-semibold text-sm uppercase">Our Offerings</h4>
+            <h4 className="text-white mb-4 font-semibold text-sm uppercase">
+              Our Offerings
+            </h4>
             <ul className="space-y-2">
               {offerings.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">{item.label}</Link>
+                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -100,36 +101,43 @@ const Footer = () => {
 
           {/* Partner Ecosystem */}
           <div>
-            <h4 className="text-white mb-4 font-semibold text-sm uppercase">Partner Ecosystem</h4>
+            <h4 className="text-white mb-4 font-semibold text-sm uppercase">
+              Partner Ecosystem
+            </h4>
             <ul className="space-y-2">
               {resources.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">{item.label}</Link>
+                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Knowledge Centre */}
+          {/* Knowledge / About Us */}
           <div>
             <h4 className="text-white mb-4 font-semibold text-sm uppercase">About Us</h4>
             <ul className="space-y-2">
               {knowledge.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">{item.label}</Link>
+                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Location/Email/Contact icons */}
-          <div className="flex flex-col gap-4">
-
+          {/* Contact + Icons */}
+          <div className="flex flex-col gap-6">
+            {/* Locations */}
             <div>
-              <h4 className="text-white mb-3 font-semibold text-sm uppercase">Locations</h4>
+              <h4 className="text-white mb-2 font-semibold text-sm uppercase">Locations</h4>
               <p className="text-purple-200 text-sm">India | UAE | Saudi Arabia</p>
             </div>
 
+            {/* Email */}
             <div>
               <h4 className="text-white mb-2 font-semibold text-sm uppercase">Email</h4>
               <p className="text-purple-200 text-sm">
@@ -140,35 +148,42 @@ const Footer = () => {
               </p>
             </div>
 
-            <div className="flex flex-col items-end gap-3 mt-3">
-              <a href="https://wa.me/1234567890" className="bg-green-500 p-3 rounded-full shadow-md text-white hover:bg-green-600">
-                <FaWhatsapp size={18} />
+            {/* Contact Buttons */}
+            <div className="flex sm:flex-row lg:flex-col items-start lg:items-end gap-4 mt-3">
+              <a
+                href="https://wa.me/1234567890"
+                className="bg-green-500 p-3 rounded-full shadow-md text-white hover:bg-green-600"
+              >
+                <FaWhatsapp size={20} />
               </a>
 
-              <a href="tel:1234567890" className="bg-blue-500 p-3 rounded-full shadow-md text-white hover:bg-blue-600">
-                <Phone size={18} />
+              <a
+                href="tel:1234567890"
+                className="bg-blue-500 p-3 rounded-full shadow-md text-white hover:bg-blue-600"
+              >
+                <Phone size={20} />
               </a>
             </div>
           </div>
         </div>
-
-        {/* Bottom Row */}
-        
-
       </div>
-      <div className='w-full border-t border-purple-500/20'>
-      <div className=" max-w-6xl mx-auto  py-6 flex justify-between items-center">
-          <p className="text-purple-300 text-sm">©2025 Xoto. All rights reserved</p>
+
+      {/* Bottom Row */}
+      <div className="w-full border-t border-purple-500/20">
+        <div className="max-w-screen-xl mx-auto px-6 sm:px-10 lg:px-20 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-purple-300 text-sm">
+            ©2025 Xoto. All rights reserved
+          </p>
 
           <div className="flex gap-5">
             {social.map((item, i) => (
-              <a key={i} href={item.url} className="text-purple-300  hover:text-white transition">
+              <a key={i} href={item.url} className="text-purple-300 hover:text-white transition">
                 {item.icon}
               </a>
             ))}
           </div>
         </div>
-        </div>
+      </div>
     </footer>
   );
 };

@@ -24,15 +24,15 @@ export default function ConsultationSection() {
 
       {/* MAIN CONTENT */}
       {/* <div className="relative z-10 mx-auto flex flex-col-reverse lg:flex-row items-center justify-between max-w-7xl min-h-screen px-4 sm:px-6 lg:px-8 py-12 lg:py-0"> */}
-<div className="relative z-10 mx-auto flex flex-col-reverse lg:flex-row items-start justify-start max-w-7xl min-h-screen px-4 sm:px-6 lg:px-8 pt-24 pb-12 gap-40">
+<div className="relative z-10 mx-16 flex flex-col-reverse lg:flex-row items-start justify-start max-w-7xl min-h-screen px-4 sm:px-6 lg:px-8 pt-24 pb-12 gap-20">
 
         {/* LEFT SIDE TEXT */}
-        <div className="max-w-xl text-white mt-10 lg:mt-10 text- lg:text-left ">
+        <div className="max-w-fit text-white mt-10 lg:mt-10 text- lg:text-left ">
           
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold whitespace-nowrap gap-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold whitespace-nowrap gap-20">
             Book Consultation
           </h2>
-          <p className="mt-8 text-base sm:text-xl text-gray-200 max-w-md mx-auto lg:mx-0">
+          <p className="mt-8 text-2xl sm:text-xl text-gray-200 max-w-md mx-auto lg:mx-0">
             One simple form to connect with XOTO experts for tailored interior design advice and project planning.
           </p>
         </div>
@@ -113,7 +113,7 @@ export default function ConsultationSection() {
               {/* SUBMIT BUTTON */}
               <button
                 type="submit"
-                className="w-full rounded-full bg-[#5C039B] py-4 text-base sm:text-lg 
+                className="w-full rounded-md bg-[#5C039B] py-4 text-base sm:text-lg 
                 font-semibold text-white"
               >
                 Book Free Consultation

@@ -46,6 +46,8 @@ import Page from "./components/homepage/Page";
 import AIPlanner from "./components/homepage/AiPlanner/AIPlanner";
 import Interior from "./components/homepage/Interior/Interior";
 import Ai from "./components/AII/Ai";
+import EstimateCalculator from "./components/modal/EstimateCalculator";
+import Calculator from "./components/homepage/AiPlanner/Calculator";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -121,6 +123,7 @@ function LayoutWrapper({ children }) {
     "/customer/dashboard",
     "/admin/login",
     "/aiPlanner",
+    "/estimate/calculator",
     "/accountant/login",
     "/ecommerce/seller",
     "/ecommerce/cart",
@@ -149,6 +152,7 @@ function LayoutWrapper({ children }) {
     "/profile",
     "/admin/login",
         "/aiPlanner",
+        "/estimate/calculator",
     "/accountant/login",
     "/ecommerce/seller",
     "/freelancer/registration",
@@ -175,6 +179,7 @@ function LayoutWrapper({ children }) {
     "/customer/dashboard",
     "/admin/login",
         "/aiPlanner",
+        "/estimate/calculator",
     "/ecommerce/seller",
     "/ecommerce/product",
   ];
@@ -192,6 +197,7 @@ function LayoutWrapper({ children }) {
     "/profile",
     "/admin/login",
         "/aiPlanner",
+        "/estimate/calculator",
     "/accountant/login",
     "/ecommerce/seller",
     "/ecommerce/product",
@@ -225,6 +231,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/landscaping" element={<Landspackng />} />
                     <Route path="/aiPlanner" element={<AIPlanner />} />
+                    <Route path="/estimate/calculator" element={<Calculator />} />
 
           <Route path="/services/interior" element={<Ynterior />} />
           <Route path="/marketplace" element={<Buy />} />

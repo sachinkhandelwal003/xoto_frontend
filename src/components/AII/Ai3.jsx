@@ -2,16 +2,33 @@ import React from "react";
 import { FaFacebookF } from "react-icons/fa";
 import { FaTwitter } from "react-icons/fa";
 import { FaLinkedinIn } from "react-icons/fa";
+import waveBottom from '../../assets/img/waveAi.png'
 
 const Ai3 = () => {
   return (
-    <div className="relative w-full bg-white px-6 lg:px-12 py-20">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
+    <div className="relative w-full bg-white px-6 lg:px-12 py-20 overflow-hidden">
+      {/* Wave background — positioned and sized to match your screenshot */}
+      <img
+        src={waveBottom}
+        alt="wave"
+        className="pointer-events-none z-10"
+        style={{
+          position: "absolute",
+          left: "50%",                    // center horizontally
+          transform: "translateX(-50%)",  // center correction
+          bottom: "-350px",               // negative offset to lift wave up (match screenshot)
+          width: "150%",                  // make wave wider so it stretches beyond container like figma
+          opacity: 0.95,                  // slight opacity like screenshot
+          zIndex: 10,
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-20">
         {/* LEFT SIDE CONTENT */}
         <div className="lg:col-span-2 flex flex-col gap-16">
           {/* MAIN HEADING & POINTS */}
           <section>
-            <h2 className="text-[32px] font-bold tracking-[-0.03em] text-[#020202] mb-6">
+            <h2 className="text-[34px] font-bold tracking-[-0.03em] text-[#020202] mb-6">
               Main Heading &amp; Points
             </h2>
 
@@ -32,13 +49,6 @@ const Ai3 = () => {
                 Nullam dignissim sem eu magna aliquet, sit amet volutpat tellus.
               </li>
             </ul>
-
-            <p className="text-[#547593] leading-relaxed mb-6">
-              Unknown printer took a galley of type and scrambled it to make a
-              type specimen book. It has survived not only five centuries, but
-              also the leap into electronic typesetting, remaining essentially
-              unchanged. It was popularised in the
-            </p>
 
             <hr className="border-gray-300 my-8" />
 
@@ -61,7 +71,7 @@ const Ai3 = () => {
 
           {/* TAGS */}
           <section>
-            <h3 className="text-[24px] font-bold tracking-[-0.03em] text-[#020202] mb-4">
+            <h3 className="text-[30px] font-bold tracking-[-0.03em] text-[#020202] mb-4">
               Tags
             </h3>
 
@@ -74,7 +84,7 @@ const Ai3 = () => {
 
           {/* SHARE TEXT LIST */}
           <section>
-            <h3 className="text-[24px] font-bold tracking-[-0.03em] text-[#020202] mb-4">
+            <h3 className="text-[30px] font-bold tracking-[-0.03em] text-[#020202] mb-4">
               Share
             </h3>
 
@@ -85,13 +95,85 @@ const Ai3 = () => {
             </ul>
           </section>
 
-          {/* SIMPLE NEWSLETTER */}
-          <section>
-            <h3 className="text-[24px] font-bold tracking-[-0.03em] text-[#020202] mb-4">
-              Join our newsletter
+          {/* NEWSLETTER – EXACT FIGMA MATCH */}
+          <section className="relative z-30"> {/* z-30 to ensure it sits ABOVE the wave */}
+            <h3
+              className="text-[34px] font-bold tracking-[-0.03em] text-[#020202] mb-4"
+              style={{ fontWeight: 700 }}
+            >
+              join Our Newsletter
             </h3>
 
-            <p className="text-[#547593]">Email address Subscribe</p>
+            <div
+              className="bg-white shadow-2xl rounded-[16px] p-8 border border-gray-100 mt-10"
+              style={{ width: "570px" }}
+            >
+              <form className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <label className="text-[12px] text-[#7b8fa4] mb-2 font-medium">
+                      First Name*
+                    </label>
+                    <input
+                      type="text"
+                      className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="text-[12px] text-[#7b8fa4] mb-2 font-medium">
+                      Last Name*
+                    </label>
+                    <input
+                      type="text"
+                      className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <label className="text-[12px] text-[#7b8fa4] mb-2 font-medium">
+                      Email address*
+                    </label>
+                    <input
+                      type="email"
+                      className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="text-[12px] text-[#7b8fa4] mb-2 font-medium">
+                      Number*
+                    </label>
+                    <input
+                      type="tel"
+                      className="border border-gray-300 rounded-md px-3 py-3 text-sm outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-[12px] text-[#7b8fa4] mb-2 font-medium">
+                    Message*
+                  </label>
+                  <textarea
+                    className="border border-gray-300 rounded-md px-3 py-3 h-20 text-sm outline-none resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full text-white rounded-md font-semibold text-[16px]"
+                  style={{
+                    backgroundColor: "#5C039B",
+                    height: "60px",
+                  }}
+                >
+                  Submit
+                </button>
+              </form>
+            </div>
           </section>
         </div>
 
@@ -99,9 +181,8 @@ const Ai3 = () => {
         <div className="space-y-10">
           {/* SHARE BUTTON CARD */}
           <div className="bg-white shadow-lg rounded-xl p-6 space-y-4">
-            <h3 className="text-xl font-semibold text-[#020202]">Share</h3>
+            <h3 className="text-[24px] font-bold tracking-[-0.03em] text-[#020202] mb-4">Share</h3>
 
-            {/* Facebook */}
             <button
               className="w-full h-11 flex items-center px-4 gap-3 text-white text-[14px] font-medium rounded-md"
               style={{ backgroundColor: "#526FA3" }}
@@ -112,7 +193,6 @@ const Ai3 = () => {
               Facebook
             </button>
 
-            {/* Twitter */}
             <button
               className="w-full h-11 flex items-center px-4 gap-3 text-white text-[14px] font-medium rounded-md"
               style={{ backgroundColor: "#46C4FF" }}
@@ -123,7 +203,6 @@ const Ai3 = () => {
               Twitter
             </button>
 
-            {/* LinkedIn */}
             <button
               className="w-full h-11 flex items-center px-4 gap-3 text-white text-[14px] font-medium rounded-md"
               style={{ backgroundColor: "#3C86AD" }}
@@ -137,7 +216,7 @@ const Ai3 = () => {
 
           {/* NEWSLETTER CARD */}
           <div className="bg-white shadow-lg rounded-xl p-6">
-            <h3 className="text-xl font-semibold text-[#020202] mb-4">
+            <h3 className="text-[24px] font-bold tracking-[-0.03em] text-[#020202] mb-4">
               Join our Newsletter
             </h3>
 
@@ -156,6 +235,7 @@ const Ai3 = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };

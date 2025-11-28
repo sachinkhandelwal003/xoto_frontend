@@ -106,7 +106,6 @@ const AssignFreelancer = ({ project, onSuccess, onCancel }) => {
               description={
                 <Space direction="vertical" size={0}>
                   <div>{f.email}</div>
-                  <div>{f.mobile}</div>
                   {f.skills && f.skills.length > 0 && (
                     <div>
                       <Tag color="blue">

@@ -36,7 +36,7 @@ const HomeDesign = () => {
             </p>
 
             <Link
-              to=""
+              to="/estimate/calculator"
               className="relative z-20 inline-block bg-[var(--color-primary)] text-white px-15 py-4 rounded-lg font-semibold"
             >
               Get Free Estimate Now

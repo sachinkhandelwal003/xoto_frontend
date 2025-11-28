@@ -367,7 +367,6 @@ const handleSubmitQuotation = async (values) => {
   const getColumns = () => [
     { key: 'customer_name', title: 'Customer Name' },
     { key: 'customer_email', title: 'Email' },
-    { key: 'customer_mobile', title: 'Mobile' },
     { key: 'category', title: 'Category', render: v => v?.name || 'N/A' },
     { key: 'subcategories', title: 'Subcategories', render: v => v?.map(s => s.name).join(', ') || 'N/A' },
     {
@@ -480,10 +479,7 @@ const handleSubmitQuotation = async (values) => {
               <Row gutter={[16, 8]}>
                 <Col span={12}><strong>Name:</strong> {selectedLead.customer_name}</Col>
                 <Col span={12}><strong>Email:</strong> {selectedLead.customer_email}</Col>
-<Col span={12}>
-  <strong>Mobile:</strong> 
-  {selectedLead?.customer_mobile?.country_code} {selectedLead?.customer_mobile?.number}
-</Col>
+
                 <Col span={12}><strong>Submitted:</strong> {new Date(selectedLead.submitted_at).toLocaleString()}</Col>
               </Row>
             </Card>

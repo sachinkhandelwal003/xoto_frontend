@@ -56,7 +56,7 @@ export default function DreamSpacesShowcase() {
   };
 
   return (
-    <div className="relative overflow-hidden pb-24">
+    <div className="relative overflow-hidden pb-24 bg-[var(--color-body)]">
 
       {/* Background Wave */}
       <div className="absolute -bottom-20 left-0 w-full z-0 pointer-events-none select-none">
@@ -66,13 +66,13 @@ export default function DreamSpacesShowcase() {
       <div className="max-w-9xl mx-auto  pt-16 relative z-10">
 
         {/* Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 px-24">
           <h1 className="text-5xl font-semibold text-black">
             Explore our curated <br />
             <span className="text-black">dream spaces</span>
           </h1>
 
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <p className="text-lg leading-relaxed text-[#547593] overflow-hidden h-[6rem]">
             Our portfolio showcases our passion for crafting extraordinary spaces
             that redefine sustainable living. As a trusted prop-tech in UAE, we
             transform visions into timeless elegance.
@@ -80,18 +80,17 @@ export default function DreamSpacesShowcase() {
         </div>
 
         {/* SLIDER CONTAINER */}
-        <div 
+        <div
           className="relative w-full overflow-hidden"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           {/* SLIDER TRACK */}
           <div className="relative flex items-center justify-center gap-4 h-[500px]">
-            
+
             {/* LEFT SIDE CARD */}
-            <div className={`hidden md:block absolute left-0 w-[350px] rounded-2xl overflow-hidden shadow-xl opacity-70 scale-95 transition-all duration-500 ease-in-out z-20 ${
-              slideDirection === 'next' ? 'translate-x-0' : 'translate-x-[-100%]'
-            }`}>
+            <div className={`hidden md:block absolute left-0 w-[350px] rounded-2xl overflow-hidden shadow-xl opacity-70 scale-95 transition-all duration-500 ease-in-out z-20 ${slideDirection === 'next' ? 'translate-x-0' : 'translate-x-[-100%]'
+              }`}>
               <img
                 src={projects[getAdjacentIndex(-1)].img}
                 alt={projects[getAdjacentIndex(-1)].title}
@@ -104,12 +103,11 @@ export default function DreamSpacesShowcase() {
             </div>
 
             {/* MAIN CARD - ANIMATED */}
-            <div 
-              className={`absolute w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-in-out z-30 ${
-                slideDirection === 'next' 
-                  ? 'translate-x-0 opacity-100 scale-100' 
+            <div
+              className={`absolute w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-in-out z-30 ${slideDirection === 'next'
+                  ? 'translate-x-0 opacity-100 scale-100'
                   : 'translate-x-0 opacity-100 scale-100'
-              }`}
+                }`}
               key={currentIndex} // Force re-render for animation
             >
               <img
@@ -137,9 +135,8 @@ export default function DreamSpacesShowcase() {
             </div>
 
             {/* RIGHT SIDE CARD */}
-            <div className={`hidden md:block absolute right-0 w-[350px] rounded-2xl overflow-hidden shadow-xl opacity-70 scale-95 transition-all duration-500 ease-in-out z-20 ${
-              slideDirection === 'next' ? 'translate-x-0' : 'translate-x-[100%]'
-            }`}>
+            <div className={`hidden md:block absolute right-0 w-[350px] rounded-2xl overflow-hidden shadow-xl opacity-70 scale-95 transition-all duration-500 ease-in-out z-20 ${slideDirection === 'next' ? 'translate-x-0' : 'translate-x-[100%]'
+              }`}>
               <img
                 src={projects[getAdjacentIndex(1)].img}
                 alt={projects[getAdjacentIndex(1)].title}
@@ -162,11 +159,10 @@ export default function DreamSpacesShowcase() {
                   setSlideDirection(index > currentIndex ? 'next' : 'prev');
                   setCurrentIndex(index);
                 }}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentIndex 
-                    ? 'bg-[#5C039B] w-8' 
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex
+                    ? 'bg-[#5C039B] w-8'
                     : 'bg-gray-300 hover:bg-gray-400'
-                }`}
+                  }`}
               />
             ))}
           </div>
@@ -175,14 +171,14 @@ export default function DreamSpacesShowcase() {
           <div className="flex justify-center items-center gap-4 mt-6">
             <button
               onClick={prev}
-              className="w-12 h-12 rounded-full border border-gray-400 flex items-center justify-center hover:bg-gray-100 transition-all duration-300 hover:scale-110"
+              className="w-12 h-12 rounded-md border border-gray-400 flex items-center justify-center hover:bg-gray-100 transition-all duration-300 hover:scale-110"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
 
             <button
               onClick={next}
-              className="w-12 h-12 rounded-full bg-[#5C039B] text-white flex items-center justify-center transition-all duration-300 hover:bg-[#4A027A] hover:scale-110"
+              className="w-12 h-12 rounded-md bg-[#5C039B] text-white flex items-center justify-center transition-all duration-300 hover:bg-[#4A027A] hover:scale-110"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
