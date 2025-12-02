@@ -39,11 +39,34 @@
 /* ---- Global Dark Mode Variant ---- */
 @custom-variant dark (&:is(.dark *));
 
-html, body {
-  font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-}
+
 /* ---- Reusable Global Gradient Button ---- */
 @layer components {
+   .heading-light {
+    font-size: 60px;
+    line-height: 76px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--color-text-white);
+  }
+ .heading-dark-1 {
+    font-size: 60px;
+    line-height: 55px;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.03em; /* -3% */
+    color: var(--color-text-primary);
+}
+ .paragraph-light {
+    font-size: 24px;
+    line-height: 30px;
+    font-family: 'DM Sans', sans-serif;
+}
+ .paragraph-light {
+    font-size: 24px;
+    line-height: 30px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+
  .main-gradient-color {
     background: linear-gradient(180deg, #5C039B 0%, #1F0135 100%);
 

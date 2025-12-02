@@ -263,17 +263,7 @@ export default function Landspackng() {
 
 
           <div className="flex items-center justify-center gap-4 mt-6">
-            {/* <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setQuoteModalOpen(true)}
-              className="bg-[var(--color-primary)] hover:bg-purple-700 text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center gap-3"
-            >
-              Get a free estimate
-            </motion.button> */}
+          
 
             {/* <Link to='/aiPlanner'>
               <motion.button
@@ -299,6 +289,7 @@ export default function Landspackng() {
               Get a free estimate
               </motion.button>
             </Link>
+            
           </div>
 
         </div>

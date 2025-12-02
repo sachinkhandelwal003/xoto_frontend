@@ -8,7 +8,6 @@ import {
   Space, 
   Tag, 
   Typography, 
-  Divider,
   Row,
   Col,
   Drawer
@@ -39,22 +38,20 @@ const Filters = ({
   setShowFilters,
   resetFilters
 }) => {
-  // Data arrays without dummy icons
   const categories = [
-    { id: 'furniture', name: 'Furniture' },
-    { id: 'lighting', name: 'Lighting' },
-    { id: 'textiles', name: 'Textiles' },
-    { id: 'decor', name: 'Decor' },
-    { id: 'kitchen', name: 'Kitchen' },
-    { id: 'bath', name: 'Bath' },
-    { id: 'outdoor', name: 'Outdoor' },
+    { id: 'Sofas', name: 'Sofas' },
+    { id: 'Beds', name: 'Beds' },
+    { id: 'Tables', name: 'Tables' },
+    { id: 'Chairs', name: 'Chairs' },
+    { id: 'Storage', name: 'Storage' },
+    { id: 'Dining', name: 'Dining' },
+    { id: 'Lighting', name: 'Lighting' },
   ];
 
   const interiorStyles = [
     { id: 'modern', name: 'Modern', color: 'blue' },
-    { id: 'minimalist', name: 'Minimalist', color: 'default' },
+    { id: 'minimalist', name: 'Minimalist', color: 'cyan' },
     { id: 'industrial', name: 'Industrial', color: 'orange' },
-    { id: 'mid-century', name: 'Mid-Century', color: 'orange' },
     { id: 'scandinavian', name: 'Scandinavian', color: 'geekblue' },
     { id: 'bohemian', name: 'Bohemian', color: 'purple' },
     { id: 'traditional', name: 'Traditional', color: 'red' },
@@ -63,43 +60,41 @@ const Filters = ({
   const materials = [
     { id: 'wood', name: 'Wood' },
     { id: 'metal', name: 'Metal' },
-    { id: 'glass', name: 'Glass' },
-    { id: 'ceramic', name: 'Ceramic' },
     { id: 'fabric', name: 'Fabric' },
     { id: 'stone', name: 'Stone' },
-    { id: 'plastic', name: 'Plastic' },
+    { id: 'glass', name: 'Glass' },
+    { id: 'leather', name: 'Leather' },
   ];
 
   const colors = [
     { id: 'white', name: 'White', hex: '#FFFFFF' },
     { id: 'black', name: 'Black', hex: '#111827' },
     { id: 'gray', name: 'Gray', hex: '#6B7280' },
-    { id: 'beige', name: 'Beige', hex: '#FEF3C7' },
     { id: 'brown', name: 'Brown', hex: '#92400E' },
     { id: 'blue', name: 'Blue', hex: '#3B82F6' },
     { id: 'green', name: 'Green', hex: '#10B981' },
+    { id: 'red', name: 'Red', hex: '#EF4444' },
   ];
 
   const filterContent = (
     <>
-      {/* Header with refined styling */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center',
-        marginBottom: 20,
-        paddingBottom: 12,
-        borderBottom: '1px solid #e8ecef'
+        marginBottom: 24,
+        paddingBottom: 16,
+        borderBottom: '2px solid #f1f5f9'
       }}>
         <Title level={4} style={{ 
           margin: 0, 
-          fontWeight: 600, 
-          color: '#1a1a1a' 
+          fontWeight: 700, 
+          color: '#4f46e5',
+          fontSize: '20px'
         }}>
           <FilterOutlined style={{ 
-            marginRight: 8, 
-            color: '#ff7a45',
-            fontSize: 18 
+            marginRight: 10, 
+            color: '#8b5cf6',
           }} />
           Filters
         </Title>
@@ -109,9 +104,10 @@ const Filters = ({
             icon={<ReloadOutlined />} 
             onClick={resetFilters}
             style={{
-              borderRadius: 6,
-              color: '#595959',
-              borderColor: '#d9d9d9'
+              borderRadius: '6px',
+              color: '#64748b',
+              borderColor: '#cbd5e1',
+              fontWeight: '500',
             }}
           >
             Reset
@@ -121,9 +117,10 @@ const Filters = ({
             icon={<CloseOutlined />}
             onClick={() => setShowFilters(false)}
             style={{
-              borderRadius: 6,
-              color: '#595959',
-              borderColor: '#d9d9d9'
+              borderRadius: '6px',
+              color: '#64748b',
+              borderColor: '#cbd5e1',
+              fontWeight: '500',
             }}
           >
             Hide
@@ -137,30 +134,29 @@ const Filters = ({
         expandIconPosition="right"
         style={{ background: 'transparent' }}
       >
-        {/* Categories */}
         <Panel 
-          header={<Text strong>Categories</Text>} 
+          header={<Text strong style={{ color: '#334155', fontSize: '15px' }}>Categories</Text>} 
           key="categories"
-          style={{ borderBottom: '1px solid #e8ecef' }}
+          style={{ borderBottom: '1px solid #e2e8f0' }}
         >
           <Checkbox.Group 
             value={selectedCategories} 
             onChange={setSelectedCategories}
             style={{ width: '100%' }}
           >
-            <Row gutter={[8, 8]}>
+            <Row gutter={[8, 10]}>
               {categories.map(category => (
                 <Col span={24} key={category.id}>
                   <Checkbox 
                     value={category.id}
                     style={{ 
-                      padding: '6px 0',
-                      transition: 'color 0.3s'
+                      padding: '8px 0',
+                      transition: 'all 0.2s'
                     }}
                   >
                     <Text style={{ 
-                      fontSize: 14, 
-                      color: '#1a1a1a',
+                      fontSize: '14px', 
+                      color: '#475569',
                       transition: 'color 0.3s'
                     }}>
                       {category.name}
@@ -172,75 +168,76 @@ const Filters = ({
           </Checkbox.Group>
         </Panel>
 
-        {/* Price Range */}
         <Panel 
-          header={<Text strong>Price Range</Text>} 
+          header={<Text strong style={{ color: '#334155', fontSize: '15px' }}>Price Range</Text>} 
           key="price"
-          style={{ borderBottom: '1px solid #e8ecef' }}
+          style={{ borderBottom: '1px solid #e2e8f0' }}
         >
-          <div style={{ padding: '12px 0' }}>
+          <div style={{ padding: '16px 0' }}>
             <Slider
               range
               min={0}
-              max={5000}
-              step={50}
+              max={50000}
+              step={1000}
               value={priceRange}
               onChange={setPriceRange}
-              trackStyle={{ backgroundColor: '#ff7a45' }}
+              trackStyle={{ background: 'linear-gradient(90deg, #8b5cf6, #6366f1)' }}
               handleStyle={{
-                borderColor: '#ff7a45',
-                backgroundColor: '#fff'
+                borderColor: '#8b5cf6',
+                backgroundColor: '#fff',
+                boxShadow: '0 2px 6px rgba(139, 92, 246, 0.3)'
               }}
               tooltip={{
-                formatter: (value) => `$${value}`,
-                backgroundColor: '#ff7a45'
+                formatter: (value) => `₹${value.toLocaleString()}`,
+                color: '#8b5cf6'
               }}
             />
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
-              marginTop: 12 
+              marginTop: 16 
             }}>
-              <Text style={{ fontSize: 13, color: '#595959' }}>
-                ${priceRange[0]}
+              <Text style={{ fontSize: '14px', color: '#475569', fontWeight: '500' }}>
+                ₹{priceRange[0].toLocaleString()}
               </Text>
-              <Text style={{ fontSize: 13, color: '#595959' }}>
-                ${priceRange[1]}
+              <Text style={{ fontSize: '14px', color: '#475569', fontWeight: '500' }}>
+                ₹{priceRange[1].toLocaleString()}
               </Text>
             </div>
           </div>
         </Panel>
 
-        {/* Colors */}
         <Panel 
-          header={<Text strong>Colors</Text>} 
+          header={<Text strong style={{ color: '#334155', fontSize: '15px' }}>Colors</Text>} 
           key="colors"
-          style={{ borderBottom: '1px solid #e8ecef' }}
+          style={{ borderBottom: '1px solid #e2e8f0' }}
         >
           <Checkbox.Group 
             value={selectedColors} 
             onChange={setSelectedColors}
             style={{ width: '100%' }}
           >
-            <Row gutter={[8, 12]}>
+            <Row gutter={[12, 12]}>
               {colors.map(color => (
                 <Col span={8} key={color.id}>
                   <Checkbox value={color.id}>
                     <Space direction="vertical" size={6} align="center">
                       <div
                         style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: 4,
+                          width: 28,
+                          height: 28,
+                          borderRadius: '50%',
                           background: color.hex,
                           border: color.id === 'white' 
-                            ? '1px solid #d9d9d9' 
-                            : '1px solid transparent',
-                          transition: 'transform 0.2s',
-                          ':hover': { transform: 'scale(1.1)' }
+                            ? '2px solid #cbd5e1' 
+                            : '2px solid transparent',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                          transition: 'transform 0.2s, box-shadow 0.2s',
+                          cursor: 'pointer',
                         }}
+                        className="hover:scale-110 hover:shadow-md"
                       />
-                      <Text style={{ fontSize: 12, color: '#1a1a1a' }}>
+                      <Text style={{ fontSize: '12px', color: '#475569', fontWeight: '500' }}>
                         {color.name}
                       </Text>
                     </Space>
@@ -251,18 +248,17 @@ const Filters = ({
           </Checkbox.Group>
         </Panel>
 
-        {/* Interior Styles */}
         <Panel 
-          header={<Text strong>Interior Styles</Text>} 
+          header={<Text strong style={{ color: '#334155', fontSize: '15px' }}>Styles</Text>} 
           key="styles"
-          style={{ borderBottom: '1px solid #e8ecef' }}
+          style={{ borderBottom: '1px solid #e2e8f0' }}
         >
           <Checkbox.Group 
             value={selectedStyles} 
             onChange={setSelectedStyles}
             style={{ width: '100%' }}
           >
-            <Row gutter={[8, 8]}>
+            <Row gutter={[8, 10]}>
               {interiorStyles.map(style => (
                 <Col span={24} key={style.id}>
                   <Checkbox value={style.id}>
@@ -270,10 +266,11 @@ const Filters = ({
                       color={style.color} 
                       style={{ 
                         margin: 0,
-                        borderRadius: 4,
-                        padding: '2px 8px',
-                        fontSize: 12,
-                        transition: 'background-color 0.3s'
+                        borderRadius: '6px',
+                        padding: '4px 12px',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        border: 'none',
                       }}
                     >
                       {style.name}
@@ -285,25 +282,23 @@ const Filters = ({
           </Checkbox.Group>
         </Panel>
 
-        {/* Materials */}
         <Panel 
-          header={<Text strong>Materials</Text>} 
+          header={<Text strong style={{ color: '#334155', fontSize: '15px' }}>Materials</Text>} 
           key="materials"
-          style={{ borderBottom: '1px solid #e8ecef' }}
         >
           <Checkbox.Group 
             value={selectedMaterials} 
             onChange={setSelectedMaterials}
             style={{ width: '100%' }}
           >
-            <Row gutter={[8, 8]}>
+            <Row gutter={[8, 10]}>
               {materials.map(material => (
                 <Col span={24} key={material.id}>
                   <Checkbox 
                     value={material.id}
-                    style={{ padding: '6px 0' }}
+                    style={{ padding: '8px 0' }}
                   >
-                    <Text style={{ fontSize: 14, color: '#1a1a1a' }}>
+                    <Text style={{ fontSize: '14px', color: '#475569', fontWeight: '500' }}>
                       {material.name}
                     </Text>
                   </Checkbox>
@@ -314,24 +309,23 @@ const Filters = ({
         </Panel>
       </Collapse>
 
-      {/* Active Filters Summary */}
       {(selectedCategories.length > 0 || selectedColors.length > 0 || 
         selectedStyles.length > 0 || selectedMaterials.length > 0 ||
-        priceRange[0] > 0 || priceRange[1] < 5000) && (
+        priceRange[0] > 0 || priceRange[1] < 50000) && (
         <div style={{ 
-          marginTop: 20, 
-          paddingTop: 12, 
-          borderTop: '1px solid #e8ecef' 
+          marginTop: 24, 
+          paddingTop: 16, 
+          borderTop: '2px solid #f1f5f9' 
         }}>
           <Text strong style={{ 
             display: 'block', 
-            marginBottom: 8, 
-            fontSize: 14,
-            color: '#1a1a1a'
+            marginBottom: 12, 
+            fontSize: '14px',
+            color: '#334155'
           }}>
             Active Filters
           </Text>
-          <Space size={[4, 8]} wrap>
+          <Space size={[6, 8]} wrap>
             {selectedCategories.map(catId => {
               const cat = categories.find(c => c.id === catId);
               return cat && (
@@ -344,11 +338,13 @@ const Filters = ({
                     );
                   }}
                   style={{ 
-                    borderRadius: 4, 
-                    padding: '2px 8px',
-                    fontSize: 12,
-                    background: '#f5f5f5',
-                    border: 'none'
+                    borderRadius: '6px', 
+                    padding: '4px 10px',
+                    fontSize: '12px',
+                    background: 'linear-gradient(135deg, #e0e7ff, #f3e8ff)',
+                    border: 'none',
+                    color: '#7c3aed',
+                    fontWeight: '500',
                   }}
                 >
                   {cat.name}
@@ -367,11 +363,13 @@ const Filters = ({
                     );
                   }}
                   style={{ 
-                    borderRadius: 4, 
-                    padding: '2px 8px',
-                    fontSize: 12,
-                    background: '#f5f5f5',
-                    border: 'none'
+                    borderRadius: '6px', 
+                    padding: '4px 10px',
+                    fontSize: '12px',
+                    background: 'linear-gradient(135deg, #e0e7ff, #f3e8ff)',
+                    border: 'none',
+                    color: '#7c3aed',
+                    fontWeight: '500',
                   }}
                 >
                   {color.name}
@@ -391,9 +389,10 @@ const Filters = ({
                     );
                   }}
                   style={{ 
-                    borderRadius: 4, 
-                    padding: '2px 8px',
-                    fontSize: 12
+                    borderRadius: '6px', 
+                    padding: '4px 10px',
+                    fontSize: '12px',
+                    fontWeight: '500',
                   }}
                 >
                   {style.name}
@@ -412,30 +411,34 @@ const Filters = ({
                     );
                   }}
                   style={{ 
-                    borderRadius: 4, 
-                    padding: '2px 8px',
-                    fontSize: 12,
-                    background: '#f5f5f5',
-                    border: 'none'
+                    borderRadius: '6px', 
+                    padding: '4px 10px',
+                    fontSize: '12px',
+                    background: 'linear-gradient(135deg, #e0e7ff, #f3e8ff)',
+                    border: 'none',
+                    color: '#7c3aed',
+                    fontWeight: '500',
                   }}
                 >
                   {material.name}
                 </Tag>
               );
             })}
-            {(priceRange[0] > 0 || priceRange[1] < 5000) && (
+            {(priceRange[0] > 0 || priceRange[1] < 50000) && (
               <Tag 
                 closable
-                onClose={() => setPriceRange([0, 5000])}
+                onClose={() => setPriceRange([0, 50000])}
                 style={{ 
-                  borderRadius: 4, 
-                  padding: '2px 8px',
-                  fontSize: 12,
-                  background: '#f5f5f5',
-                  border: 'none'
+                  borderRadius: '6px', 
+                  padding: '4px 10px',
+                  fontSize: '12px',
+                  background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                  border: 'none',
+                  color: '#92400e',
+                  fontWeight: '500',
                 }}
               >
-                Price: ${priceRange[0]} - ${priceRange[1]}
+                Price: ₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}
               </Tag>
             )}
           </Space>
@@ -446,28 +449,24 @@ const Filters = ({
 
   return (
     <>
-      {/* Desktop Filters */}
       {showFilters && (
         <div style={{ display: 'block' }}>
           <Card
             style={{
-              borderRadius: 8,
-              border: '1px solid #e8ecef',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 4px 20px rgba(139, 92, 246, 0.1)',
               position: 'sticky',
               top: 80,
-              background: '#fff',
-              transition: 'box-shadow 0.3s'
+              background: '#ffffff',
             }}
-            bodyStyle={{ padding: '20px 24px' }}
-            hoverable
+            bodyStyle={{ padding: '24px' }}
           >
             {filterContent}
           </Card>
         </div>
       )}
 
-      {/* Mobile Filters Button */}
       {!showFilters && (
         <div style={{ 
           position: 'fixed', 
@@ -481,38 +480,32 @@ const Filters = ({
             onClick={() => setMobileFiltersOpen(true)}
             size="large"
             style={{
-              background: '#ff7a45',
-              borderColor: '#ff7a45',
-              borderRadius: 50,
-              height: 48,
-              width: 48,
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+              border: 'none',
+              borderRadius: '50%',
+              height: '56px',
+              width: '56px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              ':hover': {
-                transform: 'scale(1.05)',
-                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
-              }
+              boxShadow: '0 6px 20px rgba(139, 92, 246, 0.4)',
             }}
           />
         </div>
       )}
 
-      {/* Mobile Filters Drawer */}
       <Drawer
-        title={<Text strong style={{ fontSize: 16, color: '#1a1a1a' }}>Filters</Text>}
+        title={<Text strong style={{ fontSize: '18px', color: '#1e293b' }}>Filters</Text>}
         placement="right"
         onClose={() => setMobileFiltersOpen(false)}
         open={mobileFiltersOpen}
-        width={300}
-        bodyStyle={{ padding: '16px 20px', background: '#fff' }}
-        headerStyle={{ borderBottom: '1px solid #e8ecef', padding: '12px 20px' }}
+        width={320}
+        bodyStyle={{ padding: '20px 24px', background: '#ffffff' }}
+        headerStyle={{ borderBottom: '2px solid #f1f5f9', padding: '16px 24px' }}
         extra={
           <Button 
             type="text" 
-            icon={<CloseOutlined style={{ color: '#595959' }} />} 
+            icon={<CloseOutlined style={{ color: '#64748b' }} />} 
             onClick={() => setMobileFiltersOpen(false)}
           />
         }

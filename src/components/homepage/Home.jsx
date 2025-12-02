@@ -28,14 +28,19 @@ import MagazineSlider from "../magazines/MagazinePage";
 import SocialSection from "../social/Index";
 import Homevideo from "../homedesign/Homevideo";
 import ChatBoat from "./ChatBoat";
+import Moduleboat from "./Moduleboat";
 
 const Home = () => {
 const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isModuleOpen, setIsModuleOpen] = useState(false);  // <-- NEW STATE
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
-
+const toggleModule = () => {
+    setIsModuleOpen(!isModuleOpen);
+    setIsChatOpen(false);   // close chat when module opens
+  };
   const closeChat = () => {
     setIsChatOpen(false);
   };
@@ -97,6 +102,50 @@ const [isChatOpen, setIsChatOpen] = useState(false);
           <ChatBoat onClose={closeChat} />
         </motion.div>
       )}
+
+
+        {/* <motion.button
+        onClick={toggleModule}
+        className="fixed bottom-28 right-6 w-16 h-16 rounded-full shadow-xl flex items-center justify-center text-white font-bold text-2xl bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-900 transition-all z-50"
+        whileHover={{ scale: 1.1 }}
+      >
+        {isModuleOpen ? "×" : "📦"}
+      </motion.button> */}
+
+    {/* MODULEBOAT CENTER POPUP */}
+{/* MODULEBOAT CENTER POPUP */}
+{isModuleOpen && (
+  <>
+    {/* Background Dim Overlay */}
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+      onClick={() => setIsModuleOpen(false)}
+    ></div>
+
+    {/* Center Modal */}
+    <div className="fixed inset-0 flex items-center justify-center z-50 px-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: "spring", damping: 20 }}
+        className="relative w-full max-w-3xl bg-gradient-to-br from-slate-900/90 to-slate-800/90 rounded-3xl p-6 shadow-2xl border border-white/10"
+      >
+        
+        {/* ❌ CLOSE BUTTON (Top Right Inside Modal) */}
+        <button
+          onClick={() => setIsModuleOpen(false)}
+          className="absolute top-4 right-4 text-white text-3xl font-bold hover:scale-110 transition"
+        >
+          ×
+        </button>
+
+        <Moduleboat />
+      </motion.div>
+    </div>
+  </>
+)}
+
+
     </>
   );
 };

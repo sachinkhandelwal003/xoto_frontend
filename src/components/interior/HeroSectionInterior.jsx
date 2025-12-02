@@ -3,7 +3,7 @@
 import React from "react";
 import { ArrowRight } from "lucide-react";
 import mainbgImage from "../../assets/img/mainbg.jpg"; // ← change your image path
-
+import { Link } from "react-router-dom";
 export default function HeroSectionInterior
   () {
   return (
@@ -31,10 +31,19 @@ export default function HeroSectionInterior
             corner of your home.
           </p>
 
-          <button className="group inline-flex items-center gap-3 rounded-md bg-[#5C039B] px-6 py-4 text-xl font-semibold text-white shadow-xl transition-all hover:bg-purple-700 hover:shadow-2xl hover:-translate-y-1">
-            <span className="text-2xl sm:text-xl">Get a free estimate</span>
-            <ArrowRight className="h-7 w-7 transition-transform group-hover:translate-x-1" />
-          </button>
+   <div className="flex flex-wrap items-center justify-center gap-6 mx-auto">
+  <button className="group inline-flex items-center gap-3 rounded-md bg-[#5C039B] px-6 py-4 text-xl font-semibold text-white shadow-xl transition-all hover:bg-purple-700 hover:shadow-2xl hover:-translate-y-1">
+    <span className="text-2xl sm:text-xl">Get a free estimate</span>
+    <ArrowRight className="h-7 w-7 transition-transform group-hover:translate-x-1" />
+  </button>
+
+  <Link to="/ecommerce/b2c">
+    <button className="bg-transparent hover:bg-white/10 text-white px-8 py-4 rounded-md text-lg font-bold shadow-xl transition-all flex items-center border-2 border-white/30 hover:border-white">
+      Explore our store
+    </button>
+  </Link>
+</div>
+
 
         </div>
       </div>

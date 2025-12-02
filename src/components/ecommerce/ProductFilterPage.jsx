@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { Layout, Card, Image, Button, Tag, Modal, Dropdown, Space, Avatar, Typography, Empty } from 'antd';
-import { VideoCameraOutlined, DownOutlined } from '@ant-design/icons';
-import bannerImage from '../../assets/img/ecommercebanner.png'; // Keep your banner or use placeholder
+import { Layout, Card, Image, Button, Tag, Modal, Dropdown, Space, Avatar, Typography, Input, Select, Form, message } from 'antd';
+import { VideoCameraOutlined, DownOutlined, StarFilled, CheckCircleFilled, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { motion } from 'framer-motion';
+import bannerImage from '../../assets/img/ecommercebanner.png';
 import Filters from './Filters';
 import ProductGrid from './ProductGrid';
 
 const { Content } = Layout;
-const { Text } = Typography;
+const { Text, Title } = Typography;
+const { TextArea } = Input;
 
 // Dummy Product Data
 const dummyProducts = [
@@ -25,7 +27,7 @@ const dummyProducts = [
         color_name: 'Natural Oak',
         color_code: '#D4A574',
         images: [
-          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+          { url: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=800&auto=format&fit=crop', is_primary: true },
         ],
       },
     ],
@@ -49,14 +51,7 @@ const dummyProducts = [
         color_name: 'Emerald Green',
         color_code: '#10B981',
         images: [
-          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
-        ],
-      },
-      {
-        color_name: 'Royal Blue',
-        color_code: '#3B82F6',
-        images: [
-          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+          { url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop', is_primary: true },
         ],
       },
     ],
@@ -80,7 +75,7 @@ const dummyProducts = [
         color_name: 'White Marble',
         color_code: '#F3F4F6',
         images: [
-          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+          { url: 'https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800&auto=format&fit=crop', is_primary: true },
         ],
       },
     ],
@@ -89,74 +84,76 @@ const dummyProducts = [
     category: { name: 'Tables' },
     brand: { name: 'xoto' },
   },
-   {
+  {
     _id: '4',
-    name: 'Marble Top Console',
-    short_description: 'Italian Carrara marble with matte black steel frame.',
+    name: 'Modern Sectional Sofa',
+    short_description: 'Modular design with premium fabric and memory foam cushions.',
     pricing: {
-      sale_price: 35999,
-      mrp: 49999,
-      discount: { value: 28, type: 'percentage' },
+      sale_price: 45999,
+      mrp: 59999,
+      discount: { value: 23, type: 'percentage' },
       currency: { symbol: '₹' },
     },
     color_variants: [
       {
-        color_name: 'White Marble',
-        color_code: '#F3F4F6',
+        color_name: 'Charcoal Gray',
+        color_code: '#4B5563',
         images: [
-          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+          { url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop', is_primary: true },
         ],
       },
     ],
-    tags: [{ _id: 't3', name: 'Premium' }],
-    material: { name: 'Stone' },
-    category: { name: 'Tables' },
+    tags: [{ _id: 't4', name: 'Hot Deal' }],
+    material: { name: 'Fabric' },
+    category: { name: 'Sofas' },
     brand: { name: 'xoto' },
-  }, {
+  },
+  {
     _id: '5',
-    name: 'Marble Top Console',
-    short_description: 'Italian Carrara marble with matte black steel frame.',
+    name: 'Industrial Bookshelf',
+    short_description: 'Steel frame with reclaimed wood shelves.',
     pricing: {
-      sale_price: 35999,
-      mrp: 49999,
-      discount: { value: 28, type: 'percentage' },
+      sale_price: 18999,
+      mrp: 24999,
+      discount: { value: 24, type: 'percentage' },
       currency: { symbol: '₹' },
     },
     color_variants: [
       {
-        color_name: 'White Marble',
-        color_code: '#F3F4F6',
+        color_name: 'Rustic Brown',
+        color_code: '#92400E',
         images: [
-          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+          { url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop', is_primary: true },
         ],
       },
     ],
-    tags: [{ _id: 't3', name: 'Premium' }],
-    material: { name: 'Stone' },
-    category: { name: 'Tables' },
+    tags: [{ _id: 't5', name: 'New' }],
+    material: { name: 'Metal' },
+    category: { name: 'Storage' },
     brand: { name: 'xoto' },
-  }, {
+  },
+  {
     _id: '6',
-    name: 'Marble Top Console',
-    short_description: 'Italian Carrara marble with matte black steel frame.',
+    name: 'Minimalist Dining Table',
+    short_description: 'Clean lines with solid oak top and powder-coated legs.',
     pricing: {
-      sale_price: 35999,
-      mrp: 49999,
-      discount: { value: 28, type: 'percentage' },
+      sale_price: 32999,
+      mrp: 42999,
+      discount: { value: 23, type: 'percentage' },
       currency: { symbol: '₹' },
     },
     color_variants: [
       {
-        color_name: 'White Marble',
-        color_code: '#F3F4F6',
+        color_name: 'Natural Wood',
+        color_code: '#D4A574',
         images: [
-          { url: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c29mYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000?w=800', is_primary: true },
+          { url: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&auto=format&fit=crop', is_primary: true },
         ],
       },
     ],
-    tags: [{ _id: 't3', name: 'Premium' }],
-    material: { name: 'Stone' },
-    category: { name: 'Tables' },
+    tags: [{ _id: 't6', name: 'Premium' }],
+    material: { name: 'Wood' },
+    category: { name: 'Dining' },
     brand: { name: 'xoto' },
   },
 ];
@@ -170,31 +167,6 @@ const ProductFilterPage = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [sortOption, setSortOption] = useState('most-popular');
-  const [openDropdown, setOpenDropdown] = useState({
-    categories: true,
-    price: true,
-    colors: true,
-    styles: true,
-    materials: true,
-    sort: false,
-  });
-
-  const toggleFilter = (filterType, id) => {
-    const setters = {
-      category: setSelectedCategories,
-      color: setSelectedColors,
-      style: setSelectedStyles,
-      material: setSelectedMaterials,
-    };
-    const setter = setters[filterType];
-    if (setter) {
-      setter((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
-    }
-  };
-
-  const toggleDropdown = (dropdown) => {
-    setOpenDropdown((prev) => ({ ...prev, [dropdown]: !prev[dropdown] }));
-  };
 
   const filteredProducts = useMemo(() => {
     return dummyProducts.filter((product) => {
@@ -241,37 +213,99 @@ const ProductFilterPage = () => {
   };
 
   return (
-    <Layout style={{ background: 'white', minHeight: '100vh' }}>
-      <Content style={{ padding: '0 50px' }}>
-        {/* Banner */}
-        <Card
-          style={{ margin: '16px 0', borderRadius: 12, overflow: 'hidden' }}
-          bodyStyle={{ padding: 0 }}
+    <Layout style={{ background: '#f8fafc', minHeight: '100vh' }}>
+      <Content style={{ padding: '0 24px' }}>
+        {/* Hero Banner with Gradient */}
+        <div 
+          className="relative rounded-2xl overflow-hidden mb-8 mt-6 shadow-2xl"
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            height: '400px',
+          }}
         >
-          <div style={{ position: 'relative', height: 200 }}>
-            <Image
-              src={bannerImage || 'https://images.unsplash.com/photo-1618221195710-dd030f2a2f1b?w=1600'}
-              alt="Banner"
-              preview={false}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-                color: 'white',
-              }}
-            >
-              <h2 style={{ fontSize: 32, fontWeight: 700, margin: 0 }}>Discover Your Style</h2>
-              <p style={{ fontSize: 16, margin: '8px 0 0' }}>Curated furniture for modern homes</p>
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="absolute top-6 right-6">
+            <Tag color="gold" style={{ fontSize: '14px', fontWeight: 'bold', padding: '4px 12px' }}>
+              New Collection
+            </Tag>
+          </div>
+          
+          <div className="relative z-10 h-full flex flex-col md:flex-row items-center justify-between p-8 md:p-16">
+            <div className="max-w-2xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                  Discover Your <span className="text-yellow-300">Perfect</span> Space
+                </h1>
+                <p className="text-xl text-white/90 mb-8 max-w-xl">
+                  AI-curated furniture collections that blend modern design with timeless elegance.
+                  Transform your home with pieces that tell your story.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Button 
+                    type="primary" 
+                    size="large"
+                    style={{
+                      background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                      border: 'none',
+                      fontWeight: 'bold',
+                      padding: '0 32px',
+                      height: '48px',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    Shop New Arrivals
+                  </Button>
+                  <Button 
+                    size="large"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      padding: '0 32px',
+                      height: '48px',
+                      borderRadius: '8px',
+                      backdropFilter: 'blur(10px)',
+                    }}
+                  >
+                    <VideoCameraOutlined className="mr-2" />
+                    AR Preview
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
+            
+            <div className="hidden lg:block">
+              <div className="relative">
+                <div className="absolute -top-4 -left-4 w-64 h-64 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl opacity-50"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=500&auto=format&fit=crop" 
+                  alt="Featured Furniture"
+                  className="relative w-72 h-72 object-cover rounded-2xl shadow-2xl"
+                  style={{ transform: 'rotate(3deg)' }}
+                />
+                <div 
+                  className="absolute -bottom-4 -right-4 bg-white p-4 rounded-xl shadow-2xl"
+                  style={{ transform: 'rotate(-2deg)' }}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">4.8</div>
+                    <div className="flex items-center justify-center">
+                      {[...Array(5)].map((_, i) => (
+                        <StarFilled key={i} className="text-yellow-500 text-sm" />
+                      ))}
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">Customer Rating</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         <div
           style={{
@@ -296,10 +330,6 @@ const ProductFilterPage = () => {
             setMobileFiltersOpen={setMobileFiltersOpen}
             showFilters={showFilters}
             setShowFilters={setShowFilters}
-            openDropdown={openDropdown}
-            setOpenDropdown={setOpenDropdown}
-            toggleFilter={toggleFilter}
-            toggleDropdown={toggleDropdown}
             resetFilters={resetFilters}
           />
 
