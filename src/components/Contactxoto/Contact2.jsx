@@ -21,7 +21,9 @@ export default function ContactSection() {
           <div>
             <h3 className="text-lg font-semibold mb-1">Email Us</h3>
             <p className="text-gray-600">Feel free to contact us at</p>
-            <p className="text-gray-800 font-medium">info@xotikltd.com</p>
+            <p className="text-gray-800 font-medium">sales.support@xoto.ae <br />info@xoto.ae
+
+ </p>
             <p className="text-gray-600 text-sm">We’ll respond promptly</p>
           </div>
         </div>
@@ -33,7 +35,7 @@ export default function ContactSection() {
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-1">Address</h3>
-            <p className="text-gray-600">A-21, Business Bay Tower, Dubai</p>
+            <p className="text-gray-600">1616 , Parklane Tower, Business Bay ,Dubai</p>
             <p className="text-gray-600 text-sm">UAE</p>
           </div>
         </div>
@@ -45,7 +47,8 @@ export default function ContactSection() {
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-1">Phone</h3>
-            <p className="text-gray-600">+91 7878909689</p>
+            <p className="text-gray-600">+971 50 918 0967
+</p>
             <p className="text-gray-600 text-sm">Mon–Sat | 9AM–6PM</p>
           </div>
         </div>
@@ -56,7 +59,7 @@ export default function ContactSection() {
       <div className="mt-16 flex justify-center">
         <iframe
           title="XOTIK LTD Map"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3558.820969606218!2d75.78727027523847!3d26.87734947667366!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db69c602469ed%3A0x9395d07b39cdd8b5!2sGanesh%20Glory!5e0!3m2!1sen!2sin!4v1706799612345!5m2!1sen!2sin"
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3610.5326639711025!2d55.2618832!3d25.1852532!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f69d0fe2e52c9%3A0x2efe28575bbe2f84!2sParkLane%20Tower%20-%20Business%20Bay%20-%20Dubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2sin!4v1764576845571!5m2!1sen!2sin"
           width="1000"
           height="600"
           loading="lazy"

@@ -1,5 +1,4 @@
-'use client';
-
+"use client";
 import React, { useState, useRef, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -14,7 +13,10 @@ export const languages = [
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#012169" />
-        <path fill="#FFF" d="M0,0 L20,15 M0,15 L20,0 M8,0 L8,15 M0,7.5 L20,7.5" />
+        <path
+          fill="#FFF"
+          d="M0,0 L20,15 M0,15 L20,0 M8,0 L8,15 M0,7.5 L20,7.5"
+        />
         <path
           fill="#C8102E"
           d="M0,0 L8,0 L20,7 L20,8 L12,8 L0,1 M0,14 L8,15 L20,8 L20,7 L12,7 L0,14"
@@ -75,10 +77,7 @@ export const languages = [
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#EE1C25" />
-        <polygon
-          fill="#FFFF00"
-          points="3,2 4,4.5 1.5,3.5 4.5,3.5 2,4.5"
-        />
+        <polygon fill="#FFFF00" points="3,2 4,4.5 1.5,3.5 4.5,3.5 2,4.5" />
       </svg>
     ),
   },
@@ -165,7 +164,7 @@ export const languages = [
 
   {
     code: "tl",
-    name: "Tagalog (PH)",
+    name: "Tagalog",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="7.5" fill="#0038A8" />
@@ -196,12 +195,33 @@ export const languages = [
 /* ------------------- NAV ITEMS ------------------- */
 const navItems = [
   { title: "Home", path: "/" },
+
+
   { title: "Landscaping", path: "/landscaping" },
   { title: "Interior", path: "/services/interior" },
-  { title: "Rent/Buy/Sell", path: "/marketplace" },
+
+ 
+  {
+    title: "Properties",
+    path: "",
+    submenu: [
+      { title: "Buy", path: "/marketplace" },
+      { title: "Sell", path: "/marketplace" },
+      { title: "Rent", path: "/marketplace" },
+    ],
+  },
+
   { title: "Services", path: "/Services" },
   { title: "Partner Eco-System", path: "/ecosystem" },
-  { title: "About Us", path: "/about" },
+   {
+    title: "About Us",
+    path: "/about",
+    submenu: [
+      { title: "Xoto Properties", path: "/properties" },
+      { title: "Explore XOto", path: "/explore" },
+      { title: "AI Driven", path: "/ai" },
+    ],
+  },
 ];
 
 /* ------------------- MAIN NAVBAR ------------------- */
@@ -210,26 +230,35 @@ const Navbar = () => {
   const [langOpen, setLangOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState(languages[0]);
   const [scrolled, setScrolled] = useState(false);
+  const [navItemsOpen, setNavItemsOpen] = useState({});
+
   const langRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target) && !e.target.closest('button')) {
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setLangOpen(false);
+      }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(e.target) &&
+        !e.target.closest("button")
+      ) {
         setMobileOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Shadow on scroll
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const handleLangSelect = (lang) => {
@@ -244,69 +273,108 @@ const Navbar = () => {
       {/* Sticky Navbar */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"
+          scrolled
+            ? "bg-white/95 backdrop-blur-sm shadow-lg"
+            : "bg-white"
         }`}
       >
         <div className="max-w-8xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12">
-
             {/* Logo */}
-          <div className="flex flex-col items-center justify-center text-center ">
-  <Link to="/" className="flex items-center justify-center group">
-    <img
-      src={logoNew}
-      alt="Sawtar Logo"
-      className="h-14 w-auto transition-transform group-hover:scale-105"
-    />
-  </Link>
-
-  <span className="text-gray-900" style={{fontSize:"10px"}}>
-    Powered by AI. Inspired by you.
-  </span>
-</div>
-
+            <div className="flex flex-col items-center justify-center text-center">
+              <Link
+                to="/"
+                className="flex items-center justify-center group"
+              >
+                <img
+                  src={logoNew}
+                  alt="Sawtar Logo"
+                  className="h-14 w-auto transition-transform group-hover:scale-105"
+                />
+              </Link>
+              <span
+                className="text-gray-900"
+                style={{ fontSize: "10px" }}
+              >
+                Powered by AI. Inspired by you.
+              </span>
+            </div>
 
             {/* Desktop Nav */}
             <div className="hidden lg:flex items-center space-x-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.title}
-                  to={item.path}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all duration-200 hover:bg-purple-50 hover:text-purple-700"
-                >
-                  {item.title}
-                </Link>
+              {navItems.map((item, idx) => (
+                <div key={idx} className="relative group">
+                  <Link
+                    to={item.path}
+                    className="px-4 py-2 flex items-center gap-1 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-purple-700"
+                  >
+                    {item.title}
+                    {item.submenu && (
+                      <ChevronDown className="w-4 h-4 text-gray-600" />
+                    )}
+                  </Link>
+
+                  {/* Desktop Submenu */}
+                  {item.submenu && (
+                    <div className="absolute left-0 mt-2 w-48 bg-white shadow-xl border border-gray-100 rounded-xl opacity-0 scale-95 group-hover:scale-100 group-hover:opacity-100 transition-all duration-200 origin-top">
+                      {item.submenu.map((sub, sIdx) => (
+                        <Link
+                          key={sIdx}
+                          to={sub.path}
+                          className="block px-4 py-3 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        >
+                          {sub.title}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
 
-            {/* Desktop: Language + Contact */}
+            {/* Desktop: Language + Contact + Login */}
             <div className="hidden lg:flex items-center space-x-4">
-              {/* Language Dropdown */}
               <div ref={langRef} className="relative">
                 <button
                   onClick={() => setLangOpen(!langOpen)}
-                  className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl hover:border-purple-400 transition-all duration-200 group"
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl hover:border-purple-400 transition-all"
                 >
-                  <div className="w-5 h-5 rounded-full overflow-hidden ring-2 ring-white">
+                  <div className="w-5 h-5 rounded-full overflow-hidden ring-2 ring-purple-500">
                     <selectedLang.Flag />
                   </div>
-                  <span className="text-sm font-semibold text-gray-800">{selectedLang.name}</span>
-                  <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${langOpen ? "rotate-180" : ""}`} />
+                  <span className="text-sm font-semibold text-gray-800">
+                    {selectedLang.name}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-600 transition-transform ${
+                      langOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
+                {/* Desktop Language Dropdown */}
                 {langOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
                     {languages.map((lang) => {
-                      const isActive = selectedLang.code === lang.code;
+                      const isActive =
+                        selectedLang.code === lang.code;
                       return (
                         <button
                           key={lang.code}
                           onClick={() => handleLangSelect(lang)}
                           className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${
-                            isActive ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-gray-50 text-gray-700"
+                            isActive
+                              ? "bg-purple-100 text-purple-700 font-semibold"
+                              : "hover:bg-gray-50 text-gray-700"
                           }`}
                         >
-                          <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white">
+                          <div
+                            className={`w-6 h-6 rounded-full overflow-hidden ring-2 ${
+                              isActive
+                                ? "ring-purple-600"
+                                : "ring-white"
+                            }`}
+                          >
                             <lang.Flag />
                           </div>
                           <span className="text-sm">{lang.name}</span>
@@ -318,46 +386,59 @@ const Navbar = () => {
               </div>
 
               <Link to="/contact">
-                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl  hover:from-purple-700  transform hover:scale-105 transition-all duration-200">
+                <button className="px-6 py-2.5 bg-[#5C039B] text-white font-semibold text-sm rounded-md hover:scale-105 transition-all">
                   Contact Us
                 </button>
               </Link>
-               <Link to="/login">
-                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl  hover:from-purple-700  transform hover:scale-105 transition-all duration-200">
+
+              <Link to="/login">
+                <button className="px-6 py-2.5 bg-[#5C039B] text-white font-semibold text-sm rounded-md hover:scale-105 transition-all">
                   Login
                 </button>
               </Link>
             </div>
 
-            {/* Mobile: Country Selector + Menu Icon */}
+            {/* Mobile: Language + Menu */}
             <div className="flex items-center gap-2 lg:hidden">
-              {/* Country Selector (Mobile) */}
               <div ref={langRef} className="relative">
                 <button
                   onClick={() => setLangOpen(!langOpen)}
-                  className="flex items-center gap-1.5 px-2 py-1.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all"
-                  aria-label="Select Language"
+                  className="flex items-center gap-2 px-2 py-1.5 bg-gray-100 rounded-lg hover:bg-gray-200"
                 >
-                  <div className="w-6 h-6 rounded-full overflow-hidden ring-1 ring-white shadow-sm">
+                  <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-purple-500">
                     <selectedLang.Flag />
                   </div>
-                  <ChevronDown className={`w-3.5 h-3.5 text-gray-600 transition-transform ${langOpen ? "rotate-180" : ""}`} />
+
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-600 transition-transform ${
+                      langOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
                 {/* Mobile Language Dropdown */}
                 {langOpen && (
-                  <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
                     {languages.map((lang) => {
-                      const isActive = selectedLang.code === lang.code;
+                      const isActive =
+                        selectedLang.code === lang.code;
                       return (
                         <button
                           key={lang.code}
                           onClick={() => handleLangSelect(lang)}
-                          className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${
-                            isActive ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-gray-50 text-gray-700"
+                          className={`w-full flex items-center gap-3 px-4 py-3 transition ${
+                            isActive
+                              ? "bg-purple-100 text-purple-700 font-semibold"
+                              : "hover:bg-gray-50 text-gray-700"
                           }`}
                         >
-                          <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white">
+                          <div
+                            className={`w-6 h-6 rounded-full overflow-hidden ring-2 ${
+                              isActive
+                                ? "ring-purple-600"
+                                : "ring-white"
+                            }`}
+                          >
                             <lang.Flag />
                           </div>
                           <span className="text-sm">{lang.name}</span>
@@ -368,11 +449,9 @@ const Navbar = () => {
                 )}
               </div>
 
-              {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition"
-                aria-label="Toggle menu"
+                className="p-2 rounded-lg text-gray-700 hover:bg-gray-100"
               >
                 {mobileOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
               </button>
@@ -380,28 +459,62 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu - Full Slide In */}
+        {/* Mobile Menu */}
         <div
           ref={mobileMenuRef}
-          className={`lg:hidden fixed inset-x-0 top-16 bg-white shadow-2xl border-t border-gray-100 transition-all duration-300 ease-out ${
-            mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+          className={`lg:hidden fixed inset-x-0 top-16 bg-white shadow-xl border-t border-gray-100 transition-all duration-300 ${
+            mobileOpen
+              ? "translate-y-0 opacity-100"
+              : "-translate-y-full opacity-0 pointer-events-none"
           }`}
         >
-          <div className="px-4 py-4 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.title}
-                to={item.path}
-                onClick={closeMobileMenu}
-                className="block px-4 py-3 text-base font-medium text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-700 transition"
-              >
-                {item.title}
-              </Link>
+          <div className="px-4 py-4 space-y-2">
+            {navItems.map((item, idx) => (
+              <div key={idx}>
+                <button
+                  onClick={() =>
+                    item.submenu
+                      ? setNavItemsOpen((prev) => ({
+                          ...prev,
+                          [idx]: !prev[idx],
+                        }))
+                      : closeMobileMenu()
+                  }
+                  className="w-full flex justify-between items-center px-4 py-3 text-base font-medium text-gray-700 rounded-lg hover:bg-purple-50"
+                >
+                  {item.title}
+                  {item.submenu && (
+                    <ChevronDown
+                      className={`w-5 h-5 transition-transform ${
+                        navItemsOpen[idx] ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </button>
+
+                {item.submenu && navItemsOpen[idx] && (
+                  <div className="pl-6 mt-1 space-y-1">
+                    {item.submenu.map((sub, sIdx) => (
+                      <Link
+                        key={sIdx}
+                        to={sub.path}
+                        onClick={closeMobileMenu}
+                        className="block px-3 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
+                      >
+                        {sub.title}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
 
-            {/* Contact Button in Mobile Menu */}
-            <Link to="/contact" onClick={closeMobileMenu} className="block mt-4 px-4">
-              <button className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+            <Link
+              to="/contact"
+              onClick={closeMobileMenu}
+              className="block mt-4 px-4"
+            >
+              <button className="w-full py-3 bg-purple-600 text-white font-semibold rounded-xl shadow-lg hover:scale-105 transition">
                 Contact Us
               </button>
             </Link>
@@ -409,7 +522,6 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Spacer */}
       <div className="h-16" />
     </>
   );
