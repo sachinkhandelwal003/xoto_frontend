@@ -57,7 +57,7 @@ export default function EcosystemSlider() {
       {/* Main Content */}
       <div className="relative z-10 max-w-8xl mx-auto">
         {/* Title */}
-        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-8 sm:mb-10 md:mb-12 lg:mb-16 drop-shadow-xl tracking-tight">
+        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl  text-white mb-8 sm:mb-10 md:mb-12 lg:mb-16 drop-shadow-xl tracking-tight heading-dark-1">
           Our Tech Ecosystem
         </h2>
 
@@ -95,39 +95,44 @@ export default function EcosystemSlider() {
               <SwiperSlide key={index}>
                 {({ isActive }) => (
                   <div
-                    className={`
-                      group relative flex flex-col sm:flex-row items-center justify-center sm:items-start
-                      gap-4 sm:gap-6 md:gap-6 lg:gap-8
-                      mx-auto w-full max-w-xs xs:max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-5xl
-                      rounded-3xl
-                      px-4 py-5 sm:px-6 sm:py-6 md:px-8 md:py-8 lg:px-10 lg:py-10
-                      transition-all duration-500 ease-out
-                      shadow-xl border border-white/10
-                      ${isActive
-                        ? "scale-100 sm:scale-105 bg-gradient-to-br from-[#500286] via-black to-[#500286] text-white"
-                        : "scale-90 sm:scale-95 bg-gradient-to-br from-[#500286] via-black to-[#500286] text-gray-200 opacity-75"}
-                    `}
-                  >
+  className={`
+    group relative flex flex-col sm:flex-row 
+    items-center sm:items-center   <-- ADD THIS
+    justify-center sm:justify-start
+    gap-4 sm:gap-6 md:gap-6 lg:gap-8
+    mx-auto w-full max-w-xs xs:max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-5xl
+    rounded-3xl
+    px-4 py-5 sm:px-6 sm:py-6 md:px-8 md:py-8 lg:px-10 lg:py-10
+    transition-all duration-500 ease-out
+    shadow-xl border border-white/10
+    ${isActive
+      ? "scale-100 sm:scale-105 bg-gradient-to-br from-[#500286] via-black to-[#500286] text-white"
+      : "scale-90 sm:scale-95 bg-gradient-to-br from-[#500286] via-black to-[#500286] text-gray-200 opacity-75"}
+  `}
+>
+
 
                     {/* LEFT: Logo */}
                     <div className="flex-shrink-0">
                       <div className="relative">
                         <img
-                          src={item.logo}
-                          alt="Logo"
-                          className={`w-28 h-20 sm:w-32 sm:h-24 md:w-36 md:h-28 lg:w-40 lg:h-32 transition-all duration-300 ${
-                            isActive ? "scale-110" : "scale-100"
-                          }`}
-                        />
+  src={item.logo}
+  alt="Logo"
+  className={`w-28 h-28 sm:w-32 sm:h-24 md:w-36 md:h-28 lg:w-40 lg:h-32 object-contain transition-all duration-300 ${
+    isActive ? "scale-110" : "scale-100"
+  }`}
+/>
+
                       </div>
                     </div>
 
                     {/* RIGHT: Description ONLY */}
-                    <div className="flex flex-col text-center justify-center sm:text-left flex-1 space-y-2 sm:space-y-3 md:space-y-3">
-                      <p className="leading-relaxed opacity-90 font-bold max-w-md mx-auto sm:mx-0 text-xs xs:text-sm sm:text-sm md:text-base lg:text-lg text-gray-100">
-                        {item.description}
-                      </p>
-                    </div>
+                <div className="flex flex-col h-full  flex-1">
+  <p className="flex-1 leading-relaxed opacity-90 font-bold text-gray-100">
+    {item.description}
+  </p>
+</div>
+
                   </div>
                 )}
               </SwiperSlide>

@@ -25,7 +25,13 @@ import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   SmileOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  HomeOutlined,
+  BuildOutlined,
+  EnvironmentOutlined,
+  CalculatorOutlined,
+  PhoneFilled,
+  FileDoneOutlined
 } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiService } from '../../../manageApi/utils/custom.apiservice';
@@ -35,6 +41,15 @@ import logoNew from "../../../assets/img/logoNew.png";
 const { Title, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
+
+const landscapeCategories = [
+  { id: 'residential', label: 'Residential Gardens', description: 'Home gardens, backyards, patios' },
+  { id: 'commercial', label: 'Commercial Landscaping', description: 'Office complexes, retail spaces' },
+  { id: 'hardscape', label: 'Hardscape Design', description: 'Patios, walkways, retaining walls' },
+  { id: 'irrigation', label: 'Irrigation Systems', description: 'Smart watering, drip systems' },
+  { id: 'lighting', label: 'Outdoor Lighting', description: 'Garden lights, path lighting' },
+  { id: 'maintenance', label: 'Garden Maintenance', description: 'Regular upkeep, seasonal care' },
+];
 
 const gardenTypes = [
   { id: 'modern', label: 'Modern Minimal', description: 'Clean lines, gravel, succulents & lighting' },
@@ -79,15 +94,41 @@ const countryCodes = [
 ];
 
 const steps = [
-  { title: 'Garden Style', description: 'Choose your garden style' },
-  { title: 'Area Size', description: 'Enter garden dimensions' },
-  { title: 'Package', description: 'Select your package' },
-  { title: 'Contact Details', description: 'Share your information' },
-  { title: 'Get Detailed Quote', description: 'Receive your estimate' }
+  { 
+    title: 'Landscaping Type', 
+    description: 'Choose your category',
+    icon: <EnvironmentOutlined />
+  },
+  { 
+    title: 'Garden Style', 
+    description: 'Choose your garden style',
+    icon: <HomeOutlined />
+  },
+  { 
+    title: 'Area Size', 
+    description: 'Enter garden dimensions',
+    icon: <CalculatorOutlined />
+  },
+  { 
+    title: 'Package', 
+    description: 'Select your package',
+    icon: <BuildOutlined />
+  },
+  { 
+    title: 'Contact Details', 
+    description: 'Share your information',
+    icon: <PhoneFilled />
+  },
+  { 
+    title: 'Quote Ready', 
+    description: 'Receive your estimate',
+    icon: <FileDoneOutlined />
+  }
 ];
 
 const Calculator = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [selectedLandscapeCategory, setSelectedLandscapeCategory] = useState('');
   const [selectedGardenType, setSelectedGardenType] = useState('');
   const [selectedPackage, setSelectedPackage] = useState('');
   const [areaSqFt, setAreaSqFt] = useState('');
@@ -153,14 +194,19 @@ const Calculator = () => {
       category: values.category,
       subcategories: values.subcategories || [],
       description: values.description?.trim() || "No details provided",
+      landscape_category: selectedLandscapeCategory,
+      garden_style: selectedGardenType,
+      area_sqft: areaSqFt,
+      package: selectedPackage,
+      estimated_price: calculateTotalPrice()
     };
 
     try {
       const res = await apiService.post("/estimates/submit", payload);
 
-      // Show success and move to step 5
+      // Show success and move to success step
       setEstimateSubmitted(true);
-      setActiveStep(4); // Move to success step
+      setActiveStep(5); // Move to success step (step 6)
 
       // Show success alert
       showSuccessAlert(
@@ -185,9 +231,8 @@ const Calculator = () => {
   };
 
   const handleGetFreeQuote = () => {
-    // Show alert message when "Get Free Quote" button is clicked
-    message.success("Thank you! We will reach you soon with your detailed quote.");
-    setActiveStep(3); // Move to contact details step
+    // Move to contact details step when "Get Free Quote" is clicked
+    setActiveStep(4); // Move to step 4 (contact details)
   };
 
   const handleCreateNewEstimate = () => {
@@ -196,6 +241,7 @@ const Calculator = () => {
     setEstimateSubmitted(false);
     form.resetFields();
     setMobileNumber("");
+    setSelectedLandscapeCategory('');
     setSelectedGardenType('');
     setSelectedPackage('');
     setAreaSqFt('');
@@ -206,16 +252,20 @@ const Calculator = () => {
     const pkg = packages.find(p => p.id === selectedPackage);
     if (!pkg) return 0;
     
-    return pkg.price;
+    // Optional: Add area-based pricing
+    const basePrice = pkg.price;
+    const areaMultiplier = areaSqFt ? Math.max(1, areaSqFt / 1000) : 1;
+    return Math.round(basePrice * areaMultiplier);
   };
 
   const isStepValid = () => {
     switch (activeStep) {
-      case 0: return !!selectedGardenType;
-      case 1: return areaSqFt >= 100;
-      case 2: return !!selectedPackage;
-      case 3: return true; // Form validation will handle this
-      case 4: return true; // Success step
+      case 0: return !!selectedLandscapeCategory;
+      case 1: return !!selectedGardenType;
+      case 2: return areaSqFt && areaSqFt >= 100;
+      case 3: return !!selectedPackage;
+      case 4: return true; // Form validation will handle this
+      case 5: return true; // Success step
       default: return false;
     }
   };
@@ -225,8 +275,54 @@ const Calculator = () => {
       case 0:
         return (
           <div className="text-center">
-            <Title level={2} className="mb-4">
-              What style of garden do you dream of?
+            <Title level={2} className="mb-4 text-purple-700">
+              What Type of Landscaping Do You Need?
+            </Title>
+            <Text type="secondary" className="text-lg mb-8 block">
+              Select the category that best describes your project
+            </Text>
+
+            <Radio.Group 
+              value={selectedLandscapeCategory} 
+              onChange={(e) => setSelectedLandscapeCategory(e.target.value)}
+              className="w-full"
+            >
+              <Row gutter={[24, 24]}>
+                {landscapeCategories.map((category) => (
+                  <Col xs={24} sm={12} md={8} key={category.id}>
+                    <Card
+                      hoverable
+                      className={`h-full cursor-pointer transition-all duration-300 ${
+                        selectedLandscapeCategory === category.id
+                          ? 'border-2 border-purple-600 shadow-lg shadow-purple-200'
+                          : 'border border-gray-200 hover:border-purple-400 hover:shadow-md'
+                      }`}
+                      onClick={() => setSelectedLandscapeCategory(category.id)}
+                      bodyStyle={{ padding: '24px 16px', textAlign: 'center' }}
+                    >
+                      <Radio value={category.id} className="absolute top-3 right-3" />
+                      
+                      <div className="h-32 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg flex items-center justify-center mb-4">
+                        <div className="text-5xl text-purple-600 font-bold">
+                          {category.label[0]}
+                        </div>
+                      </div>
+                      
+                      <Title level={4} className="mb-2 text-gray-800">{category.label}</Title>
+                      <Text type="secondary" className="text-sm">{category.description}</Text>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </Radio.Group>
+          </div>
+        );
+
+      case 1:
+        return (
+          <div className="text-center">
+            <Title level={2} className="mb-4 text-purple-700">
+              What Style of Garden Do You Dream Of?
             </Title>
             <Text type="secondary" className="text-lg mb-8 block">
               Choose the vibe that matches your vision
@@ -242,24 +338,24 @@ const Calculator = () => {
                   <Col xs={24} sm={12} md={8} key={type.id}>
                     <Card
                       hoverable
-                      className={`h-full cursor-pointer transition-all ${
+                      className={`h-full cursor-pointer transition-all duration-300 ${
                         selectedGardenType === type.id
-                          ? 'border-2 border-purple-600 shadow-lg'
-                          : 'border border-gray-200'
+                          ? 'border-2 border-purple-600 shadow-lg shadow-purple-200'
+                          : 'border border-gray-200 hover:border-purple-400 hover:shadow-md'
                       }`}
                       onClick={() => setSelectedGardenType(type.id)}
                       bodyStyle={{ padding: '24px 16px', textAlign: 'center' }}
                     >
                       <Radio value={type.id} className="absolute top-3 right-3" />
                       
-                      <div className="h-32 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg flex items-center justify-center mb-4">
-                        <div className="text-4xl text-green-600 font-bold">
+                      <div className="h-32 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg flex items-center justify-center mb-4">
+                        <div className="text-5xl text-green-600 font-bold">
                           {type.label[0]}
                         </div>
                       </div>
                       
-                      <Title level={4} className="mb-2">{type.label}</Title>
-                      <Text type="secondary">{type.description}</Text>
+                      <Title level={4} className="mb-2 text-gray-800">{type.label}</Title>
+                      <Text type="secondary" className="text-sm">{type.description}</Text>
                     </Card>
                   </Col>
                 ))}
@@ -268,11 +364,11 @@ const Calculator = () => {
           </div>
         );
 
-      case 1:
+      case 2:
         return (
           <div className="text-center">
-            <Title level={2} className="mb-4">
-              What's the size of your garden?
+            <Title level={2} className="mb-4 text-purple-700">
+              What's the Size of Your Garden?
             </Title>
             <Text type="secondary" className="text-lg mb-8 block">
               Enter total area in square feet (e.g., 90×90 = 8100 sq ft)
@@ -282,6 +378,8 @@ const Calculator = () => {
               <Form.Item
                 label="Total Garden Area (sq ft)"
                 className="text-left"
+                labelCol={{ span: 24 }}
+                wrapperCol={{ span: 24 }}
               >
                 <Input
                   type="number"
@@ -291,27 +389,72 @@ const Calculator = () => {
                   placeholder="Enter area in square feet"
                   min="100"
                   max="50000"
+                  className="rounded-lg border-purple-300 focus:border-purple-500 focus:shadow-purple-200"
+                  suffix={<span className="text-gray-500">sq ft</span>}
                 />
               </Form.Item>
-              <Text type="secondary" className="block mt-4">
-                Example: 30 ft × 50 ft = <strong>{30 * 50} sq ft</strong>
-              </Text>
+              
+              <div className="mt-6 p-4 bg-purple-50 rounded-lg">
+                <Text strong className="text-purple-700 block mb-2">Common Garden Sizes:</Text>
+                <Row gutter={[16, 8]} className="text-sm">
+                  <Col span={8}>
+                    <Button 
+                      type="dashed" 
+                      size="small" 
+                      onClick={() => setAreaSqFt(500)}
+                      className="w-full"
+                    >
+                      Small (500 sq ft)
+                    </Button>
+                  </Col>
+                  <Col span={8}>
+                    <Button 
+                      type="dashed" 
+                      size="small" 
+                      onClick={() => setAreaSqFt(1500)}
+                      className="w-full"
+                    >
+                      Medium (1500 sq ft)
+                    </Button>
+                  </Col>
+                  <Col span={8}>
+                    <Button 
+                      type="dashed" 
+                      size="small" 
+                      onClick={() => setAreaSqFt(3000)}
+                      className="w-full"
+                    >
+                      Large (3000 sq ft)
+                    </Button>
+                  </Col>
+                </Row>
+              </div>
+              
+              {areaSqFt && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <Text className="text-green-700">
+                    <CalculatorOutlined className="mr-2" />
+                    Example: {Math.sqrt(areaSqFt).toFixed(1)} ft × {Math.sqrt(areaSqFt).toFixed(1)} ft = <strong>{areaSqFt} sq ft</strong>
+                  </Text>
+                </div>
+              )}
+              
               {areaSqFt && areaSqFt < 100 && (
                 <Text type="warning" className="block mt-2">
-                  Minimum 100 sq ft recommended
+                  ⚠️ Minimum 100 sq ft recommended for proper landscaping
                 </Text>
               )}
             </div>
           </div>
         );
 
-      case 2:
+      case 3:
         const selectedPkg = packages.find(p => p.id === selectedPackage);
         const totalPrice = calculateTotalPrice();
 
         return (
           <div className="text-center">
-            <Title level={2} className="mb-4">
+            <Title level={2} className="mb-4 text-purple-700">
               Choose Your Landscaping Package
             </Title>
             <Text type="secondary" className="text-lg mb-8 block">
@@ -328,27 +471,29 @@ const Calculator = () => {
                   <Col xs={24} md={8} key={pkg.id}>
                     <Card
                       hoverable
-                      className={`h-full cursor-pointer transition-all ${
+                      className={`h-full cursor-pointer transition-all duration-300 ${
                         selectedPackage === pkg.id
-                          ? 'border-2 border-purple-600 shadow-lg'
-                          : 'border border-gray-200'
+                          ? 'border-2 border-purple-600 shadow-lg shadow-purple-200 transform scale-105'
+                          : 'border border-gray-200 hover:border-purple-400 hover:shadow-md'
                       }`}
                       onClick={() => setSelectedPackage(pkg.id)}
                       bodyStyle={{ padding: '24px 16px' }}
                     >
                       <Radio value={pkg.id} className="mb-4" />
-                      <Title level={3} className="mb-2">{pkg.name}</Title>
+                      <Title level={3} className="mb-2 text-gray-800">{pkg.name}</Title>
                       <Title level={2} className="text-purple-600 mb-4">
                         ${pkg.price.toLocaleString()}
+                        <Text className="text-sm text-gray-500 ml-2">starting from</Text>
                       </Title>
-                      <Text type="secondary" className="block mb-4">
+                      <Text type="secondary" className="block mb-4 italic">
                         {pkg.description}
                       </Text>
                       <div className="text-left">
                         {pkg.features.map((feature, index) => (
-                          <Text key={index} type="secondary" className="block mb-1">
-                            • {feature}
-                          </Text>
+                          <div key={index} className="flex items-start mb-2">
+                            <CheckCircleOutlined className="text-green-500 mt-1 mr-2 flex-shrink-0" />
+                            <Text type="secondary">{feature}</Text>
+                          </div>
                         ))}
                       </div>
                     </Card>
@@ -359,21 +504,26 @@ const Calculator = () => {
 
             {/* Quote Preview */}
             {selectedPackage && (
-              <Card className="mt-8 max-w-2xl mx-auto bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+              <Card className="mt-8 max-w-2xl mx-auto bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-300">
                 <Space direction="vertical" className="w-full text-center" size="middle">
-                  <Title level={3}>Your Estimated Cost</Title>
+                  <Title level={3} className="text-purple-700">Your Estimated Cost</Title>
                   <Title level={1} className="text-purple-600 m-0">
                     ${totalPrice.toLocaleString()}
                   </Title>
-                  <Text type="secondary">
-                    For {areaSqFt} sq ft {selectedGardenType && `• ${gardenTypes.find(t => t.id === selectedGardenType)?.label}`}
+                  <Text type="secondary" className="text-sm">
+                    For {areaSqFt} sq ft • {gardenTypes.find(t => t.id === selectedGardenType)?.label}
                   </Text>
                   <Button
                     type="primary"
                     size="large"
                     onClick={handleGetFreeQuote}
-                    className="mt-4 bg-green-600 hover:bg-green-700 border-green-600"
+                    className="mt-4 h-12 text-lg font-bold"
                     icon={<FileTextOutlined />}
+                    style={{
+                      backgroundColor: '#7e22ce',
+                      borderColor: '#7e22ce',
+                      borderRadius: '8px',
+                    }}
                   >
                     Get Free Detailed Quote
                   </Button>
@@ -383,14 +533,14 @@ const Calculator = () => {
           </div>
         );
 
-      case 3:
+      case 4:
         const currentPkg = packages.find(p => p.id === selectedPackage);
         const currentTotalPrice = calculateTotalPrice();
 
         return (
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
-              <Title level={2}>Complete Your Estimate Request</Title>
+              <Title level={2} className="text-purple-700">Complete Your Estimate Request</Title>
               <Text type="secondary" className="text-lg">
                 Share your details to receive your detailed garden quote
               </Text>
@@ -400,27 +550,40 @@ const Calculator = () => {
               {/* Estimate Summary */}
               <Col xs={24} lg={10}>
                 <Card 
-                  title="Your Garden Plan" 
-                  className="shadow-lg h-full"
-                  headStyle={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #e8e8e8' }}
+                  title={
+                    <Space>
+                      <FileTextOutlined className="text-purple-600" />
+                      <span className="text-purple-700">Your Garden Plan</span>
+                    </Space>
+                  } 
+                  className="shadow-lg h-full border-purple-200"
+                  headStyle={{ 
+                    backgroundColor: '#faf5ff', 
+                    borderBottom: '2px solid #e9d5ff',
+                    borderRadius: '8px 8px 0 0'
+                  }}
                 >
                   <Space direction="vertical" className="w-full" size="large">
                     <div className="space-y-3">
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center p-2 hover:bg-purple-50 rounded">
+                        <Text strong>Landscaping Type:</Text>
+                        <Text>{landscapeCategories.find(t => t.id === selectedLandscapeCategory)?.label}</Text>
+                      </div>
+                      <div className="flex justify-between items-center p-2 hover:bg-purple-50 rounded">
                         <Text strong>Garden Style:</Text>
                         <Text>{gardenTypes.find(t => t.id === selectedGardenType)?.label}</Text>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center p-2 hover:bg-purple-50 rounded">
                         <Text strong>Garden Area:</Text>
                         <Text>{areaSqFt} sq ft</Text>
                       </div>
-                      <div className="flex justify-between">
-                        <Text strong>Selected Package:</Text>
-                        <Text>{currentPkg?.name}</Text>
+                      <div className="flex justify-between items-center p-2 hover:bg-purple-50 rounded">
+                        <Text strong>Package:</Text>
+                        <Text className="font-semibold text-purple-600">{currentPkg?.name}</Text>
                       </div>
-                      <Divider />
-                      <div className="flex justify-between text-lg">
-                        <Text strong>Estimated Price:</Text>
+                      <Divider className="my-2" />
+                      <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                        <Text strong className="text-lg">Estimated Price:</Text>
                         <Title level={3} className="text-purple-600 m-0">
                           ${currentTotalPrice.toLocaleString()}
                         </Title>
@@ -428,9 +591,17 @@ const Calculator = () => {
                     </div>
                     
                     <Card size="small" className="bg-blue-50 border-blue-200">
-                      <Text className="text-blue-800 text-sm">
-                        💡 Fill in your details to receive a comprehensive quote with design options and timeline.
-                      </Text>
+                      <Space direction="vertical" size="small">
+                        <Text strong className="text-blue-800">
+                          💡 What's included in your detailed quote:
+                        </Text>
+                        <Text type="secondary" className="text-sm">
+                          • Complete itemized breakdown<br/>
+                          • Material options & samples<br/>
+                          • Timeline & project phases<br/>
+                          • 3D design visualization
+                        </Text>
+                      </Space>
                     </Card>
                   </Space>
                 </Card>
@@ -442,11 +613,15 @@ const Calculator = () => {
                   title={
                     <Space>
                       <UserOutlined className="text-purple-600" />
-                      <span>Contact Information</span>
+                      <span className="text-purple-700">Contact Information</span>
                     </Space>
                   } 
-                  className="shadow-lg h-full"
-                  headStyle={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #e8e8e8' }}
+                  className="shadow-lg h-full border-purple-200"
+                  headStyle={{ 
+                    backgroundColor: '#faf5ff', 
+                    borderBottom: '2px solid #e9d5ff',
+                    borderRadius: '8px 8px 0 0'
+                  }}
                 >
                   <Form 
                     form={form} 
@@ -463,8 +638,8 @@ const Calculator = () => {
                         >
                           <Input 
                             placeholder="John Doe" 
-                            prefix={<UserOutlined className="text-gray-400" />}
-                            className="rounded-lg"
+                            prefix={<UserOutlined className="text-purple-400" />}
+                            className="rounded-lg border-purple-300 focus:border-purple-500 focus:shadow-purple-200"
                             allowClear
                           />
                         </Form.Item>
@@ -480,8 +655,8 @@ const Calculator = () => {
                         >
                           <Input 
                             placeholder="john@example.com" 
-                            prefix={<MailOutlined className="text-gray-400" />}
-                            className="rounded-lg"
+                            prefix={<MailOutlined className="text-purple-400" />}
+                            className="rounded-lg border-purple-300 focus:border-purple-500 focus:shadow-purple-200"
                             allowClear
                           />
                         </Form.Item>
@@ -496,6 +671,7 @@ const Calculator = () => {
                           style={{ width: '120px' }}
                           showSearch
                           optionFilterProp="children"
+                          className="border-purple-300 focus:border-purple-500"
                         >
                           {countryCodes.map(c => (
                             <Option key={c.value} value={c.value}>
@@ -508,13 +684,13 @@ const Calculator = () => {
                           onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ""))}
                           placeholder="501234567"
                           maxLength={15}
-                          prefix={<PhoneOutlined className="text-gray-400" />}
-                          className="rounded-lg flex-1"
+                          prefix={<PhoneOutlined className="text-purple-400" />}
+                          className="rounded-lg flex-1 border-purple-300 focus:border-purple-500 focus:shadow-purple-200"
                           allowClear
                         />
                       </Space.Compact>
                       {mobileNumber && mobileNumber.length < 8 && (
-                        <Text type="warning" className="text-xs">
+                        <Text type="warning" className="text-xs mt-1">
                           Mobile number should be at least 8 digits
                         </Text>
                       )}
@@ -531,7 +707,7 @@ const Calculator = () => {
                         optionFilterProp="label"
                         onChange={handleCategoryChange}
                         loading={categories.length === 0}
-                        className="rounded-lg"
+                        className="rounded-lg border-purple-300 focus:border-purple-500 focus:shadow-purple-200"
                         allowClear
                       >
                         {categories.map(category => (
@@ -549,7 +725,7 @@ const Calculator = () => {
                       <Select
                         mode="multiple"
                         placeholder="Choose relevant services"
-                        className="rounded-lg"
+                        className="rounded-lg border-purple-300 focus:border-purple-500 focus:shadow-purple-200"
                         loading={fetchingSubcat}
                         disabled={!selectedCategory}
                         allowClear
@@ -570,7 +746,7 @@ const Calculator = () => {
                     >
                       <TextArea
                         placeholder="Please describe your garden project in detail. Include any specific plants, features, or special requirements you have in mind..."
-                        className="rounded-lg resize-none"
+                        className="rounded-lg resize-none border-purple-300 focus:border-purple-500 focus:shadow-purple-200"
                         rows={4}
                         showCount
                         maxLength={500}
@@ -588,6 +764,7 @@ const Calculator = () => {
                         style={{
                           backgroundColor: '#7e22ce',
                           borderColor: '#7e22ce',
+                          borderRadius: '8px',
                         }}
                       >
                         {loading ? "Submitting Your Request..." : "Submit & Get Detailed Quote"}
@@ -600,23 +777,22 @@ const Calculator = () => {
           </div>
         );
 
-      case 4:
+      case 5:
         return (
           <div className="max-w-4xl mx-auto text-center">
             <Result
               icon={<SmileOutlined style={{ color: '#7e22ce', fontSize: '72px' }} />}
               status="success"
               title={
-  <Title level={2} className="text-purple-600">
-    Your Request Has Been Submitted to Xoto!
-  </Title>
-}
-subTitle={
-  <Text className="text-lg text-gray-600">
-    Thank you for reaching out. Our team at Xoto has received your details and will get in touch within 24 hours with your customized estimate.
-  </Text>
-}
-
+                <Title level={2} className="text-purple-700">
+                  Your Request Has Been Submitted to Xoto!
+                </Title>
+              }
+              subTitle={
+                <Text className="text-lg text-gray-600">
+                  Thank you for reaching out. Our team at Xoto has received your details and will get in touch within 24 hours with your customized estimate.
+                </Text>
+              }
               extra={[
                 <Button 
                   type="primary" 
@@ -624,7 +800,11 @@ subTitle={
                   onClick={handleCreateNewEstimate}
                   size="large"
                   icon={<FileTextOutlined />}
-                  className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+                  style={{
+                    backgroundColor: '#7e22ce',
+                    borderColor: '#7e22ce',
+                    borderRadius: '8px',
+                  }}
                 >
                   Create Another Estimate
                 </Button>,
@@ -632,46 +812,48 @@ subTitle={
                   key="home"
                   onClick={() => window.location.href = '/'}
                   size="large"
+                  icon={<HomeOutlined />}
+                  className="border-purple-300 text-purple-600 hover:text-purple-700 hover:border-purple-400"
                 >
                   Back to Homepage
                 </Button>,
               ]}
             />
             
-            <Card className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+            <Card className="mt-8 bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
               <Row gutter={[32, 32]} align="middle">
                 <Col xs={24} md={12}>
                   <Space direction="vertical" size="large" className="text-left">
-                    <Title level={3}>What Happens Next?</Title>
+                    <Title level={3} className="text-purple-700">What Happens Next?</Title>
                     <div className="space-y-3">
-                      <div className="flex items-start">
-                        <CheckCircleOutlined className="text-green-600 text-lg mt-1 mr-3" />
+                      <div className="flex items-start p-3 bg-white rounded-lg shadow-sm">
+                        <CheckCircleOutlined className="text-green-600 text-lg mt-1 mr-3 flex-shrink-0" />
                         <div>
-                          <Text strong>Expert Review</Text>
+                          <Text strong className="text-gray-800">Expert Review</Text>
                           <br />
                           <Text type="secondary">Our garden specialist will review your requirements</Text>
                         </div>
                       </div>
-                      <div className="flex items-start">
-                        <CheckCircleOutlined className="text-green-600 text-lg mt-1 mr-3" />
+                      <div className="flex items-start p-3 bg-white rounded-lg shadow-sm">
+                        <CheckCircleOutlined className="text-green-600 text-lg mt-1 mr-3 flex-shrink-0" />
                         <div>
-                          <Text strong>Detailed Quote</Text>
+                          <Text strong className="text-gray-800">Detailed Quote</Text>
                           <br />
                           <Text type="secondary">We'll prepare a comprehensive quote with design options</Text>
                         </div>
                       </div>
-                      <div className="flex items-start">
-                        <CheckCircleOutlined className="text-green-600 text-lg mt-1 mr-3" />
+                      <div className="flex items-start p-3 bg-white rounded-lg shadow-sm">
+                        <CheckCircleOutlined className="text-green-600 text-lg mt-1 mr-3 flex-shrink-0" />
                         <div>
-                          <Text strong>Free Consultation</Text>
+                          <Text strong className="text-gray-800">Free Consultation</Text>
                           <br />
                           <Text type="secondary">Schedule a free consultation to discuss your vision</Text>
                         </div>
                       </div>
-                      <div className="flex items-start">
-                        <CheckCircleOutlined className="text-green-600 text-lg mt-1 mr-3" />
+                      <div className="flex items-start p-3 bg-white rounded-lg shadow-sm">
+                        <CheckCircleOutlined className="text-green-600 text-lg mt-1 mr-3 flex-shrink-0" />
                         <div>
-                          <Text strong>24-Hour Response</Text>
+                          <Text strong className="text-gray-800">24-Hour Response</Text>
                           <br />
                           <Text type="secondary">You'll hear from us within 24 hours</Text>
                         </div>
@@ -680,25 +862,29 @@ subTitle={
                   </Space>
                 </Col>
                 <Col xs={24} md={12}>
-                  <div className="bg-white p-6 rounded-lg shadow-lg">
-                    <Title level={4} className="text-purple-600">Your Garden Plan Summary</Title>
+                  <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
+                    <Title level={4} className="text-purple-600 mb-4">Your Garden Plan Summary</Title>
                     <div className="space-y-2 text-left">
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center p-2 hover:bg-purple-50 rounded">
+                        <Text>Landscaping Type:</Text>
+                        <Text strong>{landscapeCategories.find(t => t.id === selectedLandscapeCategory)?.label}</Text>
+                      </div>
+                      <div className="flex justify-between items-center p-2 hover:bg-purple-50 rounded">
                         <Text>Garden Style:</Text>
                         <Text strong>{gardenTypes.find(t => t.id === selectedGardenType)?.label}</Text>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center p-2 hover:bg-purple-50 rounded">
                         <Text>Area Size:</Text>
                         <Text strong>{areaSqFt} sq ft</Text>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center p-2 hover:bg-purple-50 rounded">
                         <Text>Package:</Text>
                         <Text strong>{packages.find(p => p.id === selectedPackage)?.name}</Text>
                       </div>
-                      <Divider />
-                      <div className="flex justify-between text-lg">
-                        <Text strong>Estimated Investment:</Text>
-                        <Text strong className="text-purple-600">
+                      <Divider className="my-2" />
+                      <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                        <Text strong className="text-lg">Estimated Investment:</Text>
+                        <Text strong className="text-purple-600 text-xl">
                           ${calculateTotalPrice().toLocaleString()}
                         </Text>
                       </div>
@@ -718,14 +904,14 @@ subTitle={
   const progressPercentage = ((activeStep + 1) / steps.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       {/* Header */}
-      <div className="bg-white border-b shadow-sm sticky top-0 z-10">
+      <div className="bg-white border-b border-purple-200 shadow-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <img src={logoNew} alt="Logo" className="h-10" />
             <div className="text-right">
-              <Text strong className="text-gray-600">
+              <Text strong className="text-purple-600">
                 Step {activeStep + 1} of {steps.length}
               </Text>
             </div>
@@ -739,30 +925,40 @@ subTitle={
               '100%': '#7c3aed',
             }}
             strokeWidth={4}
+            className="mb-2"
           />
           
           {/* Steps Indicator */}
           <div className="flex justify-between mt-4">
             {steps.map((step, index) => (
-              <div key={index} className="text-center flex-1">
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full mx-auto ${
+              <div key={index} className="text-center flex-1 relative">
+                {/* Connecting line */}
+                {index < steps.length - 1 && (
+                  <div className="absolute top-4 left-1/2 w-full h-0.5 bg-gray-300 -z-10"></div>
+                )}
+                
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full mx-auto relative z-10 transition-all duration-300 ${
                   index === activeStep 
-                    ? 'bg-purple-600 text-white' 
+                    ? 'bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-300 transform scale-110' 
                     : index < activeStep 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-gray-300 text-gray-600'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' 
+                    : 'bg-gray-100 text-gray-600 border-2 border-gray-300'
                 }`}>
-                  {index < activeStep ? <CheckCircleOutlined /> : index + 1}
+                  {index < activeStep ? step.icon : step.icon}
                 </div>
                 <Text 
                   strong 
-                  className={`text-sm mt-1 block ${
-                    index === activeStep ? 'text-purple-600' : 'text-gray-500'
+                  className={`text-sm mt-2 block transition-colors duration-300 ${
+                    index === activeStep ? 'text-purple-700' : 
+                    index < activeStep ? 'text-green-600' : 'text-gray-500'
                   }`}
                 >
                   {step.title}
                 </Text>
-                <Text type="secondary" className="text-xs hidden md:block">
+                <Text 
+                  type="secondary" 
+                  className="text-xs hidden md:block mt-1"
+                >
                   {step.description}
                 </Text>
               </div>
@@ -772,13 +968,13 @@ subTitle={
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
             {renderStepContent(activeStep)}
@@ -786,9 +982,9 @@ subTitle={
         </AnimatePresence>
       </div>
 
-      {/* Navigation Buttons - Hide on step 3 (has submit button) and step 4 (success) */}
-      {activeStep !== 3 && activeStep !== 4 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t py-4 shadow-lg">
+      {/* Navigation Buttons - Hide on step 4 (has submit button) and step 5 (success) */}
+      {activeStep !== 4 && activeStep !== 5 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-purple-200 py-4 shadow-lg">
           <div className="max-w-4xl mx-auto px-6 flex justify-between items-center">
             <Button
               type="default"
@@ -796,7 +992,7 @@ subTitle={
               icon={<ArrowLeftOutlined />}
               onClick={handleBack}
               disabled={activeStep === 0}
-              className="flex items-center"
+              className="flex items-center border-purple-300 text-purple-600 hover:text-purple-700 hover:border-purple-400 rounded-lg"
             >
               Back
             </Button>
@@ -807,7 +1003,12 @@ subTitle={
               icon={<ArrowRightOutlined />}
               onClick={handleNext}
               disabled={!isStepValid()}
-              className="flex items-center bg-purple-600 hover:bg-purple-700 border-purple-600"
+              className="flex items-center rounded-lg shadow-lg"
+              style={{
+                backgroundColor: '#7e22ce',
+                borderColor: '#7e22ce',
+                borderRadius: '8px',
+              }}
             >
               Next
             </Button>

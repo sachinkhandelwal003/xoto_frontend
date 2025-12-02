@@ -197,8 +197,8 @@ export const languages = [
 const navItems = [
   { title: "Home", path: "/" },
   { title: "Landscaping", path: "/landscaping" },
-  { title: "Interior", path: "/services/interior" },
-  { title: "Rent/Buy/Sell", path: "/marketplace" },
+  { title: "Interiors", path: "/services/interior" },
+  { title: "Properties", path: "/marketplace" },
   { title: "Services", path: "/Services" },
   { title: "Partner Eco-System", path: "/ecosystem" },
   { title: "About Us", path: "/about" },

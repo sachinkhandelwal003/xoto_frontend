@@ -45,7 +45,8 @@ const HeroSection = () => {
   return (
     <section className="relative w-full min-h-screen overflow-hidden flex items-center justify-center text-white py-8 lg:py-0">
 
-  <div className="absolute inset-0 w-full h-full bg-black/5 shadow-inner pointer-events-none z-[5]" />
+<div className="absolute inset-0 w-full h-full bg-black/20 shadow-inner pointer-events-none z-5" />
+
       {/* Background Video */}
       <video
         autoPlay
@@ -64,11 +65,11 @@ const HeroSection = () => {
         <div className="max-w-4xl space-y-4 lg:space-y-6 text-center lg:text-left " >
           <h1 className="heading-light">
             Redefining Living
-            <span className="text-amber-50"> <br />From Landscapes to Homes</span>
+            <span className=""> <br />From Landscapes to Homes</span>
           </h1>
 
           <p className="paragraph-light">
-            Discover AI-powered designs and curated <br/> properties that elevate every corner of your world.
+            Discover AI-powered designs and curated  <br /> properties that elevate every corner of your world.
           </p>
 
           {/* Buttons */}

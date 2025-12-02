@@ -48,7 +48,8 @@ export default function TrustPresenceSection() {
       </div>
 
       {/* Title */}
-      <h2 className="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-12 md:mb-16 relative z-20">
+      <h2 className="text-center text-3xl sm:text-4xl md:text-5xl   mb-12 md:mb-16 relative z-20 heading-dark-1"
+       style={{ color: "var(--color-black)" }}>
         Trust & Presence
       </h2>
 
@@ -126,33 +127,33 @@ export default function TrustPresenceSection() {
       <div className="grid grid-cols-1 mt-20 md:grid-cols-3 gap-8 sm:gap-10 lg:gap-12 max-w-6xl mx-auto px-4 pt-20 sm:px-6 relative z-10">
 
         {/* Card 1 */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-pink-200 hover:shadow-2xl hover:shadow-pink-300 transition-all duration-300 hover:-translate-y-3 border border-white/50">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 transition-all duration-300 hover:-translate-y-3 border border-white/50">
           <div className="w-16 h-16 mx-auto mb-6">
             <img src={building} alt="" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 text-center">Landscaping</h3>
+          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center">Landscaping</h3>
           <p className="text-sm sm:text-base text-gray-600 text-center">
             Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.
           </p>
         </div>
 
         {/* Card 2 */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-pink-200 hover:shadow-2xl hover:shadow-pink-300 transition-all duration-300 hover:-translate-y-3 border border-white/50">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 transition-all duration-300 hover:-translate-y-3 border border-white/50">
           <div className="w-16 h-16 mx-auto mb-6">
             <img src={sale} alt="" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 text-center">Resale</h3>
+          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center">Resale</h3>
           <p className="text-sm sm:text-base text-gray-600 text-center">
             Reimagine your home with effortless, AI-powered solutions.
           </p>
         </div>
 
         {/* Card 3 */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-pink-200 hover:shadow-2xl hover:shadow-pink-300 transition-all duration-300 hover:-translate-y-3 border border-white/50">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 transition-all duration-300 hover:-translate-y-3 border border-white/50">
           <div className="w-16 h-16 mx-auto mb-6">
             <img src={rental} alt="" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 text-center">Rental</h3>
+          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center">Rental</h3>
           <p className="text-sm sm:text-base text-gray-600 text-center">
             Reimagine your space with effortless, AI-powered upgrade solutions.
           </p>

@@ -5,7 +5,7 @@ import waveint4 from "../../assets/img/wave/waveint4.png";
 
 export default function WhatAreYouLookingFor() {
   return (
-    <section className="relative bg-[var(--color-body)] overflow-visible  pt-15 ">
+    <section className="relative bg-[var(--color-body)] overflow-hidden  pt-15 ">
       {/* BOTTOM WAVE BACKGROUND IMAGE - Fixed positioning */}
       <div className="absolute -bottom-50 left-0 w-full z-0 pointer-events-none select-none">
         <img

@@ -134,7 +134,7 @@ const Footer = () => {
             {/* Locations */}
             <div>
               <h4 className="text-white mb-2 font-semibold text-sm uppercase">Locations</h4>
-              <p className="text-purple-200 text-sm">India | UAE | Saudi Arabia</p>
+              <p className="text-purple-200 text-sm"> UAE </p>
             </div>
 
             {/* Email */}

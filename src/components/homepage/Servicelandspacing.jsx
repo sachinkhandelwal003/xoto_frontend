@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import wave1 from "../../assets/img/wave/waveint2.png";
 import hardScape from "../../assets/img/landscap/hardscape.png";
 import other from "../../assets/img/landscap/other.png";
@@ -7,6 +7,7 @@ import swimming from "../../assets/img/landscap/swimming.png";
 
 const Servicelandspacing = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [cardsPerSlide, setCardsPerSlide] = useState(2);
 
   const services = [
     {
@@ -23,7 +24,7 @@ const Servicelandspacing = () => {
     },
     {
       title: "Softscape",
-      icon: <img src={softScape} alt="Softscape" />, // Fixed: using softScape image
+      icon: <img src={softScape} alt="Softscape" />,
       items: [
         "Soil preparation & leveling",
         "Plantation (trees, shrubs, groundcover)",
@@ -35,7 +36,7 @@ const Servicelandspacing = () => {
     },
     {
       title: "Swimming Pools",
-      icon: <img src={swimming} alt="Swimming Pools" />, // Fixed: using swimming image
+      icon: <img src={swimming} alt="Swimming Pools" />,
       items: [
         "Custom pool design & construction",
         "Pool decking & surrounding areas",
@@ -47,7 +48,7 @@ const Servicelandspacing = () => {
     },
     {
       title: "Other Solutions",
-      icon: <img src={other} alt="Other Solutions" />, // Fixed: using other image
+      icon: <img src={other} alt="Other Solutions" />,
       items: [
         "Regular lawn care and mowing",
         "Pruning and trimming services",
@@ -59,32 +60,40 @@ const Servicelandspacing = () => {
     },
   ];
 
-  const cardsPerSlide = 2; // 2 cards per view
+  /* Responsive cards per slide */
+  useEffect(() => {
+    const updateCards = () => {
+      setCardsPerSlide(window.innerWidth < 768 ? 1 : 2);
+    };
+    updateCards();
+    window.addEventListener("resize", updateCards);
+    return () => window.removeEventListener("resize", updateCards);
+  }, []);
+
   const totalSlides = Math.ceil(services.length / cardsPerSlide);
 
-  const nextSlide = () =>
-    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
   const prevSlide = () =>
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
 
   return (
-    <section className="relative bg-[var(--color-body)] overflow-hidden p-8">
+    <section className="relative bg-[var(--color-body)] overflow-hidden px-3 py-10 md:px-10 md:py-16">
       {/* Wave Background */}
-      <div className="absolute bottom-[-70px] left-0 w-full z-0 overflow-hidden">
+      <div className="absolute bottom-[-50px] left-0 w-full z-0 overflow-hidden ">
         <img
           src={wave1}
-          alt="Wave background"
-          className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
+          alt="Wave"
+          className="w-full scale-[1.6] md:scale-100 pointer-events-none"
         />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-16 md:py-24">
-        <h2 className="text-3xl md:text-5xl font-bold text-center text-gray-900 mb-16">
+      <div className="relative z-10 container mx-auto mt-4">
+        <h2 className="text-center text-2xl md:text-4xl lg:text-6xl font-semibold text-gray-900 mb-10 md:mb-16">
           Our Services Portfolio
         </h2>
 
-        {/* Slider Container */}
-        <div className="relative overflow-hidden  pt-12">
+        {/* Slider */}
+        <div className="relative overflow-hidden pt-6 md:pt-12">
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{
@@ -92,43 +101,43 @@ const Servicelandspacing = () => {
               width: `${totalSlides * 100}%`,
             }}
           >
-            {/* Create slides with 2 cards each */}
             {Array.from({ length: totalSlides }).map((_, slideIndex) => (
               <div
                 key={slideIndex}
-                className="flex gap-8"
-                style={{
-                  flex: `0 0 ${100 / totalSlides}%`,
-                }}
+                className="flex gap-4 md:gap-8"
+                style={{ flex: `0 0 ${100 / totalSlides}%` }}
               >
                 {services
-                  .slice(slideIndex * cardsPerSlide, (slideIndex + 1) * cardsPerSlide)
+                  .slice(
+                    slideIndex * cardsPerSlide,
+                    (slideIndex + 1) * cardsPerSlide
+                  )
                   .map((service, idx) => (
                     <div
                       key={idx}
-                      className="relative flex-1 bg-white rounded-3xl p-8 shadow-lg min-h-[400px]"
+                      className="relative flex-1 bg-white rounded-2xl p-6 md:p-8 shadow-lg min-h-[320px] md:min-h-[400px]"
                     >
-                      {/* Icon */}
-                      <div className="absolute -top-10 left-6 w-24 h-24 bg-[var(--color-primary)] rounded-full flex items-center justify-center shadow-xl z-30">
+                      <div className="absolute -top-8 left-5 w-20 h-20 md:w-24 md:h-24 bg-[var(--color-primary)] rounded-full flex items-center justify-center shadow-xl">
                         {service.icon}
                       </div>
 
-                      <div className="mt-16">
-                        <h3 className="text-2xl md:text-3xl font-bold text-black mb-6">
+                      <div className="mt-16 md:mt-20">
+                        <h3 className="text-xl md:text-3xl font-bold text-black mb-4 md:mb-6">
                           {service.title}
                         </h3>
-                        <ul className="space-y-3 text-gray-700">
+                        <ul className="space-y-2 md:space-y-3 text-gray-700 text-sm md:text-lg">
                           {service.items.map((item, i) => (
-                            <li key={i} className="flex items-start text-base md:text-lg">
+                            <li key={i} className="flex">
                               <span
-                                className="mr-3 mt-1 font-bold text-white flex items-center justify-center w-6 h-6 rounded-full"
+                                className="mr-2 md:mr-3 font-bold text-white flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-full"
                                 style={{
-                                  background: "linear-gradient(to right, #03A4F4 0%, #64EF0A 100%)",
+                                  background:
+                                    "linear-gradient(to right, #03A4F4 0%, #64EF0A 100%)",
                                 }}
                               >
                                 ✓
                               </span>
-                              <span>{item}</span>
+                              {item}
                             </li>
                           ))}
                         </ul>
@@ -140,13 +149,14 @@ const Servicelandspacing = () => {
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-center items-center mt-12 space-x-6">
+          <div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
+            {/* Prev */}
             <button
               onClick={prevSlide}
-              className="w-12 h-12 rounded-md bg-purple-100 flex items-center justify-center text-purple-600 hover:bg-purple-200 transition transform hover:scale-110 shadow-md"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-purple-100 text-purple-600 flex items-center justify-center shadow-md hover:bg-purple-200 transition-transform hover:scale-105"
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5 md:w-6 md:h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -160,25 +170,13 @@ const Servicelandspacing = () => {
               </svg>
             </button>
 
-            {/* Slide Indicators */}
-            <div className="flex space-x-2">
-              {Array.from({ length: totalSlides }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentSlide ? 'bg-[var(--color-primary)]' : 'bg-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-
+            {/* Next */}
             <button
               onClick={nextSlide}
-              className="w-12 h-12 rounded-md bg-[var(--color-primary)] flex items-center justify-center text-white hover:bg-purple-700 transition transform hover:scale-110 shadow-md"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-[var(--color-primary)] text-white flex items-center justify-center shadow-md hover:bg-purple-700 transition-transform hover:scale-105"
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5 md:w-6 md:h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

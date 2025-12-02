@@ -215,8 +215,8 @@ export default function Landspackng() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
         </div>
-        <div className="absolute bottom-0 left-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-left-shape "></div>
-        <div className="absolute bottom-0 right-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-right-shape"></div>
+        <div className="absolute bottom-0 left-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-left-shape border-none "></div>
+        <div className="absolute bottom-0 right-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-right-shape border-none"></div>
 
         {/* Custom clip paths */}
         <style>{`
@@ -232,7 +232,7 @@ export default function Landspackng() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
+            className="text-4xl md:text-6xl font-extrabold mb-6 heading-light"
           >
             Transforming Homes With Premium
             <br />
@@ -277,7 +277,7 @@ export default function Landspackng() {
                 AI Planner
               </motion.button>
             </Link> */}
-                <Link to='/estimate/calculator'>
+            <Link to='/estimate/calculator'>
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -286,7 +286,7 @@ export default function Landspackng() {
                 whileTap={{ scale: 0.95 }}
                 className="bg-[var(--color-primary)] hover:bg-purple-700 text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center"
               >
-              Get a free estimate
+                Get a free estimate
               </motion.button>
             </Link>
             
@@ -297,48 +297,54 @@ export default function Landspackng() {
 
       {/* === NEW: SCIENCE & TECHNOLOGY INNOVATION SECTION === */}
       {/* ────────────────────── INTERACTIVE BUILDER ────────────────────── */}
-      <section className="relative z-20 bg-[#f5f5f5] pt-24 overflow-hidden">
-        {/* Wave Background - z-index 0 to stay behind content */}
-        <div className="absolute bottom-[-20px] lg:bottom-[-500px] left-0 w-full z-0 overflow-hidden">
-          <img
-            src={wave2}
-            alt=""
-            className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
-          />
+      <section className="relative z-20 bg-[#f5f5f5] pt-8 sm:pt-12 md:pt-16 lg:pt-24 overflow-hidden">
+
+  {/* Wave Background - Mobile Friendly */}
+  <div className="absolute left-0 w-full z-0 overflow-visible bottom-[-120px] sm:bottom-[-100px] md:bottom-[-60px] lg:bottom-[-500px]">
+    <img
+      src={wave2}
+      alt=""
+      className="pointer-events-none select-none w-full scale-[1.4] sm:scale-[1.2] md:scale-[1.05] lg:scale-100"
+    />
+  </div>
+
+  {/* Content Wrapper */}
+  <div className="mx-auto relative z-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="grid grid-cols-1 items-center gap-8 sm:gap-10 md:gap-12 lg:grid-cols-2">
+
+      {/* Left Content Column */}
+      <div className="space-y-6 p-4 sm:p-6 md:p-8 lg:p-10">
+        <div className="inline-block border-cyan-500 p-1 mx-auto lg:mx-0">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 drop-shadow-lg leading-tight text-center lg:text-left">
+            Bring your vision to life with our interactive builder
+          </h2>
         </div>
 
-        <div className="mx-auto relative z-20 max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            {/* Left Content Column */}
-            <div className="space-y-6  p-10 pb-25">
-              <div className="inline-block border-cyan-500 p-1">
-                <h2 className="text-3xl font-bold text-gray-900 md:text-5xl lg:text-5xl drop-shadow-lg">
-                  Bring your vision to life with our
-                  interactive builder
-                </h2>
+        <p className="text-lg sm:text-xl md:text-2xl text-[#547593] max-w-md mx-auto lg:mx-0 text-center lg:text-left">
+          Upload your space or choose a template, and get instant AI-powered design previews.
+        </p>
 
-              </div>
-              <p className="text-2xl text-[#547593]">
-                Upload your space or choose a template, and get instant AI-powered design previews.
-              </p>
-            <Link to="/aiPlanner">
-  <button className="rounded-md bg-[var(--color-primary)] px-15 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
-    Take a first step
-  </button>
-</Link>
-            </div>
+        <Link to="/aiPlanner" className="flex justify-center lg:justify-start mt-4">
+          <button className="rounded-md bg-[var(--color-primary)] px-8 sm:px-10 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
+            Take a first step
+          </button>
+        </Link>
+      </div>
 
-            {/* Right Image Column - Modified to increase size and touch bottom */}
-            <div className="flex justify-center  self-stretch">
-              <img
-                src={interImage}
-                alt="3D rendered modern living room"
-                className="w-full h-full object-cover max-w-none drop-shadow-2xl"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Right Image Column */}
+      <div className="flex justify-center lg:justify-end self-stretch mt-6 lg:mt-0">
+        <img
+          src={interImage}
+          alt="3D rendered modern living room"
+          className="w-full h-full object-cover max-w-none drop-shadow-2xl"
+        />
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
 
       {/* === BOOK CONSULTATION === */}
 

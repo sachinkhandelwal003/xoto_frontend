@@ -10,8 +10,8 @@
 
   /* Brand Palette */
   --color-primary: #5C039B;  /* purple */
-  --color-blue: #03A4F4;     /* blue */
-  --color-green: #64EF0A;    /* green */
+  --color-grey: #547593;     /* blue */
+  --color-black: #020202;    /* green */
 
   --color-secondary: #64EF0A;
   --color-green-tertiary: #69ED1F;
@@ -50,7 +50,9 @@
   }
  .heading-dark-1 {
     font-size: 60px;
+  
     line-height: 55px;
+    font-weight: 600;  /*semibold*/
     font-family: 'DM Sans', sans-serif;
     letter-spacing: -0.03em; /* -3% */
     color: var(--color-text-primary);
@@ -58,13 +60,30 @@
  .paragraph-light {
     font-size: 24px;
     line-height: 30px;
+    font-weight: 600;
     font-family: 'DM Sans', sans-serif;
 }
- .paragraph-light {
+ .paragraph-light-1 {
     font-size: 24px;
-    line-height: 30px;
+    line-height: 33px;
+    font-weight: 500;
     font-family: 'DM Sans', sans-serif;
 }
+ .paragraph-dark {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 24px;
+    /* font-weight: 600; */
+    font-family: 'DM Sans', sans-serif;
+}
+.card-heading {
+    font-size: 34px;
+    line-height: 32px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    
+}
+ 
 
 
  .main-gradient-color {
@@ -79,6 +98,7 @@
     @apply text-white font-semibold px-6 py-3 rounded-full transition-all duration-300 ease-in-out shadow-md;
     background: var(--color-gradient--btn-blue-green);
   }
+
 
   .btn-gradient:hover {
     filter: brightness(1.1);

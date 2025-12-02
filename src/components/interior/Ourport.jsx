@@ -13,6 +13,20 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 export default function ServicesPortfolio() {
   const scrollRef = useRef(null);
 
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      const cardWidth = scrollRef.current.firstChild?.offsetWidth || 280;
+      scrollRef.current.scrollBy({ left: -(cardWidth + 25), behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      const cardWidth = scrollRef.current.firstChild?.offsetWidth || 280;
+      scrollRef.current.scrollBy({ left: cardWidth + 25, behavior: "smooth" });
+    }
+  };
+
   const services = [
     { title: "Modular Kitchens", icon: kitchen },
     { title: "Modular Wardrobes", icon: wardrobe },
@@ -22,22 +36,8 @@ export default function ServicesPortfolio() {
     { title: "Wall Decor", icon: wall },
   ];
 
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      const cardWidth = scrollRef.current.firstChild?.offsetWidth || 280;
-      scrollRef.current.scrollBy({ left: -(cardWidth + 32), behavior: "smooth" });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      const cardWidth = scrollRef.current.firstChild?.offsetWidth || 280;
-      scrollRef.current.scrollBy({ left: cardWidth + 32, behavior: "smooth" });
-    }
-  };
-
   return (
-    <section className="relative w-full overflow-hidden bg-[var(--color-body)] py-24">
+    <section className="relative w-full overflow-hidden bg-[var(--color-body)] py-20 sm:py-24">
 
       {/* Heading */}
       <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,29 +46,28 @@ export default function ServicesPortfolio() {
         </h2>
       </div>
 
-      {/* Horizontal Scroller with vertical spacing */}
-      <div className="relative w-full pl-16 z-20 mt-20 flex flex-col gap-2">
-        {/* Service Cards */}
+      {/* Horizontal Scroller */}
+      <div className="relative w-full px-4 sm:pl-16 z-20 mt-16 flex flex-col gap-4">
+
         <div
           ref={scrollRef}
-          className="relative z-20 flex gap-6 sm:gap-8 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pb-12"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          className="flex gap-5 sm:gap-8 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pb-10"
         >
           {services.map((service, index) => (
             <div
               key={index}
-              className="flex-none w-72 sm:w-80 bg-white rounded-3xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl snap-center"
-              style={{
-                boxShadow: "0 10px 25px rgba(92,3,155,0.5)", // colored shadow #5C039B
-              }}
+              className="flex-none 
+              w-72              /* Bigger mobile width */
+              sm:w-72 md:w-80    /* Large screens unchanged */
+              bg-white rounded-3xl 
+              p-8 sm:p-8         /* Slightly more padding on mobile */
+              flex flex-col items-center text-center 
+              transition-all duration-300
+              hover:scale-105 hover:shadow-2xl snap-center"
+              style={{ boxShadow: "0 12px 28px rgba(92,3,155,0.5)" }}
             >
-              {/* Icon */}
-              <div className="w-20 h-20 rounded-full bg-[#5C039B] flex items-center justify-center mb-6 shadow-lg">
-                <img
-                  src={service.icon}
-                  alt={service.title}
-                  className="w-10 h-10"
-                />
+              <div className="w-20 h-20 sm:w-20 sm:h-20 rounded-full bg-[#5C039B] flex items-center justify-center mb-6 shadow-lg">
+                <img src={service.icon} alt={service.title} className="w-12 h-12 sm:w-10 sm:h-10" />
               </div>
 
               <h3 className="text-lg sm:text-xl font-bold text-gray-800">
@@ -78,28 +77,26 @@ export default function ServicesPortfolio() {
           ))}
         </div>
 
-        {/* Scroll Buttons in flow */}
-        <div className="flex gap-6 ">
+        {/* Scroll Buttons */}
+        <div className="flex gap-4 sm:gap-6">
           <button
             onClick={scrollLeft}
-            className="bg-white rounded-md p-3 shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-200"
-            aria-label="Previous"
+            className="bg-white rounded-md p-2 sm:p-3 shadow-lg hover:shadow-xl hover:bg-gray-50"
           >
-            <ChevronLeft className="w-6 h-6 text-gray-700" />
+            <ChevronLeft className="w-6 h-6 sm:w-6 sm:h-6 text-gray-700" />
           </button>
 
           <button
             onClick={scrollRight}
-            className="bg-[#5C039B] rounded-md p-3 shadow-xl hover:bg-purple-800 transition-all duration-200"
-            aria-label="Next"
+            className="bg-[#5C039B] rounded-md p-2 sm:p-3 shadow-xl hover:bg-purple-800"
           >
-            <ChevronRight className="w-6 h-6 text-white" />
+            <ChevronRight className="w-6 h-6 sm:w-6 sm:h-6 text-white" />
           </button>
         </div>
       </div>
 
-      {/* Background Wave */}
-      <div className="absolute -bottom-30 left-0 w-full z-0 pointer-events-none select-none">
+      {/* Wave */}
+      <div className="absolute -bottom-20 sm:-bottom-24 w-full z-0 pointer-events-none select-none">
         <img src={waveint2} alt="wave-bg" className="w-full object-cover" />
       </div>
     </section>
