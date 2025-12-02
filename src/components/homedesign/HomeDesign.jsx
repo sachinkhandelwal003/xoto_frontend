@@ -23,17 +23,19 @@ const HomeDesign = () => {
 
           {/* LEFT CONTENT (should appear first on mobile) */}
           <div className=" space-y-8 px-4 sm:px-8 lg:ps-40 lg:pr-10 ">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-semibold text-black mb-4 leading-relax">
+            <h2 className="heading-dark-1  text-black ">
               Your Space, <br />
-              <span className="text-black font-semibold">Redefined Instantly.</span>
+              <span className="">Redefined Instantly.</span>
             </h2>
 
-            <p className="text-gray-700 text-lg leading-relaxed max-w-md">
-              Upload your villa layout and let{" "}
-              <span className="font-semibold">Xoto AI</span> craft stunning
-              outdoor and interior design options — tailored perfectly to your
-              taste.
-            </p>
+           <p
+  className="paragraph-light-1 max-w-max"
+  style={{ color: "var(--color-grey)" }}
+>
+  Upload your villa layout and let{" "}
+  <span>Xoto AI</span> craft <br /> stunning outdoor and  design options —
+  tailored <br />  to your taste.
+</p>
 
             <Link
               to="/estimate/calculator"

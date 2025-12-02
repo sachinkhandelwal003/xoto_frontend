@@ -57,7 +57,7 @@ export default function EcosystemSlider() {
       {/* Main Content */}
       <div className="relative z-10 max-w-8xl mx-auto">
         {/* Title */}
-        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-8 sm:mb-10 md:mb-12 lg:mb-16 drop-shadow-xl tracking-tight">
+        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl  text-white mb-8 sm:mb-10 md:mb-12 lg:mb-16 drop-shadow-xl tracking-tight heading-dark-1">
           Our Tech Ecosystem
         </h2>
 

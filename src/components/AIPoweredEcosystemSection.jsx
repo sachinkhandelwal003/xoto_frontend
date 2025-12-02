@@ -34,13 +34,14 @@ export default function HomeJourneySection() {
               ${mobileView === 'image' ? 'hidden' : 'block'}
             `}
           >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-black mb-4 leading-relax">
+            <h1 className="heading-dark-1"
+               style={{ color: "var(--color-black)" }}>
               Your AI-Powered Home Journey
             </h1>
 
-            <p className="text-lg md:text-xl leading-relaxed mb-6 text-black font-medium">
-              From discovery and design to financing and maintenance — XOTO personalizes every step so you can build and care for your dream home on one seamless platform.
-            </p>
+            <p className="paragraph-dark text-black mt-6 max-w-lg">
+           From landscaping to purchase and financing — XOTO personalizes every step to help you discover, design, and maintain your dream home on one seamless platform.
+             </p>
 
             
           </div>

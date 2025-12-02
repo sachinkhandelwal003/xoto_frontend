@@ -4,7 +4,7 @@ import calender from "../../assets/icons/Homeicons/Calendar.png";
 import clock from "../../assets/icons/Homeicons/Clock.png";
 import gurantee from "../../assets/icons/Homeicons/Guarantee.png";
 import map from "../../assets/icons/Homeicons/Map-pin.png";
-import video from "../../assets/video/mortgage2.mp4";
+import video from "../../assets/video/mortage4.mp4";
 
 import { 
   ShoppingBag, 
@@ -61,13 +61,13 @@ const HeroSection = () => {
 
         {/* LEFT SECTION */}
         <div className="max-w-4xl space-y-4 lg:space-y-6 text-center lg:text-left " >
-          <h1 className="text-3xl sm:text-5xl xl:text-6xl font-semibold leading-tight">
+          <h1 className="heading-light">
             Redefining Living
-            <span className="text-amber-50"> <br />From Landscapes to Homes</span>
+            <span className=""> <br />From Landscapes to Homes</span>
           </h1>
 
-          <p className="text-lg sm:text-xl  max-w-xl mx-auto lg:mx-0">
-            Discover AI-powered designs and curated properties that elevate every corner of your world.
+          <p className="paragraph-light">
+            Discover AI-powered designs and curated  <br /> properties that elevate every corner of your world.
           </p>
 
           {/* Buttons */}

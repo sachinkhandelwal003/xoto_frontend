@@ -48,7 +48,7 @@ const BuiltForEveryone = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [cardsToShow, setCardsToShow] = useState(2);
 
-  // ✅ Detect screen width dynamically
+  // Detect screen width
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
@@ -56,33 +56,46 @@ const BuiltForEveryone = () => {
       setCardsToShow(mobile ? 1 : 2);
     };
     handleResize();
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Manual next / previous
   const nextSlide = () => {
     const maxIndex = cards.length - cardsToShow;
-    if (currentIndex < maxIndex) {
-      setCurrentIndex((prev) => prev + 1);
-    }
+    setCurrentIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
   };
 
   const prevSlide = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-    }
+    const maxIndex = cards.length - cardsToShow;
+    setCurrentIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
   };
 
-  // Calculate card width based on number of cards to show
+  // ⭐ Auto-slide every 3 seconds + loop
+  useEffect(() => {
+    const autoSlide = setInterval(() => {
+      const maxIndex = cards.length - cardsToShow;
+
+      setCurrentIndex((prev) => {
+        if (prev >= maxIndex) return 0;
+        return prev + 1;
+      });
+    }, 3000);
+
+    return () => clearInterval(autoSlide);
+  }, [cardsToShow]);
+
+  // Card width based on screen size
   const getCardWidth = () => {
-    if (isMobile) {
-      return '100%';
-    }
-    return `calc(${100 / cardsToShow}% - 16px)`; // 16px for margin
+    if (isMobile) return "100%";
+    return `calc(${100 / cardsToShow}% - 16px)`;
   };
 
   return (
     <section className="relative bg-[var(--color-body)] overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
+      
+      {/* Background Wave */}
       <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
         <img
           src={wave1}
@@ -90,29 +103,30 @@ const BuiltForEveryone = () => {
           className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
         />
       </div>
-      
+
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section Title */}
-        <h2 className="text-5xl font-semibold text-gray-900 text-center mb-12 lg:mb-16">
+
+        {/* Title */}
+        <h2 className="text-5xl  text-center mb-12 lg:mb-16 heading-dark-1"
+         style={{ color: "var(--color-black)" }}
+         >
           Built For Everyone
         </h2>
 
-        {/* Main Content - Round image on left, slider on right */}
-        <div className="flex flex-col lg:flex-row items-center justify-between">
+        <div className="flex flex-col lg:flex-row items-center justify-between" 
+        
+        >
           
-          {/* Left: Round Image */}
+          {/* Left Image */}
           <div className="w-full lg:w-1/2 flex justify-start items-start lg:justify-start mb-10 lg:mb-0">
             <div className="relative w-60 h-60 sm:w-80 sm:h-80 lg:w-96 lg:h-96 mx-auto">
-              <img 
-                src={round} 
-                alt="Round decoration" 
-                className="w-full h-full object-contain"
-              />
+              <img src={round} alt="Round decoration" className="w-full h-full object-contain" />
             </div>
           </div>
 
-          {/* Right: Cards Slider */}
+          {/* Slider Section */}
           <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
+
             <div className="relative w-full max-w-sm lg:max-w-2xl overflow-hidden">
               <div
                 className="flex transition-transform duration-500 ease-in-out gap-4"
@@ -128,27 +142,18 @@ const BuiltForEveryone = () => {
                         ? "shadow-xl scale-100 opacity-100"
                         : "opacity-70 scale-95"
                     }`}
-                    style={{
-                      width: getCardWidth(),
-                    }}
+                    style={{ width: getCardWidth() }}
                   >
-                    <div>
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-2xl font-bold text-gray-900">
-                          {card.title}
-                        </h3>
-                        <div className="bg-[var(--color-primary)] p-2 rounded-full">
-                          <img 
-                            src={card.icon} 
-                            alt={`${card.title} icon`}
-                            className="w-6 h-6 object-contain"
-                          />
-                        </div>
+                    {/* Card Content */}
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl card-heading">{card.title}</h3>
+
+                      <div className="bg-[var(--color-primary)] p-2 rounded-full">
+                        <img src={card.icon} alt="" className="w-6 h-6" />
                       </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        {card.desc}
-                      </p>
                     </div>
+
+                    <p className="text-sm text-gray-600 leading-relaxed">{card.desc}</p>
                   </div>
                 ))}
               </div>
@@ -158,19 +163,19 @@ const BuiltForEveryone = () => {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={prevSlide}
-                className="p-3 rounded-sm border border-gray-300 hover:bg-gray-100 transition disabled:opacity-40"
-                disabled={currentIndex === 0}
+                className="p-3 rounded-sm border border-gray-300 hover:bg-gray-100 transition"
               >
                 <ChevronLeft className="w-5 h-5 text-gray-700" />
               </button>
+
               <button
                 onClick={nextSlide}
-                className="p-3 rounded-sm bg-[var(--color-primary)] hover:bg-purple-800 transition disabled:opacity-40"
-                disabled={currentIndex >= cards.length - cardsToShow}
+                className="p-3 rounded-sm bg-[var(--color-primary)] hover:bg-purple-800 transition"
               >
                 <ChevronRight className="w-5 h-5 text-white" />
               </button>
             </div>
+
           </div>
         </div>
       </div>

@@ -232,7 +232,7 @@ export default function Landspackng() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
+            className="text-4xl md:text-6xl font-extrabold mb-6 heading-light"
           >
             Transforming Homes With Premium
             <br />
