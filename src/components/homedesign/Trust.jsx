@@ -31,21 +31,69 @@ export default function TrustPresenceSection() {
     <section className="relative w-full py-16 md:py-20 lg:py-24 overflow-hidden bg-[var(--color-body)]">
 
       {/* Background Waves */}
-      <div className="absolute top-[-20px] lg:top-[-525px] left-0 w-full z-0 overflow-hidden">
-        <img
-          src={wave2}
-          alt=""
-          className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
-        />
-      </div>
+ {/* Background Top Wave */}
+<div
+  className="
+  
+    absolute 
+    top-[-120px]             /* mobile default */
+    sm:top-[-180px]          /* small */
+    md:top-[-260px]          /* medium */
+    lg:top-[-420px]          /* large */
+    xl:top-[-550px]          /* extra-large */
+    left-0 w-full z-0 
+  "
+>
+  <img
+    src={wave2}
+    alt=""
+    className="
+      w-[180%]               /* mobile wider */
+      sm:w-[160%] 
+      md:w-[150%]
+      lg:w-full              /* normal at large screens */
+      mx-auto
+      scale-[1.6]            /* mobile scale */
+      sm:scale-[1.4]
+      md:scale-[1.2]
+      lg:scale-100
+      pointer-events-none 
+      select-none
+    "
+  />
+</div>
 
-      <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
-        <img
-          src={wave1}
-          alt=""
-          className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
-        />
-      </div>
+
+{/* Background Bottom Wave */}
+<div
+  className="
+    absolute 
+    bottom-[-40px]           /* mobile */
+    sm:bottom-[-70px]
+    md:bottom-[-100px]
+    lg:bottom-[-130px]
+    xl:bottom-[-160px]
+    left-0 w-full z-0 overflow-hidden
+  "
+>
+  <img
+    src={wave1}
+    alt=""
+    className="
+      w-[180%]
+      sm:w-[165%]
+      md:w-[150%]
+      lg:w-full
+      mx-auto
+      scale-[1.6]
+      sm:scale-[1.4]
+      md:scale-[1.2]
+      lg:scale-100
+      pointer-events-none 
+      select-none
+    "
+  />
+</div>
 
       {/* Title */}
       <h2 className="text-center text-3xl sm:text-4xl md:text-5xl   mb-12 md:mb-16 relative z-20 heading-dark-1"

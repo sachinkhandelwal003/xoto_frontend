@@ -10,7 +10,7 @@ import { ChevronDown } from "lucide-react";
 export const languages = [
   {
     code: "en",
-    name: "English",
+   name: "EN",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#012169" />
@@ -26,7 +26,7 @@ export const languages = [
 
   {
     code: "hi",
-    name: "Hindi",
+  name: "HI",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="5" fill="#FF9933" />
@@ -46,7 +46,7 @@ export const languages = [
 
   {
     code: "ar",
-    name: "Arabic",
+    name: "AR",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#007A3D" />
@@ -59,7 +59,7 @@ export const languages = [
 
   {
     code: "ru",
-    name: "Russian",
+    name: "RU",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="5" fill="#FFF" />
@@ -71,7 +71,7 @@ export const languages = [
 
   {
     code: "zh",
-    name: "Chinese",
+    name: "ZH",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#EE1C25" />
@@ -85,7 +85,7 @@ export const languages = [
 
   {
     code: "fa",
-    name: "Persian",
+    name: "FA",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="5" fill="#239F40" />
@@ -97,7 +97,7 @@ export const languages = [
 
   {
     code: "tr",
-    name: "Turkish",
+    name: "TR",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#E30A17" />
@@ -110,7 +110,7 @@ export const languages = [
 
   {
     code: "es",
-    name: "Spanish",
+    name: "ES",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#AA151B" />
@@ -121,7 +121,7 @@ export const languages = [
 
   {
     code: "pa",
-    name: "Punjabi",
+    name: "PA",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="5" fill="#FF9933" />
@@ -141,7 +141,7 @@ export const languages = [
 
   {
     code: "fr",
-    name: "French",
+    name: "FR",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="6.67" height="15" fill="#002395" />
@@ -153,7 +153,7 @@ export const languages = [
 
   {
     code: "de",
-    name: "German",
+    name: "DE",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="5" fill="#000" />
@@ -165,7 +165,7 @@ export const languages = [
 
   {
     code: "tl",
-    name: "Tagalog (PH)",
+    name: "TL",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="7.5" fill="#0038A8" />
@@ -178,7 +178,7 @@ export const languages = [
 
   {
     code: "ur",
-    name: "Urdu",
+    name: "UR",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#01411C" />
@@ -201,7 +201,9 @@ const navItems = [
   { title: "Properties", path: "/marketplace" },
   { title: "Services", path: "/Services" },
   { title: "Partner Eco-System", path: "/ecosystem" },
-  { title: "About Us", path: "/about" },
+  { title: "Xoto Store", path: "/ecommerce/b2c" },
+    { title: "Blog", path: "/explore" },
+
 ];
 
 /* ------------------- MAIN NAVBAR ------------------- */

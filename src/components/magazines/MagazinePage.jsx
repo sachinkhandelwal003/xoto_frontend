@@ -96,18 +96,47 @@ const BuiltForEveryone = () => {
     <section className="relative bg-[var(--color-body)] overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
       
       {/* Background Wave */}
-      <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
-        <img
-          src={wave1}
-          alt=""
-          className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
-        />
-      </div>
+  <div
+  className="
+    absolute 
+    bottom-[-20px]         /* mobile */
+    sm:bottom-[-50px]
+    md:bottom-[-80px]
+    lg:bottom-[-130px]
+    xl:bottom-[-160px]
+    left-0 w-full z-0 
+  "
+>
+  <img
+    src={wave1}
+    alt=""
+    className="
+      w-[180%]             /* mobile: wider & centered */
+      sm:w-[165%]
+      md:w-[150%]
+      lg:w-full            /* normal at large screens */
 
-      <div className="relative z-10 max-w-7xl mx-auto">
+      -ml-[20%]            /* mobile positioning */
+      sm:-ml-[12%]
+      md:-ml-[8%]
+      lg:ml-0              /* reset for large screens */
+
+      scale-[1.6]          /* mobile scale */
+      sm:scale-[1.4]
+      md:scale-[1.2]
+      lg:scale-100
+
+      pointer-events-none 
+      select-none
+    "
+  />
+</div>
+
+
+      <div className="relative z-10 max-w-7xl mx-auto ">
 
         {/* Title */}
-        <h2 className="text-5xl  text-center mb-12 lg:mb-16 heading-dark-1"
+        <h2 className=" text-center mb-12 lg:mb-16 heading-light"
          style={{ color: "var(--color-black)" }}
          >
           Built For Everyone
@@ -119,7 +148,7 @@ const BuiltForEveryone = () => {
           
           {/* Left Image */}
           <div className="w-full lg:w-1/2 flex justify-start items-start lg:justify-start mb-10 lg:mb-0">
-            <div className="relative w-60 h-60 sm:w-80 sm:h-80 lg:w-96 lg:h-96 mx-auto">
+            <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
               <img src={round} alt="Round decoration" className="w-full h-full object-contain" />
             </div>
           </div>

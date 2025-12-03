@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Linkedin, Phone } from 'lucide-react';
+import { ChevronDown, Facebook, Instagram, Twitter, Linkedin, Phone } from 'lucide-react';
 import { FaWhatsapp } from "react-icons/fa";
 import logoNewImage from "../../assets/img/logoNew.png";
 
@@ -41,6 +41,7 @@ const footerData = {
   ],
 
   knowledge: [
+    { label: "About Us", path: "/about" },
     { label: "Knowledge Centre", path: "/knowledge-centre" },
     { label: "Our Sustainability Focus", path: "/sustainability" },
     { label: "Submit Your Feedback", path: "/feedback" },
@@ -57,133 +58,205 @@ const footerData = {
   ],
 };
 
+const Accordion = ({ title, children, isOpen, toggle }) => (
+  <div className="border-b border-purple-500/20 py-2">
+    <button
+      onClick={toggle}
+      className="w-full flex justify-between items-center py-3 text-white text-lg"
+    >
+      {title}
+      <ChevronDown className={`transition-transform ${isOpen ? "rotate-180" : "rotate-0"}`} />
+    </button>
+
+    <div
+      className={`overflow-hidden transition-all duration-300 ${
+        isOpen ? "max-h-96 mt-2" : "max-h-0"
+      }`}
+    >
+      {children}
+    </div>
+  </div>
+);
+
 const Footer = () => {
   const { company, offerings, resources, knowledge, social } = footerData;
 
+  const [open, setOpen] = useState(null);
+  const toggle = (id) => setOpen(open === id ? null : id);
+
   return (
-    <footer className="border-purple-700/30 main-gradient-color overflow-hidden">
-      <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-24 xl:px-36 pt-12">
+    <footer className="border-purple-700/30 main-gradient-color overflow-hidden text-white">
 
-        {/* GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-10 pb-14">
+      {/* ---------------- MOBILE VERSION ---------------- */}
+      {/* This will show ONLY on mobile & tablet */}
+      <div className="lg:hidden">
 
-          {/* Company Section */}
-          <div className="lg:col-span-2">
-            <img
-              src={company.logo}
-              className="h-16 sm:h-20 object-contain mb-4"
-              alt="Xoto logo"
-            />
+        {/* LOGO + TEXT */}
+        <div className="text-center pt-10 px-6">
+          <img
+            src={company.logo}
+            className="h-16 sm:h-20 object-contain mx-auto"
+            alt="Xoto logo"
+          />
 
-            <p className="text-white font-semibold text-lg sm:text-xl leading-tight">
-              {company.slogan}
+          <p className="text-lg font-semibold mt-2">{company.slogan}</p>
+          <p className="text-purple-200 mt-2 text-sm">{company.description}</p>
+
+          {/* SOCIAL ICONS UNDER TEXT */}
+         <div className="flex items-center justify-center gap-4 mt-5 lg:hidden">
+  <a href="#"><Facebook size={20} /></a>
+  <a href="#"><Instagram size={20} /></a>
+  <a href="#"><Twitter size={20} /></a>
+  <a href="#"><Linkedin size={20} /></a>
+
+  <a className="bg-green-500 p-2 rounded-full" href="#">
+    <FaWhatsapp size={18} />
+  </a>
+
+  <a className="bg-blue-500 p-2 rounded-full" href="#">
+    <Phone size={18} />
+  </a>
+</div>
+
+        </div>
+
+        {/* ACCORDIONS */}
+        <div className="px-6 sm:px-10 mt-10">
+
+          <Accordion title="Our Offerings" isOpen={open === 1} toggle={() => toggle(1)}>
+            <ul className="space-y-2 text-purple-200 text-sm">
+              {offerings.map((item, i) => (
+                <li key={i}><Link to={item.path}>{item.label}</Link></li>
+              ))}
+            </ul>
+          </Accordion>
+
+          <Accordion title="Partner Ecosystem" isOpen={open === 2} toggle={() => toggle(2)}>
+            <ul className="space-y-2 text-purple-200 text-sm">
+              {resources.map((item, i) => (
+                <li key={i}><Link to={item.path}>{item.label}</Link></li>
+              ))}
+            </ul>
+          </Accordion>
+
+          <Accordion title="About Us" isOpen={open === 3} toggle={() => toggle(3)}>
+            <ul className="space-y-2 text-purple-200 text-sm">
+              {knowledge.map((item, i) => (
+                <li key={i}><Link to={item.path}>{item.label}</Link></li>
+              ))}
+            </ul>
+          </Accordion>
+
+          <Accordion title="Location" isOpen={open === 4} toggle={() => toggle(4)}>
+            <p className="text-purple-200 text-sm">UAE</p>
+          </Accordion>
+
+          <Accordion title="Email" isOpen={open === 5} toggle={() => toggle(5)}>
+            <p className="text-purple-200 text-sm">
+              For Partners: <span className="text-white">connect@xoto.ae</span>
             </p>
-            <p className="text-purple-200 mt-3 text-sm leading-relaxed">
-              {company.description}
+            <p className="text-purple-200 text-sm mt-1">
+              For Customers: <span className="text-white">care@xoto.ae</span>
             </p>
+          </Accordion>
+        </div>
+
+      </div>
+      {/* --------------- END MOBILE VERSION ---------------- */}
+
+
+      {/* --------------- DESKTOP VERSION ---------------- */}
+      {/* This will show ONLY on desktop */}
+      <div className="hidden lg:block max-w-screen-2xl mx-auto px-24 pt-16">
+
+        <div className="grid grid-cols-6 gap-10 pb-14">
+
+          {/* Company */}
+          <div className="col-span-2">
+            <img src={company.logo} className="h-20 mb-4" alt="logo" />
+            <p className="text-xl font-semibold">{company.slogan}</p>
+            <p className="text-purple-200 mt-3">{company.description}</p>
+
+            {/* SOCIAL ICONS */}
+            <div className="flex gap-4 mt-5">
+              <a href="#"><Facebook /></a>
+              <a href="#"><Instagram /></a>
+              <a href="#"><Twitter /></a>
+              <a href="#"><Linkedin /></a>
+
+              <a className="bg-green-500 p-2 rounded-full"><FaWhatsapp size={18} /></a>
+              <a className="bg-blue-500 p-2 rounded-full"><Phone size={18} /></a>
+            </div>
           </div>
 
-          {/* Our Offerings */}
+          {/* OFFERINGS */}
           <div>
-            <h4 className="text-white mb-4 font-semibold text-sm uppercase">
-              Our Offerings
-            </h4>
+            <h4 className="text-white font-semibold text-sm mb-4 uppercase">Our Offerings</h4>
             <ul className="space-y-2">
               {offerings.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">
-                    {item.label}
-                  </Link>
+                  <Link to={item.path} className="text-purple-200 hover:text-white">{item.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Partner Ecosystem */}
+          {/* PARTNER */}
           <div>
-            <h4 className="text-white mb-4 font-semibold text-sm uppercase">
-              Partner Ecosystem
-            </h4>
+            <h4 className="text-white font-semibold text-sm mb-4 uppercase">Partner Ecosystem</h4>
             <ul className="space-y-2">
               {resources.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">
-                    {item.label}
-                  </Link>
+                  <Link to={item.path} className="text-purple-200 hover:text-white">{item.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Knowledge / About Us */}
+          {/* ABOUT */}
           <div>
-            <h4 className="text-white mb-4 font-semibold text-sm uppercase">About Us</h4>
+            <h4 className="text-white font-semibold text-sm mb-4 uppercase">About Us</h4>
             <ul className="space-y-2">
               {knowledge.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34] text-sm">
-                    {item.label}
-                  </Link>
+                  <Link to={item.path} className="text-purple-200 hover:text-white">{item.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact + Icons */}
-          <div className="flex flex-col gap-6">
-            {/* Locations */}
-            <div>
-              <h4 className="text-white mb-2 font-semibold text-sm uppercase">Locations</h4>
-              <p className="text-purple-200 text-sm"> UAE </p>
-            </div>
+          {/* CONTACT */}
+          <div>
+            <h4 className="text-white font-semibold text-sm mb-4 uppercase">Contact</h4>
+            <p className="text-purple-200 text-sm">UAE</p>
+            <p className="text-purple-200 text-sm mt-3">Partners: <span className="text-white">connect@xoto.ae</span></p>
+            <p className="text-purple-200 text-sm mt-1">Customers: <span className="text-white">care@xoto.ae</span></p>
 
-            {/* Email */}
-            <div>
-              <h4 className="text-white mb-2 font-semibold text-sm uppercase">Email</h4>
-              <p className="text-purple-200 text-sm">
-                For Partners: <span className="text-white">connect@xoto.ae</span>
-              </p>
-              <p className="text-purple-200 text-sm mt-1">
-                For Customers: <span className="text-white">care@xoto.ae</span>
-              </p>
-            </div>
-
-            {/* Contact Buttons */}
-            <div className="flex sm:flex-row lg:flex-col items-start lg:items-end gap-4 mt-3">
-              <a
-                href="https://wa.me/1234567890"
-                className="bg-green-500 p-3 rounded-full shadow-md text-white hover:bg-green-600"
-              >
-                <FaWhatsapp size={20} />
-              </a>
-
-              <a
-                href="tel:1234567890"
-                className="bg-blue-500 p-3 rounded-full shadow-md text-white hover:bg-blue-600"
-              >
-                <Phone size={20} />
-              </a>
+            <div className="flex flex-col gap-4 mt-4">
+              <a className="bg-green-500 p-3 rounded-full"><FaWhatsapp size={20} /></a>
+              <a className="bg-blue-500 p-3 rounded-full"><Phone size={20} /></a>
             </div>
           </div>
         </div>
       </div>
+      {/* -------------- END DESKTOP VERSION ---------------- */}
+
 
       {/* Bottom Row */}
-      <div className="w-full border-t border-purple-500/20">
-        <div className="max-w-screen-xl mx-auto px-6 sm:px-10 lg:px-20 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-purple-300 text-sm">
-            ©2025 Xoto. All rights reserved
-          </p>
+      <div className="w-full border-t border-purple-500/20 mt-6">
+        <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-purple-300 text-sm">©2025 Xoto. All rights reserved</p>
 
           <div className="flex gap-5">
             {social.map((item, i) => (
-              <a key={i} href={item.url} className="text-purple-300 hover:text-white transition">
+              <a key={i} href={item.url} className="text-purple-300 hover:text-white">
                 {item.icon}
               </a>
             ))}
           </div>
         </div>
       </div>
+
     </footer>
   );
 };

@@ -30,21 +30,22 @@ export default function HomeJourneySection() {
           {/* LEFT: Text Content */}
           {/* On small screens we hide/show based on mobileView */}
           <div
-            className={`text-white max-w-2xl transition-all duration-300
-              ${mobileView === 'image' ? 'hidden' : 'block'}
-            `}
-          >
-            <h1 className="heading-dark-1"
-               style={{ color: "var(--color-black)" }}>
-              Your AI-Powered <br/> Home Journey
-            </h1>
+  className={`text-white max-w-2xl transition-all duration-300
+    ${mobileView === 'image' ? 'hidden' : 'block'}
+    text-center lg:text-left mx-auto lg:mx-0
+  `}
+>
+  <h1 className="heading-light-1" style={{ color: "var(--color-black)" }}>
+    Your AI-Powered <br/> Home Journey
+  </h1>
 
-            <p className="paragraph-dark text-black mt-6 max-w-lg">
-           From landscaping to purchase and financing — XOTO personalizes every step to help you discover, design, and maintain your dream home on one seamless platform.
-             </p>
+  <p className="button-text text-black mt-6 max-w-lg mx-auto lg:mx-0">
+    From landscaping to purchase and financing — XOTO personalizes every step
+    to help you discover, design, and maintain your dream home on one
+    seamless platform.
+  </p>
+</div>
 
-            
-          </div>
 
           {/* RIGHT: Wavemap Image */}
         

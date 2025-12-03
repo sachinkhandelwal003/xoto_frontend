@@ -194,11 +194,7 @@ const Calculator = () => {
       category: values.category,
       subcategories: values.subcategories || [],
       description: values.description?.trim() || "No details provided",
-      landscape_category: selectedLandscapeCategory,
-      garden_style: selectedGardenType,
-      area_sqft: areaSqFt,
-      package: selectedPackage,
-      estimated_price: calculateTotalPrice()
+      
     };
 
     try {
@@ -908,62 +904,66 @@ const Calculator = () => {
       {/* Header */}
       <div className="bg-white border-b border-purple-200 shadow-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <img src={logoNew} alt="Logo" className="h-10" />
-            <div className="text-right">
-              <Text strong className="text-purple-600">
-                Step {activeStep + 1} of {steps.length}
-              </Text>
-            </div>
-          </div>
+       <div className="grid grid-cols-1 sm:grid-cols-4 items-center mb-4 gap-4">
+
+  {/* Logo Section (25%) */}
+  <div className="flex items-center sm:col-span-1 justify-center sm:justify-start">
+    <img src={logoNew} alt="Logo" className="h-10" />
+  </div>
+
+  {/* Steps Section (75%) */}
+  <div className="flex sm:col-span-3 justify-between mt-2 sm:mt-0">
+    {steps.map((step, index) => (
+      <div key={index} className="text-center flex-1 relative">
+
+        {/* Connecting line */}
+        {index < steps.length - 1 && (
+          <div className="absolute top-4 left-1/2 w-full h-0.5 bg-gray-300 -z-10"></div>
+        )}
+
+        {/* Step Circle */}
+        <div
+          className={`
+            flex items-center justify-center w-10 h-10 rounded-full mx-auto relative z-10
+            transition-all duration-300
+            ${
+              index === activeStep
+                ? 'bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-300 transform scale-110'
+                : index < activeStep
+                ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 border-2 border-gray-300'
+            }
+          `}
+        >
+          {step.icon}
+        </div>
+
+        {/* Step Label */}
+        <Text
+          strong
+          className={`
+            text-sm mt-2 block transition-colors duration-300
+            ${
+              index === activeStep
+                ? 'text-purple-700'
+                : index < activeStep
+                ? 'text-green-600'
+                : 'text-gray-500'
+            }
+          `}
+        >
+          {step.title}
+        </Text>
+      </div>
+    ))}
+  </div>
+
+</div>
+
           
-          <Progress 
-            percent={progressPercentage} 
-            showInfo={false} 
-            strokeColor={{
-              '0%': '#8b5cf6',
-              '100%': '#7c3aed',
-            }}
-            strokeWidth={4}
-            className="mb-2"
-          />
-          
+        
           {/* Steps Indicator */}
-          <div className="flex justify-between mt-4">
-            {steps.map((step, index) => (
-              <div key={index} className="text-center flex-1 relative">
-                {/* Connecting line */}
-                {index < steps.length - 1 && (
-                  <div className="absolute top-4 left-1/2 w-full h-0.5 bg-gray-300 -z-10"></div>
-                )}
-                
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full mx-auto relative z-10 transition-all duration-300 ${
-                  index === activeStep 
-                    ? 'bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-lg shadow-purple-300 transform scale-110' 
-                    : index < activeStep 
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' 
-                    : 'bg-gray-100 text-gray-600 border-2 border-gray-300'
-                }`}>
-                  {index < activeStep ? step.icon : step.icon}
-                </div>
-                <Text 
-                  strong 
-                  className={`text-sm mt-2 block transition-colors duration-300 ${
-                    index === activeStep ? 'text-purple-700' : 
-                    index < activeStep ? 'text-green-600' : 'text-gray-500'
-                  }`}
-                >
-                  {step.title}
-                </Text>
-                <Text 
-                  type="secondary" 
-                  className="text-xs hidden md:block mt-1"
-                >
-                  {step.description}
-                </Text>
-              </div>
-            ))}
-          </div>
+        
         </div>
       </div>
 
