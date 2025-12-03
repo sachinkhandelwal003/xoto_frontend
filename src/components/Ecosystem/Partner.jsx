@@ -42,7 +42,7 @@ const WhyPartnerSection = () => {
               </div>
       {/* Heading */}
       <div className="text-center mb-10">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
+        <h2 className="text-4xl md:text-5xl font-bold text-black heading-dark-1">
           Why Partner With <span className="text-black">XOTO?</span>
         </h2>
       </div>

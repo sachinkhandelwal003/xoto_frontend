@@ -23,11 +23,11 @@ const PartnerEcosystemSection = () => {
 <div className="relative z-20 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         {/* LEFT SIDE */}
         <div className="flex flex-col justify-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-            Join the{" "}
-            <span className="bg-gradient-to-r from-[#03A4F4] to-[#64EF0A] bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold text-black heading-dark-1 leading-tight mb-6">
+            Join the
+           
               XOTO Partner Ecosystem
-            </span>{" "}
+            {/* </span>{" "} */}
             Today
           </h2>
           <img

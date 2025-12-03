@@ -83,6 +83,21 @@
     font-family: 'DM Sans', sans-serif;
     
 }
+.card-heading-1 {
+    font-size: 60px;
+    line-height: 48px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.03em;
+}
+.heading-light-1 {
+    font-size: 50px;
+    line-height: 76px;
+    font-weight: 800;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--color-text-white);
+  }
+
  
 
 

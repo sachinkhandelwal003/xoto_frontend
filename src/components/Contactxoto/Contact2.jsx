@@ -6,7 +6,7 @@ export default function ContactSection() {
   return (
     <section className="bg-[#f5f5f5] py-16">
       {/* Heading */}
-      <h2 className="text-5xl font-semibold text-center mb-12">
+      <h2 className="text-5xl font-semibold text-center text-black heading-dark-1 mb-12">
         Contact Information
       </h2>
 

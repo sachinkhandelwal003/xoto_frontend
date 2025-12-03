@@ -16,10 +16,10 @@ const CtaSection = () => {
   
   {/* Left Content */}
   <div className="md:w-2/3 space-y-6 ">
-    <h2 className="text-3xl md:text-4xl font-bold leading-snug">
+    <h2 className="text-3xl md:text-4xl font-extrabold leading-snug heading-light">
       Grow. Earn. XOTO is your one-stop property ecosystem.
     </h2>
-    <button className="bg-purple-700 hover:bg-purple-800 transition px-6 py-3 rounded-md font-semibold text-white shadow-md">
+    <button className="bg-[#5C039B] w-2xs transition px-6 py-3 rounded-md font-semibold text-white shadow-md">
       Talk to our team today
     </button>
   </div>

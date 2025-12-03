@@ -10,7 +10,7 @@ const dmSans = {
 export default function HomeLoanHero() {
   return (
     <section
-      className=" relative w-full bg-cover bg-center w-full h-140"
+      className=" relative bg-cover bg-center w-full h-140"
       style={{ backgroundImage: `url(${herobg})`, ...dmSans }}
     >
    
@@ -31,14 +31,14 @@ export default function HomeLoanHero() {
         <div className="max-w-6xl mx-auto text-center text-white py-20 md:py-28" style={dmSans}>
           
           <h1
-            className="text-3xl md:text-6xl font-extrabold drop-shadow-sm"
+            className="text-3xl md:text-6xl heading-light font-extrabold"
             style={{ lineHeight: "1.4", ...dmSans }}
           >
             Smarter Home Loans, Simplified
           </h1>
 
           <p
-            className="mt-4 md:w-3/4 mx-auto text-sm md:text-2xl text-gray-100/90"
+            className="mt-4 md:w-3/4 mx-auto text-sm md:text-2xl paragraph-light font-semibold"
             style={dmSans}
           >
             Compare lenders, get pre-approved, and secure your dream <br />

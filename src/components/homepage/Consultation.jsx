@@ -115,10 +115,10 @@ export default function Consultation() {
           transition={{ duration: 0.8 }}
           className="max-w-xl text-white text-center lg:text-left"
         >
-          <h2 className="text-3xl  sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight">
+          <h2 className="mt-9 text-3xl  sm:text-4xl md:text-5xl lg:text-6xl heading-dark-1 text-white">
             Book Consultation
           </h2>
-          <p className="mt-8 text-xl md:text-2xl text-white/90 font-medium">
+          <p className="mt-5 text-xl md:text-2xl paragraph-light-1">
             One simple form to connect with XOTO experts for tailored interior design advice and project planning.
           </p>
         </motion.div>

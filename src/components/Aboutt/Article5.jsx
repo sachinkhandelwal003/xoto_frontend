@@ -4,7 +4,7 @@ import waveBottom from "../../assets/img/1.png";
 
 const Article5 = () => {
   return (
-    <section className="relative  bg-gradient-to-b from-white to-[#F8FDF8] overflow-hidden mt-10 ">
+    <section className="relative  bg-gradient-to-b from-white to-[#F8FDF8] overflow-hidden  ">
       {/* Green wave at bottom - unchanged */}
       <img
         src={waveBottom}
@@ -13,10 +13,10 @@ const Article5 = () => {
         style={{ transform: "translateY(600px)" }} // keep your current position
       />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20 ">
         {/* Main Centered Heading (Single Div - Exact Figma Match) */}
-        <div className="text-center mb-16 lg:mb-20">
-          <h2 className="font-semibold text-[#020202] text-[60px] leading-[55px] tracking-[-0.03em]">
+        <div className="text-center  mt-10">
+          <h2 className="font-semibold text-black heading-dark-1 mt-5">
             Building a Greener Tomorrow,
             <br className="hidden lg:block" />
             <span className="block relative">
@@ -41,7 +41,7 @@ const Article5 = () => {
           </div>
 
           {/* Right: All Text Content */}
-          <div className="w-[711px] mr-10 space-y-7 font-medium text-[#547593] text-[24px] leading-[33px] tracking-normal ">
+          <div className="w-[711px] paragraph-light-1 space-y-7 font-medium text-[#547593] ">
             <p>
               At XOTO, we believe sustainability isn’t a choice — it’s the
               foundation of future living. In a world where conscious living

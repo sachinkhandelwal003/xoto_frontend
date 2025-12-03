@@ -13,7 +13,7 @@ const MortgageCalculator = () => {
 
   return (
 
-      <section className="w-full relative  py-15 bg-[var(--color-body)] relative overflow-hidden" style={dmSans}>
+      <section className="w-full   py-15 bg-[var(--color-body)] relative overflow-hidden">
         
         {/* WAVE IMAGE */}
         <div className="absolute bottom-[-20px] lg:bottom-[-705px] left-0 w-full z-0 overflow-hidden">
@@ -26,7 +26,7 @@ const MortgageCalculator = () => {
 
         {/* TITLE */}
         <h2
-          className="text-center text-4xl md:text-5xl font-bold text-[#020202] mb-12"
+          className="text-center text-4xl md:text-5xl heading-dark-1 text-black mb-12"
           style={dmSans}
         >
           Plan Your Mortgage with Confidence
@@ -88,28 +88,28 @@ const MortgageCalculator = () => {
         >
           <div>
             <p className="text-xs text-gray-400 mb-1">Feature 1</p>
-            <h3 className="text-lg font-semibold text-purple-700 leading-tight">
+            <h3 className="text-lg font-semibold text-purple-700 leading-tight ">
               Property <br /> Value
             </h3>
           </div>
 
           <div>
             <p className="text-xs text-gray-400 mb-1">Feature 2</p>
-            <h3 className="text-[20px] font-semibold text-[#020202] leading-[22px]">
+            <h3 className="text-[20px] font-bold text-[#020202] leading-[22px]">
               Down <br /> Payment
             </h3>
           </div>
 
           <div>
             <p className="text-xs text-gray-400 mb-1">Feature 3</p>
-            <h3 className="text-lg font-semibold text-gray-700 leading-tight">
+            <h3 className="text-lg font-bold text-black leading-tight">
               Term
             </h3>
           </div>
 
           <div>
-            <p className="text-xs text-gray-400 mb-1">Feature 4</p>
-            <h3 className="text-lg font-semibold text-gray-700 leading-tight">
+            <p className="text-xs text-black mb-1">Feature 4</p>
+            <h3 className="text-lg font-bold text-black  leading-tight">
               Max Loan <br /> Output
             </h3>
           </div>

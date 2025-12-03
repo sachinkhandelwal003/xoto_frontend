@@ -63,26 +63,26 @@ export default function MortgagePreApproval() {
        
 
         {/* Content Container */}
-        <div className="container mx-auto px-6 py-16 lg:py-24" style={dmSans}>
+        <div className="container mx-auto px-6 py-16 lg:py-24" >
           <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
             
             {/* LEFT SIDE */}
-            <div className="space-y-8 -mt-65 " style={dmSans}>
-              <h1 className="text-5xl z-20 relative md:text-5xl font-bold text-gray-900 leading-tight">
-                Ready to get your mortgage started?
+            <div className="space-y-4 -mt-55 ">
+              <h1 className="text-5xl z-20 relative md:text-5xl card-heading-1 text-black leading-tight">
+                Ready to get your  <br />mortgage started?
               </h1>
-              <p className="text-lg text-[#547593]">
+              <p className="text-xl text-[#547593] paragraph-light-1 mb-10  z-20 relative" >
                 Start your application today and<br/> get pre-approval in 48 hours.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="  relative z-20 grid gap-4">
                 <button
-                  style={{ backgroundColor: "#5C039B", ...dmSans }}
-                  className="px-8 py-4 rounded-lg text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                  style={{ backgroundColor: "#5C039B" }}
+                  className="px-8 py-4 mx-3 w-2xs h-xs rounded-lg text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105"
                 >
                   Get Pre-Approved Now
                 </button>
-                <button className="px-8 py-4 rounded-lg border-2 border-purple-600 text-purple-700 font-semibold hover:bg-purple-50 transition-all">
+                <button className="px-5 py-4 w-xs h-xs rounded-lg border-2 border-purple-600 text-purple-700 font-semibold hover:bg-purple-50 transition-all">
                   Talk to an Expert
                 </button>
               </div>

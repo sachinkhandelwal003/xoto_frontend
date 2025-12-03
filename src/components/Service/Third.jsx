@@ -13,7 +13,7 @@ export default function Third() {
   return (
     <section
       aria-label="Four step mortgage flow"
-      className="relative w-full h-160 overflow-hidden"
+      className="relative w-full h-160 overflow-hidden "
       style={{
         backgroundImage: `url(${maskgroup})`,
         backgroundSize: "cover",
@@ -37,14 +37,14 @@ export default function Third() {
         {/* Title + Circle */}
         <div className="flex items-start justify-between -mt-14" style={dmSans}>
           <h2
-            className="text-3xl md:text-4xl  mt-2 lg:text-5xl font-extrabold text-white leading-relaxed max-w-2xl"
-            style={dmSans}
+            className="text-3xl md:text-4xl  mt-2 lg:text-5xl heading-dark-1 text-white leading-tight max-w-2xl"
+          
           >
             Your Mortgage, <br/> Simplified in 4 Steps
           </h2>
 
           <div className="hidden md:flex items-center justify-center">
-            <div className="w-20 h-20 md:w-41 md:h-41  rounded-full bg-[#5C039B] flex items-center justify-center shadow-xl">
+            <div className="w-30 h-30 md:w-41 md:h-41  rounded-full bg-[#5C039B] flex items-center justify-center mx-10 shadow-xl">
               <img src={logo} alt="" className="w-27 h-27" />
             </div>
           </div>

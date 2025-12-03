@@ -32,13 +32,8 @@ export default function HeroSection() {
        <h1
   className="
     mx-auto mb-8 max-w-5xl
-    text-white
-    font-extrabold
-    leading-[76px]
-    tracking-[0px]
-    text-[40px]
-    sm:text-[48px]
-    md:text-[60px]
+ heading-light
+ font-extrabold
   "
 >
   Transforming the Way You <br/> Rent, Buy, & Sell Your Home.
@@ -82,7 +77,9 @@ export default function HeroSection() {
     text-base md:text-lg
     rounded-lg
     shadow-md
-    hover:bg-white hover:text-[#5C039B]
+    hover:bg-[#5C039B]
+     hover:border-none
+    hover:text-white
     transition-colors duration-200
     focus:outline-none focus:ring-2 focus:ring-[#5C039B]/40
   "
@@ -100,7 +97,10 @@ export default function HeroSection() {
     text-base md:text-lg
     rounded-lg
     shadow-md
-    hover:bg-white hover:text-[#5C039B]
+    hover:bg-[#5C039B]
+
+         hover:text-white
+    hover:border-none
     transition-colors duration-200
     focus:outline-none focus:ring-2 focus:ring-[#5C039B]/40
   "

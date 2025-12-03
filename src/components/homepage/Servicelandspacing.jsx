@@ -88,12 +88,12 @@ const Servicelandspacing = () => {
       </div>
 
       <div className="relative z-10 container mx-auto mt-4">
-        <h2 className="text-center text-2xl md:text-4xl lg:text-6xl font-semibold text-gray-900 mb-10 md:mb-16">
+        <h2 className="text-center text-2xl md:text-4xl lg:text-6xl heading-dark-1 text-black">
           Our Services Portfolio
         </h2>
 
         {/* Slider */}
-        <div className="relative overflow-hidden pt-6 md:pt-12">
+        <div className="relative overflow-hidden pt-6 md:pt-12 mt-5">
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{

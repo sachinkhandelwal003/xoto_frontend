@@ -144,8 +144,8 @@ const OurProperty = () => {
         <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
 
           {/* TITLE */}
-          <h2 className="text-center text-4xl md:text-5xl font-bold text-gray-900 mb-16">
-            Explore Property
+          <h2 className="text-center card-heading-1 text-gray-900 mb-16 mt-5">
+            Explore Properties
           </h2>
 
           {/* MOBILE SWIPER */}

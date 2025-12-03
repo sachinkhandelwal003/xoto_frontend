@@ -147,21 +147,21 @@ const Page3 = () => {
 
   {/* Content */}
   <div className="relative -mt-24 z-10 max-w-7xl text-center mx-auto px-6 text-white py-20 md:py-28">
-    <h1 className="text-3xl md:text-5xl font-extrabold drop-shadow-sm leading-snug">
-      Explore the Future of Living — Smarter, Greener, and AI-Driven.
+    <h1 className="text-3xl md:text-5xl heading-light-1 drop-shadow-sm leading-snug">
+      Explore the Future of Living — Smarter, <br /> Greener, and AI-Driven.
     </h1>
 
-    <p className="mt-10 md:w-3/4 mx-auto text-sm md:text-2xl text-gray-200">
+    <p className="mt-10 md:w-3/4 mx-auto text-sm  paragraph-light-1 md:text-2xl text-gray-200">
       Your hub for insights on PropTech, sustainable strategy, and<br/> 
       intelligent design & construction.
     </p>
 
     <div className="mt-18 flex justify-center gap-4 flex-wrap">
-      <button className="bg-[#5C039B] hover:bg-[#6A1B9A] px-12 py-4  rounded-md font-semibold text-xl transition tracking-wider">
+      <button className="bg-[#5C039B]  px-12 py-4  rounded-md font-semibold text-2xl transition tracking-wider">
         Browse Categories
       </button>
 
-      <a href="#watch-video" className="text-white text-xl font-semibold hover:opacity-80 py-4 px-12 rounded-md transition tracking-wider border-1">
+      <a href="#watch-video" className="text-white text-xl font-semibold hover:border-none hover:bg-[#5C039B] py-4 px-12 rounded-md transition tracking-wider border-1 ">
         Ask Xobia Ai
       </a>
     </div>
@@ -187,7 +187,7 @@ const Page3 = () => {
 
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <h2 className="text-3xl md:text-6xl font-bold text-center text-gray-800 mb-12">
+        <h2 className="text-3xl md:text-6xl  text-center text-black hrading-dark-1 mb-12">
           Latest Blogs & Articles
         </h2>
 
@@ -287,10 +287,10 @@ const Page3 = () => {
         
         {/* Header Text */}
         <div className="text-center">
-          <h2 className="text-3xl md:text-6xl font-bold text-gray-800 -mt-10 leading-snug">
+          <h2 className="text-3xl md:text-6xl font-bold text-black heading-dark-1 -mt-10 leading-snug">
             Explore Insights That Redefine <br />Modern Living
           </h2>
-          <p className="text-gray-600 text-base md:text-2xl mt-10 max-w-4xl mx-auto">
+          <p className="text-gray-600 text-base md:text-2xl paragraph-light-1 mt-10 max-w-4xl mx-auto">
             From smart landscaping to sustainable design — dive into expert guides,<br/> 
             trends, and innovations shaping the future of homes in the UAE.
           </p>

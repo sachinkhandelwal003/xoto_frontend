@@ -100,8 +100,8 @@ export default function TestimonialsSection() {
       <div className="relative w-full z-10 px-20 box-border">
 
         {/* Heading */}
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900">
-          What Our Clients Say
+        <h2 className="text-4xl md:text-5xl  text-center mb-16 text-white card-heading-1">
+          What Our Clients Says
         </h2>
 
         {/* Scrollable Wrapper */}

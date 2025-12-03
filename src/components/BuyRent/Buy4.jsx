@@ -33,12 +33,12 @@ export default function TrustPresenceSection() {
                           </div>
 
       {/* Title */}
-      <h2 className=" relative z-20 text-center text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-12 md:mb-16">
-        Trust & Presence
+      <h2 className=" relative z-20 text-center card-heading-1 mb-12 md:mb-16">
+        Our Partners
       </h2>
 
       {/* ✅ Full-width Swiper */}
-      <div className="relative w-screen -mx-[calc((100vw-100%)/2)] mb-16 md:mb-20">
+      <div className="relative w-screen -mx-[calc((100vw-100%)/2)] mb-16 md:mb-20 mt-10" >
         <Swiper
           modules={[Autoplay]}
           slidesPerView="auto"

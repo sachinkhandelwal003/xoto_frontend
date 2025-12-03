@@ -68,15 +68,13 @@ export default function DreamSpacesShowcase() {
 
         {/* Header */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12 lg:mb-16 text-center lg:text-left">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-black">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1 text-black">
             Explore our curated <br />
             <span className="text-black">dream spaces</span>
           </h1>
 
-          <p className="text-base sm:text-lg leading-relaxed text-[#547593] overflow-hidden h-auto lg:h-[6rem] mt-4 lg:mt-0">
-            Our portfolio showcases our passion for crafting extraordinary spaces
-            that redefine sustainable living. As a trusted prop-tech in UAE, we
-            transform visions into timeless elegance.
+          <p className="text-base sm:text-lg paragarph-light-1 text-[#547593] overflow-hidden h-auto lg:h-[6rem] mt-4 lg:mt-0">
+          Our portfolio showcases our passion for crafting extraordinary spaces that redefine sustainable living. As a trustead prop-tech in UAE, we bring each client’s unique vision to life, transforming spaces into timeless expressions of elegance.
           </p>
         </div>
 

@@ -21,11 +21,11 @@ export default function HeroSection() {
         {/* LEFT CONTENT */}
         <div className="space-y-10 relative z-20 text-center pl-0">
 
-          <h1 className="text-5xl font-bold leading-tight text-gray-900">
+          <h1 className="text-5xl  card-heading-1 text-left mx-30 text-gray-900">
             Where Dreams <br /> Meet Doorsteps
           </h1>
 
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <p className="text-lg text-gray-600 text-left mx-30">
             Find, Sell & Finance Your Dream Home <br />
             Smarter, Faster, Easier
           </p>
@@ -35,7 +35,7 @@ export default function HeroSection() {
             <img
               src={image}
               alt="House"
-              className="w-[520px] object-contain mt-6"
+              className="w-[920px] object-contain mt-6"
             />
           </div>
         </div>
@@ -43,7 +43,7 @@ export default function HeroSection() {
         {/* RIGHT FORM CARD */}
         <div className="bg-white shadow-2xl rounded-2xl p-5 w-full max-w-lg relative z-20 border justify-self-end-safe">
           <h2 className="text-2xl font-bold text-gray-900">Discover, Decide, Deal</h2>
-          <p className="text-gray-500 mb-8">All in One Place.</p>
+          <p className="text-black mb-8">All in One Place.</p>
 
           <form className="space-y-5">
             <div className="grid grid-cols-2 gap-4">

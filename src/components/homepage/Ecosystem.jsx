@@ -68,11 +68,11 @@ export default function XotoLandingPage() {
   />
   
   {/* Content */}
-  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center h-full px-6 text-center text-white">
-    <h1 className="text-5xl md:text-6xl font-bold leading-tight max-w-6xl">
+  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center h-full px-6 text-center text-white ">
+    <h1 className="text-5xl md:text-6xl  leading-tight max-w-6xl heading-light font-extrabold ">
       One Ecosystem. Infinite Opportunities.
     </h1>
-    <p className="mt-4 text-lg md:text-xl max-w-3xl opacity-90">
+    <p className="mt-4 text-lg md:text-xl max-w-3xl  paragraph-light">
       XOTO empowers every stakeholder in the property lifecycle with AI-driven tools to
       simplify operations, increase revenue, and create seamless experiences for customers.
     </p>

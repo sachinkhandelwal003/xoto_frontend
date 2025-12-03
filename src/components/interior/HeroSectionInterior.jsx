@@ -22,11 +22,11 @@ export default function HeroSectionInterior
       {/* Hero Content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16">
         <div className="max-w-4xl text-center">
-          <h1 className="mb-6 text-6xl font-bold text-white drop-shadow-lg sm:text-5xl md:text-6xl lg:text-6xl">
+          <h1 className="mb-6 text-6xl heading-light font-extrabold sm:text-5xl md:text-6xl lg:text-6xl">
             Interiors That Reflect You
           </h1>
 
-          <p className="mb-8 text-2xl text-gray-100 drop-shadow-md sm:text-lg md:text-xl lg:text-2xl max-w-[700px] ml-2">
+          <p className="mb-8 text-2xl paragraph-light text-white sm:text-lg md:text-xl lg:text-2xl max-w-[700px] ml-2">
             Tailored designs, smart solutions, and expert execution for every
             corner of your home.
           </p>

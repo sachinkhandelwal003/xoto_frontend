@@ -62,17 +62,17 @@ export default function OurPartners() {
 
       {/* ================= TITLE ================= */}
       <div
-        className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 mb-24"
+        className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-50 mb-24"
         style={dmSans}
       >
         <h2
-          className="text-4xl md:text-5xl font-extrabold leading-tight text-[#0b1739]"
-          style={dmSans}
+          className="text-4xl md:text-5xl heading-dark-1 leading-tight text-[#0b1739]"
+          
         >
           We Make Lenders <br /> Work for You
         </h2>
 
-        <p className="text-[#547593] text-lg mt-5 leading-relaxed max-w-md" style={dmSans}>
+        <p className="text-[#547593] text-lg paragraph-light-1 mt-5 leading-relaxed max-w-md mx-1" >
           Xoto partners with leading banks and institutions so you get access to
           exclusive mortgage offers — faster, easier, and with full transparency.
         </p>
@@ -96,7 +96,7 @@ export default function OurPartners() {
             <img src={iconAI} className="w-8 h-8" alt="AI" />
           </div>
 
-          <div className="absolute -mx-31">
+          <div className="absolute -mx-31 ">
             <LoopLabel
               title="AI Matched Offers"
               text="We match you to mortgage plans suited to your income, property, and goals."
@@ -110,7 +110,7 @@ export default function OurPartners() {
           style={{ top: "-10px", right: "11%", ...dmSans }}
            background = "linear-gradient(to bottom, #FFFFFF, #2516DF)"
         >
-          <div className="absolute mx-80">
+          <div className="absolute mx-80 ">
             <LoopLabel
               title="Transparent Cost"
               text="All fees, interest, and charges are shown upfront — no last-minute surprises."

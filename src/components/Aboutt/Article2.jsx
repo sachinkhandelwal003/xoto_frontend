@@ -3,7 +3,7 @@ import xotoLogo from "../../assets/img/image_109-removebg-preview.png";
 import wave1 from "../../assets/img/wave/waveint2.png";
 
 const Article2 = () => {
-  const [active, setActive] = useState("vision");
+
 
   return (
     <div>
@@ -101,44 +101,7 @@ const Article2 = () => {
         </div>
         {/* BOTTOM BUTTON GROUP - EXACT SAME POSITION AS BEFORE */}
 
-        <div
-          className="p-3 max-w-xl bg-[linear-gradient(180deg,#03A4F4_0%,#64EF0A_100%)]
-              absolute bottom-0 left-140 rounded-lg shadow-xl py-py-[8px] px-[16px] border-1"
-        >
-          <div
-            className="
-            flex flex-col sm:flex-row 
-            justify-start items-start
-            space-y-2 sm:space-y-0 sm:space-x-3
-            rounded-lg"
-          >
-            <button
-              onClick={() => setActive("vision")}
-              className={`px-8 sm:px-15 py-4 rounded-lg border border-white text-white font-medium
-             transition-all duration-300 min-w-[140px]
-        ${
-          active === "vision"
-            ? "bg-[#5C039B] shadow-md"
-            : "bg-transparent hover:bg-[#5C039B]/70"
-        }`}
-            >
-              Vision
-            </button>
-
-            <button
-              onClick={() => setActive("mission")}
-              className={`px-8 sm:px-15 py-4 rounded-lg border border-white text-white font-medium
-        transition-all duration-300 min-w-[140px]
-        ${
-          active === "mission"
-            ? "bg-[#5C039B] shadow-md"
-            : "bg-transparent hover:bg-[#5C039B]/70"
-        }`}
-            >
-              Mission
-            </button>
-          </div>
-        </div>
+      
       </section>
     </div>
   );
