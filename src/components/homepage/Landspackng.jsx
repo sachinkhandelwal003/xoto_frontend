@@ -206,7 +206,7 @@ export default function Landspackng() {
   return (
     <>
       <QuoteModal isOpen={quoteModalOpen} onClose={() => setQuoteModalOpen(false)} />      {/* === HERO SECTION === */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative  flex items-center py-20 pb-20 md:py-20 lg:py-28 xl:py-36 justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={interiorImage}
@@ -232,7 +232,7 @@ export default function Landspackng() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-6xl font-extrabold mb-6 heading-light"
+            className=" mb-6 heading-light"
           >
             Transforming Homes With Premium
             <br />
@@ -315,12 +315,12 @@ export default function Landspackng() {
       {/* Left Content Column */}
       <div className="space-y-6 p-4 sm:p-6 md:p-8 lg:p-10">
         <div className="inline-block border-cyan-500 p-1 mx-auto lg:mx-0">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 drop-shadow-lg leading-tight text-center lg:text-left">
-            Bring your vision to life with our interactive builder
+          <h2 className="text-3xl sm:text-4xl md:text-5xl heading-dark-1 text-black text-center lg:text-left">
+            Bring your vision to  <br />life with our interactive builder
           </h2>
         </div>
 
-        <p className="text-lg sm:text-xl md:text-2xl text-[#547593] max-w-md mx-auto lg:mx-0 text-center lg:text-left">
+        <p className="text-lg sm:text-xl md:text-2xl text-[#547593] max-w-md mx-auto lg:mx-0 text-center lg:text-left paragrapah-light-1">
           Upload your space or choose a template, and get instant AI-powered design previews.
         </p>
 

@@ -23,9 +23,9 @@ const Article1 = () => {
       {/* content */}
       <div className="relative text-center px-6">
         <h1
-          className="text-white font-extrabold"
+          className="text-white font-extrabold heading-light"
           style={{
-            fontFamily: "'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+            
             fontSize: "50px",
             lineHeight: "76px",
             letterSpacing: "0px",
@@ -38,7 +38,7 @@ const Article1 = () => {
         </h1>
 
         <p
-          className="text-white font-medium mt-4"
+          className="text-white font-semibold mt-4 paragaph-light"
           style={{
             fontFamily: "'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
             fontSize: "20px",

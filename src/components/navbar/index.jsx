@@ -202,7 +202,7 @@ const navItems = [
   { title: "Services", path: "/Services" },
   { title: "Partner Eco-System", path: "/ecosystem" },
   { title: "Xoto Store", path: "/ecommerce/b2c" },
-    { title: "Blog", path: "/explore" },
+    { title: "Blogs", path: "/explore" },
 
 ];
 

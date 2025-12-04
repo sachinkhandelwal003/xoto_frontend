@@ -117,14 +117,14 @@ const StakeholderSection = () => {
     <section className="w-full bg-white relative z-20  py-16 md:py-24 overflow-hidden">
       {/* Heading */}
       <div className="text-center mb-12 px-6">
-        <h2 className="text-4xl md:text-6xl font-bold text-gray-900">
+        <h2 className="text-4xl md:text-6xl font-semibold text-black heading-dark-1">
           Built for{" "}
-          <span className="bg-gradient-to-r from-[#03A4F4] via-[#6F2DBD] to-[#64EF0A] bg-clip-text text-transparent">
+         
             Every Stakeholder
-          </span>
+          {/* </span> */}
         </h2>
-        <p className="mt-4 text-gray-600 text-lg max-w-3xl mx-auto">
-          Our platform serves diverse stakeholders with customized benefits.
+        <p className="mt-4 text-[#547593] text-lg  mx-auto paragraph-light-1">
+       Our platform serves diverse stakeholders in the home ecosystem, each with tailored solutions and benefits
         </p>
       </div>
 
@@ -141,7 +141,7 @@ const StakeholderSection = () => {
         key={tab}
         onClick={() => setActiveTab(tab)}
         className={`
-          px-6 py-2 rounded-xl text-xl text-sm border transition-all duration-300
+          px-6 py-2 rounded-xl text-xl  border transition-all duration-300
           ${
             activeTab === tab
               ? "bg-[#6F2DBD] text-white border-transparent shadow-md"
@@ -215,7 +215,11 @@ const StakeholderSection = () => {
             <img src={realImage} className="w-[80%] object-contain" />
           </div>
         </div>
+        
       </div>
+      <button className="justify-center  item-center border bg-[#5C039B] rounded-md text-white px-6 py-3 mt-10 w-40 flex mx-auto">
+        Sign Up
+      </button>
     </section>
   );
 };

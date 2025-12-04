@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Upload, Sun, Sprout, Zap, X, Check, Loader, Image as ImageIcon, ArrowLeft, Download, RotateCcw, Trash2 } from 'lucide-react';
 import { Button, Modal, Progress, Card, Tag, Empty, notification } from 'antd';
+import axios from 'axios';
 
 // Dummy Images (using Unsplash or placeholder)
 const dummySpaceImages = [
@@ -28,40 +29,6 @@ const gardenElements = [
   { value: 'seating', label: 'Seating Area', img: 'https://images.unsplash.com/photo-1586023492125-27b2c0d58d9f?w=400' },
 ];
 
-// Different generated design images based on styles
-const styleBasedImages = {
-  modern: [
-    'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600',
-    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600',
-    'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600'
-  ],
-  japanese: [
-    'https://images.unsplash.com/photo-1587502537104-aac4031028fe?w=600',
-    'https://images.unsplash.com/photo-1545569341-9c0d4d3dcce6?w=600',
-    'https://images.unsplash.com/photo-1587502536575-6df6c808d5f5?w=600'
-  ],
-  cottage: [
-    'https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=600',
-    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600',
-    'https://images.unsplash.com/photo-1598726668148-999da4e02c31?w=600'
-  ],
-  mediterranean: [
-    'https://images.unsplash.com/photo-1558618666-4178cb59b3d7?w=600',
-    'https://images.unsplash.com/photo-1560717780-2d4727b99f73?w=600',
-    'https://images.unsplash.com/photo-1589656493111-7eb93561a91f?w=600'
-  ],
-  tropical: [
-    'https://images.unsplash.com/photo-1583258292688-d0213dc5a3f8?w=600',
-    'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=600',
-    'https://images.unsplash.com/photo-1589656493111-7eb93561a91f?w=600'
-  ],
-  minimalist: [
-    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600',
-    'https://images.unsplash.com/photo-1564013797765-e0ef549569a6?w=600',
-    'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600'
-  ]
-};
-
 const AIPlanner = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedStyles, setSelectedStyles] = useState([]);
@@ -81,30 +48,6 @@ const AIPlanner = () => {
   // File upload state
   const [uploadedFile, setUploadedFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
-
-  // Get design images based on selected styles
-  const getStyleBasedDesignImages = (count = 3) => {
-    let availableImages = [];
-    
-    if (selectedStyles.length > 0) {
-      // Get images from selected styles
-      selectedStyles.forEach(style => {
-        if (styleBasedImages[style]) {
-          availableImages = [...availableImages, ...styleBasedImages[style]];
-        }
-      });
-    } else {
-      // If no styles selected, use all images
-      Object.values(styleBasedImages).forEach(images => {
-        availableImages = [...availableImages, ...images];
-      });
-    }
-
-    // Remove duplicates and shuffle
-    const uniqueImages = [...new Set(availableImages)];
-    const shuffled = uniqueImages.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  };
 
   // Reset function to clear all inputs and start fresh
   const resetDesign = () => {
@@ -211,7 +154,22 @@ const AIPlanner = () => {
     });
   };
 
-  const simulateGeneration = () => {
+  // Function to convert data URL to File object
+  const dataURLtoFile = (dataurl, filename) => {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  };
+
+  // Function to call AI backend
+const generateAIDesigns = async () => {
+  try {
     if (!selectedImage) {
       notification.warning({ message: 'Please upload a photo first!' });
       return;
@@ -220,63 +178,203 @@ const AIPlanner = () => {
     setIsGenerating(true);
     setGenerationProgress(0);
 
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 3;
-      setGenerationProgress(progress);
+    const formData = new FormData();
 
-      if (progress >= 100) {
-        clearInterval(interval);
-        setIsGenerating(false);
+    if (uploadedFile) {
+      formData.append('gardenImage', uploadedFile);
+    } else if (selectedImage) {
+      const response = await fetch(selectedImage);
+      const blob = await response.blob();
+      const file = new File([blob], 'garden-image.jpg', { type: 'image/jpeg' });
+      formData.append('gardenImage', file);
+    }
 
-        // Generate 3 different design images based on selected styles
-        const generatedImages = getStyleBasedDesignImages(3);
-        setCurrentGeneratedImages(generatedImages);
+    formData.append(
+      'styleName',
+      selectedStyles.length > 0
+        ? gardenStyles.find(s => s.value === selectedStyles[0])?.label
+        : 'Modern Garden'
+    );
 
-        // Create 3 new designs with different images
-        const newDesigns = generatedImages.map((image, index) => ({
-          id: Date.now() + index,
-          image: image,
-          title: `Design ${designs.length + index + 1}`,
-          styles: selectedStyles,
-          elements: selectedElements,
-          requirement: specificRequirement,
-          timestamp: new Date().toLocaleString(),
-          isUploaded: !!uploadedFile,
-          originalImage: selectedImage
-        }));
+    const elementsText = selectedElements
+      .map(e => gardenElements.find(el => el.value === e)?.label)
+      .join(', ');
 
-        setDesigns(prev => [...newDesigns, ...prev]);
-        setShowGeneratedModal(true);
+    formData.append('elements', elementsText || 'beautiful plants');
 
-        notification.success({ 
-          message: '3 Designs Generated Successfully!',
-          description: `Created ${selectedStyles.length > 0 ? selectedStyles.map(s => gardenStyles.find(gs => gs.value === s)?.label).join(', ') : 'beautiful'} garden designs`
-        });
+    formData.append(
+      'description',
+      specificRequirement || 'Create a beautiful garden design'
+    );
+
+    // ⭐ DEBUG SECTION — CHECK FORM DATA CONTENTS ⭐
+    console.log("----- FORM DATA DEBUG -----");
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+    console.log("----- END FORM DATA -----");
+
+    // Simulated progress
+    const progressInterval = setInterval(() => {
+      setGenerationProgress(prev => {
+        const newProgress = prev + 2;
+        if (newProgress >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return newProgress;
+      });
+    }, 100);
+
+    const response = await axios.post(
+      'https://kotiboxglobaltech.online/api/ai/generate-garden',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 300000,
       }
-    }, 150);
+    );
+
+    clearInterval(progressInterval);
+    setGenerationProgress(100);
+
+    if (response.data.success) {
+      const generatedImages = response.data.designs.map(d => d.url);
+      setCurrentGeneratedImages(generatedImages);
+
+      const newDesigns = generatedImages.map((image, index) => ({
+        id: Date.now() + index,
+        image: image,
+        title: `AI Design ${designs.length + index + 1}`,
+        styles: selectedStyles,
+        elements: selectedElements,
+        requirement: specificRequirement,
+        timestamp: new Date().toLocaleString(),
+        isUploaded: !!uploadedFile,
+        originalImage: selectedImage,
+        isAIGenerated: true,
+      }));
+
+      setDesigns(prev => [...newDesigns, ...prev]);
+      setShowGeneratedModal(true);
+
+      notification.success({
+        message: 'AI Designs Generated Successfully!',
+        description: `${generatedImages.length} unique garden designs created by AI`,
+      });
+    } else {
+      throw new Error(response.data.message || 'Failed to generate designs');
+    }
+  } catch (error) {
+    console.error('Error generating AI designs:', error);
+
+    if (error.code === 'ECONNABORTED') {
+      notification.error({
+        message: 'Generation Timeout',
+        description: 'AI generation took too long. Try again.',
+      });
+    } else if (error.response) {
+      notification.error({
+        message: 'Generation Failed',
+        description: error.response.data.message || 'Failed to generate designs.',
+      });
+    } else {
+      notification.error({
+        message: 'Connection Error',
+        description: 'Backend not running at http://localhost:5000',
+      });
+    }
+
+    generateFallbackDesigns();
+  } finally {
+    setIsGenerating(false);
+    setGenerationProgress(0);
+  }
+};
+
+
+  // Fallback function if AI fails
+  const generateFallbackDesigns = () => {
+    const fallbackImages = [
+      'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600',
+      'https://images.unsplash.com/photo-1558618666-4178cb59b3d7?w=600'
+    ];
+
+    const newDesigns = fallbackImages.map((image, index) => ({
+      id: Date.now() + index,
+      image: image,
+      title: `Design ${designs.length + index + 1} (Demo)`,
+      styles: selectedStyles,
+      elements: selectedElements,
+      requirement: specificRequirement,
+      timestamp: new Date().toLocaleString(),
+      isUploaded: !!uploadedFile,
+      originalImage: selectedImage
+    }));
+
+    setDesigns(prev => [...newDesigns, ...prev]);
+    setCurrentGeneratedImages(fallbackImages);
+    setShowGeneratedModal(true);
+
+    notification.info({
+      message: 'Demo Designs Generated',
+      description: 'Using example designs. AI service is currently unavailable.'
+    });
+  };
+
+  // Download image function
+  const downloadImage = (imageUrl, designName) => {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `${designName.replace(/\s+/g, '-').toLowerCase()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    notification.success({
+      message: 'Download Started',
+      description: `${designName} is being downloaded`
+    });
+  };
+
+  // Download all designs
+  const downloadAllDesigns = () => {
+    designs.forEach((design, index) => {
+      setTimeout(() => {
+        downloadImage(design.image, design.title);
+      }, index * 500); // Stagger downloads
+    });
+    
+    notification.success({
+      message: 'Download All',
+      description: `${designs.length} designs are being downloaded`
+    });
   };
 
   return (
     <>
       <style jsx global>{`
         :root {
-          --color-primary: #5C039B;  /* purple */
-          --color-blue: #03A4F4;     /* blue */
-          --color-green: #64EF0A;    /* green */
-          --color-secondary: #64EF0A;
-          --color-green-tertiary: #69ED1F;
-          --color-green-light: #56EA1B;
-          --color-green-accent: #58E526;
-          --color-text-primary: #03A4F4;
-          --color-text-secondary: #5C039B;
-          --color-text-dark: #020202;
-          --color-text-white: #FFFFFF;
-          --color-text-green: #64EF0A;
-          --color-btn-primary: #03A4F4;
-          --color-btn-secondary: #5C039B;
-          --color-btn-dark: #020202;
-          --color-btn-gradient: linear-gradient(90deg, #63C117, #32C882, #69ED1F);
+          --color-primary: #5C039B;
+          --color-blue: #03A4F4;
+          --color-green: #64EF0A;
+        }
+        
+        .ant-modal-content {
+          border-radius: 20px !important;
+        }
+        
+        .ant-modal-header {
+          border-radius: 20px 20px 0 0 !important;
+        }
+        
+        .ant-card {
+          transition: all 0.3s ease !important;
+        }
+        
+        .ant-card:hover {
+          transform: translateY(-5px);
         }
       `}</style>
 
@@ -407,19 +505,19 @@ const AIPlanner = () => {
 
             {/* Generate Button */}
             <button
-              onClick={simulateGeneration}
+              onClick={generateAIDesigns}
               disabled={!selectedImage || isGenerating}
               className="w-full h-16 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xl font-bold rounded-2xl hover:from-purple-700 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl transform hover:scale-105 transition-all"
             >
               {isGenerating ? (
                 <>
                   <Loader className="w-8 h-8 animate-spin" />
-                  Generating Magic...
+                  AI Generating...
                 </>
               ) : (
                 <>
-                  Generate 3 Designs
-                  <span className="ml-3 bg-white text-purple-600 px-4 py-1 rounded-full text-sm font-bold">FREE</span>
+                  Generate 3 AI Designs
+                  <span className="ml-3 bg-white text-purple-600 px-4 py-1 rounded-full text-sm font-bold">AI</span>
                 </>
               )}
             </button>
@@ -440,6 +538,15 @@ const AIPlanner = () => {
                     <RotateCcw className="w-5 h-5" />
                     New Design
                   </button>
+                  {designs.length > 0 && (
+                    <button
+                      onClick={downloadAllDesigns}
+                      className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white border-2 border-green-500 rounded-xl hover:bg-green-600 transition-all font-semibold"
+                    >
+                      <Download className="w-5 h-5" />
+                      Download All
+                    </button>
+                  )}
                   {designs.length > 0 && (
                     <button
                       onClick={() => setDesigns([])}
@@ -468,11 +575,23 @@ const AIPlanner = () => {
                         <div className="absolute top-3 right-3 bg-purple-600 text-white px-2 py-1 rounded text-sm">
                           {design.timestamp}
                         </div>
+                        {design.isAIGenerated && (
+                          <div className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
+                            AI Generated
+                          </div>
+                        )}
                       </div>
                     }
                     className="rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all border-2 border-purple-100"
                     actions={[
-                      <Button type="text" icon={<Download size={16} />} className="text-purple-600">Download</Button>,
+                      <Button 
+                        type="text" 
+                        icon={<Download size={16} />} 
+                        className="text-purple-600"
+                        onClick={() => downloadImage(design.image, design.title)}
+                      >
+                        Download
+                      </Button>,
                       <Button type="text" className="text-blue-500">Edit</Button>,
                       <Button 
                         type="text" 
@@ -660,24 +779,29 @@ const AIPlanner = () => {
         <div className="text-center py-8">
           <Check className="w-20 h-20 text-green-500 mx-auto mb-6 animate-bounce" />
           <h2 className="text-4xl font-bold mb-8 text-purple-700">
-            Your {selectedStyles.length > 0 ? selectedStyles.map(s => gardenStyles.find(gs => gs.value === s)?.label).join(' & ') : 'Beautiful'} Garden Designs Are Ready!
+            Your AI Garden Designs Are Ready!
           </h2>
           <div className="grid grid-cols-3 gap-6 mb-8">
             {currentGeneratedImages.map((image, index) => (
               <div key={index} className="text-center">
                 <img 
                   src={image} 
-                  alt={`Design ${index + 1}`}
+                  alt={`AI Design ${index + 1}`}
                   className="w-full h-64 object-cover rounded-2xl shadow-lg mb-4 border-4 border-purple-200" 
                 />
                 <p className="font-semibold text-lg text-purple-600">
-                  {selectedStyles.length > 0 ? gardenStyles.find(gs => gs.value === selectedStyles[0])?.label : 'Beautiful'} Design {index + 1}
+                  AI Design {index + 1}
                 </p>
               </div>
             ))}
           </div>
           <div className="flex justify-center gap-4">
-            <Button type="primary" size="large" className="bg-purple-600 h-12 px-8 border-purple-600 hover:bg-purple-700">
+            <Button 
+              type="primary" 
+              size="large" 
+              className="bg-purple-600 h-12 px-8 border-purple-600 hover:bg-purple-700"
+              onClick={downloadAllDesigns}
+            >
               Download All HD
             </Button>
             <Button 
@@ -699,7 +823,7 @@ const AIPlanner = () => {
         <Modal open={true} footer={null} closable={false} width={500}>
           <div className="text-center py-10">
             <Sparkles className="w-20 h-20 text-purple-500 mx-auto animate-pulse" />
-            <h3 className="text-2xl font-bold mt-6 text-purple-700">Creating Your Dream Garden...</h3>
+            <h3 className="text-2xl font-bold mt-6 text-purple-700">AI is Creating Your Dream Garden...</h3>
             <Progress 
               percent={generationProgress} 
               type="circle" 
@@ -711,9 +835,9 @@ const AIPlanner = () => {
             />
             <p className="mt-6 text-lg text-purple-600">
               {generationProgress < 30 && "Analyzing your space and preferences..."}
-              {generationProgress >= 30 && generationProgress < 60 && `Designing ${selectedStyles.length > 0 ? selectedStyles.map(s => gardenStyles.find(gs => gs.value === s)?.label).join(', ') : 'beautiful'} layout...`}
-              {generationProgress >= 60 && generationProgress < 90 && "Adding plants & garden elements..."}
-              {generationProgress >= 90 && "Finalizing your garden designs..."}
+              {generationProgress >= 30 && generationProgress < 60 && "Designing layout with AI..."}
+              {generationProgress >= 60 && generationProgress < 90 && "Adding garden elements with AI..."}
+              {generationProgress >= 90 && "Finalizing AI-generated designs..."}
             </p>
           </div>
         </Modal>

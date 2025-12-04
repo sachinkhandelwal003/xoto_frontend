@@ -41,7 +41,7 @@ export default function ServicesPortfolio() {
 
       {/* Heading */}
       <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-center text-gray-900">
+        <h2 className=" heading-dark-1 sm:text-4xl md:text-5xl  text-center text-black">
           Our Services Portfolio
         </h2>
       </div>

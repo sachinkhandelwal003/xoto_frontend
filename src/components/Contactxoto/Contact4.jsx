@@ -54,12 +54,12 @@ export default function PartnerForm() {
         
         {/* LEFT CONTENT */}
         <div className="md:w-1/2 flex flex-col gap-5">
-          <h2 className="text-5xl font-semibold text-gray-900">
+          <h2 className="text-5xl font-semibold text-black heading-dark-1">
             Partner & <br />
             Collaboration Form
           </h2>
 
-          <p className="text-gray-900">
+          <p className="text-[#547593]  font-medium   paragraph-heading-1">
             Interested in collaborating with XOTO? Tell <br />
             us more about your business or project.
           </p>

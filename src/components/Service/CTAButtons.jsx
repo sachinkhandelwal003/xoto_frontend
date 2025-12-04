@@ -9,7 +9,8 @@ export default function CTAButtons() {
         onClick={() => alert("Get Pre-Approved clicked")}
         className="
           px-8 py-3 
-          bg-[#5C039B] 
+           bg-[#4A0080]
+          hover:bg-none
           text-white 
           font-semibold 
           rounded-md 
@@ -31,7 +32,7 @@ export default function CTAButtons() {
           text-white 
           font-semibold 
           rounded-md
-          hover:bg-white hover:text-[#5C039B]
+          hover:bg-[#4A0080] hover:text-white
           transition
         "
       >

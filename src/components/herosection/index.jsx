@@ -5,7 +5,7 @@ import calender from "../../assets/icons/Homeicons/Calendar.png";
 import clock from "../../assets/icons/Homeicons/Clock.png";
 import gurantee from "../../assets/icons/Homeicons/Guarantee.png";
 import map from "../../assets/icons/Homeicons/Map-pin.png";
-import video from "../../assets/video/mortage4.mp4";
+import video from "../../assets/video/mortgage2.mp4";
 
 import { ShoppingBag, Trees, Sparkles } from "lucide-react";
 

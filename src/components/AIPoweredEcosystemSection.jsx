@@ -35,7 +35,7 @@ export default function HomeJourneySection() {
     text-center lg:text-left mx-auto lg:mx-0
   `}
 >
-  <h1 className="heading-light-1" style={{ color: "var(--color-black)" }}>
+  <h1 className="heading-light" style={{ color: "var(--color-black)" }}>
     Your AI-Powered <br/> Home Journey
   </h1>
 

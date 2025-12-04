@@ -1,6 +1,7 @@
 import React from "react";
 import { FaBed, FaBath, FaRulerCombined } from "react-icons/fa";
 import propertyImg from "../../assets/img/Property.png";
+import bgImage from "../../assets/img/buy3bg.png";
 
 const Property = () => {
   const deals = [
@@ -34,12 +35,27 @@ const Property = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16 px-4 sm:px-6 lg:px-12">
-      
-      {/* Heading */}
-      <h2 className="text-center text-3xl sm:text-4xl font-bold mb-14 text-[#1A1A1A]">
-        Our Property
-      </h2>
+    <div
+      className="min-h-screen py-16 px-4 sm:px-6 lg:px-12 bg-cover bg-center bg-no-repeat relative"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+      }}
+    >
+
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-14">
+
+  {/* Heading */}
+  <h2 className=" mx-40 text-5xl heading-dark-1  text-[#ffffff] text-center sm:text-left">
+    Hot Property Deals
+  </h2>
+
+  {/* Paragraph */}
+  <p className="text-[#ffffff] text-center sm:text-left text-[20px] mt-3 sm:mt-0 mx-60 paragraph-light-1">
+    Discover exclusive properties with the <br />
+    best value in Dubai's premium locations
+  </p>
+
+</div>
 
       {/* Cards Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -47,7 +63,6 @@ const Property = () => {
           <PropertyCard key={deal.id} deal={deal} />
         ))}
       </div>
-
     </div>
   );
 };
@@ -55,7 +70,6 @@ const Property = () => {
 function PropertyCard({ deal }) {
   return (
     <div className="w-full bg-white rounded-[30px] shadow-lg overflow-hidden hover:scale-[1.02] transition-all duration-300">
-
       {/* Image */}
       <div className="h-[220px] sm:h-[250px] w-full overflow-hidden rounded-t-[30px]">
         <img
@@ -67,52 +81,45 @@ function PropertyCard({ deal }) {
 
       {/* Card Content */}
       <div className="p-6 bg-gradient-to-b from-[#F7F6F9] to-white">
-
-        {/* Title */}
         <h3 className="text-[20px] sm:text-[22px] font-semibold text-[#1A1A1A]">
           {deal.name}
         </h3>
 
-        {/* Location */}
         <p className="text-[#676767] text-[14px] sm:text-[15px] mt-1">
           {deal.location}
         </p>
 
         {/* Features Row */}
         <div className="flex items-center gap-5 sm:gap-6 mt-5 text-[#4A4A4A] text-[14px]">
-
-          {/* Area */}
           <div className="flex items-center gap-2">
             <FaRulerCombined size={15} />
             <span>{deal.area}</span>
           </div>
 
-          {/* Beds */}
           <div className="flex items-center gap-2">
             <FaBed size={15} />
             <span>{deal.beds} Beds</span>
           </div>
 
-          {/* Baths */}
           <div className="flex items-center gap-2">
             <FaBath size={15} />
             <span>{deal.bathroom} Baths</span>
           </div>
         </div>
 
-        {/* Button */}
-        <button className="
-          w-full bg-[#6A00D4] text-white font-semibold py-3 
-          rounded-full mt-7 text-[15px] shadow-md
-          transition-all border-2 border-transparent
-          hover:bg-white hover:text-[#6A00D4] hover:border-[#6A00D4]
-        ">
+        <button
+          className="
+            w-full bg-[#6A00D4] text-white font-semibold py-3 
+            rounded-md mt-7 text-[15px] shadow-md
+            transition-all border-2 border-transparent
+            hover:bg-white hover:text-[#6A00D4] hover:border-[#6A00D4]
+        "
+        >
           Schedule Visit
         </button>
-
       </div>
     </div>
   );
 }
 
-export default Property;
+export default Property;

@@ -4,7 +4,7 @@ import Second from '../Service/Second'
 import Third from '../Service/Third'
 import  FOurth from '../Service/FOurth'
 // import {  ChevronLeft, ChevronRight,  Star  } from 'lucide-react';
-import  Fifth from '../Service/Fifth'
+import  Buy6 from '../BuyRent/Buy6'
 import  Sixth from '../Service/Sixth'
 const Service = () => {
   return (
@@ -14,8 +14,8 @@ const Service = () => {
       <Second/>
       <Third/>
       <FOurth/>
-      
-       <Fifth/>
+      <Buy6/>
+       {/* <Fifth/> */}
            <Sixth/>
     </div>
   )

@@ -20,20 +20,14 @@ export default function WhatAreYouLookingFor() {
         {/* Heading */}
         <div className="max-w-5xl mx-auto text-center">
         <h2
-  className="font-semibold text-[#020202] "
-  style={{
-    fontFamily: "DM Sans",
-    fontSize: "60px",
-    fontWeight: 600,         // SemiBold
-    letterSpacing: "-0.03em", 
-    lineHeight: "55px",
-  }}
+  className="heading-dark-1 text-[#020202] "
+ 
 >
   What are you looking for
 </h2>
 
 
-      <p className="text-[24px] leading-[33px] font-medium text-[#547593] whitespace-nowrap py-5">
+      <p className="text-[24px] pargraph-light-1 text-[#547593] mt-4">
   Let Xobia guide you through your perfect property journey with personalized recommendations.
 </p>
 
@@ -81,13 +75,9 @@ export default function WhatAreYouLookingFor() {
 
   {/* Paragraph */}
   <p
-    className="font-medium text-[#547593] mt-2"
+    className="font-medium text-[#547593] mt-2 paragraph-light-1"
     style={{
-      fontFamily: "DM Sans",
-      fontSize: "24px",
-      lineHeight: "33px",
-      letterSpacing: "0px",
-      maxWidth: "503px",
+    
       marginLeft:"65px"
     }}
   >

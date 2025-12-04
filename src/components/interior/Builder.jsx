@@ -25,13 +25,13 @@ export default function InteractiveBuilderSection() {
           <div className="space-y-6 text-center lg:text-left">
 
             <div className="inline-block max-w-[90%] sm:max-w-[400px] md:max-w-[500px] mx-auto lg:mx-0">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gray-900 leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1  text-black">
                 Bring your vision to life with our{" "}
                 <span className="text-black">interactive builder</span>
               </h2>
             </div>
 
-            <p className="text-lg sm:text-xl md:text-2xl font-medium text-[#547593] max-w-md mx-auto lg:mx-0">
+            <p className="text-lg sm:text-xl md:text-2xl paragraph-light-1 text-[#547593] max-w-lg mx-auto lg:mx-0">
               Upload your space or choose a template, and get instant AI-powered
               design previews.
             </p>

@@ -9,10 +9,10 @@ const ContactHero = () => {
     >
       {/* Content */}
       <div className="relative z-10 text-center max-w-2xl px-4">
-        <h1 className="text-4xl md:text-5xl font-Extrabold mb-4">
+        <h1 className="text-4xl md:text-5xl font-Extrabold mb-4 h-20">
           Contact XOTO
         </h1>
-        <p className="text-lg md:text-xl leading-relaxed font-semibold">
+        <p className="text-xl w-3xl  leading-relaxed font-semibold">
           Get in touch with our luxury real estate experts. We’re here to help
           you with all your property needs in the UAE.
         </p>

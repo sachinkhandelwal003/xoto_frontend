@@ -30,11 +30,11 @@ export default function ConsultationSection() {
         <div className="flex flex-col lg:flex-row items-start justify-start gap-12 lg:gap-20">
 
           {/* LEFT SIDE TEXT */}
-          <div className="w-full lg:w-auto text-center lg:text-left order-0 lg:order-0 mb-6 lg:mb-0">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white">
+          <div className="w-full lg:w-auto text-center lg:text-left order-0 lg:order-0 mb-6 lg:mb-0 mt-9">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl heading-dark-1 text-white">
               Book Consultation
             </h2>
-            <p className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl text-gray-200 max-w-md mx-auto lg:mx-0">
+            <p className="mt-4 sm:mt-6 paragraph-light-1 text-white max-w-md mx-auto lg:mx-0">
               One simple form to connect with XOTO experts for tailored interior design advice and project planning.
             </p>
           </div>

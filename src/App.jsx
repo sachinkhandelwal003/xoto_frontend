@@ -48,6 +48,7 @@ import Interior from "./components/homepage/Interior/Interior";
 import Ai from "./components/AII/Ai";
 import EstimateCalculator from "./components/modal/EstimateCalculator";
 import Calculator from "./components/homepage/AiPlanner/Calculator";
+import OtherLogin from "./components/login/OtherLogin";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -238,6 +239,7 @@ function App() {
           <Route path="/ecosystem" element={<Ecosystem />} />
           <Route path="/about" element={<About />} />
           <Route path="/aiInterior" element={<Interior />} />
+          <Route path="/other/login" element={<OtherLogin />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/admin/login" element={<AdminLogin />} />

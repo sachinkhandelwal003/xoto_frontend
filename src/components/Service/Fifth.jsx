@@ -82,12 +82,12 @@ export default function TestimonialsSection() {
     <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 w-full flex flex-col items-center pt-12 md:pt-16">
       <div className="relative w-full z-10 px-4 sm:px-10 md:px-20">
 
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-10 md:mb-12 text-gray-900">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-center card-heading-1">
           What Our Clients Say
         </h2>
 
         {/* SCROLL AREA */}
-        <div className="relative flex items-center h-auto sm:h-[380px] md:h-[420px]">
+        <div className=" mt-5 relative flex items-center h-auto sm:h-[380px] md:h-[420px]">
           <div
             ref={scrollRef}
             className="flex overflow-x-scroll gap-4 sm:gap-6 snap-x snap-mandatory scroll-smooth w-full scrollbar-hide"
