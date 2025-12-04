@@ -1,11 +1,11 @@
-import React from 'react';
-import Imagemain from '../../assets/img/buy.jpg';
+import React from "react";
+import Imagemain from "../../assets/img/buy.jpg";
 
 export default function HeroSection() {
   return (
     <section className="relative  w-full overflow-hidden font-dm h-140">
       {/* ---------- Background Image ---------- */}
-       <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape "></div>
+      <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape "></div>
       <div className="absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape"></div>
 
       {/* Custom clip paths */}
@@ -27,26 +27,21 @@ export default function HeroSection() {
 
       {/* ---------- Content ---------- */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center text-white">
-
         {/* Heading with DM Sans Extra-Bold */}
-       <h1
-  className="
+        <h1
+          className="
     mx-auto mb-8 max-w-5xl
  heading-light
- font-extrabold
+ 
   "
->
-  Transforming the Way You <br/> Rent, Buy, & Sell Your Home.
-</h1>
+        >
+          Transforming the Way You <br /> Rent, Buy, & Sell Your Home.
+        </h1>
 
-
-     
-          <div className="flex items-center gap-3 flex-wrap justify-center">
-
-      {/* Left Button - Solid Purple */}
-   <button
-  
-  className="
+        <div className="flex items-center gap-3 flex-wrap justify-center">
+          {/* Left Button - Solid Purple */}
+          <button
+            className="
     px-8 md:px-10 lg:px-12   /* horizontal padding */
     py-3 md:py-4             /* vertical padding */
     bg-[#5C039B]             /* purple fill */
@@ -59,15 +54,13 @@ export default function HeroSection() {
     transition-colors duration-200
     focus:outline-none focus:ring-2 focus:ring-[#5C039B]/40
   "
->
-  Rent a Home
-</button>
+          >
+            Rent a Home
+          </button>
 
-
-      {/* Right Button - Transparent */}
-      <button
-       
-        className="
+          {/* Right Button - Transparent */}
+          <button
+            className="
     px-8 md:px-10 lg:px-12   /* horizontal padding */
     py-3 md:py-4             /* vertical padding */
     bg-transparent
@@ -83,11 +76,11 @@ export default function HeroSection() {
     transition-colors duration-200
     focus:outline-none focus:ring-2 focus:ring-[#5C039B]/40
   "
-      >
+          >
             Find a Home
-      </button>
-  <button
-         className="
+          </button>
+          <button
+            className="
     px-8 md:px-10 lg:px-12   /* horizontal padding */
     py-3 md:py-4             /* vertical padding */
     bg-transparent
@@ -104,13 +97,11 @@ export default function HeroSection() {
     transition-colors duration-200
     focus:outline-none focus:ring-2 focus:ring-[#5C039B]/40
   "
-      >
+          >
             Sell a Home
-      </button>
-    </div>
+          </button>
+        </div>
       </div>
-
-   
     </section>
   );
 }

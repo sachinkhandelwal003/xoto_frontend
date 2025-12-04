@@ -52,7 +52,34 @@ const OurProperty = () => {
       bathrooms: 2,
       area: "110m²",
     },
+    {
+      id: 4,
+      type: "Sell",
+      image:
+        "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=800&q=80",
+      name: "Green Villa",
+      price: "$320,000",
+      location: "California",
+      bedrooms: 4,
+      bathrooms: 3,
+      area: "150m²",
+    },
+    {
+      id: 5,
+      type: "Rent",
+      image:
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80",
+      name: "Urban Loft",
+      price: "$140,000",
+      location: "Chicago",
+      bedrooms: 2,
+      bathrooms: 2,
+      area: "95m²",
+    },
   ];
+
+  /* NEW STATE FOR VIEW MORE FUNCTIONALITY */
+  const [visibleCount, setVisibleCount] = useState(3);
 
   const [selectedProperty, setSelectedProperty] = useState(null);
 
@@ -68,13 +95,8 @@ const OurProperty = () => {
     setSelectedProperty(properties[next]);
   };
 
-  /* -----------------------------
-      PROPERTY CARD (unchanged UI)
-  ------------------------------ */
   const PropertyCard = ({ property }) => (
     <div className="relative z-30 bg-white rounded-[28px] shadow-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-
-      {/* IMAGE */}
       <div className="w-full h-[240px] rounded-t-[28px] overflow-hidden">
         <img
           src={property.image}
@@ -83,18 +105,13 @@ const OurProperty = () => {
         />
       </div>
 
-      {/* CONTENT */}
       <div className="p-6 bg-gradient-to-b from-white to-[#f2edff]">
-
         <h3 className="text-[22px] font-semibold text-[#1a1a1a]">
           {property.name}
         </h3>
 
-        <p className="text-gray-600 text-[14px] mt-1">
-          {property.location}
-        </p>
+        <p className="text-gray-600 text-[14px] mt-1">{property.location}</p>
 
-        {/* ICON INFO */}
         <div className="flex items-center gap-6 text-gray-700 text-[14px] mt-5">
           <span className="flex items-center gap-1">
             <Square className="w-4 h-4" /> {property.area}
@@ -109,7 +126,6 @@ const OurProperty = () => {
           </span>
         </div>
 
-        {/* BUTTON (unchanged design) */}
         <button
           onClick={() => setSelectedProperty(property)}
           className="
@@ -133,8 +149,6 @@ const OurProperty = () => {
   return (
     <>
       <section className="relative pt-20 pb-40 bg-white overflow-hidden">
-
-        {/* WAVE FIX — always bottom */}
         <img
           src={waveint4}
           alt="wave"
@@ -142,8 +156,6 @@ const OurProperty = () => {
         />
 
         <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-
-          {/* TITLE */}
           <h2 className="text-center card-heading-1 text-gray-900 mb-16 mt-5">
             Explore Properties
           </h2>
@@ -167,7 +179,6 @@ const OurProperty = () => {
                 </SwiperSlide>
               ))}
 
-              {/* NAV BUTTONS */}
               <button className="mobile-prev absolute left-3 top-1/2 -translate-y-1/2 z-40 bg-white text-[#6A00C1] w-11 h-11 rounded-full shadow-lg flex items-center justify-center">
                 <ChevronLeft className="w-6 h-6" />
               </button>
@@ -178,28 +189,31 @@ const OurProperty = () => {
             </Swiper>
           </div>
 
-          {/* DESKTOP GRID (perfect spacing) */}
+          {/* DESKTOP GRID WITH VIEW MORE LOGIC */}
           <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-10">
-            {properties.map((property) => (
+            {properties.slice(0, visibleCount).map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
 
-          {/* VIEW MORE BUTTON */}
-          <div className="flex justify-center mt-16">
-            <button className="bg-[#6A00C1] text-white px-10 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl">
-              View More
-            </button>
-          </div>
+          {/* VIEW MORE BUTTON (auto hides when done) */}
+          {visibleCount < properties.length && (
+            <div className="flex justify-center mt-16">
+              <button
+                onClick={() => setVisibleCount(properties.length)}
+                className="bg-[#6A00C1] text-white px-10 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl"
+              >
+                View More
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* MODAL — FIXED OVERFLOW ON MOBILE */}
+      {/* MODAL */}
       {selectedProperty && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl max-w-md w-full p-6 relative">
-
-            {/* CLOSE */}
             <button
               onClick={() => setSelectedProperty(null)}
               className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200"
@@ -207,14 +221,12 @@ const OurProperty = () => {
               <X className="w-5 h-5" />
             </button>
 
-            {/* IMAGE */}
             <img
               src={selectedProperty.image}
               alt={selectedProperty.name}
               className="w-full h-48 object-cover rounded-2xl mb-4"
             />
 
-            {/* INFO */}
             <h3 className="text-xl font-bold text-gray-900 mb-1">
               {selectedProperty.name}
             </h3>
@@ -240,7 +252,6 @@ const OurProperty = () => {
               </span>
             </div>
 
-            {/* MODAL CONTROLS */}
             <div className="flex gap-3">
               <button
                 onClick={() => openPrevProperty(selectedProperty.id)}
@@ -263,4 +274,4 @@ const OurProperty = () => {
   );
 };
 
-export default OurProperty;
+export default OurProperty;

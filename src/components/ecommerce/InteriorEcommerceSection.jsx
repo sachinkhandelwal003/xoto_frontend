@@ -26,19 +26,19 @@ const InteriorEcommerceSection = () => {
       id: 1,
       title: "Luxury Sofa Set",
       image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7",
-      price: "₹29,999",
+      price: "AED 2900",
     },
     {
       id: 2,
       title: "Contemporary Lamp",
       image: "https://www.homedecorcompany.in/cdn/shop/files/41xnFUmFvaL._AC.jpg?v=1714497193&width=1445",
-      price: "₹2,499",
+      price: "AED 2,499",
     },
     {
       id: 3,
       title: "Wooden Coffee Table",
       image: "https://www.urbanwood.in//image/cache/catalog/coffee-tables/akin/honey/crop-400x281.jpg",
-      price: "₹7,999",
+      price: "AED7,999",
     },
   ];
 

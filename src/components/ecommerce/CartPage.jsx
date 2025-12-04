@@ -196,7 +196,7 @@ const CartPage = () => {
                 <p className="text-gray-600">Review your items and proceed to checkout</p>
               </div>
               <Chip
-                label={`Total: ₹${total.toLocaleString('en-IN')}`}
+                label={`Total: AED${total.toLocaleString('en-IN')}`}
                 sx={{ backgroundColor: '#5C039B', color: 'white', fontWeight: 600 }}
               />
             </div>
@@ -300,13 +300,13 @@ const CartPage = () => {
                         <div className="md:col-span-3 text-right">
                           <div className="space-y-2">
                             <p className="text-2xl font-bold text-gray-900">
-                              ₹{(item.price_per_unit * item.quantity).toLocaleString('en-IN')}
+                              AED{(item.price_per_unit * item.quantity).toLocaleString('en-IN')}
                             </p>
                             <p className="text-sm text-gray-500 line-through">
-                              ₹{Math.round(item.price_per_unit * DISCOUNT_MULTIPLIER * item.quantity).toLocaleString('en-IN')}
+                              AED{Math.round(item.price_per_unit * DISCOUNT_MULTIPLIER * item.quantity).toLocaleString('en-IN')}
                             </p>
                             <p className="text-green-600 text-sm font-medium">
-                              Save ₹{Math.round(calculateSavings(item)).toLocaleString('en-IN')}
+                              Save AED{Math.round(calculateSavings(item)).toLocaleString('en-IN')}
                             </p>
                           </div>
                         </div>
@@ -326,20 +326,20 @@ const CartPage = () => {
                 <div className="space-y-3 mb-4">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({cart.items.length} items)</span>
-                    <span>₹{subtotal.toLocaleString('en-IN')}</span>
+                    <span>AED{subtotal.toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between text-green-600">
                     <span>Total Savings</span>
-                    <span>-₹{Math.round(totalSavings).toLocaleString('en-IN')}</span>
+                    <span>-AED{Math.round(totalSavings).toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span>₹{SHIPPING_COST.toLocaleString('en-IN')}</span>
+                    <span>AED{SHIPPING_COST.toLocaleString('en-IN')}</span>
                   </div>
                   <Divider />
                   <div className="flex justify-between text-lg font-bold text-gray-900">
                     <span>Total Amount</span>
-                    <span>₹{total.toLocaleString('en-IN')}</span>
+                    <span>AED{total.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
 
