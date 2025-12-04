@@ -36,26 +36,22 @@ const Property = () => {
 
   return (
     <div
-      className="min-h-screen py-16 px-4 sm:px-6 lg:px-12 bg-cover bg-center bg-no-repeat relative"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-      }}
+      className="min-h-screen py-16 px-4 sm:px-6 lg:px-12 
+                 bg-cover bg-center bg-no-repeat relative"
+      style={{ backgroundImage: `url(${bgImage})` }}
     >
+      {/* Header Section */}
+      <div className="max-w-5xl mx-auto text-center mb-14">
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+          Hot Property Deals
+        </h2>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-14">
-
-  {/* Heading */}
-  <h2 className=" mx-40 text-5xl heading-dark-1  text-[#ffffff] text-center sm:text-left">
-    Hot Property Deals
-  </h2>
-
-  {/* Paragraph */}
-  <p className="text-[#ffffff] text-center sm:text-left text-[20px] mt-3 sm:mt-0 mx-60 paragraph-light-1">
-    Discover exclusive properties with the <br />
-    best value in Dubai's premium locations
-  </p>
-
-</div>
+        <p className="text-white text-lg sm:text-xl mt-4 leading-relaxed">
+          Discover exclusive properties with the{" "}
+          <br className="hidden sm:block" />
+          best value in Dubai's premium locations
+        </p>
+      </div>
 
       {/* Cards Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -69,7 +65,11 @@ const Property = () => {
 
 function PropertyCard({ deal }) {
   return (
-    <div className="w-full bg-white rounded-[30px] shadow-lg overflow-hidden hover:scale-[1.02] transition-all duration-300">
+    <div
+      className="w-full bg-white rounded-[30px] shadow-lg 
+                    overflow-hidden hover:scale-[1.02] 
+                    transition-all duration-300"
+    >
       {/* Image */}
       <div className="h-[220px] sm:h-[250px] w-full overflow-hidden rounded-t-[30px]">
         <img
@@ -79,7 +79,7 @@ function PropertyCard({ deal }) {
         />
       </div>
 
-      {/* Card Content */}
+      {/* Content */}
       <div className="p-6 bg-gradient-to-b from-[#F7F6F9] to-white">
         <h3 className="text-[20px] sm:text-[22px] font-semibold text-[#1A1A1A]">
           {deal.name}
@@ -89,8 +89,8 @@ function PropertyCard({ deal }) {
           {deal.location}
         </p>
 
-        {/* Features Row */}
-        <div className="flex items-center gap-5 sm:gap-6 mt-5 text-[#4A4A4A] text-[14px]">
+        {/* Features */}
+        <div className="flex flex-wrap items-center gap-4 mt-5 text-[#4A4A4A] text-[14px]">
           <div className="flex items-center gap-2">
             <FaRulerCombined size={15} />
             <span>{deal.area}</span>

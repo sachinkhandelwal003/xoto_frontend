@@ -20,7 +20,7 @@ const dummyProducts = [
       sale_price: 12999,
       mrp: 18999,
       discount: { value: 32, type: 'percentage' },
-      currency: { symbol: '₹' },
+      currency: { symbol: 'AED' },
     },
     color_variants: [
       {
@@ -44,7 +44,7 @@ const dummyProducts = [
       sale_price: 24999,
       mrp: 34999,
       discount: { value: 29, type: 'percentage' },
-      currency: { symbol: '₹' },
+      currency: { symbol: 'AED' },
     },
     color_variants: [
       {
@@ -68,7 +68,7 @@ const dummyProducts = [
       sale_price: 35999,
       mrp: 49999,
       discount: { value: 28, type: 'percentage' },
-      currency: { symbol: '₹' },
+      currency: { symbol: 'AED' },
     },
     color_variants: [
       {
@@ -92,7 +92,7 @@ const dummyProducts = [
       sale_price: 45999,
       mrp: 59999,
       discount: { value: 23, type: 'percentage' },
-      currency: { symbol: '₹' },
+      currency: { symbol: 'AED' },
     },
     color_variants: [
       {
@@ -116,7 +116,7 @@ const dummyProducts = [
       sale_price: 18999,
       mrp: 24999,
       discount: { value: 24, type: 'percentage' },
-      currency: { symbol: '₹' },
+      currency: { symbol: 'AED' },
     },
     color_variants: [
       {
@@ -140,7 +140,7 @@ const dummyProducts = [
       sale_price: 32999,
       mrp: 42999,
       discount: { value: 23, type: 'percentage' },
-      currency: { symbol: '₹' },
+      currency: { symbol: 'AED' },
     },
     color_variants: [
       {

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules';
-import 'swiper/css';
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
 import wave1 from "../../assets/img/wave/wave1.png";
 import wave2 from "../../assets/img/wave/wave2.png";
 import building from "../../assets/icons/Homeicons/building.png";
@@ -14,7 +14,6 @@ import company2 from "../../assets/img/home/companylogo2.png";
 import company3 from "../../assets/img/home/companylogo3.png";
 
 export default function TrustPresenceSection() {
-
   const logos = [
     { icon: company1 },
     { icon: company2 },
@@ -29,11 +28,10 @@ export default function TrustPresenceSection() {
 
   return (
     <section className="relative w-full py-16 md:py-20 lg:py-24 overflow-hidden bg-[var(--color-body)]">
-
       {/* Background Waves */}
- {/* Background Top Wave */}
-<div
-  className="
+      {/* Background Top Wave */}
+      <div
+        className="
   
     absolute 
     top-[-120px]             /* mobile default */
@@ -43,11 +41,11 @@ export default function TrustPresenceSection() {
     xl:top-[-550px]          /* extra-large */
     left-0 w-full z-0 
   "
->
-  <img
-    src={wave2}
-    alt=""
-    className="
+      >
+        <img
+          src={wave2}
+          alt=""
+          className="
       w-[180%]               /* mobile wider */
       sm:w-[160%] 
       md:w-[150%]
@@ -60,13 +58,12 @@ export default function TrustPresenceSection() {
       pointer-events-none 
       select-none
     "
-  />
-</div>
+        />
+      </div>
 
-
-{/* Background Bottom Wave */}
-<div
-  className="
+      {/* Background Bottom Wave */}
+      <div
+        className="
     absolute 
     bottom-[-40px]           /* mobile */
     sm:bottom-[-70px]
@@ -75,11 +72,11 @@ export default function TrustPresenceSection() {
     xl:bottom-[-160px]
     left-0 w-full z-0 overflow-hidden
   "
->
-  <img
-    src={wave1}
-    alt=""
-    className="
+      >
+        <img
+          src={wave1}
+          alt=""
+          className="
       w-[180%]
       sm:w-[165%]
       md:w-[150%]
@@ -92,12 +89,14 @@ export default function TrustPresenceSection() {
       pointer-events-none 
       select-none
     "
-  />
-</div>
+        />
+      </div>
 
       {/* Title */}
-      <h2 className="text-center text-3xl sm:text-4xl md:text-5xl   mb-12 md:mb-16 relative z-20 heading-dark-1"
-       style={{ color: "var(--color-black)" }}>
+      <h2
+        className="text-center text-3xl sm:text-4xl md:text-5xl   mb-12 md:mb-16 relative z-20 heading-dark-1"
+        style={{ color: "var(--color-black)" }}
+      >
         Trust & Presence
       </h2>
 
@@ -137,7 +136,6 @@ export default function TrustPresenceSection() {
             });
           }}
         >
-
           {logos.concat(logos).map((logo, index) => (
             <SwiperSlide
               key={index}
@@ -164,49 +162,67 @@ export default function TrustPresenceSection() {
                 {/* Glow effect */}
                 <div className="absolute inset-0 rounded-full bg-purple-200/30 blur-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
               </div>
-
             </SwiperSlide>
           ))}
-
         </Swiper>
       </div>
 
       {/* Service Cards */}
       <div className="grid grid-cols-1 mt-20 md:grid-cols-3 gap-8 sm:gap-10 lg:gap-12 max-w-6xl mx-auto px-4 pt-20 sm:px-6 relative z-10">
-
         {/* Card 1 */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 transition-all duration-300 hover:-translate-y-3 border border-white/50">
-          <div className="w-16 h-16 mx-auto mb-6">
-            <img src={building} alt="" />
+        <a
+          href="/landscaping"
+          className="block cursor-pointer bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 
+               shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 
+               transition-all duration-300 hover:-translate-y-3 border border-white/50"
+        >
+          <div className="w-16 h-16 mx-auto mb-6 pointer-events-none">
+            <img src={building} alt="Landscaping" className="mx-auto" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center">Landscaping</h3>
-          <p className="text-sm sm:text-base text-gray-600 text-center">
-            Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.
+          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center pointer-events-none">
+            Landscaping
+          </h3>
+          <p className="text-sm sm:text-base text-gray-600 text-center pointer-events-none">
+            Reimagine your home and outdoors with effortless, AI-powered
+            landscaping and upgrade solutions.
           </p>
-        </div>
+        </a>
 
         {/* Card 2 */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 transition-all duration-300 hover:-translate-y-3 border border-white/50">
-          <div className="w-16 h-16 mx-auto mb-6">
-            <img src={sale} alt="" />
+        <a
+          href="/marketplace"
+          className="block cursor-pointer bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 
+               shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 
+               transition-all duration-300 hover:-translate-y-3 border border-white/50"
+        >
+          <div className="w-16 h-16 mx-auto mb-6 pointer-events-none">
+            <img src={sale} alt="Resale" className="mx-auto" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center">Resale</h3>
-          <p className="text-sm sm:text-base text-gray-600 text-center">
+          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center pointer-events-none">
+            Resale
+          </h3>
+          <p className="text-sm sm:text-base text-gray-600 text-center pointer-events-none">
             Reimagine your home with effortless, AI-powered solutions.
           </p>
-        </div>
+        </a>
 
         {/* Card 3 */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 transition-all duration-300 hover:-translate-y-3 border border-white/50">
-          <div className="w-16 h-16 mx-auto mb-6">
-            <img src={rental} alt="" />
+        <a
+          href="/marketplace"
+          className="block cursor-pointer bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 
+               shadow-xl shadow-purple-400 hover:shadow-2xl hover:shadow-purple-500 
+               transition-all duration-300 hover:-translate-y-3 border border-white/50"
+        >
+          <div className="w-16 h-16 mx-auto mb-6 pointer-events-none">
+            <img src={rental} alt="Rental" className="mx-auto" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center">Rental</h3>
-          <p className="text-sm sm:text-base text-gray-600 text-center">
+          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 text-center pointer-events-none">
+            Rental
+          </h3>
+          <p className="text-sm sm:text-base text-gray-600 text-center pointer-events-none">
             Reimagine your space with effortless, AI-powered upgrade solutions.
           </p>
-        </div>
-
+        </a>
       </div>
     </section>
   );

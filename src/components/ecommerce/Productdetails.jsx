@@ -263,13 +263,13 @@ const ProductDetails = () => {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Our Price</p>
                   <p className="text-4xl font-bold text-gray-900">
-                    ₹{price.toLocaleString('en-IN')}
+                    AED{price.toLocaleString('en-IN')}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">MRP</p>
                   <p className="text-xl text-gray-500 line-through">
-                    ₹{originalPrice.toLocaleString('en-IN')}
+                    AED{originalPrice.toLocaleString('en-IN')}
                   </p>
                 </div>
                 <div className="ml-auto">
@@ -542,7 +542,7 @@ const ProductDetails = () => {
                   <p className="text-sm text-white/80">Lowest price online</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-4xl font-bold text-white mb-1">₹{price.toLocaleString('en-IN')}</p>
+                  <p className="text-4xl font-bold text-white mb-1">AED{price.toLocaleString('en-IN')}</p>
                   <p className="text-sm text-white/80">Incl. all taxes</p>
                 </div>
               </div>
@@ -607,8 +607,8 @@ const ProductDetails = () => {
                 <div className="p-5">
                   <h3 className="font-bold text-gray-900 mb-2 line-clamp-1">{product.name}</h3>
                   <div className="flex items-center gap-2 mb-3">
-                    <p className="text-xl font-bold text-gray-900">₹{product.pricing.sale_price.toLocaleString('en-IN')}</p>
-                    <p className="text-sm text-gray-500 line-through">₹{product.pricing.mrp.toLocaleString('en-IN')}</p>
+                    <p className="text-xl font-bold text-gray-900">AED{product.pricing.sale_price.toLocaleString('en-IN')}</p>
+                    <p className="text-sm text-gray-500 line-through">AED{product.pricing.mrp.toLocaleString('en-IN')}</p>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">{product.tags[0].name}</span>

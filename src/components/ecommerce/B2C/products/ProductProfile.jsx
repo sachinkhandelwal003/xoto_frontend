@@ -312,13 +312,13 @@ const ProductProfile = () => {
                 {product.tags?.length > 0 ? product.tags.map((tag) => tag.name).join(', ') : '--'}
               </Descriptions.Item>
               <Descriptions.Item label="Price">
-                {product.pricing?.currency?.symbol || '₹'} {product.pricing?.sale_price?.toFixed(2) || '--'}
+                {product.pricing?.currency?.symbol || 'AED'} {product.pricing?.sale_price?.toFixed(2) || '--'}
               </Descriptions.Item>
               <Descriptions.Item label="Cost Price">
-                {product.pricing?.currency?.symbol || '₹'} {product.pricing?.cost_price?.toFixed(2) || '--'}
+                {product.pricing?.currency?.symbol || 'AED'} {product.pricing?.cost_price?.toFixed(2) || '--'}
               </Descriptions.Item>
               <Descriptions.Item label="MRP">
-                {product.pricing?.currency?.symbol || '₹'} {product.pricing?.mrp?.toFixed(2) || '--'}
+                {product.pricing?.currency?.symbol || 'AED'} {product.pricing?.mrp?.toFixed(2) || '--'}
               </Descriptions.Item>
               <Descriptions.Item label="Discount">
                 {product.pricing?.discount && product.pricing.discount.value > 0

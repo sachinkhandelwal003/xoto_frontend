@@ -7,7 +7,6 @@ export default function HeroSection() {
   return (
     <section className="relative w-full  bg-white flex items-center justify-start px-0 py-16 overflow-hidden">
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-18 items-center">
-
         {/* UPPER WAVE */}
         <div className="absolute top-[0px] left-0 w-full z-0 pointer-events-none select-none">
           <img src={waveint6} alt="" className="w-full object-cover" />
@@ -20,7 +19,6 @@ export default function HeroSection() {
 
         {/* LEFT CONTENT */}
         <div className="space-y-10 relative z-20 text-center pl-0">
-
           <h1 className="text-5xl  card-heading-1 text-left mx-30 text-gray-900">
             Where Dreams <br /> Meet Doorsteps
           </h1>
@@ -42,7 +40,9 @@ export default function HeroSection() {
 
         {/* RIGHT FORM CARD */}
         <div className="bg-white shadow-2xl rounded-2xl p-5 w-full max-w-lg relative z-20 border justify-self-end-safe">
-          <h2 className="text-2xl font-bold text-gray-900">Discover, Decide, Deal</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Discover, Decide, Deal
+          </h2>
           <p className="text-black mb-8">All in One Place.</p>
 
           <form className="space-y-5">

@@ -14,15 +14,12 @@ export default function HeroSectionInterior() {
       }}
     >
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none"></div>
+      {/* <div className="absolute inset-0 bg- pointer-events-none"></div> */}
 
       {/* Content */}
       <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-16 py-28 md:py-40">
         <div className="max-w-4xl text-center mx-auto">
-
-          <h1 className="mb-6 heading-light">
-            Interiors That Reflect You
-          </h1>
+          <h1 className="mb-6 heading-light">Interiors That Reflect You</h1>
 
           <p className="mb-8 paragraph-light text-white">
             Tailored designs, smart solutions, and expert execution for every
