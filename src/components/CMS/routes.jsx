@@ -47,6 +47,8 @@ import MyProfileb2b from "./pages/dashboardPages/managevendor/vendorprofile/Vend
 import MyProfile from "./pages/dashboardPages/Profiles/MyProfile";
 import UpdateFreelancerProfile from "./pages/dashboardPages/managefreelancer/freelancer/UpdateFreelancerProfile";
 import Bookings from "./pages/dashboardPages/consult/Bookings";
+import Packages from "./pages/packages/Packages";
+import MasterCategory from "./pages/estimateMaster/MasterCategory";
 
 const roleSlugMap = {
   0: "superadmin",
@@ -99,8 +101,10 @@ const componentMap = {
   "leads/assigned":<AssignedLeadsList/>,
     "request/quatation":<QuatationLeadsList/>,
   "estimates/my":<Myestimates/>,
+  "estimate/master/categories":<MasterCategory/>,
   deals: <Leads />,
-bookings:<Bookings/>};
+bookings:<Bookings/>,
+packages:<Packages/>};
 
 // Placeholder for missing components
 const Placeholder = ({ title }) => (

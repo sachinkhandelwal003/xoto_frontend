@@ -74,18 +74,24 @@ export const loginUser = createAsyncThunk(
 // LOGOUT
 export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
-  async (_, { getState }) => {
+  async (logoutUrl, { getState }) => {
     try {
       const { token } = getState().auth;
-      if (token) await axios.post("/auth/logout");
+
+      if (token && logoutUrl) {
+        await axios.post(logoutUrl, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
     } catch (error) {
       console.warn("Logout error:", error);
     } finally {
       localStorage.removeItem("token");
-      delete axios.defaults.headers.common['Authorization'];
+      delete axios.defaults.headers.common["Authorization"];
     }
   }
 );
+
 
 // REFRESH TOKEN
 export const refreshToken = createAsyncThunk(
@@ -116,7 +122,7 @@ export const fetchMyPermissions = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      const res = await axios.get("https://kotiboxglobaltech.online/api/permission/my/get", {
+      const res = await axios.get(`${API_BASE}/permission/my/get`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

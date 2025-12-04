@@ -12,11 +12,10 @@ const { Title, Text } = Typography;
 
 const StyledContainer = styled.div`
   display: flex;
-  min-height: 100vh;
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #5C039B 0%, #03A4F4 100%);
-  padding: 2rem;
+  padding: 27px 10px;
   font-family: 'Poppins', sans-serif;
 `;
 
@@ -161,7 +160,7 @@ const AdminLogin = () => {
           {/* Header */}
           <div style={{
             background: 'linear-gradient(135deg, #5C039B, #03A4F4)',
-            padding: '32px 24px',
+            padding: '20px 16px',
             textAlign: 'center',
             color: 'white',
           }}>
@@ -173,7 +172,7 @@ const AdminLogin = () => {
             </Text>
           </div>
 
-          <div style={{ padding: '40px 32px' }}>
+          <div style={{ padding: '32px 25px' }}>
             {/* Lock Alert */}
             {lockUntil && (
               <Alert

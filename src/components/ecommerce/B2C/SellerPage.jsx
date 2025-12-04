@@ -1,1251 +1,572 @@
-import React, { useState, useEffect } from 'react';
-import {
-  FiArrowRight, FiArrowLeft, FiCheck, FiUpload, FiPhone, FiShield,
-} from 'react-icons/fi';
-import { LockOutlined, UserOutlined, UploadOutlined, SafetyCertificateOutlined, BankOutlined, FileTextOutlined, ShopOutlined, PhoneOutlined, EnvironmentOutlined, TagsOutlined, TruckOutlined, MailOutlined, IdcardOutlined, GlobalOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useForm, Controller } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
-import {
-  Form, Input, Button, Select, Card, Upload, Row, Col, Divider, Alert, Checkbox, Typography, Progress, Steps, TreeSelect,
-} from 'antd';
-
-const { Text, Title } = Typography;
-const { Option } = Select;
-const { TextArea } = Input;
-const { Step: AntStep } = Steps;
-
-const registerVendor = async (data) => {
-  const formData = new FormData();
-  // =============== BASIC DETAILS ===============
-  formData.append('email', data.email);
-  formData.append('password', data.password);
-  formData.append('confirmPassword', data.confirmPassword);
-  formData.append('full_name', data.fullName);
-  formData.append('mobile', `${data.countryCode}${data.mobile}`);
-  formData.append('is_mobile_verified', 'true'); // Auto-verified
-  formData.append('meta.agreed_to_terms', data.agreedToTerms ? 'true' : 'false');
-  // =============== STORE DETAILS ===============
-  formData.append('store_details.store_name', data.store_details.store_name || '');
-  formData.append('store_details.store_description', data.store_details.store_description || '');
-  formData.append('store_details.store_type', data.store_details.store_type || '');
-  formData.append('store_details.store_address', data.store_details.store_address || '');
-  formData.append('store_details.pincode', data.store_details.pincode || '');
-  formData.append('store_details.website', data.store_details.website || '');
-  (data.store_details.categories || []).forEach((cat, i) => {
-    formData.append(`store_details.categories[${i}]`, cat);
-  });
-  Object.entries(data.store_details.social_links || {}).forEach(([key, value]) => {
-    formData.append(`store_details.social_links[${key}]`, value || '');
-  });
-  // 🖼️ Single logo file
-  if (data.store_details.logo?.originFileObj) {
-    formData.append('logo', data.store_details.logo.originFileObj);
-  }
-  // =============== REGISTRATION ===============
-  formData.append('registration.pan_number', data.registration.pan_number || '');
-  formData.append('registration.gstin', data.registration.gstin || '');
-  formData.append('registration.business_license_number', data.registration.business_license_number || '');
-  if (data.registration.shop_act_license?.originFileObj) {
-    formData.append('registration.shop_act_license', data.registration.shop_act_license.originFileObj);
-  }
-  // =============== BANK DETAILS ===============
-  formData.append('bank_details.bank_account_number', data.bank_details.bank_account_number || '');
-  formData.append('bank_details.ifsc_code', data.bank_details.ifsc_code || '');
-  formData.append('bank_details.account_holder_name', data.bank_details.account_holder_name || '');
-  formData.append('bank_details.upi_id', data.bank_details.upi_id || '');
-  formData.append('bank_details.preferred_currency', data.bank_details.preferred_currency || 'INR');
-  // =============== CONTACTS ===============
-  Object.entries(data.contacts || {}).forEach(([contactType, contactInfo]) => {
-    Object.entries(contactInfo || {}).forEach(([key, value]) => {
-      formData.append(`contacts.${contactType}[${key}]`, value || '');
-    });
-  });
-  // =============== OPERATIONS ===============
-  (data.operations.delivery_modes || []).forEach((mode, i) => {
-    formData.append(`operations.delivery_modes[${i}]`, mode);
-  });
-  formData.append('operations.return_policy', data.operations.return_policy || '');
-  formData.append('operations.avg_delivery_time_days', data.operations.avg_delivery_time_days || 0);
-  // =============== DOCUMENTS (flat keys) ===============
-  if (data.documents.identity_proof?.originFileObj) {
-    formData.append('identityProof', data.documents.identity_proof.originFileObj);
-  }
-  if (data.documents.address_proof?.originFileObj) {
-    formData.append('addressProof', data.documents.address_proof.originFileObj);
-  }
-  if (data.documents.gst_certificate?.originFileObj) {
-    formData.append('gstCertificate', data.documents.gst_certificate.originFileObj);
-  }
-  (data.documents.additional || []).forEach((fileObj, i) => {
-    if (fileObj?.originFileObj) {
-      formData.append(`additional[${i}]`, fileObj.originFileObj);
-    }
-  });
-  // =============== DEBUG OUTPUT ===============
-  console.group('📦 FormData Preview');
-  for (const [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
-  console.groupEnd();
-  // =============== API REQUEST ===============
-  const response = await axios.post('https://kotiboxglobaltech.online/api/vendor/b2c', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data;
-};
+import React, { useState } from 'react';
 
 const SellerPage = () => {
-  const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
-  const [form] = Form.useForm();
-  const [countryCode, setCountryCode] = useState('+91');
-  const [categories, setCategories] = useState([]);
-  const [fileList, setFileList] = useState({
-    'store_details.logo': [],
-    'registration.shop_act_license': [],
-    'documents.identity_proof': [],
-    'documents.address_proof': [],
-    'documents.gst_certificate': [],
-    'documents.additional': [],
-  });
-  const [backendErrors, setBackendErrors] = useState({});
-
-  const { control, handleSubmit, setValue, getValues, formState: { errors }, setError, reset, watch, trigger } = useForm({
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      fullName: '',
-      mobile: '',
-      countryCode: '+91',
-      mobileVerified: true, // Auto-verified
-      store_details: {
-        store_name: '',
-        store_description: '',
-        store_type: 'Individual / Sole Proprietor',
-        store_address: '',
-        pincode: '',
-        website: '',
-        logo: null,
-        categories: [],
-        social_links: {
-          facebook: '',
-          twitter: '',
-          instagram: '',
-          linkedin: '',
-          youtube: '',
-        },
-      },
-      registration: {
-        pan_number: '',
-        gstin: '',
-        business_license_number: '',
-        shop_act_license: null,
-      },
-      bank_details: {
-        bank_account_number: '',
-        ifsc_code: '',
-        account_holder_name: '',
-        upi_id: '',
-        preferred_currency: 'INR',
-      },
-      contacts: {
-        primary_contact: {
-          name: '',
-          designation: '',
-          email: '',
-          mobile: '',
-          whatsapp: '',
-        },
-        support_contact: {
-          name: '',
-          designation: '',
-          email: '',
-          mobile: '',
-          whatsapp: '',
-        },
-      },
-      operations: {
-        delivery_modes: [],
-        return_policy: '',
-        avg_delivery_time_days: 0,
-      },
-      documents: {
-        identity_proof: null,
-        address_proof: null,
-        gst_certificate: null,
-        additional: [],
-      },
-      agreedToTerms: false,
-    },
-    mode: 'onChange',
-    resolver: async (data) => {
-      const errors = {};
-      if (!data.email) errors.email = { message: 'Email is required' };
-      if (!data.password) errors.password = { message: 'Password is required' };
-      if (data.password && data.password.length < 6) errors.password = { message: 'Password must be at least 6 characters' };
-      if (!data.confirmPassword) errors.confirmPassword = { message: 'Confirm password is required' };
-      if (data.password !== data.confirmPassword) errors.confirmPassword = { message: 'Passwords do not match' };
-      if (!data.fullName) errors.fullName = { message: 'Full name is required' };
-      if (!data.store_details.store_name) errors.store_details = { store_name: { message: 'Store name is required' } };
-      if (!data.store_details.store_type) errors.store_details = { ...errors.store_details, store_type: { message: 'Store type is required' } };
-      if (!data.mobile) errors.mobile = { message: 'Mobile number is required' };
-      if (data.mobile && !/^\d{10}$/.test(data.mobile)) errors.mobile = { message: 'Mobile number must be 10 digits' };
-      if (!data.store_details.store_address) errors.store_details = { ...errors.store_details, store_address: { message: 'Store address is required' } };
-      if (!data.store_details.pincode) errors.store_details = { ...errors.store_details, pincode: { message: 'Pincode is required' } };
-      if (!data.registration.pan_number) errors.registration = { pan_number: { message: 'PAN number is required' } };
-      if (!data.bank_details.account_holder_name) errors.bank_details = { account_holder_name: { message: 'Account holder name is required' } };
-      if (!data.bank_details.bank_account_number) errors.bank_details = { ...errors.bank_details, bank_account_number: { message: 'Bank account number is required' } };
-      if (!data.bank_details.ifsc_code) errors.bank_details = { ...errors.bank_details, ifsc_code: { message: 'IFSC code is required' } };
-      if (!data.documents.identity_proof) errors.documents = { identity_proof: { message: 'Identity proof is required' } };
-      if (!data.documents.address_proof) errors.documents = { ...errors.documents, address_proof: { message: 'Address proof is required' } };
-      if (!data.store_details.categories.length) errors.store_details = { ...errors.store_details, categories: { message: 'At least one category is required' } };
-      if (!data.operations.return_policy) errors.operations = { return_policy: { message: 'Return policy is required' } };
-      if (!data.agreedToTerms) errors.agreedToTerms = { message: 'You must agree to the terms' };
-      return { values: Object.keys(errors).length ? {} : data, errors };
-    },
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    // Basic Information
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    
+    // Store Information
+    storeName: '',
+    storeCategory: '',
+    storeDescription: '',
+    
+    // Business Information
+    businessType: '',
+    businessRegistrationNumber: '',
+    taxId: '',
+    address: '',
+    city: '',
+    country: '',
+    zipCode: ''
   });
 
-  // Watch form values for real-time validation feedback
-  const watchedFields = watch();
-
-  // Fetch categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get('https://kotiboxglobaltech.online/api/categories');
-        setCategories(response.data.hierarchy);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  const countryCodes = [
-    { code: '+91', country: 'India' },
-    { code: '+1', country: 'USA' },
-    { code: '+44', country: 'UK' },
-    { code: '+61', country: 'Australia' },
-    { code: '+971', country: 'UAE' },
+  const categories = [
+    'Electronics',
+    'Fashion',
+    'Home & Garden',
+    'Beauty & Health',
+    'Sports & Outdoors',
+    'Books & Media',
+    'Toys & Games',
+    'Food & Grocery',
+    'Automotive',
+    'Other'
   ];
 
-  const mutation = useMutation({
-    mutationFn: registerVendor,
-    onSuccess: (response) => {
-      console.log('✅ Vendor Registration Successful:', response);
-      toast.success('Registration successful!');
-      reset();
-      navigate('/login');
-    },
-    onError: (error) => {
-      console.error('❌ Vendor Registration Error:', error);
-      if (error.response) {
-        console.group('📡 Backend Error Response');
-        console.log('🔗 Status:', error.response.status);
-        console.log('🧾 Data:', error.response.data);
-        console.groupEnd();
-      } else {
-        console.warn('⚠️ No response from server (network error or CORS issue)');
-      }
-      if (error.response?.data?.errors) {
-        const errorMap = {};
-        error.response.data.errors.forEach(({ field, message }) => {
-          errorMap[field] = message;
-          setError(field, { type: 'server', message });
-        });
-        setBackendErrors(errorMap);
-        toast.error('Please correct the highlighted errors');
-      } else {
-        const msg = error.response?.data?.message || 'Unexpected registration error';
-        setError('root', { message: msg });
-        toast.error(msg);
-      }
-    },
-  });
-
-  const handleFileChange = (field, { fileList }) => {
-    // For single-file fields, take the latest file
-    if (field !== 'documents.additional') {
-      const latestFile = fileList.length > 0 ? fileList[fileList.length - 1] : null;
-      setValue(field, latestFile, { shouldValidate: true });
-      setFileList(prev => ({
-        ...prev,
-        [field]: latestFile ? [latestFile] : [],
-      }));
-    } else {
-      // For multiple files (documents.additional)
-      setValue(field, fileList, { shouldValidate: true });
-      setFileList(prev => ({
-        ...prev,
-        [field]: fileList,
-      }));
-    }
-    trigger(field); // Trigger validation after file change
-  };
-
-  const uploadProps = (field) => ({
-    beforeUpload: () => false, // Prevent automatic upload
-    fileList: fileList[field],
-    multiple: field === 'documents.additional',
-    onChange: (info) => handleFileChange(field, info),
-    accept: 'image/*,application/pdf', // Restrict to images and PDFs
-    maxCount: field === 'documents.additional' ? 5 : 1, // Limit additional documents to 5
-    onRemove: (file) => {
-      const updatedFileList = fileList[field].filter(item => item.uid !== file.uid);
-      setFileList(prev => ({
-        ...prev,
-        [field]: updatedFileList,
-      }));
-      setValue(field, field === 'documents.additional' ? updatedFileList : null, { shouldValidate: true });
-      trigger(field);
-    },
-    onPreview: async (file) => {
-      // Preview file in a new tab
-      if (file.url || file.preview) {
-        window.open(file.url || file.preview);
-      } else if (file.originFileObj) {
-        const url = URL.createObjectURL(file.originFileObj);
-        window.open(url);
-      }
-    },
-  });
-
-  const nextStep = async () => {
-    const fieldsToValidate = {
-      0: ['email', 'password', 'confirmPassword'],
-      1: ['fullName', 'store_details.store_name', 'store_details.store_type'],
-      2: ['mobile', 'store_details.store_address', 'store_details.pincode'],
-      3: ['registration.pan_number'],
-      4: ['bank_details.account_holder_name', 'bank_details.bank_account_number', 'bank_details.ifsc_code'],
-      5: ['documents.identity_proof', 'documents.address_proof'],
-      6: ['store_details.categories'],
-      7: ['operations.return_policy'],
-      8: ['agreedToTerms'],
-    };
-    try {
-      await trigger(fieldsToValidate[activeStep]);
-      if (Object.keys(errors).length === 0) {
-        setActiveStep((prev) => Math.min(prev + 1, steps.length - 1));
-        setBackendErrors({});
-      } else {
-        toast.error('Please fill all required fields correctly');
-      }
-    } catch (error) {
-      toast.error('Validation failed. Please check your inputs.');
-    }
-  };
-
-  const prevStep = () => {
-    setActiveStep((prev) => Math.max(prev - 1, 0));
-    setBackendErrors({});
-  };
-
-  const onSubmit = async (data) => {
-    if (!data.documents.identity_proof || !data.documents.address_proof) {
-      toast.error('Required documents missing');
-      return;
-    }
-    if (!data.agreedToTerms) {
-      setError('agreedToTerms', { type: 'manual', message: 'You must agree to the terms and conditions' });
-      toast.error('You must agree to the terms and conditions');
-      return;
-    }
-    mutation.mutate({ ...data, countryCode, mobileVerified: true });
-  };
-
-  const steps = [
-    { label: 'Account Setup', icon: <UserOutlined />, description: 'Create your vendor account' },
-    { label: 'Business Info', icon: <ShopOutlined />, description: 'Store details & branding' },
-    { label: 'Contact & Address', icon: <PhoneOutlined />, description: 'Location & contacts' },
-    { label: 'Tax & Registration', icon: <FileTextOutlined />, description: 'Legal documents' },
-    { label: 'Bank Details', icon: <BankOutlined />, description: 'Payment information' },
-    { label: 'Documents', icon: <UploadOutlined />, description: 'Upload required files' },
-    { label: 'Categories', icon: <TagsOutlined />, description: 'Product catalog setup' },
-    { label: 'Operations', icon: <TruckOutlined />, description: 'Delivery & policies' },
-    { label: 'Agreement', icon: <SafetyCertificateOutlined />, description: 'Terms & verification' },
+  const businessTypes = [
+    'Sole Proprietorship',
+    'Partnership',
+    'LLC',
+    'Corporation',
+    'Non-profit'
   ];
 
-  const renderSuccessIndicator = (field) => {
-    return !errors[field] && watchedFields[field] ? <CheckCircleOutlined className="text-green-600 ml-2" /> : null;
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
   };
+
+  const handleNext = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Form submitted:', formData);
+    alert('Registration submitted successfully!');
+    // Add your API call here
+  };
+
+  const StepCard = () => (
+    <div className="bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 rounded-2xl p-8 md:p-10 h-full text-white shadow-2xl">
+      <div className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold mb-3">Become a Vendor</h1>
+        <p className="text-purple-200 opacity-90">
+          Join our marketplace in just 3 simple steps
+        </p>
+      </div>
+
+      {/* Steps with icons */}
+      <div className="space-y-8">
+        {/* Step 1 */}
+        <div className={`flex items-start space-x-4 p-4 rounded-xl transition-all duration-300 ${currentStep >= 1 ? 'bg-white/10 backdrop-blur-sm' : 'opacity-70'}`}>
+          <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= 1 ? 'bg-white text-purple-700' : 'bg-purple-700/50'}`}>
+            {currentStep >= 1 ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            ) : (
+              <span className="text-lg font-bold">1</span>
+            )}
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-1">Basic Information</h3>
+            <p className="text-purple-200 text-sm opacity-90">
+              Provide your personal details and contact information
+            </p>
+          </div>
+        </div>
+
+        {/* Step 2 */}
+        <div className={`flex items-start space-x-4 p-4 rounded-xl transition-all duration-300 ${currentStep >= 2 ? 'bg-white/10 backdrop-blur-sm' : 'opacity-70'}`}>
+          <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= 2 ? 'bg-white text-purple-700' : 'bg-purple-700/50'}`}>
+            {currentStep >= 2 ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            ) : (
+              <span className="text-lg font-bold">2</span>
+            )}
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-1">Store Setup</h3>
+            <p className="text-purple-200 text-sm opacity-90">
+              Tell us about your store name and what you'll be selling
+            </p>
+          </div>
+        </div>
+
+        {/* Step 3 */}
+        <div className={`flex items-start space-x-4 p-4 rounded-xl transition-all duration-300 ${currentStep >= 3 ? 'bg-white/10 backdrop-blur-sm' : 'opacity-70'}`}>
+          <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= 3 ? 'bg-white text-purple-700' : 'bg-purple-700/50'}`}>
+            {currentStep >= 3 ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            ) : (
+              <span className="text-lg font-bold">3</span>
+            )}
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-1">Business Details</h3>
+            <p className="text-purple-200 text-sm opacity-90">
+              Enter your business registration and tax information
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mt-12">
+        <div className="flex justify-between text-sm mb-2">
+          <span>Progress</span>
+          <span>{Math.round((currentStep / 3) * 100)}%</span>
+        </div>
+        <div className="h-2 bg-purple-700/50 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-white rounded-full transition-all duration-500"
+            style={{ width: `${(currentStep / 3) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Benefits */}
+      <div className="mt-12 pt-8 border-t border-purple-700/50">
+        <h4 className="text-lg font-semibold mb-4">Why Join Us?</h4>
+        <ul className="space-y-3">
+          <li className="flex items-center text-sm">
+            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+            </svg>
+            Zero commission for first 3 months
+          </li>
+          <li className="flex items-center text-sm">
+            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+            </svg>
+            Marketing support & promotion
+          </li>
+          <li className="flex items-center text-sm">
+            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+            </svg>
+            Real-time analytics dashboard
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+
+  const Step1 = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-purple-800 mb-2">Personal Information</h2>
+      <p className="text-gray-600 mb-6">Tell us about yourself</p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            First Name *
+          </label>
+          <input
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            required
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Last Name *
+          </label>
+          <input
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            required
+          />
+        </div>
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Email Address *
+        </label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+          required
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Phone Number *
+        </label>
+        <input
+          type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+          required
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Password *
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            required
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Confirm Password *
+          </label>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            required
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const Step2 = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-purple-800 mb-2">Store Information</h2>
+      <p className="text-gray-600 mb-6">Create your store identity</p>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Store Name *
+        </label>
+        <input
+          type="text"
+          name="storeName"
+          value={formData.storeName}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+          required
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Store Category *
+        </label>
+        <select
+          name="storeCategory"
+          value={formData.storeCategory}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition appearance-none bg-white"
+          required
+        >
+          <option value="">Select a category</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Store Description
+        </label>
+        <textarea
+          name="storeDescription"
+          value={formData.storeDescription}
+          onChange={handleInputChange}
+          rows="4"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+          placeholder="Tell customers about your store, products, and brand story..."
+        ></textarea>
+        <p className="text-xs text-gray-500 mt-1">Maximum 500 characters</p>
+      </div>
+    </div>
+  );
+
+  const Step3 = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-purple-800 mb-2">Business Details</h2>
+      <p className="text-gray-600 mb-6">Legal and tax information</p>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Business Type *
+        </label>
+        <select
+          name="businessType"
+          value={formData.businessType}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition appearance-none bg-white"
+          required
+        >
+          <option value="">Select business type</option>
+          {businessTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Business Registration Number
+          </label>
+          <input
+            type="text"
+            name="businessRegistrationNumber"
+            value={formData.businessRegistrationNumber}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            placeholder="e.g., 123456789"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tax ID / VAT Number
+          </label>
+          <input
+            type="text"
+            name="taxId"
+            value={formData.taxId}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            placeholder="e.g., GB123456789"
+          />
+        </div>
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Business Address *
+        </label>
+        <input
+          type="text"
+          name="address"
+          value={formData.address}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition mb-4"
+          required
+          placeholder="Street address, P.O. box, company name"
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            City *
+          </label>
+          <input
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            required
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Country *
+          </label>
+          <select
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition appearance-none bg-white"
+            required
+          >
+            <option value="">Select country</option>
+            <option value="US">United States</option>
+            <option value="UK">United Kingdom</option>
+            <option value="CA">Canada</option>
+            <option value="AU">Australia</option>
+            <option value="IN">India</option>
+          </select>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            ZIP Code *
+          </label>
+          <input
+            type="text"
+            name="zipCode"
+            value={formData.zipCode}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+            required
+          />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-      
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* Left Sidebar Stepper - Fixed Position */}
-          <div className="lg:col-span-3">
-              <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <div className="flex items-center justify-center mb-4">
-           
-            <Title level={1} className="text-4xl font-bold text-gray-900 mb-0">
-              Vendor Registration
-            </Title>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full mb-4">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
           </div>
-          
-        </motion.div>
-            <Card className="sticky top-8 shadow-lg border-0 rounded-2xl h-fit" bodyStyle={{ padding: '24px' }}>
-              <div className="text-center mb-6">
-                <Progress
-                  type="circle"
-                  percent={Math.round((activeStep / (steps.length - 1)) * 100)}
-                  width={80}
-                  strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
-                  format={percent => `${percent}%`}
-                />
-                <Text className="block mt-2 text-gray-600 font-medium">Progress</Text>
-              </div>
-              
-              <div className="max-h-[500px] overflow-y-auto pr-2">
-                <Steps direction="vertical" current={activeStep} size="small">
-                  {steps.map((step, index) => (
-                    <AntStep
-                      key={step.label}
-                      title={
-                        <Text className={index <= activeStep ? 'text-blue-600 font-medium' : 'text-gray-500'}>
-                          {step.label}
-                        </Text>
-                      }
-                      description={
-                        <Text className="text-xs text-gray-400">
-                          {step.description}
-                        </Text>
-                      }
-                      icon={
-                        <div className={`flex items-center justify-center w-6 h-6 rounded-full ${
-                          index <= activeStep ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
-                        }`}>
-                          {step.icon}
-                        </div>
-                      }
-                    />
-                  ))}
-                </Steps>
-              </div>
-              
-              {/* Progress Info */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <Text className="text-sm text-blue-700 block text-center">
-                  Step {activeStep + 1} of {steps.length}
-                </Text>
-                <Text className="text-xs text-blue-600 block text-center mt-1">
-                  {steps[activeStep].description}
-                </Text>
-              </div>
-            </Card>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Vendor Registration
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Complete your registration in 3 simple steps to start selling on our platform
+          </p>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Card - Steps */}
+          <div className="lg:col-span-1">
+            <StepCard />
           </div>
 
-          {/* Main Content Area */}
-          <div className="lg:col-span-9">
-            <Form form={form} layout="vertical" onFinish={handleSubmit(onSubmit)} className="h-full">
-              <Card className="shadow-2xl border-0 rounded-2xl h-full" bodyStyle={{ padding: '32px' }}>
-                <motion.div 
-                  key={activeStep} 
-                  initial={{ opacity: 0, x: 20 }} 
-                  animate={{ opacity: 1, x: 0 }} 
-                  transition={{ duration: 0.3 }}
-                >
-                  {/* Step 1: Account Setup */}
-                  {activeStep === 0 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <UserOutlined className="mr-3 text-blue-600" /> Account Setup
-                        </Title>
-                        <Text className="text-gray-600">Create your secure vendor account</Text>
-                      </div>
-                      <Row gutter={16}>
-                        <Col span={24}>
-                          <Form.Item
-                            label={<span>Email Address <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.email || backendErrors.email ? 'error' : ''}
-                            help={errors.email?.message || backendErrors.email}
-                          >
-                            <Controller
-                              name="email"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  prefix={<MailOutlined className="text-gray-400" />}
-                                  placeholder="Enter your business email"
-                                  suffix={renderSuccessIndicator('email')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>Password <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.password ? 'error' : ''}
-                            help={errors.password?.message}
-                          >
-                            <Controller
-                              name="password"
-                              control={control}
-                              render={({ field }) => (
-                                <Input.Password
-                                  {...field}
-                                  size="large"
-                                  prefix={<LockOutlined className="text-gray-400" />}
-                                  placeholder="Create a strong password"
-                                  suffix={renderSuccessIndicator('password')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>Confirm Password <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.confirmPassword ? 'error' : ''}
-                            help={errors.confirmPassword?.message}
-                          >
-                            <Controller
-                              name="confirmPassword"
-                              control={control}
-                              render={({ field }) => (
-                                <Input.Password
-                                  {...field}
-                                  size="large"
-                                  prefix={<LockOutlined className="text-gray-400" />}
-                                  placeholder="Confirm your password"
-                                  suffix={renderSuccessIndicator('confirmPassword')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                    </div>
-                  )}
+          {/* Right Card - Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 h-full">
+              <div className="mb-2 flex items-center justify-between">
+                <div>
+                  <span className="inline-block px-4 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-2">
+                    Step {currentStep} of 3
+                  </span>
+                </div>
+               
+              </div>
 
-                  {/* Step 2: Business Information */}
-                  {activeStep === 1 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <ShopOutlined className="mr-3 text-green-600" /> Business Information
-                        </Title>
-                        <Text className="text-gray-600">Tell us about your business</Text>
-                      </div>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>Full Name <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.fullName ? 'error' : ''}
-                            help={errors.fullName?.message}
-                          >
-                            <Controller
-                              name="fullName"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  prefix={<UserOutlined className="text-gray-400" />}
-                                  placeholder="Your full name"
-                                  suffix={renderSuccessIndicator('fullName')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>Store Name <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.store_details?.store_name ? 'error' : ''}
-                            help={errors.store_details?.store_name?.message}
-                          >
-                            <Controller
-                              name="store_details.store_name"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  prefix={<ShopOutlined className="text-gray-400" />}
-                                  placeholder="Your store name"
-                                  suffix={renderSuccessIndicator('store_details.store_name')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                      <Form.Item label="Store Description">
-                        <Controller
-                          name="store_details.store_description"
-                          control={control}
-                          render={({ field }) => (
-                            <TextArea
-                              {...field}
-                              rows={4}
-                              placeholder="Describe your business and products..."
-                              className="rounded-lg"
-                            />
-                          )}
-                        />
-                      </Form.Item>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>Store Type <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.store_details?.store_type ? 'error' : ''}
-                            help={errors.store_details?.store_type?.message}
-                          >
-                            <Controller
-                              name="store_details.store_type"
-                              control={control}
-                              render={({ field }) => (
-                                <Select
-                                  {...field}
-                                  size="large"
-                                  placeholder="Select store type"
-                                  className="rounded-lg"
-                                >
-                                  <Option value="Individual / Sole Proprietor">Individual / Sole Proprietor</Option>
-                                  <Option value="Private Limited">Private Limited</Option>
-                                  <Option value="Partnership">Partnership</Option>
-                                  <Option value="LLP">LLP</Option>
-                                </Select>
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                        {/* <Col span={12}>
-                          <Form.Item label="Website">
-                            <Controller
-                              name="store_details.website"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  prefix={<GlobalOutlined className="text-gray-400" />}
-                                  placeholder="https://yourstore.com"
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col> */}
-                      </Row>
-                      {/* <Form.Item label="Store Logo">
-                        <Controller
-                          name="store_details.logo"
-                          control={control}
-                          render={({ field }) => (
-                            <Upload {...uploadProps('store_details.logo')}>
-                              <Button icon={<UploadOutlined />} size="large" className="rounded-lg">
-                                Upload Logo
-                              </Button>
-                            </Upload>
-                          )}
-                        />
-                        {fileList['store_details.logo'].length > 0 && (
-                          <Alert message={fileList['store_details.logo'][0].name} type="success" showIcon className="mt-2" />
-                        )}
-                      </Form.Item> */}
-                    </div>
-                  )}
-
-                  {/* Step 3: Contact & Address */}
-                  {activeStep === 2 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <PhoneOutlined className="mr-3 text-orange-600" /> Contact & Address
-                        </Title>
-                        <Text className="text-gray-600">Your business location and contact information</Text>
-                      </div>
-                      
-                   
-                      
-                      <Row gutter={16}>
-                        <Col span={8}>
-                          <Form.Item label="Country Code">
-                            <Select
-                              size="large"
-                              value={countryCode}
-                              onChange={(value) => { setCountryCode(value); setValue('countryCode', value); }}
-                              className="rounded-lg"
-                            >
-                              {countryCodes.map(({ code, country }) => (
-                                <Option key={code} value={code}>
-                                  {country} ({code})
-                                </Option>
-                              ))}
-                            </Select>
-                          </Form.Item>
-                        </Col>
-                        <Col span={16}>
-                          <Form.Item
-                            label={<span>Mobile Number <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.mobile || backendErrors.mobile ? 'error' : ''}
-                            help={errors.mobile?.message || backendErrors.mobile}
-                          >
-                            <Controller
-                              name="mobile"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  prefix={<PhoneOutlined className="text-gray-400" />}
-                                  placeholder="10-digit mobile number"
-                                  suffix={renderSuccessIndicator('mobile')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-
-                      <Form.Item
-                        label={<span>Store Address <span className="text-red-500">*</span></span>}
-                        validateStatus={errors.store_details?.store_address ? 'error' : ''}
-                        help={errors.store_details?.store_address?.message}
-                      >
-                        <Controller
-                          name="store_details.store_address"
-                          control={control}
-                          render={({ field }) => (
-                            <TextArea
-                              {...field}
-                              rows={3}
-                              placeholder="Complete business address"
-                              className="rounded-lg"
-                            />
-                          )}
-                        />
-                      </Form.Item>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>Pincode <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.store_details?.pincode ? 'error' : ''}
-                            help={errors.store_details?.pincode?.message}
-                          >
-                            <Controller
-                              name="store_details.pincode"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  prefix={<EnvironmentOutlined className="text-gray-400" />}
-                                  placeholder="Enter pincode"
-                                  suffix={renderSuccessIndicator('store_details.pincode')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                    
-                    </div>
-                  )}
-
-                  {/* Step 4: Tax & Registration */}
-                  {activeStep === 3 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <FileTextOutlined className="mr-3 text-purple-600" /> Tax & Registration
-                        </Title>
-                        <Text className="text-gray-600">Legal and tax registration details</Text>
-                      </div>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>PAN Number <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.registration?.pan_number ? 'error' : ''}
-                            help={errors.registration?.pan_number?.message}
-                          >
-                            <Controller
-                              name="registration.pan_number"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  prefix={<IdcardOutlined className="text-gray-400" />}
-                                  placeholder="Enter PAN number"
-                                  suffix={renderSuccessIndicator('registration.pan_number')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                          <Form.Item label="GSTIN">
-                            <Controller
-                              name="registration.gstin"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  placeholder="Enter GSTIN"
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                      <Form.Item label="Business License Number">
-                        <Controller
-                          name="registration.business_license_number"
-                          control={control}
-                          render={({ field }) => (
-                            <Input
-                              {...field}
-                              size="large"
-                              placeholder="Business license number"
-                              className="rounded-lg"
-                            />
-                          )}
-                        />
-                      </Form.Item>
-                      {/* <Form.Item label="Shop Act License">
-                        <Controller
-                          name="registration.shop_act_license"
-                          control={control}
-                          render={({ field }) => (
-                            <Upload {...uploadProps('registration.shop_act_license')}>
-                              <Button icon={<UploadOutlined />} size="large" className="rounded-lg">
-                                Upload License
-                              </Button>
-                            </Upload>
-                          )}
-                        />
-                        {fileList['registration.shop_act_license'].length > 0 && (
-                          <Alert message={fileList['registration.shop_act_license'][0].name} type="success" showIcon className="mt-2" />
-                        )}
-                      </Form.Item> */}
-                    </div>
-                  )}
-
-                  {/* Step 5: Bank Details */}
-                  {activeStep === 4 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <BankOutlined className="mr-3 text-green-600" /> Bank Details
-                        </Title>
-                        <Text className="text-gray-600">Payment and bank account information</Text>
-                      </div>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>Account Holder Name <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.bank_details?.account_holder_name ? 'error' : ''}
-                            help={errors.bank_details?.account_holder_name?.message}
-                          >
-                            <Controller
-                              name="bank_details.account_holder_name"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  placeholder="Name as in bank account"
-                                  suffix={renderSuccessIndicator('bank_details.account_holder_name')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>Bank Account Number <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.bank_details?.bank_account_number ? 'error' : ''}
-                            help={errors.bank_details?.bank_account_number?.message}
-                          >
-                            <Controller
-                              name="bank_details.bank_account_number"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  placeholder="Account number"
-                                  suffix={renderSuccessIndicator('bank_details.bank_account_number')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Form.Item
-                            label={<span>IFSC Code <span className="text-red-500">*</span></span>}
-                            validateStatus={errors.bank_details?.ifsc_code ? 'error' : ''}
-                            help={errors.bank_details?.ifsc_code?.message}
-                          >
-                            <Controller
-                              name="bank_details.ifsc_code"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  placeholder="IFSC code"
-                                  suffix={renderSuccessIndicator('bank_details.ifsc_code')}
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col>
-                        {/* <Col span={12}>
-                          <Form.Item label="UPI ID">
-                            <Controller
-                              name="bank_details.upi_id"
-                              control={control}
-                              render={({ field }) => (
-                                <Input
-                                  {...field}
-                                  size="large"
-                                  placeholder="UPI ID for payments"
-                                  className="rounded-lg"
-                                />
-                              )}
-                            />
-                          </Form.Item>
-                        </Col> */}
-                      </Row>
-                      <Form.Item label="Preferred Currency">
-                        <Controller
-                          name="bank_details.preferred_currency"
-                          control={control}
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              size="large"
-                              defaultValue="INR"
-                              className="rounded-lg"
-                            >
-                              <Option value="INR">Indian Rupee (INR)</Option>
-                              <Option value="USD">US Dollar (USD)</Option>
-                              <Option value="EUR">Euro (EUR)</Option>
-                            </Select>
-                          )}
-                        />
-                      </Form.Item>
-                    </div>
-                  )}
-
-                  {/* Step 6: Documents Upload */}
-                  {activeStep === 5 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <UploadOutlined className="mr-3 text-blue-600" /> Documents Upload
-                        </Title>
-                        <Text className="text-gray-600">Upload required documents for verification</Text>
-                      </div>
-                      <Row gutter={16}>
-                        <Col span={12}>
-                          <Card size="small" title={<span>Identity Proof <span className="text-red-500">*</span></span>} className="rounded-lg h-full">
-                            <Controller
-                              name="documents.identity_proof"
-                              control={control}
-                              render={({ field }) => (
-                                <Upload {...uploadProps('documents.identity_proof')}>
-                                  <Button icon={<UploadOutlined />} size="large" className="rounded-lg w-full">
-                                    Upload Identity Proof
-                                  </Button>
-                                </Upload>
-                              )}
-                            />
-                            {fileList['documents.identity_proof'].length > 0 && (
-                              <Alert message={fileList['documents.identity_proof'][0].name} type="success" showIcon className="mt-2" />
-                            )}
-                            {errors.documents?.identity_proof && (
-                              <Text type="danger">{errors.documents.identity_proof.message}</Text>
-                            )}
-                          </Card>
-                        </Col>
-                        <Col span={12}>
-                          <Card size="small" title={<span>Address Proof <span className="text-red-500">*</span></span>} className="rounded-lg h-full">
-                            <Controller
-                              name="documents.address_proof"
-                              control={control}
-                              render={({ field }) => (
-                                <Upload {...uploadProps('documents.address_proof')}>
-                                  <Button icon={<UploadOutlined />} size="large" className="rounded-lg w-full">
-                                    Upload Address Proof
-                                  </Button>
-                                </Upload>
-                              )}
-                            />
-                            {fileList['documents.address_proof'].length > 0 && (
-                              <Alert message={fileList['documents.address_proof'][0].name} type="success" showIcon className="mt-2" />
-                            )}
-                            {errors.documents?.address_proof && (
-                              <Text type="danger">{errors.documents.address_proof.message}</Text>
-                            )}
-                          </Card>
-                        </Col>
-                      </Row>
-                      <Row gutter={16} className="mt-4">
-                        <Col span={12}>
-                          <Card size="small" title="GST Certificate" className="rounded-lg h-full">
-                            <Controller
-                              name="documents.gst_certificate"
-                              control={control}
-                              render={({ field }) => (
-                                <Upload {...uploadProps('documents.gst_certificate')}>
-                                  <Button icon={<UploadOutlined />} size="large" className="rounded-lg w-full">
-                                    Upload GST Certificate
-                                  </Button>
-                                </Upload>
-                              )}
-                            />
-                            {fileList['documents.gst_certificate'].length > 0 && (
-                              <Alert message={fileList['documents.gst_certificate'][0].name} type="success" showIcon className="mt-2" />
-                            )}
-                          </Card>
-                        </Col>
-                        <Col span={12}>
-                          <Card size="small" title="Additional Documents" className="rounded-lg h-full">
-                            <Controller
-                              name="documents.additional"
-                              control={control}
-                              render={({ field }) => (
-                                <Upload {...uploadProps('documents.additional')}>
-                                  <Button icon={<UploadOutlined />} size="large" className="rounded-lg w-full">
-                                    Upload Additional Files
-                                  </Button>
-                                </Upload>
-                              )}
-                            />
-                            {fileList['documents.additional'].length > 0 && (
-                              <div className="mt-2">
-                                {fileList['documents.additional'].map((file, idx) => (
-                                  <Alert key={idx} message={file.name} type="info" showIcon className="mb-1" />
-                                ))}
-                              </div>
-                            )}
-                          </Card>
-                        </Col>
-                      </Row>
-                    </div>
-                  )}
-
-                  {/* Step 7: Product Categories */}
-                  {activeStep === 6 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <TagsOutlined className="mr-3 text-orange-600" /> Product Categories
-                        </Title>
-                        <Text className="text-gray-600">Select your product categories</Text>
-                      </div>
-                      <Form.Item
-                        label={<span>Categories <span className="text-red-500">*</span></span>}
-                        validateStatus={errors.store_details?.categories ? 'error' : ''}
-                        help={errors.store_details?.categories?.message}
-                      >
-                        <Controller
-                          name="store_details.categories"
-                          control={control}
-                          render={({ field }) => (
-                            <TreeSelect
-                              {...field}
-                              size="large"
-                              treeData={categories.map(category => ({
-                                title: category.name,
-                                value: category._id,
-                               
-                              }))}
-                              multiple
-                              treeCheckable
-                              placeholder="Select categories"
-                              className="rounded-lg"
-                            />
-                          )}
-                        />
-                      </Form.Item>
-                    </div>
-                  )}
-
-                  {/* Step 8: Operations */}
-                  {activeStep === 7 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <TruckOutlined className="mr-3 text-cyan-600" /> Operations
-                        </Title>
-                        <Text className="text-gray-600">Configure your delivery and return policies</Text>
-                      </div>
-                      <Form.Item
-                        label={<span>Return Policy <span className="text-red-500">*</span></span>}
-                        validateStatus={errors.operations?.return_policy ? 'error' : ''}
-                        help={errors.operations?.return_policy?.message}
-                      >
-                        <Controller
-                          name="operations.return_policy"
-                          control={control}
-                          render={({ field }) => (
-                            <TextArea
-                              {...field}
-                              rows={4}
-                              placeholder="Describe your return policy, including time frames, conditions, and process..."
-                              className="rounded-lg"
-                            />
-                          )}
-                        />
-                      </Form.Item>
-                      {/* <Form.Item label="Average Delivery Time (days)">
-                        <Controller
-                          name="operations.avg_delivery_time_days"
-                          control={control}
-                          render={({ field }) => (
-                            <Input
-                              {...field}
-                              type="number"
-                              min="0"
-                              placeholder="Estimated delivery time in days"
-                              className="rounded-lg"
-                            />
-                          )}
-                        />
-                      </Form.Item> */}
-                    </div>
-                  )}
-
-                  {/* Step 9: Agreement & Verification */}
-                  {activeStep === 8 && (
-                    <div className="space-y-6">
-                      <div className="text-center mb-8">
-                        <Title level={2} className="text-2xl font-bold text-gray-900">
-                          <SafetyCertificateOutlined className="mr-3 text-green-600" /> Agreement & Verification
-                        </Title>
-                        <Text className="text-gray-600">Review and submit your application</Text>
-                      </div>
-                      {/* <Alert
-                        message="Final Verification"
-                        description="Please review all information before submission. You will receive confirmation within 24-48 hours."
-                        type="info"
-                        showIcon
-                        className="mb-6"
-                      /> */}
-                      <Card className="rounded-lg">
-                        <div className="mb-6">
-                          <Title level={4}>Terms & Conditions</Title>
-                          <div className="bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto">
-                            <Text className="text-gray-700">
-                              By proceeding, you agree to our Vendor Agreement, Terms of Service, and Privacy Policy.
-                              You confirm that all information provided is accurate and complete. You understand that:
-                              <br /><br />
-                              • You are responsible for the quality and authenticity of your products
-                              <br />
-                              • You will maintain adequate inventory levels
-                              <br />
-                              • You will process orders within the specified timeframes
-                              <br />
-                              • You comply with all applicable laws and regulations
-                              <br />
-                              • Xoto LuxeInteriors may verify provided information
-                              <br />
-                              • Approval is subject to verification and compliance checks
-                            </Text>
-                          </div>
-                        </div>
-                        <Form.Item
-                          validateStatus={errors.agreedToTerms ? 'error' : ''}
-                          help={errors.agreedToTerms?.message}
-                        >
-                          <Controller
-                            name="agreedToTerms"
-                            control={control}
-                            render={({ field }) => (
-                              <Checkbox
-                                {...field}
-                                checked={field.value}
-                                className="text-gray-700"
-                              >
-                                I have read and agree to the Terms and Conditions, Privacy Policy, and Vendor Agreement <span className="text-red-500">*</span>
-                              </Checkbox>
-                            )}
-                          />
-                        </Form.Item>
-                        <Divider />
-                        <div className="text-center">
-                          <Button
-                            type="primary"
-                            size="large"
-                            htmlType="submit"
-                            loading={mutation.isLoading}
-                            className="rounded-lg h-12 px-8 bg-green-600 hover:bg-green-700 border-none"
-                            icon={<CheckCircleOutlined />}
-                          >
-                            {mutation.isLoading ? 'Submitting...' : 'Submit for Verification'}
-                          </Button>
-                        </div>
-                      </Card>
-                    </div>
-                  )}
-                </motion.div>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-8">
+                  {currentStep === 1 && <Step1 />}
+                  {currentStep === 2 && <Step2 />}
+                  {currentStep === 3 && <Step3 />}
+                </div>
                 
                 {/* Navigation Buttons */}
-                <Divider />
-                <div className="flex justify-between mt-8">
-                  <Button
-                    size="large"
-                    onClick={prevStep}
-                    disabled={activeStep === 0}
-                    icon={<FiArrowLeft />}
-                    className="rounded-lg px-6 h-10"
+                <div className="flex justify-between pt-8 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className={`flex items-center px-6 py-3 rounded-lg font-medium transition-all ${currentStep === 1 
+                      ? 'opacity-0 cursor-default' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'}`}
+                    disabled={currentStep === 1}
                   >
-                    Previous
-                  </Button>
-                  {activeStep < steps.length - 1 && (
-                    <Button
-                      type="primary"
-                      size="large"
-                      onClick={nextStep}
-                      icon={<FiArrowRight />}
-                      className="rounded-lg px-6 h-10 bg-blue-600 hover:bg-blue-700 border-none"
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back
+                  </button>
+                  
+                  {currentStep < 3 ? (
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all hover:shadow-lg"
                     >
-                      Next
-                    </Button>
+                      Continue
+                      <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all hover:shadow-lg hover:scale-105"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      Complete Registration
+                    </button>
                   )}
                 </div>
-              </Card>
-            </Form>
+              </form>
+
+              {/* Footer */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
+                  <div className="mb-4 md:mb-0">
+                    <p className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      Your information is secure and encrypted
+                    </p>
+                  </div>
+                  <div className="text-center md:text-right">
+                    <p>
+                      Already have an account?{' '}
+                      <a href="/login" className="text-purple-600 hover:text-purple-800 font-medium">
+                        Sign in
+                      </a>
+                    </p>
+                    <p className="text-xs mt-1 text-gray-500">
+                      By registering, you agree to our Terms & Privacy Policy
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

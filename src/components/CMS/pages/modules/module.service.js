@@ -3,8 +3,8 @@ import { apiService } from '../../../../manageApi/utils/custom.apiservice';
 import { showToast } from '../../../../manageApi/utils/toast';
 
 const API = {
-  // MODULES
-  getAll: () => apiService.get('/module'),
+  // MODULES with pagination support
+  getAll: (params = {}) => apiService.get('/module',  params ),
   getOne: (id) => apiService.get(`/module/${id}`),
   create: (data) => apiService.post('/module', data),
   update: (id, data) => apiService.put(`/module/${id}`, data),

@@ -85,7 +85,7 @@ const login = async (endpoint, credentials) => {
     const fullEndpoint = `${API_BASE}${logoutEndpoint}`;
     
     try {
-      await dispatch(logoutUser(fullEndpoint)).unwrap();
+      await dispatch(logoutUser(fullEndpoint));
     } catch (err) {
       // Even if backend fails, clear local state
       dispatch(logoutUser());
