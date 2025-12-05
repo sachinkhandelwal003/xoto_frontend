@@ -47,6 +47,7 @@ const BuiltForEveryone = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [cardsToShow, setCardsToShow] = useState(2);
+  const [activeBtn, setActiveBtn] = useState("");
 
   // Detect screen width
   useEffect(() => {
@@ -56,12 +57,11 @@ const BuiltForEveryone = () => {
       setCardsToShow(mobile ? 1 : 2);
     };
     handleResize();
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Manual next / previous
+  // Next / Prev
   const nextSlide = () => {
     const maxIndex = cards.length - cardsToShow;
     setCurrentIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
@@ -72,108 +72,76 @@ const BuiltForEveryone = () => {
     setCurrentIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
   };
 
-  // ⭐ Auto-slide every 3 seconds + loop
+  // Auto-slide
   useEffect(() => {
     const autoSlide = setInterval(() => {
       const maxIndex = cards.length - cardsToShow;
-
-      setCurrentIndex((prev) => {
-        if (prev >= maxIndex) return 0;
-        return prev + 1;
-      });
+      setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
     }, 3000);
 
     return () => clearInterval(autoSlide);
   }, [cardsToShow]);
 
-  // Card width based on screen size
-  const getCardWidth = () => {
-    if (isMobile) return "100%";
-    return `calc(${100 / cardsToShow}% - 16px)`;
-  };
-
   return (
     <section className="relative bg-[var(--color-body)] overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
-      
       {/* Background Wave */}
-  <div
-  className="
-    absolute 
-    bottom-[-20px]         /* mobile */
-    sm:bottom-[-50px]
-    md:bottom-[-80px]
-    lg:bottom-[-130px]
-    xl:bottom-[-160px]
-    left-0 w-full z-0 
-  "
->
-  <img
-    src={wave1}
-    alt=""
-    className="
-      w-[180%]             /* mobile: wider & centered */
-      sm:w-[165%]
-      md:w-[150%]
-      lg:w-full            /* normal at large screens */
+      <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0">
+        <img
+          src={wave1}
+          alt=""
+          className="w-[180%] sm:w-[165%] md:w-[150%] lg:w-full -ml-[20%] sm:-ml-[12%] md:-ml-[8%] lg:ml-0 scale-[1.6] sm:scale-[1.4] md:scale-[1.2] lg:scale-100 pointer-events-none select-none"
+        />
+      </div>
 
-      -ml-[20%]            /* mobile positioning */
-      sm:-ml-[12%]
-      md:-ml-[8%]
-      lg:ml-0              /* reset for large screens */
-
-      scale-[1.6]          /* mobile scale */
-      sm:scale-[1.4]
-      md:scale-[1.2]
-      lg:scale-100
-
-      pointer-events-none 
-      select-none
-    "
-  />
-</div>
-
-
-      <div className="relative z-10 max-w-7xl mx-auto ">
-
+      <div className="relative z-10 max-w-7xl mx-auto">
         {/* Title */}
-        <h2 className=" text-center mb-12 lg:mb-16 heading-light"
-         style={{ color: "var(--color-black)" }}
-         >
+        <h2
+          className="text-center mb-12 lg:mb-16 heading-light"
+          style={{ color: "var(--color-black)" }}
+        >
           Built For Everyone
         </h2>
 
-        <div className="flex flex-col lg:flex-row items-center justify-between" 
-        
-        >
-          
+        <div className="flex flex-col lg:flex-row items-center justify-between">
           {/* Left Image */}
-          <div className="w-full lg:w-1/2 flex justify-start items-start lg:justify-start mb-10 lg:mb-0">
+          <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-0">
             <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
-              <img src={round} alt="Round decoration" className="w-full h-full object-contain" />
+              <img
+                src={round}
+                alt=""
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
 
-          {/* Slider Section */}
+          {/* Slider */}
           <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
-
             <div className="relative w-full max-w-sm lg:max-w-2xl overflow-hidden">
               <div
                 className="flex transition-transform duration-500 ease-in-out gap-4"
                 style={{
-                  transform: `translateX(-${currentIndex * (100 / cardsToShow)}%)`,
+                  transform: `translateX(-${
+                    isMobile
+                      ? currentIndex * 100 // FIX FOR MOBILE
+                      : currentIndex * (100 / cardsToShow)
+                  }%)`,
                 }}
               >
                 {cards.map((card, index) => (
                   <div
                     key={index}
                     className={`flex-shrink-0 bg-white rounded-xl p-6 transition-all duration-300 ${
-                      index >= currentIndex && index < currentIndex + cardsToShow
+                      index >= currentIndex &&
+                      index < currentIndex + cardsToShow
                         ? "shadow-xl scale-100 opacity-100"
                         : "opacity-70 scale-95"
                     }`}
-                    style={{ width: getCardWidth() }}
+                    style={{
+                      width: isMobile
+                        ? "100%"
+                        : `calc(${100 / cardsToShow}% - 16px)`,
+                    }}
                   >
-                    {/* Card Content */}
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-xl card-heading">{card.title}</h3>
 
@@ -182,29 +150,46 @@ const BuiltForEveryone = () => {
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 leading-relaxed">{card.desc}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {card.desc}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Navigation Arrows */}
+            {/* Navigation Buttons */}
             <div className="flex gap-3 mt-8">
+              {/* LEFT */}
               <button
-                onClick={prevSlide}
-                className="p-3 rounded-sm border border-gray-300 hover:bg-gray-100 transition"
+                onClick={() => {
+                  prevSlide();
+                  setActiveBtn("left");
+                }}
+                className={`p-3 rounded-sm border transition ${
+                  activeBtn === "left"
+                    ? "bg-[var(--color-primary)] text-white border-transparent"
+                    : "border-gray-300 hover:bg-gray-100"
+                }`}
               >
-                <ChevronLeft className="w-5 h-5 text-gray-700" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
 
+              {/* RIGHT */}
               <button
-                onClick={nextSlide}
-                className="p-3 rounded-sm bg-[var(--color-primary)] hover:bg-purple-800 transition"
+                onClick={() => {
+                  nextSlide();
+                  setActiveBtn("right");
+                }}
+                className={`p-3 rounded-sm transition ${
+                  activeBtn === "right"
+                    ? "bg-[var(--color-primary)] text-white"
+                    : " text-grey"
+                }`}
               >
-                <ChevronRight className="w-5 h-5 text-white" />
+                <ChevronRight className="w-5 h-5" />
               </button>
             </div>
-
           </div>
         </div>
       </div>
