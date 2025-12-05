@@ -42,7 +42,6 @@ const Dashboard = () => {
     { label: 'E-Commerce Orders', value: '1,234', change: '+22%', trend: 'up', icon: 'fas fa-shopping-cart' },
     { label: 'Landscaping Projects', value: '342', change: '+28%', trend: 'up', icon: 'fas fa-tree' },
     { label: 'Avg. Project Value', value: '$1,280', change: '+9%', trend: 'up', icon: 'fas fa-chart-line' },
-    { label: 'Customer Ratings', value: '4.8★', change: '+0.3', trend: 'up', icon: 'fas fa-star' },
   ];
 
   const recentActivity = [
@@ -109,7 +108,7 @@ const Dashboard = () => {
         </div>
 
         {/* === STATS CARDS === */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {stats.map((stat, i) => (
             <div
               key={i}

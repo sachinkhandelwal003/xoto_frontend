@@ -148,11 +148,7 @@ const UsersRoleList = () => {
   const getSerialNumber = (index) => (currentPage - 1) * itemsPerPage + index + 1;
 
   const columns = [
- {
-      key: 'id',
-      title: 'Id',
-      render: (_, r) => `${r._id} `,
-    },
+
     {
       key: 'name',
       title: 'Name',

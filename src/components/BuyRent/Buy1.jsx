@@ -103,101 +103,133 @@ export default function HeroSection() {
       </section>
 
       {/* MODAL FORM */}
-      {openModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl p-6 relative">
+  {openModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-8 relative animate-fadeIn">
             {/* Close Button */}
             <button
               onClick={() => setOpenModal(false)}
-              className="absolute right-4 top-4 text-gray-600 hover:text-black text-2xl"
+              className="absolute right-6 top-6 text-gray-500 hover:text-gray-800 text-3xl leading-none"
             >
               ×
             </button>
 
-            <h2 className="text-2xl font-bold mb-4 text-center">
-              {actionType} – Submit Your Information
-            </h2>
+            {/* Header */}
+            <div className="text-center mb-6">
+              <h2 className="text-3xl font-extrabold text-gray-800">
+                {actionType}
+              </h2>
+              <p className="text-gray-500 text-sm mt-1">
+                Submit your information and our team will reach out shortly.
+              </p>
+            </div>
+
+            <hr className="my-4 border-gray-200" />
 
             {/* FORM */}
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-              <input
-                name="firstName"
-                required
-                placeholder="First Name"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.firstName}
-              />
-
-              <input
-                name="lastName"
-                required
-                placeholder="Last Name"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.lastName}
-              />
-
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="Email Address"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.email}
-              />
-
-              <input
-                name="number"
-                required
-                placeholder="Phone Number"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.number}
-              />
-
-              <select
-                name="lookingTo"
-                required
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.lookingTo}
-              >
-                <option value="">I am looking to</option>
-                <option value="Rent">Rent</option>
-                <option value="Buy">Buy</option>
-                <option value="Sell">Sell</option>
-              </select>
-
-              <input
-                name="city"
-                required
-                placeholder="Preferred City"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.city}
-              />
-
-              {/* UPDATED BUDGET INPUT WITH AED LABEL */}
-              <div className="relative col-span-2">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 font-semibold">
-                  AED
-                </span>
-
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 md:grid-cols-2 gap-5"
+            >
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-700 text-sm">First Name</label>
                 <input
-                  name="budget"
+                  name="firstName"
                   required
-                  placeholder="Enter Budget"
-                  className="border p-3 pl-16 rounded w-full"
+                  placeholder="Enter first name"
+                  className="border px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#5C039B] outline-none"
                   onChange={handleChange}
-                  value={formData.budget}
+                  value={formData.firstName}
                 />
               </div>
 
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-700 text-sm">Last Name</label>
+                <input
+                  name="lastName"
+                  required
+                  placeholder="Enter last name"
+                  className="border px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#5C039B] outline-none"
+                  onChange={handleChange}
+                  value={formData.lastName}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-700 text-sm">Email Address</label>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="example@mail.com"
+                  className="border px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#5C039B] outline-none"
+                  onChange={handleChange}
+                  value={formData.email}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-700 text-sm">Phone Number</label>
+                <input
+                  name="number"
+                  required
+                  placeholder="+971 XXXXXXXXX"
+                  className="border px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#5C039B] outline-none"
+                  onChange={handleChange}
+                  value={formData.number}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-700 text-sm">I am looking to</label>
+                <select
+                  name="lookingTo"
+                  required
+                  className="border px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#5C039B] outline-none"
+                  onChange={handleChange}
+                  value={formData.lookingTo}
+                >
+                  <option value="">Select an option</option>
+                  <option value="Rent">Rent</option>
+                  <option value="Buy">Buy</option>
+                  <option value="Sell">Sell</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-700 text-sm">Preferred City</label>
+                <input
+                  name="city"
+                  required
+                  placeholder="Dubai, Sharjah, Abu Dhabi..."
+                  className="border px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#5C039B] outline-none"
+                  onChange={handleChange}
+                  value={formData.city}
+                />
+              </div>
+
+              {/* Budget (Full width) */}
+              <div className="flex flex-col gap-1 md:col-span-2">
+                <label className="text-gray-700 text-sm">Budget (AED)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 font-semibold">
+                    AED
+                  </span>
+                  <input
+                    name="budget"
+                    required
+                    placeholder="Enter your budget"
+                    className="border w-full px-14 py-3 rounded-lg focus:ring-2 focus:ring-[#5C039B] outline-none"
+                    onChange={handleChange}
+                    value={formData.budget}
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="col-span-2 bg-[#5C039B] text-white py-3 rounded-lg text-lg font-bold hover:bg-[#4A0080] transition"
+                className="md:col-span-2 w-full bg-[#5C039B] text-white py-3 rounded-lg text-lg font-bold hover:bg-[#4A0080] transition"
               >
                 Submit Now
               </button>

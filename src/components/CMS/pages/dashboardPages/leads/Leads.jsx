@@ -482,15 +482,14 @@ const Leads = () => {
   ];
 
   return (
-    <div className="min-h-screen p-6" style={{ background: PURPLE_THEME.light }}>
+    <div className="min-h-screen  p-6" style={{ background: PURPLE_THEME.light }}>
       <div className="max-w-screen-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold" style={{ color: PURPLE_THEME.dark }}>
-                Customer Responses
-              </h1>
+Deals              </h1>
               <p className="text-gray-600">Track accepted/rejected leads and converted deals</p>
             </div>
           </div>

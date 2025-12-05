@@ -138,7 +138,6 @@ const Calculator = () => {
 
     try {
       await apiService.post("/estimates/submit", payload);
-      showSuccessAlert("Success!", "Your request has been submitted! We'll contact you soon.");
       setActiveStep(5);
       setTimeout(() => setActiveStep(6), 9000);
     } catch (err) {
@@ -166,10 +165,10 @@ const Calculator = () => {
   const SelectionCard = ({ item, isSelected, onClick, iconColor = "text-purple-600" }) => (
     <div 
       onClick={onClick}
-      className={`relative h-full p-6 rounded-2xl cursor-pointer transition-all duration-300 border-2 group
+      className={`relative h-full p-6 rounded-2xl  cursor-pointer transition-all duration-300 border-2 group
         ${isSelected 
           ? 'border-purple-600 bg-purple-50 shadow-xl shadow-purple-100 transform -translate-y-1' 
-          : 'border-white bg-white hover:border-purple-300 hover:shadow-lg'
+          : 'border-white bg-gray-200 hover:border-purple-300 hover:shadow-lg'
         }`}
     >
       {isSelected && (
@@ -201,12 +200,12 @@ const Calculator = () => {
       case 0: // Subcategory
         return (
           <motion.div {...fadeIn} className="text-center">
-            <Title level={2} className="mb-2 text-purple-900">What are you creating?</Title>
+            <Title level={2} className="mb-2 text-purple-900 ">What are you creating?</Title>
             <Text type="secondary" className="text-lg mb-10 block">Select the type of landscaping project</Text>
             {loadingSubcat ? <Spin size="large" className="mt-10" /> : (
               <Row gutter={[24, 24]}>
                 {subcategories.map((sub) => (
-                  <Col xs={24} sm={12} md={8} key={sub._id}>
+                  <Col xs={24} sm={12} md={8} key={sub._id} >
                     <SelectionCard 
                       item={sub} 
                       isSelected={selectedSubcategory === sub._id} 
@@ -470,7 +469,7 @@ const Calculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] pb-32 font-sans">
+    <div className="min-h-screen bg-[#F5F4F5] pb-32 font-sans   ">
         {/* Background Gradients */}
         <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-b from-purple-50/50 via-white to-white -z-10 pointer-events-none"></div>
 
@@ -501,7 +500,7 @@ const Calculator = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="max-w-4xl bg-white mx-auto  mt-5 p-2">
         <AnimatePresence mode="wait">
           <motion.div key={activeStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
             {renderStepContent(activeStep)}
@@ -537,16 +536,23 @@ const Calculator = () => {
                     {activeStep === 4 ? (
                        <span className="text-sm text-gray-400 italic mr-2">Fill the form to submit</span>
                     ) : (
-                        <Button 
-                            type="primary" 
-                            size="large" 
-                            onClick={activeStep === 3 ? handleGetQuote : handleNext} 
-                            disabled={!isStepValid()} 
-                            className={`h-12 px-8 rounded-xl text-lg shadow-lg shadow-purple-200 border-none transition-all
-                                ${!isStepValid() ? 'bg-gray-300' : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-105'}`}
-                        >
-                            {activeStep === 3 ? "Get Quote" : "Next Step"} <ArrowRightOutlined />
-                        </Button>
+                       <Button 
+  type="primary" 
+  size="large" 
+  onClick={activeStep === 3 ? handleGetQuote : handleNext} 
+  disabled={!isStepValid()} 
+  className={`
+    h-12 px-8 rounded-xl text-lg shadow-lg border-none transition-all
+    ${!isStepValid() 
+      ? 'bg-gray-300 cursor-not-allowed' 
+      : 'bg-[var(--color-primary)] hover:bg-purple-800 hover:scale-105 text-white'
+    }
+  `}
+>
+  {activeStep === 3 ? "Get Quote" : "Next Step"} 
+  <ArrowRightOutlined className="ml-2" />
+</Button>
+
                     )}
                 </div>
             </div>

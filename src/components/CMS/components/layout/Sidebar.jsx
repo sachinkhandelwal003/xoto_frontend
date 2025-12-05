@@ -18,7 +18,7 @@ const roleSlugMap = {
 };
 
 const ROLE_MODULE_ORDER = {
-  '0': ['Dashboard',"All Leads","Deals", 'Xoto Partners', 'Products', 'Seller B2C','Request', 'Projects', 'Payout', 'Module', 'Permission', 'Role', 'Inventory','Settings'],
+  '0': ['Dashboard',"All Estimation","Deals", 'Xoto Partners' ,'Projects','Packages','Estimate master','Consultation Bookings','All Users',, 'Products', 'Seller B2C','Request', 'Payout', 'Module', 'Permission', 'Role', 'Inventory','Settings'],
   '1': ['Dashboard', 'Products', 'Xoto Partners', 'Projects', 'Payout', 'Request', 'Settings'],
   '5': ['Dashboard', 'Products', 'My Products', 'Orders', 'Payout', 'Settings'],
   '6': ['Dashboard', 'Products', 'Projects', 'Inventory', 'Payout'],

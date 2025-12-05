@@ -30,7 +30,7 @@ const Customerdashboard = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">
-          Employee Dashboard
+          Customer Dashboard
         </h1>
         <div className="flex space-x-2">
           <button className="px-3 py-1 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200">
