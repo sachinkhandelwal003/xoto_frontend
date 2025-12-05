@@ -20,7 +20,6 @@ function LoopLabel({ title, text, align = "left" }) {
       className={`w-60 ${align === "right" ? "text-right" : "text-left"}`}
       style={dmSans}
     >
-      {/* Title bubble */}
       <p
         className="
           font-semibold
@@ -38,8 +37,7 @@ function LoopLabel({ title, text, align = "left" }) {
         {title}
       </p>
 
-      {/* Description */}
-      <p className="text-gray-600 text-sm mt-2 leading-relaxed" style={dmSans}>
+      <p className="text-gray-600 text-sm  leading-relaxed" style={dmSans}>
         {text}
       </p>
     </div>
@@ -50,10 +48,9 @@ export default function OurPartners() {
   return (
     <>
       <section
-        className="w-full bg-[var(--color-body)] px-6 md:px-12 p-5 lg:px-20 pb-20 pt-20  relative"
+        className="w-full bg-[var(--color-body)] px-4 sm:px-6 md:px-12 lg:px-20 pb-20 pt-20 relative overflow-x-hidden"
         style={dmSans}
       >
-        {/* Load Google Font */}
         <link
           href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
@@ -61,14 +58,14 @@ export default function OurPartners() {
 
         {/* ================= TITLE ================= */}
         <div
-          className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-50 mb-24"
+          className=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-10 sm:gap-6 mb-24 text-center md:text-left"
           style={dmSans}
         >
-          <h2 className="text-4xl md:text-5xl heading-dark-1 leading-tight text-[#0b1739]">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl heading-dark-1 leading-tight text-[#0b1739]">
             We Make Lenders <br /> Work for You
           </h2>
 
-          <p className="text-[#547593] text-lg paragraph-light-1 mt-5 leading-relaxed max-w-md mx-1">
+          <p className="text-[#547593] text-xl md:text-2xl paragraph-light-1 mt-5 leading-relaxed  mx-auto md:mx-1 text-center md:text-left">
             Xoto partners with leading banks and institutions so you get access
             to exclusive mortgage offers — faster, easier, and with full
             transparency.
@@ -76,84 +73,96 @@ export default function OurPartners() {
         </div>
 
         {/* ================= INFINITY LOOP ================= */}
-        <div className="relative w-full max-w-6xl mx-auto" style={dmSans}>
-          {/* LOOP SVG */}
-          <img
-            src={loopImg}
-            alt="Infinity Loop"
-            className="w-140 max-w-6xl mx-auto pointer-events-none select-none"
-          />
+        <div className="relative  ">
 
-          {/* ---- TOP LEFT ---- */}
-          <div
-            className="absolute flex items-start gap-4"
-            style={{ top: "-10px", left: "11%", ...dmSans }}
-          >
-            <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-60 -mt-5">
-              <img src={iconAI} className="w-8 h-8" alt="AI" />
+          {/* ⭐ SCALE WRAPPER (ONLY REAL CHANGE) ⭐ */}
+          <div className="
+            scale-[0.55]        /* mobile */
+            sm:scale-[0.80]     /* small screen */
+            md:scale-100        /* desktop: original size */
+            origin-top
+            
+          ">
+
+            {/* LOOP IMAGE */}
+            <img
+              src={loopImg}
+              alt="Infinity Loop"
+              className="w-140 max-w-6xl mx-auto pointer-events-none select-none"
+            />
+
+            {/* ---- TOP LEFT ---- */}
+            <div
+              className="absolute flex items-start gap-4"
+              style={{ top: "-10px", left: "11%", ...dmSans }}
+            >
+              <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-60 -mt-5">
+                <img src={iconAI} className="w-8 h-8" alt="AI" />
+              </div>
+
+              <div className="absolute -mx-50 lg:-mx-31 ">
+                <LoopLabel
+                  title="AI Matched Offers"
+                  text="We match you to mortgage plans suited to your income, property, and goals."
+                />
+              </div>
             </div>
 
-            <div className="absolute -mx-31 ">
-              <LoopLabel
-                title="AI Matched Offers"
-                text="We match you to mortgage plans suited to your income, property, and goals."
-              />
-            </div>
-          </div>
+            {/* ---- TOP RIGHT ---- */}
+            <div
+              className="absolute flex items-start gap-4 mx-60 mb-10 "
+              style={{ top: "-10px", right: "11%", ...dmSans }}
+            >
+              <div className="absolute mx-96 sm:mx-96 lg:mx-80 ">
+                <LoopLabel
+                  title="Transparent Cost"
+                  text="All fees, interest, and charges are shown upfront — no last-minute surprises."
+                />
+              </div>
 
-          {/* ---- TOP RIGHT ---- */}
-          <div
-            className="absolute flex items-start gap-4 mx-60 mb-10 "
-            style={{ top: "-10px", right: "11%", ...dmSans }}
-            background="linear-gradient(to bottom, #FFFFFF, #2516DF)"
-          >
-            <div className="absolute mx-80 ">
-              <LoopLabel
-                title="Transparent Cost"
-                text="All fees, interest, and charges are shown upfront — no last-minute surprises."
-              />
+              <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-10 -mt-5">
+                <img src={iconCost} className="w-8 h-8" alt="Cost" />
+              </div>
             </div>
 
-            <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-10 -mt-5">
-              <img src={iconCost} className="w-8 h-8" alt="Cost" />
-            </div>
-          </div>
+            {/* ---- BOTTOM LEFT ---- */}
+            <div
+              className="absolute flex items-start gap-4"
+              style={{ bottom: "-15px", left: "11%", ...dmSans }}
+            >
+              <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-60 -mt-5">
+                <img src={iconGuide} className="w-8 h-8" alt="Guide" />
+              </div>
 
-          {/* ---- BOTTOM LEFT ---- */}
-          <div
-            className="absolute flex items-start gap-4"
-            style={{ bottom: "-15px", left: "11%", ...dmSans }}
-          >
-            <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-60 -mt-5">
-              <img src={iconGuide} className="w-8 h-8" alt="Guide" />
-            </div>
-
-            <div className="absolute -mx-31">
-              <LoopLabel
-                title="Personal Guidance"
-                text="Our mortgage experts help guide you through every step, including paperwork."
-              />
-            </div>
-          </div>
-
-          {/* ---- BOTTOM RIGHT ---- */}
-          <div
-            className="absolute flex items-start gap-4"
-            style={{ bottom: "-15px", right: "11%", ...dmSans }}
-          >
-            <div className="absolute mx-140">
-              <LoopLabel
-                title="Fast Process"
-                text="Fastest Pre approval to disbursement."
-              />
+              <div className="absolute -mx-50 lg:-mx-31">
+                <LoopLabel
+                  title="Personal Guidance"
+                  text="Our mortgage experts help guide you through every step, including paperwork."
+                />
+              </div>
             </div>
 
-            <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-70 -mt-5">
-              <img src={iconFast} className="w-8 h-8" alt="Fast" />
+            {/* ---- BOTTOM RIGHT ---- */}
+            <div
+              className="absolute flex items-start gap-4"
+              style={{ bottom: "-15px", right: "11%", ...dmSans }}
+            >
+              <div className="absolute mx-160 lg:mx-140">
+                <LoopLabel
+                  title="Fast Process"
+                  text="Fastest Pre approval to disbursement."
+                />
+              </div>
+
+              <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-70 -mt-5">
+                <img src={iconFast} className="w-8 h-8" alt="Fast" />
+              </div>
             </div>
+
           </div>
         </div>
       </section>
+
       <Testimonialpage />
     </>
   );
