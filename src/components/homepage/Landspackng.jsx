@@ -254,7 +254,7 @@ export default function Landspackng() {
                 className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2  flex-col inline-flex"
               >
                 <div className="flex items-center justify-center">
-                  <h3 className="text-lg font-semibold text-white">{service.title}</h3>
+                  <h3 className="button-text text-white text-xl">{service.title}</h3>
                 </div>
               </motion.div>
             ))}

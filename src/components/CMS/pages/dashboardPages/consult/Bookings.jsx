@@ -7,7 +7,8 @@ import {
 import {
   PhoneOutlined, MailOutlined, MessageOutlined, UserOutlined,
   CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined,
-  EyeOutlined, DeleteOutlined, UndoOutlined, EditOutlined,BellOutlined
+  EyeOutlined, DeleteOutlined, UndoOutlined, EditOutlined, BellOutlined,
+  HomeOutlined, BuildOutlined, SettingOutlined
 } from '@ant-design/icons';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
 import { showSuccessAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
@@ -25,52 +26,80 @@ const statusConfig = {
   rejected: { label: 'Rejected', color: 'volcano', icon: <CloseCircleOutlined /> },
 };
 
+const typeConfig = {
+  landscape: { label: 'Landscape', color: 'green', icon: <HomeOutlined /> },
+  interior: { label: 'Interior', color: 'geekblue', icon: <SettingOutlined /> },
+  architect: { label: 'Architect', color: 'cyan', icon: <BuildOutlined /> },
+  civil_engineer: { label: 'Civil Engineer', color: 'orange', icon: <BuildOutlined /> },
+  other: { label: 'Other', color: 'gray', icon: <SettingOutlined /> },
+};
+
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [activeTab, setActiveTab] = useState('submitted');
-  const [pagination, setPagination] = useState({ currentPage: 1, itemsPerPage: 10, totalItems: 0 });
+  const [selectedType, setSelectedType] = useState('all');
+  const [pagination, setPagination] = useState({ 
+    currentPage: 1, 
+    itemsPerPage: 10, 
+    totalItems: 0 
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [activeOnly, setActiveOnly] = useState(true);
 
-  const fetchBookings = async (status = activeTab, page = 1, limit = 10, search = '') => {
+  const fetchBookings = async (status = activeTab, page = 1, limit = 10, search = '', type = selectedType) => {
     setLoading(true);
     try {
-      const params = { page, limit, status };
+      const params = { 
+        page, 
+        limit, 
+        status,
+        active: activeOnly 
+      };
+      
       if (search) params.search = search;
+      if (type && type !== 'all') params.type = type;
 
       const res = await apiService.get('/consult', params);
       if (res.success) {
         setBookings(res.data);
         setPagination({
-          currentPage: res.pagination.page,
-          itemsPerPage: res.pagination.limit,
-          totalItems: res.pagination.total
+          currentPage: res.pagination?.page || 1,
+          itemsPerPage: res.pagination?.limit || 10,
+          totalItems: res.pagination?.total || 0
         });
       }
     } catch (err) {
+      console.error('Error fetching bookings:', err);
+      message.error('Failed to fetch bookings');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBookings(activeTab, 1, 10, searchTerm);
-  }, [activeTab]);
+    fetchBookings(activeTab, 1, 10, searchTerm, selectedType);
+  }, [activeTab, selectedType, activeOnly]);
 
   const handleTabChange = (key) => {
     setActiveTab(key);
-    fetchBookings(key, 1, 10, searchTerm);
+    fetchBookings(key, 1, 10, searchTerm, selectedType);
+  };
+
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
+    fetchBookings(activeTab, 1, 10, searchTerm, type);
   };
 
   const handleSearch = () => {
-    fetchBookings(activeTab, 1, 10, searchTerm);
+    fetchBookings(activeTab, 1, 10, searchTerm, selectedType);
   };
 
   const handlePageChange = (page, pageSize) => {
-    fetchBookings(activeTab, page, pageSize, searchTerm);
+    fetchBookings(activeTab, page, pageSize, searchTerm, selectedType);
   };
 
   const updateStatus = async (id, newStatus) => {
@@ -106,7 +135,18 @@ const Bookings = () => {
       render: (_, record) => (
         <Space>
           <Avatar icon={<UserOutlined />} size="small" />
-          <span className="font-medium">{record.full_name}</span>
+          <div>
+            <div className="font-medium">{record.full_name}</div>
+            <div className="text-xs text-gray-500">
+              <Tag 
+                size="small" 
+                color={typeConfig[record.type]?.color || 'gray'}
+                icon={typeConfig[record.type]?.icon}
+              >
+                {typeConfig[record.type]?.label || 'Other'}
+              </Tag>
+            </div>
+          </div>
         </Space>
       )
     },
@@ -126,9 +166,21 @@ const Bookings = () => {
       render: (_, record) => (
         <Space>
           <PhoneOutlined className="text-gray-500" />
-          <span>{record.mobile.country_code} {record.mobile.number}</span>
+          <span>{record.mobile?.country_code || '+91'} {record.mobile?.number}</span>
         </Space>
       )
+    },
+    {
+      key: 'type',
+      title: 'Type',
+      render: (_, record) => {
+        const config = typeConfig[record.type] || typeConfig.other;
+        return (
+          <Tag color={config.color} icon={config.icon}>
+            {config.label}
+          </Tag>
+        );
+      }
     },
     {
       key: 'status',
@@ -188,18 +240,29 @@ const Bookings = () => {
     }
   ];
 
-  const tabItems = Object.keys(statusConfig).map(key => ({
+const tabItems = Object.keys(statusConfig).map(key => {
+  // Count bookings for this specific status
+  const statusCount = bookings.filter(booking => booking.status === key).length;
+  
+  return {
     key,
     label: (
       <span>
         {statusConfig[key].icon} {statusConfig[key].label}
-        {key === 'submitted' && bookings.length > 0 && (
-          <Badge count={bookings.length} style={{ marginLeft: 8 }} />
+        {statusCount > 0 && (
+          <Badge 
+            count={statusCount} 
+            style={{ 
+              marginLeft: 8,
+              backgroundColor: statusConfig[key].color 
+            }} 
+          />
         )}
       </span>
     ),
     children: null
-  }));
+  };
+});
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -225,7 +288,7 @@ const Bookings = () => {
         />
       )}
 
-      {/* Search Bar */}
+      {/* Filters Card */}
       <Card className="mb-6">
         <Row gutter={16} align="middle">
           <Col flex="auto">
@@ -237,6 +300,33 @@ const Bookings = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               onSearch={handleSearch}
             />
+          </Col>
+          <Col>
+            <Select
+              value={selectedType}
+              onChange={handleTypeChange}
+              style={{ width: 150 }}
+              size="large"
+              placeholder="Filter by type"
+            >
+              <Option value="all">All Types</Option>
+              {Object.keys(typeConfig).map(key => (
+                <Option key={key} value={key}>
+                  <Space>{typeConfig[key].icon} {typeConfig[key].label}</Space>
+                </Option>
+              ))}
+            </Select>
+          </Col>
+          <Col>
+            <Select
+              value={activeOnly}
+              onChange={(value) => setActiveOnly(value)}
+              style={{ width: 120 }}
+              size="large"
+            >
+              <Option value={true}>Active Only</Option>
+              <Option value={false}>Show All</Option>
+            </Select>
           </Col>
         </Row>
       </Card>
@@ -278,7 +368,17 @@ const Bookings = () => {
                 <Avatar size={64} icon={<UserOutlined />} />
                 <div>
                   <h3 className="text-xl font-bold">{selectedBooking.full_name}</h3>
-                  <p className="text-gray-500">Submitted on {new Date(selectedBooking.createdAt).toLocaleString()}</p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <Tag 
+                      color={typeConfig[selectedBooking.type]?.color || 'gray'}
+                      icon={typeConfig[selectedBooking.type]?.icon}
+                    >
+                      {typeConfig[selectedBooking.type]?.label || 'Other'}
+                    </Tag>
+                    <p className="text-gray-500">
+                      Submitted on {new Date(selectedBooking.createdAt).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -292,11 +392,22 @@ const Bookings = () => {
                 <Descriptions.Item label="Mobile">
                   <Space>
                     <PhoneOutlined />
-                    {selectedBooking.mobile.country_code} {selectedBooking.mobile.number}
+                    {selectedBooking.mobile?.country_code || '+91'} {selectedBooking.mobile?.number}
+                  </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label="Consultation Type">
+                  <Space>
+                    {typeConfig[selectedBooking.type]?.icon}
+                    <Tag color={typeConfig[selectedBooking.type]?.color}>
+                      {typeConfig[selectedBooking.type]?.label}
+                    </Tag>
                   </Space>
                 </Descriptions.Item>
                 <Descriptions.Item label="Status">
-                  <Tag color={statusConfig[selectedBooking.status].color} icon={statusConfig[selectedBooking.status].icon}>
+                  <Tag 
+                    color={statusConfig[selectedBooking.status].color} 
+                    icon={statusConfig[selectedBooking.status].icon}
+                  >
                     {statusConfig[selectedBooking.status].label}
                   </Tag>
                 </Descriptions.Item>

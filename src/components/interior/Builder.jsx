@@ -3,6 +3,7 @@
 import React from "react";
 import heImage from "../../assets/img/he.png";
 import wave2 from "../../assets/img/wave/wave2.png";
+import { Link } from "react-router-dom";
 
 export default function InteractiveBuilderSection() {
   return (
@@ -36,9 +37,11 @@ export default function InteractiveBuilderSection() {
               design previews.
             </p>
 
-            <button className="group inline-flex items-center justify-center gap-3 rounded-md bg-[#5C039B] px-10 sm:px-14 py-3 sm:py-4 text-lg sm:text-xl font-semibold text-white shadow-xl transition-all hover:bg-purple-700 hover:shadow-2xl hover:-translate-y-1 mx-auto lg:mx-0">
-              <span className="text-lg sm:text-xl">Take a first step</span>
-            </button>
+           <Link to={'/aiPlanner/interior'}>
+  <button className="group inline-flex items-center justify-center gap-3 rounded-md bg-[#5C039B] px-10 sm:px-14 py-3 sm:py-4 text-lg sm:text-xl font-semibold text-white shadow-xl transition-all hover:bg-purple-700 hover:shadow-2xl hover:-translate-y-1 mx-auto lg:mx-0">
+    <span className="text-lg sm:text-xl">Take a first step</span>
+  </button>
+</Link>
           </div>
 
           {/* RIGHT IMAGE */}
