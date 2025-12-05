@@ -53,6 +53,7 @@ export default function Consultation() {
     setLoading(true);
 
     const payload = {
+      type:"landscape",
       name: {
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim()

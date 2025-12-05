@@ -2,20 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
 import CustomTable from '../../../pages/custom/CustomTable';
 import { 
-  Tabs, Card, Button, Tag, Modal, Table, Descriptions, 
-  Row, Col, Statistic, Progress, Badge, Avatar, Timeline,
-  Space, Divider, Alert, List, Tooltip, Popconfirm, message
+  Tabs, Card, Button, Modal, Table, Tag, Row, Col, 
+  Badge, Avatar, Space, Alert, Statistic, Popconfirm
 } from 'antd';
 import { 
   CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, 
   UserOutlined, DollarOutlined, CalendarOutlined,
-  PhoneOutlined, MailOutlined, FileTextOutlined,
-  TeamOutlined, SafetyCertificateOutlined, TrophyOutlined,
-  ClockCircleOutlined, ArrowRightOutlined, StarOutlined,
-  RocketOutlined, ProjectOutlined, EnvironmentOutlined,
-  FlagOutlined, CheckSquareOutlined, TagOutlined
+  MailOutlined, FileTextOutlined, TeamOutlined,
+  RocketOutlined, ProjectOutlined, PhoneOutlined,
+  ClockCircleOutlined, CheckOutlined
 } from '@ant-design/icons';
 import { showSuccessAlert, showErrorAlert } from '../../../../../manageApi/utils/sweetAlert';
+
+// Purple Theme Colors
+const PURPLE_THEME = {
+  primary: '#722ed1',
+  primaryLight: '#9254de',
+  primaryLighter: '#d3adf7',
+  primaryBg: '#f9f0ff',
+  success: '#52c41a',
+  warning: '#faad14',
+  error: '#ff4d4f',
+  info: '#1890ff',
+  dark: '#1f2937',
+  gray: '#6b7280',
+  light: '#f8fafc'
+};
 
 const Leads = () => {
   const [loading, setLoading] = useState(false);
@@ -25,9 +37,7 @@ const Leads = () => {
   const [rejectedLeads, setRejectedLeads] = useState([]);
   const [deals, setDeals] = useState([]);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
-  const [selectedDeal, setSelectedDeal] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [dealModalVisible, setDealModalVisible] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     accepted: 0,
@@ -43,46 +53,45 @@ const Leads = () => {
       label: 'Accepted', 
       color: 'success', 
       icon: <CheckCircleOutlined />,
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200'
+      bgColor: '#f6ffed',
+      textColor: '#52c41a'
     },
     customer_rejected: { 
       label: 'Rejected', 
       color: 'error', 
       icon: <CloseCircleOutlined />,
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200'
-    },
-    superadmin_approved: { 
-      label: 'Approved', 
-      color: 'processing', 
-      icon: <SafetyCertificateOutlined />,
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200'
-    },
-    final_created: { 
-      label: 'Final Created', 
-      color: 'warning', 
-      icon: <FileTextOutlined />,
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200'
+      bgColor: '#fff1f0',
+      textColor: '#ff4d4f'
     },
     deal: { 
-      label: 'Converted to Deal', 
+      label: 'Deal', 
       color: 'purple', 
       icon: <RocketOutlined />,
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-200'
+      bgColor: '#f9f0ff',
+      textColor: '#722ed1'
     }
   };
 
-  // Project status configuration
-  const projectStatusConfig = {
-    pending: { label: 'Pending', color: 'default', icon: <ClockCircleOutlined /> },
-    active: { label: 'Active', color: 'processing', icon: <ProjectOutlined /> },
-    completed: { label: 'Completed', color: 'success', icon: <CheckCircleOutlined /> },
-    cancelled: { label: 'Cancelled', color: 'error', icon: <CloseCircleOutlined /> },
-    on_hold: { label: 'On Hold', color: 'warning', icon: <FlagOutlined /> }
+  // Format mobile number
+  const formatMobileNumber = (mobileObj) => {
+    if (!mobileObj) return 'N/A';
+    return `${mobileObj.country_code || ''} ${mobileObj.number || ''}`.trim();
+  };
+
+  // Format currency
+  const formatCurrency = (amount, currency = 'AED') => {
+    if (!amount) return `${currency} 0`;
+    return `${currency} ${amount.toLocaleString()}`;
+  };
+
+  // Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   // Fetch Leads by Customer Response
@@ -121,31 +130,8 @@ const Leads = () => {
       });
 
       if (response.success) {
-        const dealsData = response.data || [];
-        setDeals(dealsData);
-        updateDealStats(dealsData);
-        
-        // Fetch project details for each deal
-        const dealsWithProjects = await Promise.all(
-          dealsData.map(async (deal) => {
-            if (deal.project_reference) {
-              try {
-                const projectResponse = await apiService.get(`/projects/${deal.project_reference}`);
-                if (projectResponse.success) {
-                  return {
-                    ...deal,
-                    project: projectResponse.data
-                  };
-                }
-              } catch (error) {
-                console.error(`Failed to fetch project for deal ${deal._id}:`, error);
-              }
-            }
-            return deal;
-          })
-        );
-        
-        setDeals(dealsWithProjects);
+        setDeals(response.data || []);
+        updateDealStats(response.data || []);
       }
     } catch (error) {
       showErrorAlert('Error', 'Failed to load deals');
@@ -191,42 +177,14 @@ const Leads = () => {
       const response = await apiService.post(`/estimates/${estimateId}/convert-to-deal`);
       
       if (response.success) {
-        showSuccessAlert('Success', 'Estimate successfully converted to deal!');
-        // Refresh all data
+        showSuccessAlert('Success', 'Converted to deal successfully');
         fetchLeads('accepted');
         fetchDeals();
       }
     } catch (error) {
-      showErrorAlert(
-        'Conversion Failed', 
-        error.response?.data?.message || 'Failed to convert estimate to deal'
-      );
+      showErrorAlert('Error', 'Failed to convert to deal');
     } finally {
       setConvertingDeal(null);
-    }
-  };
-
-  // View Deal Details
-  const openDealDetails = async (deal) => {
-    try {
-      // If project data is not already loaded, fetch it
-      if (deal.project_reference && !deal.project) {
-        const response = await apiService.get(`/projects/${deal.project_reference}`);
-        if (response.success) {
-          setSelectedDeal({
-            ...deal,
-            project: response.data
-          });
-        } else {
-          setSelectedDeal(deal);
-        }
-      } else {
-        setSelectedDeal(deal);
-      }
-      setDealModalVisible(true);
-    } catch (error) {
-      setSelectedDeal(deal);
-      setDealModalVisible(true);
     }
   };
 
@@ -243,130 +201,99 @@ const Leads = () => {
     setModalVisible(true);
   };
 
+  // Status Badge Component
+  const StatusBadge = ({ status }) => {
+    const config = statusConfig[status] || statusConfig.customer_accepted;
+    
+    return (
+      <Tag 
+        color={config.color} 
+        icon={config.icon}
+        style={{ 
+          background: config.bgColor,
+          color: config.textColor,
+          borderColor: config.textColor
+        }}
+      >
+        {config.label}
+      </Tag>
+    );
+  };
+
   // Accepted Leads Columns
   const acceptedColumns = [
     {
-      title: 'Customer Details',
+      title: 'Customer',
       width: 200,
       render: (_, record) => (
-        <div className="flex items-start space-x-3">
+        <div className="flex items-center gap-3">
           <Avatar 
             size={40} 
+            style={{ 
+              background: PURPLE_THEME.primaryBg,
+              color: PURPLE_THEME.primary
+            }}
             icon={<UserOutlined />}
-            className="bg-blue-100 text-blue-600"
           />
-          <div className="flex-1 min-w-0">
-            <div className="font-semibold text-gray-900 truncate">
-              {record.customer_name}
+          <div>
+            <div className="font-semibold text-gray-900">{record.customer_name}</div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <MailOutlined />
+              <span>{record.customer_email}</span>
             </div>
-            <div className="text-xs text-gray-500 truncate">
-              <MailOutlined className="mr-1" />
-              {record.customer_email}
-            </div>
-    
-
           </div>
         </div>
       )
     },
     {
-      title: 'Service Information',
-      width: 180,
+      title: 'Service',
+      width: 150,
       render: (_, record) => (
         <div>
-          <div className="font-medium text-gray-900">{record.category?.name}</div>
-          <div className="text-xs text-gray-500 mt-1">
-            {record.subcategories?.slice(0, 2).map(sub => sub.name).join(', ')}
-            {record.subcategories?.length > 2 && '...'}
+          <div className="font-medium">{record.subcategory?.label || record.service_type}</div>
+          <div className="text-xs text-gray-500">
+            {record.area_sqft} sq ft
           </div>
+        </div>
+      )
+    },
+    {
+      title: 'Amount',
+      width: 120,
+      render: (_, record) => (
+        <div className="font-bold" style={{ color: PURPLE_THEME.success }}>
+          {formatCurrency(record.final_quotation?.grand_total)}
         </div>
       )
     },
     {
       title: 'Status',
-      width: 140,
-      render: (_, record) => {
-        const config = statusConfig[record.status] || statusConfig.customer_accepted;
-        return (
-          <Tag 
-            color={config.color} 
-            icon={config.icon}
-            className="flex items-center space-x-1 px-2 py-1"
-          >
-            {config.label}
-          </Tag>
-        );
-      }
+      width: 120,
+      render: (_, record) => <StatusBadge status={record.status} />
     },
     {
-      title: 'Financial Details',
-      width: 150,
-      render: (_, record) => (
-        <div className="text-right">
-          <div className="text-lg font-bold text-green-600">
-            <DollarOutlined className="mr-1" />
-            AED {record.final_quotation?.grand_total?.toLocaleString() || '0'}
-          </div>
-          {record.final_quotation?.discount_percent > 0 && (
-            <div className="text-xs text-green-500">
-              {record.final_quotation.discount_percent}% OFF
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      title: 'Timeline',
-      width: 140,
-      render: (_, record) => (
-        <div className="space-y-1">
-          <div className="text-xs text-gray-500">
-            Submitted: {new Date(record.submitted_at).toLocaleDateString()}
-          </div>
-          <div className="text-xs text-green-600 font-medium">
-            Accepted: {record.customer_response?.responded_at ? 
-              new Date(record.customer_response.responded_at).toLocaleDateString() : '-'
-            }
-          </div>
-          {record.deal_converted_at && (
-            <div className="text-xs text-purple-600 font-medium">
-              Converted: {new Date(record.deal_converted_at).toLocaleDateString()}
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      title: 'Supervisor',
+      title: 'Accepted On',
       width: 120,
       render: (_, record) => (
-        <div className="text-center">
-          {record.assigned_supervisor ? (
-            <Tooltip title={`${record.assigned_supervisor.name?.first_name} ${record.assigned_supervisor.name?.last_name}`}>
-              <Avatar 
-                size="small" 
-                icon={<UserOutlined />}
-                className="bg-purple-100 text-purple-600 mx-auto"
-              />
-            </Tooltip>
-          ) : (
-            <span className="text-gray-400 text-xs">Not Assigned</span>
-          )}
+        <div className="text-xs text-gray-500">
+          {formatDate(record.customer_response?.responded_at)}
         </div>
       )
     },
     {
       title: 'Actions',
       width: 180,
-      fixed: 'right',
       render: (_, record) => (
         <Space>
-          <Button
-            type="primary"
-            size="small"
+          <Button 
+            size="small" 
             icon={<EyeOutlined />}
             onClick={() => openQuotation(record.final_quotation)}
-            className="bg-blue-600 hover:bg-blue-700"
+            style={{ 
+              background: PURPLE_THEME.primaryBg,
+              borderColor: PURPLE_THEME.primaryLighter,
+              color: PURPLE_THEME.primary
+            }}
           >
             View
           </Button>
@@ -374,37 +301,24 @@ const Leads = () => {
           {record.status === 'customer_accepted' && !record.project_reference && (
             <Popconfirm
               title="Convert to Deal"
-              description="Are you sure you want to convert this estimate to a project deal?"
+              description="Convert this estimate to a project deal?"
               onConfirm={() => handleConvertToDeal(record._id)}
-              okText="Yes, Convert"
+              okText="Convert"
               cancelText="Cancel"
-              okButtonProps={{ 
-                loading: convertingDeal === record._id,
-                className: 'bg-purple-600 hover:bg-purple-700'
-              }}
             >
               <Button
                 type="primary"
                 size="small"
                 icon={<RocketOutlined />}
                 loading={convertingDeal === record._id}
-                className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+                style={{ 
+                  background: PURPLE_THEME.primary,
+                  borderColor: PURPLE_THEME.primary
+                }}
               >
-                Convert to Deal
+                Convert
               </Button>
             </Popconfirm>
-          )}
-          
-          {record.status === 'deal' && (
-            <Button
-              type="primary"
-              size="small"
-              icon={<ProjectOutlined />}
-              onClick={() => openDealDetails(record)}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              View Deal
-            </Button>
           )}
         </Space>
       )
@@ -417,63 +331,54 @@ const Leads = () => {
       title: 'Customer',
       width: 180,
       render: (_, record) => (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-3">
           <Avatar 
             size={40} 
+            style={{ 
+              background: '#fff1f0',
+              color: '#ff4d4f'
+            }}
             icon={<UserOutlined />}
-            className="bg-red-100 text-red-600"
           />
           <div>
             <div className="font-semibold">{record.customer_name}</div>
-            <div className="text-xs text-gray-500">{record.customer_email}</div>
+            <div className="text-sm text-gray-500">{record.customer_email}</div>
           </div>
         </div>
       )
     },
     {
       title: 'Service',
-      width: 150,
-      render: (_, record) => record.category?.name || 'N/A'
+      width: 120,
+      render: (_, record) => record.subcategory?.label || 'N/A'
     },
     {
-      title: 'Quotation Value',
-      width: 130,
+      title: 'Amount',
+      width: 100,
       render: (_, record) => (
-        <div className="text-red-600 font-semibold">
-          AED {record.final_quotation?.grand_total?.toLocaleString() || '0'}
+        <div className="font-semibold" style={{ color: PURPLE_THEME.error }}>
+          {formatCurrency(record.final_quotation?.grand_total)}
         </div>
       )
     },
     {
-      title: 'Rejection Details',
-      width: 200,
+      title: 'Reason',
+      width: 150,
       render: (_, record) => (
-        <div>
-          <div className="text-xs text-gray-500">
-            {record.customer_response?.responded_at ? 
-              new Date(record.customer_response.responded_at).toLocaleDateString() : '-'
-            }
-          </div>
-          {record.customer_response?.reason && (
-            <Tooltip title={record.customer_response.reason}>
-              <div className="text-xs text-red-600 truncate mt-1">
-                {record.customer_response.reason}
-              </div>
-            </Tooltip>
-          )}
+        <div className="text-xs text-gray-600 truncate">
+          {record.customer_response?.reason || 'No reason provided'}
         </div>
       )
     },
     {
       title: 'Action',
       width: 100,
-      fixed: 'right',
       render: (_, record) => (
         <Button
-          danger
           size="small"
           icon={<EyeOutlined />}
           onClick={() => openQuotation(record.final_quotation)}
+          style={{ color: PURPLE_THEME.primary }}
         >
           View
         </Button>
@@ -484,930 +389,424 @@ const Leads = () => {
   // Deals Columns
   const dealsColumns = [
     {
-      title: 'Project Details',
-      width: 220,
+      title: 'Project',
+      width: 200,
       render: (_, record) => (
-        <div className="flex items-start space-x-3">
+        <div className="flex items-center gap-3">
           <Avatar 
             size={40} 
+            style={{ 
+              background: PURPLE_THEME.primaryBg,
+              color: PURPLE_THEME.primary
+            }}
             icon={<ProjectOutlined />}
-            className="bg-purple-100 text-purple-600"
           />
-          <div className="flex-1 min-w-0">
-            <div className="font-semibold text-gray-900 truncate">
-              {record.project?.title || 'Landscaping Project'}
-            </div>
-            <div className="text-xs text-gray-500 truncate">
-              <UserOutlined className="mr-1" />
-              {record.customer_name}
-            </div>
-            <div className="text-xs text-purple-600 font-medium">
-              Project ID: {record.project?.code || 'N/A'}
+          <div>
+            <div className="font-semibold text-gray-900">{record.customer_name}</div>
+            <div className="text-xs text-purple-600">
+              Project #{record.project_reference?.substring(0, 8) || 'N/A'}
             </div>
           </div>
         </div>
       )
     },
     {
-      title: 'Service Category',
-      width: 150,
-      render: (_, record) => (
-        <div>
-          <div className="font-medium">{record.category?.name}</div>
-          <div className="text-xs text-gray-500">
-            {record.subcategories?.length || 0} subcategories
-          </div>
-        </div>
-      )
+      title: 'Service',
+      width: 140,
+      render: (_, record) => record.subcategory?.label || 'N/A'
     },
     {
-      title: 'Project Status',
-      width: 130,
-      render: (_, record) => {
-        const status = record.project?.status || 'pending';
-        const config = projectStatusConfig[status] || projectStatusConfig.pending;
-        return (
-          <Tag 
-            color={config.color} 
-            icon={config.icon}
-            className="flex items-center space-x-1 px-2 py-1"
-          >
-            {config.label}
-          </Tag>
-        );
-      }
-    },
-    {
-      title: 'Budget & Timeline',
-      width: 180,
-      render: (_, record) => (
-        <div className="space-y-1">
-          <div className="font-bold text-green-600">
-            AED {record.final_quotation?.grand_total?.toLocaleString() || '0'}
-          </div>
-          <div className="text-xs text-gray-500">
-            Duration: {record.project?.duration_days || record.final_quotation?.duration_days || 'N/A'} days
-          </div>
-          {record.project?.start_date && (
-            <div className="text-xs text-blue-600">
-              Starts: {new Date(record.project.start_date).toLocaleDateString()}
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      title: 'Location',
+      title: 'Value',
       width: 120,
       render: (_, record) => (
-        <div className="text-xs text-gray-600">
-          {record.project?.city || record.city || 'N/A'}
+        <div className="font-bold" style={{ color: PURPLE_THEME.success }}>
+          {formatCurrency(record.final_quotation?.grand_total)}
         </div>
       )
     },
     {
-      title: 'Conversion Info',
-      width: 140,
+      title: 'Converted',
+      width: 100,
       render: (_, record) => (
-        <div className="space-y-1">
-          <div className="text-xs text-purple-600">
-            Converted: {record.deal_converted_at ? 
-              new Date(record.deal_converted_at).toLocaleDateString() : '-'
-            }
-          </div>
-          <div className="text-xs text-gray-500">
-            By: {record.deal_converted_by?.name || 'System'}
-          </div>
+        <div className="text-xs text-gray-500">
+          {formatDate(record.deal_converted_at)}
         </div>
       )
     },
     {
       title: 'Actions',
-      width: 150,
-      fixed: 'right',
+      width: 100,
       render: (_, record) => (
-        <Space>
-          <Button
-            type="primary"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => openQuotation(record.final_quotation)}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            Quotation
-          </Button>
-          <Button
-            type="default"
-            size="small"
-            icon={<ProjectOutlined />}
-            onClick={() => openDealDetails(record)}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            Details
-          </Button>
-        </Space>
+        <Button
+          size="small"
+          icon={<EyeOutlined />}
+          onClick={() => openQuotation(record.final_quotation)}
+          style={{ 
+            background: PURPLE_THEME.primaryBg,
+            borderColor: PURPLE_THEME.primaryLighter,
+            color: PURPLE_THEME.primary
+          }}
+        >
+          View
+        </Button>
       )
     }
   ];
 
+  // Tab items
   const tabItems = [
     {
       key: 'accepted',
       label: (
-        <Badge count={acceptedLeads.length} size="small" offset={[10, -5]}>
-          <span className="flex items-center space-x-2">
-            <CheckCircleOutlined className="text-green-500" />
-            <span>Accepted Leads</span>
-          </span>
+        <Badge count={acceptedLeads.length} size="small" style={{ backgroundColor: PURPLE_THEME.success }}>
+          Accepted
         </Badge>
-      ),
-      children: (
-        <div className="space-y-6">
-          {/* Statistics Cards */}
-          <Row gutter={[16, 16]}>
-            <Col xs={12} sm={6}>
-              <Card className="text-center border-0 shadow-sm">
-                <Statistic
-                  title="Total Accepted"
-                  value={acceptedLeads.length}
-                  prefix={<CheckCircleOutlined className="text-green-500" />}
-                  valueStyle={{ color: '#10b981' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6}>
-              <Card className="text-center border-0 shadow-sm">
-                <Statistic
-                  title="Total Revenue"
-                  value={stats.revenue}
-                  prefix="AED "
-                  valueStyle={{ color: '#059669' }}
-                  formatter={value => value.toLocaleString()}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6}>
-              <Card className="text-center border-0 shadow-sm">
-                <Statistic
-                  title="Converted to Deals"
-                  value={acceptedLeads.filter(lead => lead.status === 'deal').length}
-                  prefix={<RocketOutlined className="text-purple-500" />}
-                  valueStyle={{ color: '#7c3aed' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6}>
-              <Card className="text-center border-0 shadow-sm">
-                <Statistic
-                  title="Success Rate"
-                  value={stats.total > 0 ? (acceptedLeads.length / stats.total) * 100 : 0}
-                  suffix="%"
-                  valueStyle={{ color: '#7c3aed' }}
-                  formatter={value => Math.round(value)}
-                />
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Conversion Alert */}
-          {acceptedLeads.some(lead => lead.status === 'customer_accepted' && !lead.project_reference) && (
-            <Alert
-              message="Ready for Conversion"
-              description="You have accepted leads that can be converted to project deals. Use the 'Convert to Deal' button to create projects."
-              type="info"
-              showIcon
-              icon={<RocketOutlined />}
-              action={
-                <Button 
-                  size="small" 
-                  type="primary"
-                  onClick={() => {
-                    const convertibleLeads = acceptedLeads.filter(
-                      lead => lead.status === 'customer_accepted' && !lead.project_reference
-                    );
-                    if (convertibleLeads.length > 0) {
-                      showSuccessAlert(
-                        'Convertible Leads', 
-                        `You have ${convertibleLeads.length} leads ready for conversion to deals.`
-                      );
-                    }
-                  }}
-                >
-                  View Details
-                </Button>
-              }
-            />
-          )}
-
-          {/* Leads Table */}
-          <Card 
-            title={
-              <div className="flex items-center space-x-2">
-                <TeamOutlined className="text-blue-500" />
-                <span>Accepted Customer Leads</span>
-                <Tag color="success" className="ml-2">
-                  {acceptedLeads.length} Leads
-                </Tag>
-                <Tag color="purple" className="ml-2">
-                  {acceptedLeads.filter(lead => lead.status === 'deal').length} Converted
-                </Tag>
-              </div>
-            }
-            className="shadow-lg border-0"
-          >
-            <CustomTable
-              columns={acceptedColumns}
-              data={acceptedLeads}
-              loading={loading && activeTab === 'accepted'}
-              pagination={false}
-              scroll={{ x: 1200 }}
-            />
-          </Card>
-        </div>
       )
     },
     {
       key: 'rejected',
       label: (
-        <Badge count={rejectedLeads.length} size="small" offset={[10, -5]}>
-          <span className="flex items-center space-x-2">
-            <CloseCircleOutlined className="text-red-500" />
-            <span>Rejected Leads</span>
-          </span>
+        <Badge count={rejectedLeads.length} size="small" style={{ backgroundColor: PURPLE_THEME.error }}>
+          Rejected
         </Badge>
-      ),
-      children: (
-        <div className="space-y-6">
-          {/* Rejection Insights */}
-          <Row gutter={[16, 16]}>
-            <Col xs={24} lg={12}>
-              <Card 
-                title="Rejection Analysis" 
-                className="shadow-sm border-0"
-                extra={<Tag color="red">{rejectedLeads.length} Rejections</Tag>}
-              >
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Rejection Rate</span>
-                      <span>{stats.total > 0 ? Math.round((rejectedLeads.length / stats.total) * 100) : 0}%</span>
-                    </div>
-                    <Progress 
-                      percent={stats.total > 0 ? Math.round((rejectedLeads.length / stats.total) * 100) : 0} 
-                      status="exception"
-                      strokeColor="#ef4444"
-                    />
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Total lost revenue: <strong>AED {rejectedLeads.reduce((sum, lead) => 
-                      sum + (lead.final_quotation?.grand_total || 0), 0
-                    ).toLocaleString()}</strong>
-                  </div>
-                </div>
-              </Card>
-            </Col>
-            <Col xs={24} lg={12}>
-              <Card 
-                title="Common Feedback" 
-                className="shadow-sm border-0"
-              >
-                <List
-                  size="small"
-                  dataSource={rejectedLeads.slice(0, 3).filter(lead => lead.customer_response?.reason)}
-                  renderItem={(lead) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={<CloseCircleOutlined className="text-red-500" />}
-                        title={
-                          <div className="text-xs text-gray-500">
-                            {lead.customer_name}
-                          </div>
-                        }
-                        description={
-                          <div className="text-sm">
-                            {lead.customer_response.reason}
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  )}
-                />
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Rejected Leads Table */}
-          <Card 
-            title={
-              <div className="flex items-center space-x-2">
-                <CloseCircleOutlined className="text-red-500" />
-                <span>Rejected Customer Leads</span>
-                <Tag color="error" className="ml-2">
-                  {rejectedLeads.length} Leads
-                </Tag>
-              </div>
-            }
-            className="shadow-lg border-0"
-          >
-            <CustomTable
-              columns={rejectedColumns}
-              data={rejectedLeads}
-              loading={loading && activeTab === 'rejected'}
-              pagination={false}
-              scroll={{ x: 800 }}
-            />
-          </Card>
-        </div>
       )
     },
     {
       key: 'deals',
       label: (
-        <Badge count={deals.length} size="small" offset={[10, -5]}>
-          <span className="flex items-center space-x-2">
-            <RocketOutlined className="text-purple-500" />
-            <span>Project Deals</span>
-          </span>
+        <Badge count={deals.length} size="small" style={{ backgroundColor: PURPLE_THEME.primary }}>
+          Deals
         </Badge>
-      ),
-      children: (
-        <div className="space-y-6">
-          {/* Deal Statistics */}
-          <Row gutter={[16, 16]}>
-            <Col xs={12} sm={6}>
-              <Card className="text-center border-0 shadow-sm">
-                <Statistic
-                  title="Total Deals"
-                  value={deals.length}
-                  prefix={<RocketOutlined className="text-purple-500" />}
-                  valueStyle={{ color: '#7c3aed' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6}>
-              <Card className="text-center border-0 shadow-sm">
-                <Statistic
-                  title="Deal Revenue"
-                  value={stats.dealRevenue}
-                  prefix="AED "
-                  valueStyle={{ color: '#059669' }}
-                  formatter={value => value.toLocaleString()}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6}>
-              <Card className="text-center border-0 shadow-sm">
-                <Statistic
-                  title="Active Projects"
-                  value={deals.filter(deal => deal.project?.status === 'active').length}
-                  prefix={<ProjectOutlined className="text-green-500" />}
-                  valueStyle={{ color: '#10b981' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={12} sm={6}>
-              <Card className="text-center border-0 shadow-sm">
-                <Statistic
-                  title="Conversion Rate"
-                  value={stats.accepted > 0 ? (deals.length / stats.accepted) * 100 : 0}
-                  suffix="%"
-                  valueStyle={{ color: '#7c3aed' }}
-                  formatter={value => Math.round(value)}
-                />
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Project Status Overview */}
-          <Card 
-            title="Project Status Overview" 
-            className="shadow-sm border-0"
-            extra={<Tag color="purple">{deals.length} Total Deals</Tag>}
-          >
-            <Row gutter={[16, 16]}>
-              {Object.entries(projectStatusConfig).map(([status, config]) => {
-                const count = deals.filter(deal => deal.project?.status === status).length;
-                const percentage = deals.length > 0 ? (count / deals.length) * 100 : 0;
-                
-                return (
-                  <Col xs={24} sm={8} key={status}>
-                    <div className="border rounded-lg p-4 text-center">
-                      <Tag 
-                        color={config.color} 
-                        icon={config.icon}
-                        className="text-lg px-3 py-1 mb-2"
-                      >
-                        {config.label}
-                      </Tag>
-                      <div className="text-2xl font-bold text-gray-900">{count}</div>
-                      <div className="text-sm text-gray-500">Projects</div>
-                      <Progress 
-                        percent={Math.round(percentage)} 
-                        size="small"
-                        strokeColor={config.color === 'success' ? '#10b981' : 
-                                   config.color === 'processing' ? '#1890ff' : 
-                                   config.color === 'warning' ? '#faad14' : 
-                                   config.color === 'error' ? '#ff4d4f' : '#d9d9d9'}
-                      />
-                    </div>
-                  </Col>
-                );
-              })}
-            </Row>
-          </Card>
-
-          {/* Deals Table */}
-          <Card 
-            title={
-              <div className="flex items-center space-x-2">
-                <RocketOutlined className="text-purple-500" />
-                <span>Converted Project Deals</span>
-                <Tag color="purple" className="ml-2">
-                  {deals.length} Deals
-                </Tag>
-              </div>
-            }
-            className="shadow-lg border-0"
-          >
-            <CustomTable
-              columns={dealsColumns}
-              data={deals}
-              loading={loading && activeTab === 'deals'}
-              pagination={false}
-              scroll={{ x: 1200 }}
-            />
-          </Card>
-        </div>
       )
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen p-6" style={{ background: PURPLE_THEME.light }}>
+      <div className="max-w-screen-2xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-lg mb-6">
-            <TeamOutlined className="text-4xl text-blue-600" />
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-bold" style={{ color: PURPLE_THEME.dark }}>
+                Customer Responses
+              </h1>
+              <p className="text-gray-600">Track accepted/rejected leads and converted deals</p>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Customer Responses & Deals
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Track customer decisions, manage accepted quotations, and monitor converted project deals in one place.
-          </p>
+
+          {/* Stats */}
+          <Row gutter={[16, 16]} className="mb-6">
+            <Col xs={12} sm={6} md={4}>
+              <Card 
+                className="text-center border-0"
+                style={{ 
+                  background: 'white',
+                  borderLeft: `4px solid ${PURPLE_THEME.primary}`
+                }}
+                bodyStyle={{ padding: '16px' }}
+              >
+                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.primary }}>
+                  {stats.total}
+                </div>
+                <div className="text-sm text-gray-600">Total</div>
+              </Card>
+            </Col>
+            
+            <Col xs={12} sm={6} md={4}>
+              <Card 
+                className="text-center border-0"
+                style={{ 
+                  background: 'white',
+                  borderLeft: `4px solid ${PURPLE_THEME.success}`
+                }}
+                bodyStyle={{ padding: '16px' }}
+              >
+                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.success }}>
+                  {stats.accepted}
+                </div>
+                <div className="text-sm text-gray-600">Accepted</div>
+              </Card>
+            </Col>
+            
+            <Col xs={12} sm={6} md={4}>
+              <Card 
+                className="text-center border-0"
+                style={{ 
+                  background: 'white',
+                  borderLeft: `4px solid ${PURPLE_THEME.error}`
+                }}
+                bodyStyle={{ padding: '16px' }}
+              >
+                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.error }}>
+                  {stats.rejected}
+                </div>
+                <div className="text-sm text-gray-600">Rejected</div>
+              </Card>
+            </Col>
+            
+            <Col xs={12} sm={6} md={4}>
+              <Card 
+                className="text-center border-0"
+                style={{ 
+                  background: 'white',
+                  borderLeft: `4px solid ${PURPLE_THEME.primary}`
+                }}
+                bodyStyle={{ padding: '16px' }}
+              >
+                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.primary }}>
+                  {stats.deals}
+                </div>
+                <div className="text-sm text-gray-600">Deals</div>
+              </Card>
+            </Col>
+            
+            <Col xs={24} sm={12} md={4}>
+              <Card 
+                className="text-center border-0"
+                style={{ 
+                  background: 'white',
+                  borderLeft: `4px solid ${PURPLE_THEME.success}`
+                }}
+                bodyStyle={{ padding: '16px' }}
+              >
+                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.success }}>
+                  {formatCurrency(stats.revenue)}
+                </div>
+                <div className="text-sm text-gray-600">Revenue</div>
+              </Card>
+            </Col>
+            
+            <Col xs={24} sm={12} md={4}>
+              <Card 
+                className="text-center border-0"
+                style={{ 
+                  background: 'white',
+                  borderLeft: `4px solid ${PURPLE_THEME.success}`
+                }}
+                bodyStyle={{ padding: '16px' }}
+              >
+                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.success }}>
+                  {formatCurrency(stats.dealRevenue)}
+                </div>
+                <div className="text-sm text-gray-600">Deal Value</div>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Conversion Alert */}
+          {activeTab === 'accepted' && acceptedLeads.some(lead => lead.status === 'customer_accepted' && !lead.project_reference) && (
+            <Alert
+              message="Leads Ready for Conversion"
+              description={`You have ${acceptedLeads.filter(lead => lead.status === 'customer_accepted' && !lead.project_reference).length} accepted leads that can be converted to deals`}
+              type="info"
+              showIcon
+              style={{ 
+                marginBottom: '16px',
+                background: PURPLE_THEME.primaryBg,
+                borderColor: PURPLE_THEME.primaryLighter
+              }}
+            />
+          )}
         </div>
 
         {/* Main Content */}
-        <Card 
-          className="border-0 shadow-xl rounded-2xl overflow-hidden"
+        <Card
+          style={{ 
+            borderRadius: '12px',
+            border: '1px solid #f0f0f0',
+            background: 'white'
+          }}
           bodyStyle={{ padding: 0 }}
         >
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
             items={tabItems}
-            size="large"
-            className="custom-tabs"
-            tabBarStyle={{ 
-              padding: '0 24px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              margin: 0
-            }}
+            style={{ padding: '0 16px' }}
           />
+
+          <div className="p-4">
+            {activeTab === 'accepted' && (
+              <CustomTable
+                columns={acceptedColumns}
+                data={acceptedLeads}
+                loading={loading}
+                pagination={false}
+                scroll={{ x: 800 }}
+                rowClassName="hover:bg-purple-50 transition-colors"
+              />
+            )}
+            
+            {activeTab === 'rejected' && (
+              <CustomTable
+                columns={rejectedColumns}
+                data={rejectedLeads}
+                loading={loading}
+                pagination={false}
+                scroll={{ x: 800 }}
+                rowClassName="hover:bg-purple-50 transition-colors"
+              />
+            )}
+            
+            {activeTab === 'deals' && (
+              <CustomTable
+                columns={dealsColumns}
+                data={deals}
+                loading={loading}
+                pagination={false}
+                scroll={{ x: 800 }}
+                rowClassName="hover:bg-purple-50 transition-colors"
+              />
+            )}
+          </div>
         </Card>
 
-        {/* Enhanced Quotation Modal */}
+        {/* Quotation Details Modal */}
         <Modal
           title={
-            <div className="flex items-center space-x-3">
-              <TrophyOutlined className="text-2xl text-yellow-500" />
+            <div className="flex items-center gap-3">
+              <Avatar 
+                size={40}
+                style={{ 
+                  background: PURPLE_THEME.primary,
+                  color: 'white'
+                }}
+                icon={<FileTextOutlined />}
+              />
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 m-0">Final Quotation Details</h2>
-                <p className="text-gray-600 text-sm m-0">Complete project breakdown and customer decision</p>
+                <h3 className="text-xl font-bold m-0" style={{ color: PURPLE_THEME.dark }}>
+                  Quotation Details
+                </h3>
+                <p className="text-gray-500 text-sm m-0">Full quotation breakdown</p>
               </div>
             </div>
           }
           open={modalVisible}
           onCancel={() => setModalVisible(false)}
           footer={null}
-          width="95%"
-          style={{ maxWidth: 1200 }}
-          className="quotation-modal"
+          width={800}
         >
           {selectedQuotation && (
-            <div className="space-y-6">
-              {/* Header Summary */}
-              <Row gutter={[16, 16]} className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
-                <Col xs={24} md={12}>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <DollarOutlined className="text-green-500 text-xl" />
-                      <span className="font-semibold text-lg">Grand Total:</span>
-                      <span className="text-2xl font-bold text-green-600">
-                        AED {selectedQuotation.grand_total?.toLocaleString()}
-                      </span>
-                    </div>
-                    {selectedQuotation.duration_days && (
-                      <div className="flex items-center space-x-2">
-                        <CalendarOutlined className="text-blue-500" />
-                        <span className="font-semibold">Project Duration:</span>
-                        <span className="text-lg text-blue-600">{selectedQuotation.duration_days} days</span>
-                      </div>
-                    )}
-                  </div>
-                </Col>
-                <Col xs={24} md={12}>
-                  <div className="space-y-2 text-right">
-                    {selectedQuotation.discount_percent > 0 && (
-                      <div className="text-lg text-green-600 font-semibold">
-                        Customer Savings: AED {selectedQuotation.discount_amount?.toLocaleString()} 
-                        ({selectedQuotation.discount_percent}% OFF)
-                      </div>
-                    )}
-                    <div className="text-sm text-gray-500">
-                      Quotation created: {new Date(selectedQuotation.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                </Col>
-              </Row>
-
-              {/* Scope of Work */}
+            <div className="space-y-6 mt-4">
+              {/* Amount Summary */}
               <Card 
-                title={
-                  <span className="text-lg font-semibold flex items-center">
-                    <FileTextOutlined className="mr-2 text-blue-500" />
-                    Project Scope & Specifications
-                  </span>
-                }
-                className="shadow-sm"
+                style={{ 
+                  background: PURPLE_THEME.primaryBg,
+                  border: `1px solid ${PURPLE_THEME.primaryLighter}`
+                }}
               >
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-lg">
-                    {selectedQuotation.scope_of_work}
-                  </p>
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">Grand Total</div>
+                  <div className="text-3xl font-bold mt-2" style={{ color: PURPLE_THEME.success }}>
+                    {formatCurrency(selectedQuotation.grand_total)}
+                  </div>
+                  {selectedQuotation.discount_percent > 0 && (
+                    <div className="text-sm text-green-600 mt-2">
+                      {selectedQuotation.discount_percent}% discount
+                    </div>
+                  )}
                 </div>
               </Card>
 
-              {/* Detailed Breakdown */}
-              <Card
-                title={
-                  <span className="text-lg font-semibold flex items-center">
-                    <TeamOutlined className="mr-2 text-green-500" />
-                    Detailed Cost Breakdown
-                  </span>
-                }
-                className="shadow-sm"
-              >
+              {/* Scope of Work */}
+              <Card title="Scope of Work" size="small">
+                <div className="p-3 bg-gray-50 rounded">
+                  <p>{selectedQuotation.scope_of_work}</p>
+                </div>
+              </Card>
+
+              {/* Items Table */}
+              <Card title="Items Breakdown" size="small">
                 <Table
-                  dataSource={selectedQuotation.items}
+                  dataSource={selectedQuotation.items || []}
                   pagination={false}
                   bordered
-                  size="middle"
-                  className="custom-table"
-                  scroll={{ x: 800 }}
+                  size="small"
+                  scroll={{ x: 600 }}
                 >
                   <Table.Column 
-                    title="S.No" 
-                    dataIndex="sno" 
+                    title="Item" 
+                    dataIndex="item" 
+                    width={200}
+                  />
+                  <Table.Column 
+                    title="Description" 
+                    dataIndex="description" 
+                    ellipsis
+                  />
+                  <Table.Column 
+                    title="Qty" 
+                    dataIndex="quantity" 
                     width={80}
                     align="center"
-                    render={(text) => <Tag color="blue">{text}</Tag>}
                   />
                   <Table.Column 
-                    title="Item Description" 
-                    dataIndex="item" 
-                    render={(text, record) => (
-                      <div>
-                        <div className="font-semibold">{text}</div>
-                        {record.description && (
-                          <div className="text-sm text-gray-600 mt-1">{record.description}</div>
-                        )}
+                    title="Rate" 
+                    render={(_, r) => (
+                      <div>{formatCurrency(r.unit_price)}</div>
+                    )}
+                    width={100}
+                  />
+                  <Table.Column 
+                    title="Total" 
+                    render={(_, r) => (
+                      <div className="font-semibold" style={{ color: PURPLE_THEME.success }}>
+                        {formatCurrency(r.total)}
                       </div>
                     )}
-                  />
-                  <Table.Column 
-                    title="Unit" 
-                    dataIndex="unit" 
-                    width={100}
-                    align="center"
-                  />
-                  <Table.Column 
-                    title="Quantity" 
-                    dataIndex="quantity" 
-                    width={100}
-                    align="center"
-                  />
-                  <Table.Column 
-                    title="Unit Price" 
-                    render={(_, record) => (
-                      <div className="text-right font-semibold">
-                        AED {record.unit_price?.toLocaleString()}
-                      </div>
-                    )} 
                     width={120}
-                  />
-                  <Table.Column 
-                    title="Total Amount" 
-                    render={(_, record) => (
-                      <div className="text-right font-bold text-green-600">
-                        AED {record.total?.toLocaleString()}
-                      </div>
-                    )} 
-                    width={140}
                   />
                 </Table>
               </Card>
 
-              {/* Financial Summary */}
-              <Card 
-                className="bg-gradient-to-r from-green-50 to-emerald-100 border-0 shadow-sm"
-              >
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} md={12}>
-                    <div className="space-y-4">
-                      <h3 className="text-xl font-bold text-gray-900 flex items-center">
-                        <DollarOutlined className="mr-2 text-green-500" />
-                        Financial Summary
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex justify-between text-lg">
-                          <span className="font-semibold">Subtotal:</span>
-                          <span className="font-semibold">AED {selectedQuotation.subtotal?.toLocaleString()}</span>
-                        </div>
-                        {selectedQuotation.discount_percent > 0 && (
-                          <div className="flex justify-between text-lg text-green-600">
-                            <span>Discount ({selectedQuotation.discount_percent}%):</span>
-                            <span className="font-semibold">-AED {selectedQuotation.discount_amount?.toLocaleString()}</span>
-                          </div>
-                        )}
-                        <Divider className="my-3" />
-                        <div className="flex justify-between text-2xl font-bold text-green-700">
-                          <span>Grand Total:</span>
-                          <span>AED {selectedQuotation.grand_total?.toLocaleString()}</span>
-                        </div>
-                      </div>
+              {/* Totals */}
+              <Card size="small">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span className="font-semibold">{formatCurrency(selectedQuotation.subtotal)}</span>
+                  </div>
+                  
+                  {selectedQuotation.discount_percent > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount ({selectedQuotation.discount_percent}%):</span>
+                      <span className="font-semibold">-{formatCurrency(selectedQuotation.discount_amount)}</span>
                     </div>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <div className="bg-white p-4 rounded-lg border shadow-sm">
-                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                        <SafetyCertificateOutlined className="mr-2 text-blue-500" />
-                        Project Inclusions
-                      </h4>
-                      <ul className="space-y-2 text-gray-600">
-                        <li className="flex items-center">
-                          <CheckCircleOutlined className="text-green-500 mr-2" />
-                          Premium quality materials
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircleOutlined className="text-green-500 mr-2" />
-                          Certified professional team
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircleOutlined className="text-green-500 mr-2" />
-                          Quality assurance guarantee
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircleOutlined className="text-green-500 mr-2" />
-                          Comprehensive after-service support
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircleOutlined className="text-green-500 mr-2" />
-                          Timely project completion
-                        </li>
-                      </ul>
-                    </div>
-                  </Col>
-                </Row>
+                  )}
+
+                  <div className="flex justify-between text-lg font-bold" style={{ color: PURPLE_THEME.success }}>
+                    <span>Grand Total:</span>
+                    <span>{formatCurrency(selectedQuotation.grand_total)}</span>
+                  </div>
+                </div>
               </Card>
-            </div>
-          )}
-        </Modal>
 
-        {/* Deal Details Modal */}
-        <Modal
-          title={
-            <div className="flex items-center space-x-3">
-              <RocketOutlined className="text-2xl text-purple-500" />
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 m-0">Project Deal Details</h2>
-                <p className="text-gray-600 text-sm m-0">Complete project information and conversion details</p>
-              </div>
-            </div>
-          }
-          open={dealModalVisible}
-          onCancel={() => setDealModalVisible(false)}
-          footer={null}
-          width="95%"
-          style={{ maxWidth: 1200 }}
-          className="deal-modal"
-        >
-          {selectedDeal && (
-            <div className="space-y-6">
-              {/* Deal Header */}
-              <Row gutter={[16, 16]} className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg">
-                <Col xs={24} md={12}>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <ProjectOutlined className="text-purple-500 text-xl" />
-                      <span className="font-semibold text-lg">Project:</span>
-                      <span className="text-2xl font-bold text-purple-600">
-                        {selectedDeal.project?.title || 'Landscaping Project'}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <UserOutlined className="text-blue-500" />
-                      <span className="font-semibold">Client:</span>
-                      <span className="text-lg text-blue-600">{selectedDeal.customer_name}</span>
-                    </div>
-                    {selectedDeal.project?.code && (
-                      <div className="flex items-center space-x-2">
-                        <TagOutlined className="text-green-500" />
-                        <span className="font-semibold">Project ID:</span>
-                        <span className="text-lg text-green-600">{selectedDeal.project.code}</span>
-                      </div>
-                    )}
+              {/* Additional Info */}
+              <Card title="Additional Information" size="small">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Created:</span>
+                    <span>{formatDate(selectedQuotation.created_at)}</span>
                   </div>
-                </Col>
-                <Col xs={24} md={12}>
-                  <div className="space-y-2 text-right">
-                    <div className="text-lg font-bold text-green-600">
-                      <DollarOutlined className="mr-1" />
-                      AED {selectedDeal.final_quotation?.grand_total?.toLocaleString() || '0'}
+                  {selectedQuotation.superadmin_approved && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Approved by Superadmin:</span>
+                      <CheckOutlined />
                     </div>
-                    <div className="text-sm text-purple-600">
-                      Converted: {selectedDeal.deal_converted_at ? 
-                        new Date(selectedDeal.deal_converted_at).toLocaleDateString() : '-'
-                      }
+                  )}
+                  {selectedQuotation.is_final && (
+                    <div className="flex justify-between text-purple-600">
+                      <span>Final Quotation:</span>
+                      <CheckOutlined />
                     </div>
-                    {selectedDeal.deal_converted_by?.name && (
-                      <div className="text-xs text-gray-500">
-                        By: {selectedDeal.deal_converted_by.name}
-                      </div>
-                    )}
-                  </div>
-                </Col>
-              </Row>
-
-              {/* Project Information */}
-              <Row gutter={[16, 16]}>
-                <Col xs={24} md={12}>
-                  <Card title="Project Information" className="shadow-sm">
-                    <Descriptions column={1} size="small">
-                      <Descriptions.Item label="Category">
-                        {selectedDeal.category?.name || 'N/A'}
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Subcategories">
-                        {selectedDeal.subcategories?.map(sub => sub.name).join(', ') || 'N/A'}
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Project Status">
-                        <Tag 
-                          color={
-                            selectedDeal.project?.status === 'completed' ? 'green' :
-                            selectedDeal.project?.status === 'active' ? 'blue' :
-                            selectedDeal.project?.status === 'pending' ? 'orange' : 'default'
-                          }
-                        >
-                          {selectedDeal.project?.status?.toUpperCase() || 'PENDING'}
-                        </Tag>
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Location">
-                        {selectedDeal.project?.city || selectedDeal.city || 'N/A'}
-                      </Descriptions.Item>
-                      {selectedDeal.project?.budget && (
-                        <Descriptions.Item label="Project Budget">
-                          AED {selectedDeal.project.budget?.toLocaleString()}
-                        </Descriptions.Item>
-                      )}
-                    </Descriptions>
-                  </Card>
-                </Col>
-                <Col xs={24} md={12}>
-                  <Card title="Timeline Information" className="shadow-sm">
-                    <Descriptions column={1} size="small">
-                      <Descriptions.Item label="Estimate Submitted">
-                        {new Date(selectedDeal.submitted_at).toLocaleDateString()}
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Customer Accepted">
-                        {selectedDeal.customer_response?.responded_at ? 
-                          new Date(selectedDeal.customer_response.responded_at).toLocaleDateString() : '-'
-                        }
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Deal Converted">
-                        {selectedDeal.deal_converted_at ? 
-                          new Date(selectedDeal.deal_converted_at).toLocaleDateString() : '-'
-                        }
-                      </Descriptions.Item>
-                      {selectedDeal.project?.start_date && (
-                        <Descriptions.Item label="Project Start">
-                          {new Date(selectedDeal.project.start_date).toLocaleDateString()}
-                        </Descriptions.Item>
-                      )}
-                      {selectedDeal.project?.end_date && (
-                        <Descriptions.Item label="Project End">
-                          {new Date(selectedDeal.project.end_date).toLocaleDateString()}
-                        </Descriptions.Item>
-                      )}
-                    </Descriptions>
-                  </Card>
-                </Col>
-              </Row>
-
-              {/* Financial Summary */}
-              {selectedDeal.final_quotation && (
-                <Card title="Financial Summary" className="shadow-sm">
-                  <Row gutter={[16, 16]}>
-                    <Col xs={24} md={8}>
-                      <Statistic
-                        title="Quotation Value"
-                        value={selectedDeal.final_quotation.grand_total}
-                        prefix="AED "
-                        valueStyle={{ color: '#059669' }}
-                      />
-                    </Col>
-                    <Col xs={24} md={8}>
-                      <Statistic
-                        title="Discount"
-                        value={selectedDeal.final_quotation.discount_percent || 0}
-                        suffix="%"
-                        valueStyle={{ color: '#ef4444' }}
-                      />
-                    </Col>
-                    <Col xs={24} md={8}>
-                      <Statistic
-                        title="Discount Amount"
-                        value={selectedDeal.final_quotation.discount_amount || 0}
-                        prefix="AED "
-                        valueStyle={{ color: '#ef4444' }}
-                      />
-                    </Col>
-                  </Row>
-                </Card>
-              )}
-
-              {/* Actions */}
-              <Card title="Actions" className="shadow-sm">
-                <Space>
-                  <Button
-                    type="primary"
-                    icon={<EyeOutlined />}
-                    onClick={() => {
-                      setDealModalVisible(false);
-                      openQuotation(selectedDeal.final_quotation);
-                    }}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    View Full Quotation
-                  </Button>
-                  <Button
-                    type="default"
-                    icon={<ProjectOutlined />}
-                    onClick={() => {
-                      // Navigate to project management page if needed
-                      message.info('Redirecting to project management...');
-                    }}
-                  >
-                    Manage Project
-                  </Button>
-                </Space>
+                  )}
+                </div>
               </Card>
             </div>
           )}
         </Modal>
       </div>
-
-      <style jsx>{`
-        .custom-tabs .ant-tabs-tab {
-          color: white !important;
-          font-weight: 600;
-        }
-        
-        .custom-tabs .ant-tabs-tab-active {
-          background: rgba(255, 255, 255, 0.2) !important;
-          border-radius: 8px 8px 0 0;
-        }
-        
-        .custom-tabs .ant-tabs-ink-bar {
-          background: white !important;
-          height: 3px;
-        }
-        
-        .quotation-modal .ant-modal-header {
-          background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-          border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .deal-modal .ant-modal-header {
-          background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
-          border-bottom: 1px solid #e9d5ff;
-        }
-        
-        .custom-table .ant-table-thead > tr > th {
-          background: #f8fafc;
-          font-weight: 600;
-        }
-      `}</style>
     </div>
   );
 };

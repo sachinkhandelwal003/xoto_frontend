@@ -49,6 +49,8 @@ import Ai from "./components/AII/Ai";
 import EstimateCalculator from "./components/modal/EstimateCalculator";
 import Calculator from "./components/homepage/AiPlanner/Calculator";
 import OtherLogin from "./components/login/OtherLogin";
+import InteriorPlanner from "./components/homepage/AiPlanner/InteriorPlanner";
+import InteriorCalculator from "./components/homepage/AiPlanner/InteriorCalculator";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -125,7 +127,9 @@ function LayoutWrapper({ children }) {
     "/admin/login",
     "/other/login",
     "/aiPlanner",
+    "/aiPlanner/interior",
     "/estimate/calculator",
+    "/estimate/calculator/interior",
     "/accountant/login",
     "/ecommerce/seller",
     "/ecommerce/cart",
@@ -155,7 +159,9 @@ function LayoutWrapper({ children }) {
     "/admin/login",
     "/other/login",
         "/aiPlanner",
+        "/aiPlanner/interior",
         "/estimate/calculator",
+        "/estimate/calculator/interior",
     "/accountant/login",
     "/ecommerce/seller",
     "/freelancer/registration",
@@ -183,7 +189,9 @@ function LayoutWrapper({ children }) {
     "/admin/login",
     "/other/login",
         "/aiPlanner",
+        "/aiPlanner/interior",
         "/estimate/calculator",
+        "/estimate/calculator/interior",
     "/ecommerce/seller",
     "/ecommerce/product",
   ];
@@ -202,7 +210,9 @@ function LayoutWrapper({ children }) {
     "/admin/login",
     "/other/login",
         "/aiPlanner",
+        "/aiPlanner/interior",
         "/estimate/calculator",
+        "/estimate/calculator/interior",
     "/accountant/login",
     "/ecommerce/seller",
     "/ecommerce/product",
@@ -236,7 +246,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/landscaping" element={<Landspackng />} />
                     <Route path="/aiPlanner" element={<AIPlanner />} />
+                                        <Route path="/aiPlanner/interior" element={<InteriorPlanner />} />
+
                     <Route path="/estimate/calculator" element={<Calculator />} />
+                    <Route path="/estimate/calculator/interior" element={<InteriorCalculator />} />
 
           <Route path="/services/interior" element={<Ynterior />} />
           <Route path="/marketplace" element={<Buy />} />
