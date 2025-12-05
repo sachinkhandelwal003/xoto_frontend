@@ -5,9 +5,23 @@ import waveint4 from "../../assets/img/wave/waveint4.png";
 
 export default function WhatAreYouLookingFor() {
   return (
-    <section className="relative bg-[var(--color-body)] overflow-hidden  pt-15 ">
-      {/* BOTTOM WAVE BACKGROUND IMAGE - Fixed positioning */}
-      <div className="absolute -bottom-50 left-0 w-full z-0 pointer-events-none select-none">
+    <section className="relative bg-[var(--color-body)] overflow-hidden pt-15">
+      {/* BOTTOM WAVE BACKGROUND IMAGE */}
+      <div
+        className="
+    absolute 
+    -bottom-10 
+    sm:-bottom-20 
+    lg:-bottom-48 
+    left-0 
+    w-full 
+    sm:mx-0 
+    lg:mx-[-80px]
+    z-0 
+    pointer-events-none 
+    select-none
+  "
+      >
         <img
           src={waveint4}
           alt="Decorative wave"
@@ -16,30 +30,33 @@ export default function WhatAreYouLookingFor() {
       </div>
 
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
-        {/* Heading */}
+        {/* HEADING + SUBTEXT */}
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="heading-dark-1 text-[#020202] ">
+          <h2 className="font-bold text-[#020202] text-3xl sm:text-4xl lg:text-5xl leading-tight">
             What are you looking for
           </h2>
 
-          <p className="text-[24px] pargraph-light-1 text-[#547593] mt-4">
+          <p className="mt-4 text-[16px] sm:text-[18px] lg:text-[20px] text-[#547593]">
             Let Xobia guide you through your perfect property journey with
             personalized recommendations.
           </p>
 
-          {/* Buttons */}
+          {/* BUTTONS */}
           <div className="mt-8 flex justify-center">
-            <div className="rounded-xl p-1 bg-gradient-to-b from-[#03A4F4] to-[#64EF0A]">
-              <div className="flex items-center gap-5 px-2 py-1 backdrop-blur-sm">
-                <button className="rounded-lg px-10 py-4 text-sm sm:text-base font-semibold bg-[#5C039B] text-white shadow-md">
+            <div
+              className="rounded-xl p-1 bg-gradient-to-b from-[#03A4F4] to-[#64EF0A] 
+                         max-w-[380px] sm:max-w-none mx-auto"
+            >
+              <div className="flex flex-row items-center justify-center gap-2 sm:gap-5 px-2 py-1">
+                <button className="whitespace-nowrap w-auto rounded-lg px-6 sm:px-10 py-3 sm:py-4 text-sm sm:text-base font-semibold bg-[#5C039B] text-white shadow-md">
                   Rent Home
                 </button>
 
-                <button className="rounded-lg px-10 py-4 text-sm sm:text-base font-semibold bg-white/10 text-white border border-white/40 hover:bg-[#5C039B] hover:text-white transition">
+                <button className="whitespace-nowrap w-auto rounded-lg px-6 sm:px-10 py-3 sm:py-4 text-sm sm:text-base font-semibold bg-white/10 text-white border border-white/40 hover:bg-[#5C039B] hover:text-white transition">
                   Buy Home
                 </button>
 
-                <button className="rounded-lg px-10 py-4 text-sm sm:text-base font-semibold bg-white/10 text-white border border-white/40 hover:bg-[#5C039B] hover:text-white transition">
+                <button className="whitespace-nowrap w-auto rounded-lg px-6 sm:px-10 py-3 sm:py-4 text-sm sm:text-base font-semibold bg-white/10 text-white border border-white/40 hover:bg-[#5C039B] hover:text-white transition">
                   Sell Home
                 </button>
               </div>
@@ -47,43 +64,36 @@ export default function WhatAreYouLookingFor() {
           </div>
         </div>
 
-        {/* Text + Avatar Container */}
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        {/* TEXT + AVATAR ROW (desktop-aligned) */}
+        <div className="max-w-5xl mx-auto mt-10 lg:mt-14 grid grid-cols-2 gap-4 sm:gap-6 lg:gap-10 items-center">
           {/* LEFT CONTENT */}
-          <div className="max-w-2xl h-full flex flex-col lg:justify-center">
-            {/* Heading */}
+          <div className="max-w-[320px] lg:max-w-2xl h-full flex flex-col mt-10 md:mt-8 lg:mt-0 lg:justify-center lg:ml-[150px]">
             <h3
-              className="font-semibold text-[#000000]"
-              style={{
-                fontFamily: "DM Sans",
-                fontSize: "31px",
-                lineHeight: "32px",
-                letterSpacing: "0px",
-                marginLeft: "65px",
-              }}
+              className="font-semibold mt-10 text-[#000000]
+                 text-[22px] sm:text-[24px] lg:text-[26px]
+                 leading-[32px] text-left"
+              style={{ fontFamily: "DM Sans" }}
             >
               Rent Home
             </h3>
 
-            {/* Paragraph */}
             <p
-              className="font-medium text-[#547593] mt-2 paragraph-light-1"
-              style={{
-                marginLeft: "65px",
-              }}
+              className="font-medium text-[#547593] mt-2
+                 text-[15px] sm:text-[16px]
+                 text-left max-w-[503px]"
             >
               Curated rentals with flexible terms, verified listings, and smart
               match recommendations.
             </p>
           </div>
 
-          {/* RIGHT IMAGE */}
-          <div className="w-full flex justify-center lg:justify-end">
+          {/* RIGHT AVATAR */}
+          <div className="w-full flex mx-4 sm:mx-8 lg:mx-0 justify-center lg:justify-end mt-6 lg:mt-0">
             <div className="relative">
               <img
                 src={avatarSrc}
                 alt="Xobia assistant"
-                className="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mr-15"
+                className="max-w-[180px] sm:max-w-[220px] md:max-w-sm lg:max-w-md"
               />
             </div>
           </div>

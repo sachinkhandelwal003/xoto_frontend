@@ -37,10 +37,13 @@ const features = [
 export default function EcoSmartLiving() {
   return (
     <section className="relative w-full overflow-hidden pb-20 bg-white min-h-screen">
-
       {/* Wave Background */}
       <div className="absolute -bottom-160 left-0 w-full z-0 pointer-events-none">
-        <img src={waveBg} alt="wave-bg" className="w-full object-cover opacity-90" />
+        <img
+          src={waveBg}
+          alt="wave-bg"
+          className="w-full object-cover opacity-90"
+        />
       </div>
 
       {/* Content */}
@@ -50,7 +53,10 @@ export default function EcoSmartLiving() {
         </h1>
 
         <p className="mt-4 text-[#547593] paragraph-light-1 max-w-3xl mx-auto text-lg ">
-        At XOTO, EcoSmart Living means creating landscapes that balance beauty, sustainability, and technology. Our designs use smart automation and eco-friendly solutions to make outdoor spaces efficient, self-sustaining, and effortlessly modern.
+          At XOTO, EcoSmart Living means creating landscapes that balance
+          beauty, sustainability, and technology. Our designs use smart
+          automation and eco-friendly solutions to make outdoor spaces
+          efficient, self-sustaining, and effortlessly modern.
         </p>
 
         <h2 className="text-3xl font-semibold mt-10 text-black leading-tight">
@@ -59,18 +65,18 @@ export default function EcoSmartLiving() {
 
         {/* Features Grid */}
         <div className="mt-14 flex flex-col items-center gap-10">
-
           {/* Row 1 */}
           <div className="flex flex-wrap justify-center gap-20">
-
             {/* Smart Irrigation */}
-            <div className="
+            <div
+              className="
               rounded-full p-[12px] 
               ring-4 ring-transparent
               hover:ring-[#5C039B]
               hover:ring-4
               transition-all duration-300
-            ">
+            "
+            >
               <div
                 className="
                   w-[200px] h-[200px] rounded-full 
@@ -78,6 +84,7 @@ export default function EcoSmartLiving() {
                   text-white font-semibold shadow-xl
                   bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400
                   hover:scale-105 hover:shadow-2xl transition-all duration-300
+                  sm:hover:scale-105 sm:hover:shadow-2xl
                 "
               >
                 <span className="text-lg font-bold">Smart Irrigation</span>
@@ -89,14 +96,16 @@ export default function EcoSmartLiving() {
 
             {/* Solar + Low Water */}
             {features.slice(1, 3).map((item, i) => (
-              <div key={i}
+              <div
+                key={i}
                 className="
                   rounded-full p-[12px]
                   ring-4 ring-transparent
                   hover:ring-[#5C039B]
                   hover:ring-4
                   transition-all duration-300
-                ">
+                "
+              >
                 <div
                   className="
                     w-[200px] h-[200px] rounded-full bg-cover bg-center shadow-lg
@@ -116,14 +125,16 @@ export default function EcoSmartLiving() {
           {/* Row 2 */}
           <div className="flex flex-wrap justify-center gap-20">
             {features.slice(3).map((item, i) => (
-              <div key={i}
+              <div
+                key={i}
                 className="
                   rounded-full p-[12px]
                   ring-4 ring-transparent
                   hover:ring-[#5C039B]
                   hover:ring-4
                   transition-all duration-300
-                ">
+                "
+              >
                 <div
                   className="
                     w-[200px] h-[200px] rounded-full bg-cover bg-center shadow-lg
@@ -139,7 +150,6 @@ export default function EcoSmartLiving() {
               </div>
             ))}
           </div>
-
         </div>
       </div>
     </section>
