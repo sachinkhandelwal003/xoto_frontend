@@ -4,7 +4,8 @@ import toast, { Toaster } from "react-hot-toast";
 
 export default function HeroSection() {
   const [openModal, setOpenModal] = useState(false);
-  const [actionType, setActionType] = useState("");
+  const [actionType, setActionType] = useState("Buy"); // BUY or SELL FORM
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -16,7 +17,9 @@ export default function HeroSection() {
   });
 
   const handleOpenModal = (type) => {
-    setActionType(type);
+    if (type === "Sell a Home") setActionType("Sell");
+    else setActionType("Buy");
+
     setOpenModal(true);
   };
 
@@ -32,16 +35,6 @@ export default function HeroSection() {
     );
 
     setOpenModal(false);
-
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      number: "",
-      lookingTo: "",
-      city: "",
-      budget: "",
-    });
   };
 
   return (
@@ -88,120 +81,323 @@ export default function HeroSection() {
             </button>
           </div>
         </div>
+
         {/* Bottom clipping shapes */}
         <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
         <div className="absolute bottom-0 right-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-right-shape" />
 
         <style>{`
-        .clip-left-shape {
-          clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
-        }
-        .clip-right-shape {
-          clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
-        }
-      `}</style>
+          .clip-left-shape { clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%); }
+          .clip-right-shape { clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%); }
+        `}</style>
       </section>
 
       {/* MODAL FORM */}
       {openModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl p-6 relative">
-            {/* Close Button */}
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-[#EEE5FF] to-[#C8B3FF] w-full max-w-3xl rounded-3xl p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            {/* CLOSE BUTTON */}
             <button
               onClick={() => setOpenModal(false)}
-              className="absolute right-4 top-4 text-gray-600 hover:text-black text-2xl"
+              className="absolute right-5 top-5 text-white bg-green-500 hover:bg-green-600 w-8 h-8 rounded-full flex items-center justify-center text-xl"
             >
               ×
             </button>
 
-            <h2 className="text-2xl font-bold mb-4 text-center">
-              {actionType} – Submit Your Information
-            </h2>
+            {/* BUY / SELL Toggle */}
+            <div className="flex justify-center mb-6">
+              <div className="flex bg-[#5C039B] rounded-full p-1 gap-2">
+                <button
+                  onClick={() => setActionType("Buy")}
+                  className={`px-6 py-2 rounded-full text-lg font-extrabold ${
+                    actionType === "Buy"
+                      ? "bg-white text-[#5C039B]"
+                      : "text-white"
+                  }`}
+                >
+                  BUY
+                </button>
 
-            {/* FORM */}
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-              <input
-                name="firstName"
-                required
-                placeholder="First Name"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.firstName}
-              />
+                <button
+                  onClick={() => setActionType("Sell")}
+                  className={`px-6 py-2 rounded-full text-lg font-extrabold ${
+                    actionType === "Sell"
+                      ? "bg-white text-[#5C039B]"
+                      : "text-white"
+                  }`}
+                >
+                  SELL
+                </button>
+              </div>
+            </div>
 
-              <input
-                name="lastName"
-                required
-                placeholder="Last Name"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.lastName}
-              />
+            {/* HEADING */}
+            <h1 className="text-center text-4xl font-extrabold text-[#4a0075]">
+              LET'S GET STARTED
+            </h1>
 
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="Email Address"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.email}
-              />
+            {/* DESCRIPTION */}
+            <p className="text-center text-[#5F4A7A] mt-3 mb-8 text-lg font-medium">
+              {actionType === "Sell"
+                ? "We Have Buyers Waiting – Just Need Your Property Details!"
+                : "Almost There! Share Your Information to Finalize Your Property Search."}
+            </p>
 
-              <input
-                name="number"
-                required
-                placeholder="Phone Number"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.number}
-              />
+            {/* BUY / RENT FORM */}
+            {actionType === "Buy" && (
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <input
+                    name="firstName"
+                    placeholder="Name"
+                    className=" w-full px-4 py-3 rounded-lg border border-[#5C039B] text-lg outline-none"
+                    onChange={handleChange}
+                    value={formData.firstName}
+                    required
+                  />
 
-              <select
-                name="lookingTo"
-                required
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.lookingTo}
-              >
-                <option value="">I am looking to</option>
-                <option value="Rent">Rent</option>
-                <option value="Buy">Buy</option>
-                <option value="Sell">Sell</option>
-              </select>
-
-              <input
-                name="city"
-                required
-                placeholder="Preferred City"
-                className="border p-3 rounded"
-                onChange={handleChange}
-                value={formData.city}
-              />
-
-              {/* UPDATED BUDGET INPUT WITH AED LABEL */}
-              <div className="relative col-span-2">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 font-semibold">
-                  AED
-                </span>
+                  <input
+                    name="number"
+                    placeholder="Phone No."
+                    className=" w-full px-4 py-3 rounded-lg border border-[#5C039B] text-lg outline-none"
+                    onChange={handleChange}
+                    value={formData.number}
+                    required
+                  />
+                </div>
 
                 <input
-                  name="budget"
-                  required
-                  placeholder="Enter Budget"
-                  className="border p-3 pl-16 rounded w-full"
+                  name="email"
+                  placeholder="Your Email"
+                  className=" w-full px-4 py-3 rounded-lg border border-[#5C039B] text-lg outline-none mb-4"
                   onChange={handleChange}
-                  value={formData.budget}
+                  value={formData.email}
+                  required
                 />
-              </div>
 
-              <button
-                type="submit"
-                className="col-span-2 bg-[#5C039B] text-white py-3 rounded-lg text-lg font-bold hover:bg-[#4A0080] transition"
-              >
-                Submit Now
-              </button>
-            </form>
+                <input
+                  name="lookingTo"
+                  placeholder="No. of bedrooms you are looking for"
+                  className=" w-full px-4 py-3 rounded-lg border border-[#5C039B] text-lg outline-none mb-6"
+                  onChange={handleChange}
+                  value={formData.lookingTo}
+                  required
+                />
+
+                {/* Contact Preference */}
+                <p className="text-[#4a0075] font-semibold text-lg mb-3">
+                  How do you prefer to be contacted?
+                </p>
+
+                <div className="flex gap-4 mb-6">
+                  {["Call", "WhatsApp", "Email"].map((c) => (
+                    <label key={c} className="flex items-center gap-2">
+                      <input type="radio" name="contact" required />
+                      <span className="bg-[#5C039B] text-white px-4 py-1 rounded-full text-lg font-bold">
+                        {c}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Checkboxes */}
+                <label className="flex items-start gap-3 mb-4">
+                  <input type="checkbox" />
+                  <p className="text-sm text-[#4a0075]">
+                    I agree to receive newsletters and updates.
+                  </p>
+                </label>
+
+                <label className="flex items-start gap-3 mb-6">
+                  <input type="checkbox" required />
+                  <p className="text-sm text-[#4a0075]">
+                    I accept the Terms & Conditions.
+                  </p>
+                </label>
+
+                <button
+                  type="submit"
+                  className="w-full bg-[#5C039B] text-white py-3 rounded-full text-xl font-extrabold hover:bg-[#4A0080] transition"
+                >
+                  SUBMIT
+                </button>
+              </form>
+            )}
+
+            {/* SELL FORM */}
+            {actionType === "Sell" && (
+              <form onSubmit={handleSubmit}>
+                {/* SELL FIELD CLASS */}
+                <style>{`
+      .sellInput {
+        @apply w-full px-4 py-3 rounded-2xl border-2 border-[#5C039B]  bg-white text-base
+               placeholder:text-[#5C039B] placeholder:font-medium placeholder:text-base;
+      }
+      .sellTextarea {
+        @apply w-full px-4 py-3 rounded-2xl border-2 border-[#5C039B]  bg-white text-base h-40
+               placeholder:text-[#5C039B] placeholder:font-medium placeholder:text-base;
+      }
+    `}</style>
+
+                {/* Basic */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <input
+                    className="sellInput bg-white rounded-lg"
+                    placeholder="Name"
+                    required
+                  />
+                  <input
+                    className="sellInput bg-white rounded-lg"
+                    placeholder="Phone No."
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <input
+                    className="sellInput bg-white rounded-lg"
+                    placeholder="Your Email"
+                    required
+                  />
+                  <input
+                    className="sellInput bg-white rounded-lg"
+                    placeholder="Listing type"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <input
+                    className="sellInput bg-white rounded-lg"
+                    placeholder="City"
+                    required
+                  />
+                  <input
+                    className="sellInput bg-white rounded-lg"
+                    placeholder="Area"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <input
+                    className="sellInput bg-white rounded-lg"
+                    placeholder="Project Name"
+                  />
+                  <input
+                    className="sellInput bg-white rounded-lg"
+                    placeholder="Developer"
+                  />
+                </div>
+
+                <input
+                  className="sellInput mb-8 bg-white rounded-lg"
+                  placeholder="No. of bedrooms you are looking for"
+                />
+
+                {/* Unit Type */}
+                <p className="font-semibold text-[#4a0075] text-lg mb-3">
+                  Unit Type
+                </p>
+                <div className="flex flex-wrap gap-4 mb-8">
+                  {[
+                    "Apartment",
+                    "Villa",
+                    "Townhouse",
+                    "Duplex",
+                    "Penthouse",
+                  ].map((u) => (
+                    <label key={u} className="flex items-center gap-3">
+                      <input type="radio" name="unit" />
+                      <span className="px-5 py-2 bg-[#5C039B] text-white rounded-full text-lg font-bold">
+                        {u}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Bedrooms */}
+                <p className="font-semibold text-[#4a0075] text-lg mb-3">
+                  Bedrooms
+                </p>
+                <div className="flex flex-wrap gap-4 mb-8">
+                  {[
+                    "Studio",
+                    "1 Bed",
+                    "2 Bed",
+                    "3 Bed",
+                    "4 Bed",
+                    "5 Bed",
+                    "6 Bed",
+                    "7 Bed",
+                    "8+ Bed",
+                  ].map((b) => (
+                    <label key={b} className="flex items-center gap-3">
+                      <input type="radio" name="bed" />
+                      <span className="px-5 py-2 bg-[#5C039B] text-white rounded-full text-lg font-bold ">
+                        {b}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Price + Area */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <input
+                    className="sellInput rounded-lg  bg-white"
+                    placeholder="Unit Price (AED)"
+                  />
+                  <input
+                    className="sellInput bg-white rounded-lg h-full"
+                    placeholder="Unit Area (Sq. Ft.)"
+                  />
+                </div>
+
+                {/* Description */}
+                <textarea
+                  className="sellTextarea mb-8 rounded-lg bg-white"
+                  placeholder="Description"
+                ></textarea>
+
+                {/* Contact Preference */}
+                <p className="font-semibold text-[#4a0075] text-lg mb-3">
+                  Preferred Contact
+                </p>
+                <div className="flex gap-4 mb-8">
+                  {["Call", "WhatsApp", "Email"].map((c) => (
+                    <label key={c} className="flex items-center gap-3">
+                      <input type="radio" name="contactSell" />
+                      <span className="bg-[#5C039B] text-white px-5 py-2 rounded-full text-lg font-bold">
+                        {c}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Checkboxes */}
+                <label className="flex items-start gap-3 mb-4">
+                  <input type="checkbox" />
+                  <p className="text-sm text-[#4a0075]">
+                    I agree to receive newsletters & marketing communications.
+                  </p>
+                </label>
+
+                <label className="flex items-start gap-3 mb-8">
+                  <input type="checkbox" required />
+                  <p className="text-sm text-[#4a0075]">
+                    I accept the Terms & Conditions.
+                  </p>
+                </label>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  className="w-full bg-[#5C039B] text-white py-4 rounded-full text-2xl font-extrabold hover:bg-[#4A0080] transition"
+                >
+                  SUBMIT
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}
