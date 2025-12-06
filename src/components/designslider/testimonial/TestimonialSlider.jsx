@@ -81,15 +81,17 @@ export default function EcosystemSlider() {
             loop={true}
             grabCursor={true}
             slidesPerView={1}
-            spaceBetween={16}
-            breakpoints={{
-              480: { slidesPerView: 1.05, spaceBetween: 22 },
-              640: { slidesPerView: 1.12, spaceBetween: 26 },
-              768: { slidesPerView: 1.22, spaceBetween: 32 },
-              1024: { slidesPerView: 1.32, spaceBetween: 40 },
-              1280: { slidesPerView: 1.38, spaceBetween: 60 },
-              1536: { slidesPerView: 1.45, spaceBetween: 80 },
-            }}
+breakpoints={{
+  480: { slidesPerView: 1.05, spaceBetween: 2 },
+  640: { slidesPerView: 1.12, spaceBetween: 3 },
+  768: { slidesPerView: 1.22, spaceBetween: 4 },
+  1024: { slidesPerView: 1.32, spaceBetween: 5 },
+  1280: { slidesPerView: 1.38, spaceBetween: 6 },
+  1536: { slidesPerView: 1.45, spaceBetween: 6 },
+}}
+
+
+
             className="!pb-10 sm:!pb-12 md:!pb-14 lg:!pb-16"
           >
             {ecosystemData.map((item, index) => (
@@ -102,7 +104,7 @@ export default function EcosystemSlider() {
               justify-center sm:justify-start
               text-center sm:text-left
               rounded-3xl
-              min-h-[240px] sm:min-h-[260px] md:min-h-[280px] lg:min-h-[260px]
+              min-h-[240px] sm:min-h-[260px] md:min-h-[280px] lg:min-h-[220px]
 
               w-full mx-auto 
               max-w-[300px] xs:max-w-[380px] sm:max-w-[520px]

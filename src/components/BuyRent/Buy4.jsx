@@ -1,30 +1,38 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules';
-import 'swiper/css';
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
 import waveint5 from "../../assets/img/wave/waveint5.png";
+
+import wave1 from "../../assets/img/wave/wave1.png";
+import wave2 from "../../assets/img/wave/wave2.png";
+import building from "../../assets/icons/Homeicons/building.png";
+import rental from "../../assets/icons/Homeicons/rental.png";
+import sale from "../../assets/icons/Homeicons/sale.png";
+import company1 from "../../assets/img/home/companylogo1.png";
+import company2 from "../../assets/img/home/companylogo2.png";
+import company3 from "../../assets/img/home/companylogo3.png";
 
 export default function TrustPresenceSection() {
   const logos = [
-    { name: 'DAMAC', color: 'text-gray-800' },
-    { name: 'SOBHA', sub: 'REALTY', color: 'text-gray-800', subColor: 'text-gray-600' },
-    { name: 'DANUBE', sub: 'PROP.', color: 'text-red-600', subColor: 'text-gray-600' },
-    { name: 'EMAAR', color: 'text-emerald-700' },
-    { name: 'ALDAR', color: 'text-gray-800' },
-    { name: 'NAKHEEL', color: 'text-gray-700' },
-    { name: 'AZIZI', color: 'text-blue-700' },
-    { name: 'MERAAS', color: 'text-indigo-700' },
-    { name: 'DEYAAR', color: 'text-cyan-700' },
+    { icon: company1 },
+    { icon: company2 },
+    { icon: company3 },
+    { icon: company1 },
+    { icon: company2 },
+    { icon: company3 },
+    { icon: company1 },
+    { icon: company2 },
+    { icon: company3 },
   ];
 
   return (
-    <section className="relative w-full py-16 md:py-20 lg:py-24 overflow-hidden bg-gradient-to-b from-white via-cyan-50 to-white">
-      {/* Background Wave */}
-     
-         {/* BOTTOM WAVE BACKGROUND IMAGE */}
-                          <div className="absolute bottom-90 left-0 w-full z-0 pointer-events-none select-none">
+    <section className="relative w-full py-16 md:py-20 lg:py-24 overflow-hidden bg-[var(--color-body)]">
+      {/* Background Waves */}
+      {/* Background Top Wave */}
+          <div className="absolute bottom-90 left-0 w-full z-0 pointer-events-none select-none">
                             <img
                               src={waveint5}
                               alt=""
@@ -32,68 +40,83 @@ export default function TrustPresenceSection() {
                             />
                           </div>
 
-      {/* Title */}
-      <h2 className=" relative z-20 text-center card-heading-1 mb-12 md:mb-16">
-        Our Partners
-      </h2>
+     
 
-      {/* ✅ Full-width Swiper */}
-      <div className="relative w-screen -mx-[calc((100vw-100%)/2)] mb-16 md:mb-20 mt-10" >
+      {/* Title */}
+      <h2
+        className="text-center text-3xl sm:text-4xl md:text-5xl   mb-12 md:mb-16 relative z-20 heading-dark-1"
+        style={{ color: "var(--color-black)" }}
+      >
+Our Partners      </h2>
+
+      {/* Swiper */}
+      <div className="relative w-screen -mx-[calc((100vw-100%)/2)] mb-16 md:mb-20">
         <Swiper
           modules={[Autoplay]}
-          slidesPerView="auto"
+          slidesPerView={7}
           spaceBetween={40}
           loop={true}
-          speed={6000}
+          speed={3000}
           autoplay={{
-            delay: 0,
+            // delay: 0,
             disableOnInteraction: false,
-            reverseDirection: true, // move right to left
+            reverseDirection: true,
           }}
+          centeredSlides={true}
           className="!overflow-visible"
+          onProgress={(swiper) => {
+            swiper.slides.forEach((slide) => {
+              const slideProgress = slide.progress;
+              const scale = 1 - Math.min(Math.abs(slideProgress * 0.55), 0.8);
+              const opacity = 1 - Math.min(Math.abs(slideProgress * 0.35), 0.6);
+
+              slide.style.transform = `scale(${scale})`;
+              slide.style.opacity = opacity;
+            });
+          }}
+          onSetTranslate={(swiper) => {
+            swiper.slides.forEach((slide) => {
+              const slideProgress = slide.progress;
+              const scale = 1 - Math.min(Math.abs(slideProgress * 0.25), 0.4);
+              const opacity = 1 - Math.min(Math.abs(slideProgress * 0.35), 0.6);
+
+              slide.style.transform = `scale(${scale})`;
+              slide.style.opacity = opacity;
+            });
+          }}
         >
           {logos.concat(logos).map((logo, index) => (
             <SwiperSlide
               key={index}
-              className="!w-auto flex justify-center"
+              className="!w-auto flex justify-center transition-all duration-500 ease-out"
             >
+              {/* HOVER-SCALE CIRCLE */}
               <div
-                className={`relative group
-                  w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48
-                  rounded-full bg-white shadow-xl
-                  flex flex-col items-center justify-center
-                  border border-gray-100
-                  transition-all duration-300
-                  hover:scale-110 hover:shadow-2xl
-                `}
+                className="
+                  relative group bg-[var(--color-body)] cursor-pointer
+                  w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48
+                  rounded-full border border-green-300
+                  flex items-center justify-center
+                  shadow-xl
+                  transition-all duration-300 ease-out
+                  hover:scale-125
+                "
               >
-                <div className="text-center">
-                  <span
-                    className={`block font-bold leading-tight ${logo.color}
-                      text-xl sm:text-2xl md:text-3xl lg:text-4xl
-                    `}
-                  >
-                    {logo.name}
-                  </span>
-                  {logo.sub && (
-                    <span
-                      className={`block font-medium leading-none ${logo.subColor}
-                        text-sm sm:text-base md:text-lg
-                      `}
-                    >
-                      {logo.sub}
-                    </span>
-                  )}
-                </div>
+                <img
+                  src={logo.icon}
+                  alt="Logo"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain transition-all duration-300 group-hover:scale-110"
+                />
+
                 {/* Glow effect */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400 to-emerald-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
+                <div className="absolute inset-0 rounded-full bg-purple-200/30 blur-2xl opacity-0 group-hover:opacity-100 transition duration-300"></div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
 
-      
+     
     </section>
   );
 }

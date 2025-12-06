@@ -49,6 +49,7 @@ import UpdateFreelancerProfile from "./pages/dashboardPages/managefreelancer/fre
 import Bookings from "./pages/dashboardPages/consult/Bookings";
 import Packages from "./pages/packages/Packages";
 import MasterCategory from "./pages/estimateMaster/MasterCategory";
+import Enquiry from "./pages/dashboardPages/consult/Enquiry";
 
 const roleSlugMap = {
   0: "superadmin",
@@ -104,6 +105,7 @@ const componentMap = {
   "estimate/master/categories":<MasterCategory/>,
   deals: <Leads />,
 bookings:<Bookings/>,
+enquiries:<Enquiry/>,
 packages:<Packages/>};
 
 // Placeholder for missing components

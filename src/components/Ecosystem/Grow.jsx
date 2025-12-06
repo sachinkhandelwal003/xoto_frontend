@@ -14,33 +14,29 @@ const CtaSection = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate required fields
     if (!name.trim() || !inquiryType.trim()) {
       setToast("Please fill in required fields.");
       setTimeout(() => setToast(null), 3000);
       return;
     }
 
-    // Create professional message
     setToast(
       `Thank you, ${name}!\nYour ${inquiryType} inquiry has been submitted.\nXOTO team will contact you soon.`
     );
 
-    // Close modal
     setOpenModal(false);
-
-    // Clear fields
     setName("");
     setInquiryType("");
 
-    // Auto hide toast
     setTimeout(() => setToast(null), 3500);
   };
 
   return (
     <>
       {/* CTA SECTION */}
-      <section className="relative w-full flex justify-center items-center py-12 px-6 h-[450px]">
+      <section className="relative w-full flex justify-center items-center py-12 px-6 md:h-[450px]">
+
+        {/* Wave Background */}
         <div className="absolute bottom-[-20px] lg:bottom-[-70px] left-0 w-full z-0 overflow-hidden">
           <img
             src={wave1}
@@ -49,27 +45,38 @@ const CtaSection = () => {
           />
         </div>
 
-        <div className="max-w-6xl absolute top-[-40px] banner-gradient-color rounded-2xl text-white flex flex-col md:flex-row justify-between items-center p-10 md:p-14 shadow-lg overflow-hidden">
+        {/* CTA Container */}
+        <div
+          className="
+            max-w-6xl relative banner-gradient-color rounded-2xl text-white
+            flex flex-col md:flex-row justify-between 
+            items-center md:items-start
+            p-8 md:p-14 gap-6
+            text-center md:text-left
+          "
+        >
           {/* LEFT CONTENT */}
-          <div className="md:w-2/3 space-y-6">
-            <h2 className="text-3xl md:text-4xl font-extrabold leading-snug heading-light">
+          <div className="md:w-2/3 relative z-10">
+            <h2 className="text-3xl md:text-5xl font-extrabold leading-snug heading-light mb-6">
               Grow. Earn. XOTO is your one-stop property ecosystem.
             </h2>
 
             <button
               onClick={() => setOpenModal(true)}
-              className="bg-[#5C039B] w-2xs transition px-6 py-3 rounded-md font-semibold text-white shadow-md"
+              className="bg-[#5C039B] px-6 py-3 rounded-md font-semibold text-white shadow-md transition"
             >
               Talk to our team today
             </button>
           </div>
 
-          {/* RIGHT IMAGE */}
-          <img
-            src={GrowImage}
-            alt="Property ecosystem illustration"
-            className="w-[400px] h-auto object-contain drop-shadow-2xl"
-          />
+          {/* RESPONSIVE IMAGE */}
+          <div className="mt-6 md:mt-0 md:absolute md:bottom-0 md:right-0">
+            <img
+              src={GrowImage}
+              alt="Property ecosystem illustration"
+              className="object-contain h-56 md:h-80 drop-shadow-2xl"
+            />
+          </div>
         </div>
       </section>
 
@@ -77,6 +84,7 @@ const CtaSection = () => {
       {openModal && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[999]">
           <div className="bg-white w-[90%] max-w-md p-6 rounded-xl shadow-xl relative">
+
             {/* CLOSE BUTTON */}
             <button
               onClick={() => setOpenModal(false)}
@@ -85,11 +93,10 @@ const CtaSection = () => {
               ×
             </button>
 
-            <h2 className="text-2xl font-bold mb-4 text-center">
-              Team Inquiry Form
-            </h2>
+            <h2 className="text-2xl font-bold mb-4 text-center">Team Inquiry Form</h2>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
+
               {/* NAME */}
               <div>
                 <label className="text-sm font-medium">Name *</label>
@@ -112,7 +119,7 @@ const CtaSection = () => {
                 />
               </div>
 
-              {/* PHONE + COUNTRY CODE */}
+              {/* PHONE */}
               <div>
                 <label className="text-sm font-medium">Phone Number</label>
                 <div className="flex gap-2">
@@ -140,16 +147,10 @@ const CtaSection = () => {
                   <option value="Buying Property">Buying Property</option>
                   <option value="Selling Property">Selling Property</option>
                   <option value="Renting Property">Renting Property</option>
-                  <option value="Real Estate Investment">
-                    Real Estate Investment
-                  </option>
-                  <option value="Property Management">
-                    Property Management
-                  </option>
+                  <option value="Real Estate Investment">Real Estate Investment</option>
+                  <option value="Property Management">Property Management</option>
                   <option value="Property Valuation">Property Valuation</option>
-                  <option value="Other Real Estate Inquiry">
-                    Other Inquiry
-                  </option>
+                  <option value="Other Real Estate Inquiry">Other Inquiry</option>
                 </select>
               </div>
 
@@ -174,7 +175,7 @@ const CtaSection = () => {
         </div>
       )}
 
-      {/* TOAST MESSAGE */}
+      {/* TOAST */}
       {toast && (
         <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#5C039B] text-white px-5 py-4 rounded-lg shadow-lg whitespace-pre-line text-sm font-medium animate-fadeIn z-[9999]">
           {toast}

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import wave1 from "../../assets/img/wave/wave1.png";
+import wave1 from "../../assets/img/wave/waveint2.png";
 import round from "../../assets/img/home/round.png";
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/icons/Homeicons/partners.png";
@@ -44,6 +44,7 @@ const BuiltForEveryone = () => {
       desc: "Elite Contractors Network",
     },
   ];
+  const [activeBtn, setActiveBtn] = useState("right");
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -97,13 +98,13 @@ const BuiltForEveryone = () => {
     <section className="relative bg-[var(--color-body)] overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
       
       {/* Background Wave */}
-      <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
-        <img
-          src={wave1}
-          alt=""
-          className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
-        />
-      </div>
+      <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0">
+             <img
+               src={wave1}
+               alt=""
+               className="w-[180%] sm:w-[165%] md:w-[150%] lg:w-full -ml-[20%] sm:-ml-[12%] md:-ml-[8%] lg:ml-0 scale-[1.6] sm:scale-[1.4] md:scale-[1.2] lg:scale-100 pointer-events-none select-none"
+             />
+           </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
 
@@ -162,20 +163,36 @@ const BuiltForEveryone = () => {
 
             {/* Navigation Arrows */}
             <div className="flex gap-3 mt-8">
-              <button
-                onClick={prevSlide}
-                className="p-3 rounded-sm border border-gray-300 hover:bg-gray-100 transition"
-              >
-                <ChevronLeft className="w-5 h-5 text-gray-700" />
-              </button>
-
-              <button
-                onClick={nextSlide}
-                className="p-3 rounded-sm bg-[var(--color-primary)] hover:bg-purple-800 transition"
-              >
-                <ChevronRight className="w-5 h-5 text-white" />
-              </button>
-            </div>
+                        {/* LEFT */}
+                        <button
+                          onClick={() => {
+                            prevSlide();
+                            setActiveBtn("left");
+                          }}
+                          className={`p-3 rounded-sm border transition ${
+                            activeBtn === "left"
+                              ? "bg-[var(--color-primary)] text-white border-transparent"
+                              : " bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+                          }`}
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+          
+                        {/* RIGHT */}
+                        <button
+                          onClick={() => {
+                            nextSlide();
+                            setActiveBtn("right");
+                          }}
+                          className={`p-3 rounded-sm transition ${
+                            activeBtn === "right"
+                              ? "bg-[var(--color-primary)] text-white"
+                              : " bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+                          }`}
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </div>
 
           </div>
         </div>

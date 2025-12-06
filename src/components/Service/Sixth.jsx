@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import wave1 from "../../assets/img/wave/wave1.png";
+import wave1 from "../../assets/img/wave/waveint2.png";
 import wave2 from "../../assets/img/wave/wave2.png";
 
 const dmSans = {
@@ -40,60 +40,60 @@ export default function MortgagePreApproval() {
         style={dmSans}
       >
         {/* ---- TOP WAVE ---- */}
-        <div className="absolute top-0 left-0 w-full z-0 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full -translate-y-1/2 z-0 overflow-hidden">
           <img
             src={wave2}
             alt=""
-            className="w-full object-cover opacity-90 pointer-events-none select-none"
+            className="w-full h-auto object-cover opacity-90 pointer-events-none select-none"
           />
         </div>
 
         {/* ---- BOTTOM WAVE ---- */}
-        <div className="absolute bottom-0 left-0 w-full z-0 overflow-hidden">
+        <div className="absolute bottom-0 left-0 w-full translate-y-1/3 z-0 overflow-hidden">
           <img
             src={wave1}
             alt=""
-            className="w-full object-cover opacity-90 pointer-events-none select-none"
+            className="w-full h-auto object-cover opacity-90 pointer-events-none select-none"
           />
         </div>
 
         {/* ---- MAIN CONTENT ---- */}
         <div className="relative z-10 container mx-auto px-4 sm:px-6 py-16 lg:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
-            {/* LEFT SIDE */}
-            <div className="space-y-5 text-center lg:text-left">
+          <div className="grid lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
+
+            {/* ---------- LEFT CONTENT ---------- */}
+            <div className="space-y-6 text-center lg:text-left">
               <h1 className="text-4xl sm:text-5xl font-bold text-black leading-tight">
                 Ready to get your <br />
                 mortgage started?
               </h1>
 
               <p className="text-lg sm:text-xl text-[#547593] mb-8">
-                Start your application today and <br />
+                Start your application today and <br className="hidden sm:block" />
                 get pre-approval in 48 hours.
               </p>
 
               <div className="grid gap-4 justify-center lg:justify-start">
-                <button
-                  style={{ backgroundColor: "#5C039B" }}
-                  className="px-6 py-3 w-full sm:w-auto rounded-lg text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105"
-                >
+                <button className="px-6 py-3 w-full sm:w-auto bg-[var(--color-primary)] rounded-lg text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105">
                   Get Pre-Approved Now
                 </button>
 
-                <button className="px-6 py-3 w-full sm:w-auto rounded-lg border-2 border-purple-600 text-purple-700 font-semibold hover:bg-purple-50 transition-all">
+                <button className="px-6 py-3 w-full sm:w-auto rounded-lg border-2 border-purple-600 text-purple-700 font-semibold hover:bg-[var(--color-primary)] hover:text-white transition-all">
                   Talk to an Expert
                 </button>
               </div>
             </div>
 
-            {/* RIGHT SIDE (FORM) */}
-            <div className="relative">
-              <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-10 max-w-xl mx-auto w-full">
+            {/* ---------- RIGHT SIDE FORM ---------- */}
+            <div className="relative w-full flex justify-center">
+              <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-10 w-full max-w-xl">
+                
                 <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-6 text-center lg:text-left">
                   Discover, Decide, and Deal – All in One Place.
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
+
                   {/* NAME FIELDS */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -144,7 +144,6 @@ export default function MortgagePreApproval() {
                       />
                     </div>
 
-                    {/* PHONE */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Number <span className="text-red-500">*</span>
@@ -232,7 +231,7 @@ export default function MortgagePreApproval() {
                     />
                   </div>
 
-                  {/* SUBMIT BTN */}
+                  {/* SUBMIT BUTTON */}
                   <button
                     type="submit"
                     style={{ backgroundColor: "#5C039B" }}
@@ -240,9 +239,11 @@ export default function MortgagePreApproval() {
                   >
                     Get Pre-Approved Now
                   </button>
+
                 </form>
               </div>
             </div>
+
           </div>
         </div>
       </div>

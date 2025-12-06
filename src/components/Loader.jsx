@@ -13,7 +13,7 @@ const Loader = () => {
         {/* LOGO (centered inside the spinner) */}
         <img
           src={logoNew}
-          alt="Sawtar logo"
+          alt="Xoto logo"
           className="logo-spinner"
         />
       </div>

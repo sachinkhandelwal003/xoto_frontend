@@ -5,7 +5,7 @@ import wave1 from "../../assets/img/wave/wave1.png";
 
 export default function ContactSection() {
   return (
-    <section className="relative bg-[#f5f5f5] py-16 sm:py-20 lg:py-24 overflow-hidden">
+    <section className="relative bg-[var(--color-body)] py-16 sm:py-20 lg:py-24 overflow-hidden">
 
       {/* 🌊 Background Wave */}
       <div
@@ -89,7 +89,7 @@ export default function ContactSection() {
             src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3610.5326639711025!2d55.2618832!3d25.1852532!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f69d0fe2e52c9%3A0x2efe28575bbe2f84!2sParkLane%20Tower%20-%20Business%20Bay%20-%20Dubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2sin!4v1764576845571!5m2!1sen!2sin"
             loading="lazy"
             allowFullScreen
-            className="rounded-xl shadow-md w-[92%] sm:w-[88%] md:w-[80%] h-[300px] sm:h-[350px] md:h-[450px] lg:h-[500px] border"
+            className=" shadow-md w-[92%] sm:w-[88%] md:w-[80%] h-[300px] sm:h-[350px] md:h-[450px] lg:h-[500px] "
           ></iframe>
         </div>
 

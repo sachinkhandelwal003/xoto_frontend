@@ -23,10 +23,9 @@ const ContactHero = () => {
       </div>
 
       {/* Bottom clipped shapes */}
-      <div className="absolute bottom-0 left-0 h-10 bg-[#f5f5f5] z-[5] clip-left-shape w-[150px] sm:w-[180px] md:w-[230px] lg:w-[260px]"></div>
-      <div className="absolute bottom-0 right-0 h-10 bg-[#f5f5f5] z-[5] clip-right-shape w-[150px] sm:w-[180px] md:w-[230px] lg:w-[260px]"></div>
+        <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
+      <div className="absolute bottom-0 right-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-right-shape" />
 
-      {/* Custom clip paths */}
       <style>{`
         .clip-left-shape {
           clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);

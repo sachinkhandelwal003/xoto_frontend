@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 const NotFound = () => {
   useEffect(() => {
-    document.title = "Page Not Found | Sawtar";
+    document.title = "Page Not Found | Xoto";
   }, []);
 
   return (

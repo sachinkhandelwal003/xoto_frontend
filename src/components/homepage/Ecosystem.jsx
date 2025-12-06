@@ -46,10 +46,13 @@ export default function XotoLandingPage() {
   return (
     <>
       {/* ================= HERO SECTION ================= */}
-      <section className="relative w-full h-[546px] overflow-hidden">
+      <section className="relative w-full ">
+        {/* Black Overlay */}
+<div className="absolute inset-0 bg-black/40 z-[5]"></div>
+
         {/* Bottom Decorative Shapes - Hidden on mobile */}
-        <div className="hidden lg:block absolute bottom-0 left-0 w-70 h-10 bg-white z-[5] clip-left-shape"></div>
-        <div className="hidden lg:block absolute bottom-0 right-0 w-70 h-10 bg-white z-[5] clip-right-shape"></div>
+        <div className=" lg:block absolute bottom-0 left-0 w-70 h-10 bg-white z-[5] clip-left-shape"></div>
+        <div className=" lg:block absolute bottom-0 right-0 w-70 h-10 bg-white z-[5] clip-right-shape"></div>
 
         <style>{`
         .clip-left-shape {
@@ -63,7 +66,7 @@ export default function XotoLandingPage() {
         <img
           src={huuuImage}
           alt="Hero Background"
-          className="w-full h-auto object-cover object-center"
+          className="w-full h-[500px] object-cover object-center"
         />
 
         {/* Content */}

@@ -88,7 +88,7 @@ const Footer = () => {
   const toggle = (id) => setOpen(open === id ? null : id);
 
   return (
-    <footer className="border-purple-700/30 main-gradient-color overflow-hidden text-white">
+    <footer className="border-purple-700/30 main-gradient-color  text-white relative">
 
       {/* LOGO CENTERED ON MOBILE */}
       <div className="text-center pt-10 lg:hidden">

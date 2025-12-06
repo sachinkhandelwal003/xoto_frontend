@@ -1,13 +1,13 @@
 import React from "react";
 // import partnerImage from "../../assets/img/partner.png"; // replace with your actual image path
 import joinImage from "../../assets/img/join.png";
-import wave1 from "../../assets/img/wave/wave1.png";
+import wave1 from "../../assets/img/wave/waveint5.png";
 
 const PartnerEcosystemSection = () => {
   return (
 <section className="w-full relative bg-[var(--color-body)] py-16 md:py-20 px-6 md:px-12 z-10">
 
- <div className="absolute top-[-20px] lg:top-[-150px] left-0 w-full z-0 overflow-hidden">
+ <div className="absolute top-[-20px] lg:top-[-150px] left-0 w-full z-0 ">
        <img
   src={wave1}
   alt=""
@@ -15,21 +15,26 @@ const PartnerEcosystemSection = () => {
     w-full min-w-[140%] -ml-[20%] scale-[1.8] 
     lg:scale-100 lg:min-w-full lg:ml-0 
     pointer-events-none select-none
-    transform rotate-180
+   
   "
 />
 
       </div>
-<div className="relative z-20 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+<div className="relative z-20 max-w-7xl mx-auto grid md:grid-cols-2  items-center">
         {/* LEFT SIDE */}
-        <div className="flex flex-col justify-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-black heading-dark-1 leading-tight mb-6">
-            Join the
-           
-              XOTO Partner Ecosystem
-            {/* </span>{" "} */}
-            Today
-          </h2>
+        <div className="flex flex-col items-center  lg:items-center   ">
+        {/* Desktop Heading (LG and up) */}
+<h2 className="hidden lg:block text-2xl md:text-5xl font-semibold text-black mb-6">
+  Join the XOTO <br /> Partner Ecosystem <br />
+  Today
+</h2>
+
+{/* Mobile + Tablet Heading (SM to MD) */}
+<h2 className="block lg:hidden text-3xl md:text-4xl font-bold text-black mb-6">
+  Join the XOTO Partner <br /> Ecosystem 
+  Today
+</h2>
+
           <img
             src={joinImage}
             alt="People collaborating"
@@ -38,7 +43,7 @@ const PartnerEcosystemSection = () => {
         </div>
 
         {/* RIGHT SIDE FORM */}
-        <div className="bg-white shadow-2xl rounded-2xl p-8 md:p-10 w-full max-w-md mx-auto border border-gray-100">
+        <div className="bg-white    shadow-2xl rounded-2xl  md:p-10 p-4 w-full  mx-auto ">
           <form className="space-y-6">
             {/* First Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -129,7 +134,7 @@ const PartnerEcosystemSection = () => {
             {/* Button */}
             <button
               type="submit"
-              className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-md shadow-md transition"
+              className="w-full py-3 bg-[var(--color-primary)] text-white font-semibold rounded-md shadow-md transition"
             >
               Submit Now
             </button>
