@@ -1,9 +1,11 @@
 import { useRef } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import image from "../../assets/img/wave/wave2.png";
 
 export default function TestimonialsSection() {
   const scrollRef = useRef(null);
+const [activeBtn, setActiveBtn] = useState("right");
 
   const testimonials = [
     {
@@ -134,21 +136,42 @@ export default function TestimonialsSection() {
         </div>
 
         {/* BUTTONS */}
-        <div className="flex justify-center gap-4 sm:gap-6 mt-6 sm:mt-8 md:mt-12 mb-4 z-10 relative">
-          <button
-            onClick={() => slide(-1)}
-            className="bg-white border rounded-md p-2 sm:p-3 shadow-md hover:scale-110 transition-transform"
-          >
-            <ChevronLeft className="w-5 sm:w-7 h-5 sm:h-7 text-black" />
-          </button>
+      <div className="flex justify-center gap-3 sm:gap-6 mt-6 sm:mt-8 md:mt-12 mb-4 z-10 relative">
 
-          <button
-            onClick={() => slide(1)}
-            className="bg-[#5C039B] rounded-md p-2 sm:p-3 shadow-md hover:bg-purple-700 hover:scale-110 transition-transform"
-          >
-            <ChevronRight className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
-          </button>
-        </div>
+  {/* LEFT (Prev) */}
+  <button
+    onClick={() => {
+      slide(-1);
+      setActiveBtn("left");
+    }}
+    className={`p-3 rounded-sm border 
+      ${
+        activeBtn === "left"
+          ? "bg-[var(--color-primary)] text-white border-transparent"
+          : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+      }`}
+  >
+    <ChevronLeft className="w-5 sm:w-7 h-5 sm:h-7" />
+  </button>
+
+  {/* RIGHT (Next) */}
+  <button
+    onClick={() => {
+      slide(1);
+      setActiveBtn("right");
+    }}
+    className={`p-3 rounded-sm border 
+      ${
+        activeBtn === "right"
+          ? "bg-[var(--color-primary)] text-white border-transparent"
+          : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+      }`}
+  >
+    <ChevronRight className="w-5 sm:w-7 h-5 sm:h-7"/>
+  </button>
+
+</div>
+
       </div>
 
       {/* BACKGROUND WAVE */}

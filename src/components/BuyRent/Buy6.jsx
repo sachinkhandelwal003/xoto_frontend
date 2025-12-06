@@ -1,9 +1,12 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import bgTestimonial from "../../assets/img/bgimage.png";
 
 export default function TestimonialsSection() {
   const scrollContainerRef = useRef(null);
+
+  // ⭐ Add active button state
+  const [activeBtn, setActiveBtn] = useState("right");
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -27,7 +30,7 @@ export default function TestimonialsSection() {
     }
   };
 
-  const testimonials = [
+ const testimonials = [
     {
       title: "Found amazing place",
       text: "RentBro made it so easy for me to settle in new city, with fair price and amazing neighborhood, recommending it to everyone.",
@@ -81,9 +84,7 @@ export default function TestimonialsSection() {
   return (
     <section
       className="relative overflow-hidden bg-cover bg-center bg-no-repeat py-20 px-4 sm:px-8 lg:px-16"
-      style={{
-        backgroundImage: `url(${bgTestimonial})`,
-      }}
+      style={{ backgroundImage: `url(${bgTestimonial})` }}
     >
       <div className="relative w-full z-10 max-w-7xl mx-auto">
         {/* Heading */}
@@ -91,34 +92,23 @@ export default function TestimonialsSection() {
           What Our Clients Say
         </h2>
 
-        {/* Scrollable CARD WRAPPER */}
+        {/* Scrollable Cards */}
         <div className="relative flex items-center justify-center w-full">
           <div
             ref={scrollContainerRef}
-            className="
-              flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth snap-x
-              snap-mandatory items-center w-full py-4
-            "
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory items-center w-full py-4"
           >
             {testimonials.map((t, index) => (
               <div
                 key={index}
-                className="
-                  flex-none w-64 sm:w-72 md:w-80 bg-white rounded-3xl shadow-xl p-8 
-                  flex flex-col items-center text-center snap-center 
-                  hover:scale-[1.03] transition-transform duration-300
-                "
+                className="flex-none w-64 sm:w-72 md:w-80 bg-white rounded-3xl shadow-xl p-8 
+                flex flex-col items-center text-center snap-center hover:scale-[1.03] transition-transform duration-300"
               >
-                {t.image ? (
-                  <img
-                    src={t.image}
-                    alt={t.name}
-                    className="w-20 h-20 rounded-full object-cover ring-4 ring-purple-100 mb-4"
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-teal-400 mb-4" />
-                )}
+                <img
+                  src={t.image}
+                  alt={t.name}
+                  className="w-20 h-20 rounded-full object-cover ring-4 ring-purple-100 mb-4"
+                />
 
                 {/* Star Rating */}
                 <div className="flex gap-1 mb-5">
@@ -151,26 +141,38 @@ export default function TestimonialsSection() {
           </div>
         </div>
 
-        {/* Bottom Navigation Buttons */}
-        <div className="flex justify-center gap-4 mt-10">
+        {/* ⭐ Navigation Buttons — EXACT STYLE YOU WANTED */}
+        <div className="flex justify-center gap-3 mt-10">
+          {/* LEFT */}
           <button
-            onClick={scrollLeft}
-            className="
-              bg-white shadow-xl rounded-full p-3 hover:bg-gray-100 
-              transition-all flex items-center justify-center
-            "
+            onClick={() => {
+              scrollLeft();
+              setActiveBtn("left");
+            }}
+            className={`p-3 rounded-sm border transition 
+              ${
+                activeBtn === "left"
+                  ? "bg-[var(--color-primary)] text-white border-transparent"
+                  : "bg-white border-none hover:bg-[var(--color-primary)] hover:text-white"
+              }`}
           >
-            <ChevronLeft className="w-6 h-6 text-black" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
 
+          {/* RIGHT */}
           <button
-            onClick={scrollRight}
-            className="
-              bg-[#5C039B] shadow-xl rounded-full p-3 hover:bg-[#6B00E5] 
-              transition-all flex items-center justify-center
-            "
+            onClick={() => {
+              scrollRight();
+              setActiveBtn("right");
+            }}
+            className={`p-3 rounded-sm border transition 
+              ${
+                activeBtn === "right"
+                  ? "bg-[var(--color-primary)] text-white border-transparent"
+                  : "bg-white border-none hover:bg-[var(--color-primary)] hover:text-white"
+              }`}
           >
-            <ChevronRight className="w-6 h-6 text-white" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>

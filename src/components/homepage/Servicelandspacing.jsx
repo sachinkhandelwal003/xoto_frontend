@@ -8,6 +8,8 @@ import swimming from "../../assets/img/landscap/swimming.png";
 const Servicelandspacing = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [cardsPerSlide, setCardsPerSlide] = useState(2);
+  const [activeBtn, setActiveBtn] = useState("right"); // right is active on load
+
 
   const services = [
     {
@@ -149,47 +151,68 @@ const Servicelandspacing = () => {
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
-            {/* Prev */}
-            <button
-              onClick={prevSlide}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-purple-100 text-purple-600 flex items-center justify-center shadow-md hover:bg-purple-200 transition-transform hover:scale-105"
-            >
-              <svg
-                className="w-5 h-5 md:w-6 md:h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
+<div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
 
-            {/* Next */}
-            <button
-              onClick={nextSlide}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-[var(--color-primary)] text-white flex items-center justify-center shadow-md hover:bg-purple-700 transition-transform hover:scale-105"
-            >
-              <svg
-                className="w-5 h-5 md:w-6 md:h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-          </div>
+  {/* Prev */}
+  <button
+    onClick={() => {
+      prevSlide();
+      setActiveBtn("left");
+    }}
+    className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center 
+      
+      ${
+        activeBtn === "left"
+          ? "bg-[var(--color-primary)] text-white border border-transparent"
+          : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+      }`}
+  >
+    <svg
+      className="w-5 h-5 md:w-6 md:h-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M15 19l-7-7 7-7"
+      />
+    </svg>
+  </button>
+
+  {/* Next */}
+  <button
+    onClick={() => {
+      nextSlide();
+      setActiveBtn("right");
+    }}
+    className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center 
+      ${
+        activeBtn === "right"
+          ? "bg-[var(--color-primary)] text-white border border-transparent"
+          : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+      }`}
+  >
+    <svg
+      className="w-5 h-5 md:w-6 md:h-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 5l7 7-7 7"
+      />
+    </svg>
+  </button>
+
+</div>
+
+
         </div>
       </div>
     </section>

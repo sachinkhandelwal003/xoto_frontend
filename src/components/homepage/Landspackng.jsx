@@ -254,7 +254,7 @@ export default function Landspackng() {
                 className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2  flex-col inline-flex"
               >
                 <div className="flex items-center justify-center">
-                  <h3 className="button-text text-white text-xl">{service.title}</h3>
+                  <h3 className=" text-white text-xl">{service.title}</h3>
                 </div>
               </motion.div>
             ))}
@@ -284,7 +284,7 @@ export default function Landspackng() {
                 transition={{ delay: 0.9 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-[var(--color-primary)] hover:bg-purple-700 text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center"
+                className="bg-[var(--color-primary)] text-white px-10 py-3 rounded-md text-lg font-bold shadow-xl transition-all flex items-center"
               >
                 Get a free estimate
               </motion.button>
@@ -325,7 +325,7 @@ export default function Landspackng() {
         </p>
 
         <Link to="/aiPlanner" className="flex justify-center lg:justify-start mt-4">
-          <button className="rounded-md bg-[var(--color-primary)] px-8 sm:px-10 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-purple-700 hover:shadow-xl">
+          <button className="rounded-md bg-[var(--color-primary)] px-8 sm:px-10 py-3 text-lg font-medium text-white shadow-lg transition-all ">
             Take a first step
           </button>
         </Link>

@@ -47,7 +47,7 @@ const BuiltForEveryone = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [cardsToShow, setCardsToShow] = useState(2);
-  const [activeBtn, setActiveBtn] = useState("");
+  const [activeBtn, setActiveBtn] = useState("right");
 
   // Detect screen width
   useEffect(() => {
@@ -169,7 +169,7 @@ const BuiltForEveryone = () => {
                 className={`p-3 rounded-sm border transition ${
                   activeBtn === "left"
                     ? "bg-[var(--color-primary)] text-white border-transparent"
-                    : "border-gray-300 hover:bg-gray-100"
+                    : " bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
                 }`}
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -184,7 +184,7 @@ const BuiltForEveryone = () => {
                 className={`p-3 rounded-sm transition ${
                   activeBtn === "right"
                     ? "bg-[var(--color-primary)] text-white"
-                    : " text-grey"
+                    : " bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
                 }`}
               >
                 <ChevronRight className="w-5 h-5" />

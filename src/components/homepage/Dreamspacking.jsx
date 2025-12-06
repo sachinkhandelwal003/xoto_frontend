@@ -25,6 +25,7 @@ export default function DreamSpacesShowcase() {
   const [isPaused, setIsPaused] = useState(false);
   const [slideDirection, setSlideDirection] = useState("next");
   const autoSlideRef = useRef(null);
+const [activeBtn, setActiveBtn] = useState("right");
 
   const next = () => {
     setSlideDirection("next");
@@ -64,10 +65,10 @@ export default function DreamSpacesShowcase() {
 </div>
 
 
-      <div className="max-w-7xl mx-auto pt-12 md:pt-16 relative z-10 px-4 sm:px-6 lg:px-8">
+      <div className=" mx-auto pt-12 md:pt-16 relative z-10 px-4 ">
 
         {/* Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12 lg:mb-16 text-center lg:text-left">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 px-10 mb-12 lg:mb-16 text-center lg:text-left">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1 text-black">
             Explore our curated <br />
             <span className="text-black">dream spaces</span>
@@ -157,21 +158,41 @@ export default function DreamSpacesShowcase() {
           </div>
 
           {/* Controls */}
-          <div className="flex justify-center items-center gap-4 mt-4 sm:mt-6">
-            <button
-              onClick={prev}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-md border border-gray-400 flex items-center justify-center hover:bg-gray-100 transition-all duration-300 hover:scale-110"
-            >
-              <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
-            </button>
+        {/* Navigation — SAME STYLE AS YOUR OTHER SECTION */}
+<div className="flex justify-center items-center gap-3 mt-8">
 
-            <button
-              onClick={next}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-md bg-[#5C039B] text-white flex items-center justify-center transition-all duration-300 hover:bg-[#4A027A] hover:scale-110"
-            >
-              <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
-            </button>
-          </div>
+  {/* LEFT */}
+  <button
+    onClick={() => {
+      prev();
+      setActiveBtn("left");
+    }}
+    className={`p-3 rounded-sm border transition ${
+      activeBtn === "left"
+        ? "bg-[var(--color-primary)] text-white border-transparent"
+        : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+    }`}
+  >
+    <ChevronLeft className="w-5 h-5" />
+  </button>
+
+  {/* RIGHT */}
+  <button
+    onClick={() => {
+      next();
+      setActiveBtn("right");
+    }}
+    className={`p-3 rounded-sm border transition ${
+      activeBtn === "right"
+        ? "bg-[var(--color-primary)] text-white border-transparent"
+        : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+    }`}
+  >
+    <ChevronRight className="w-5 h-5" />
+  </button>
+
+</div>
+
         </div>
 
       </div>

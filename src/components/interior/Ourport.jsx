@@ -1,5 +1,5 @@
 import waveint2 from "../../assets/img/service/wave4.png";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
 import construction from "../../assets/img/service/construction-worker.png";
 import electrical from "../../assets/img/service/electrical.png";
@@ -12,6 +12,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ServicesPortfolio() {
   const scrollRef = useRef(null);
+
+  // ⭐ ADD THIS → active button state
+  const [activeBtn, setActiveBtn] = useState("right");
 
   const scrollLeft = () => {
     if (scrollRef.current) {
@@ -41,7 +44,7 @@ export default function ServicesPortfolio() {
 
       {/* Heading */}
       <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className=" heading-dark-1 sm:text-4xl md:text-5xl  text-center text-black">
+        <h2 className="heading-dark-1 sm:text-4xl md:text-5xl text-center text-black">
           Our Services Portfolio
         </h2>
       </div>
@@ -56,18 +59,14 @@ export default function ServicesPortfolio() {
           {services.map((service, index) => (
             <div
               key={index}
-              className="flex-none 
-              w-72              /* Bigger mobile width */
-              sm:w-72 md:w-80    /* Large screens unchanged */
-              bg-white rounded-3xl 
-              p-8 sm:p-8         /* Slightly more padding on mobile */
+              className="flex-none w-72 sm:w-72 md:w-80 
+              bg-white rounded-3xl p-8 sm:p-8 
               flex flex-col items-center text-center 
-              transition-all duration-300
-              hover:scale-105 hover:shadow-2xl snap-center"
+              transition-all duration-300 hover:scale-105 hover:shadow-2xl snap-center"
               style={{ boxShadow: "0 12px 28px rgba(92,3,155,0.5)" }}
             >
-              <div className="w-20 h-20 sm:w-20 sm:h-20 rounded-full bg-[#5C039B] flex items-center justify-center mb-6 shadow-lg">
-                <img src={service.icon} alt={service.title} className="w-12 h-12 sm:w-10 sm:h-10" />
+              <div className="w-20 h-20 rounded-full bg-[#5C039B] flex items-center justify-center mb-6 shadow-lg">
+                <img src={service.icon} alt={service.title} className="w-12 h-12" />
               </div>
 
               <h3 className="text-lg sm:text-xl font-bold text-gray-800">
@@ -77,22 +76,43 @@ export default function ServicesPortfolio() {
           ))}
         </div>
 
-        {/* Scroll Buttons */}
-        <div className="flex gap-4 sm:gap-6">
+        {/* Scroll Buttons (FIXED VERSION) */}
+        <div className="flex gap-3 mt-8">
+          {/* LEFT */}
           <button
-            onClick={scrollLeft}
-            className="bg-white rounded-md p-2 sm:p-3 shadow-lg hover:shadow-xl hover:bg-gray-50"
+            onClick={() => {
+              scrollLeft();
+              setActiveBtn("left");
+            }}
+            className={`p-3 rounded-sm border transition 
+              ${
+                activeBtn === "left"
+                  ? "bg-[var(--color-primary)] text-white border-transparent"
+                  : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+              }
+            `}
           >
-            <ChevronLeft className="w-6 h-6 sm:w-6 sm:h-6 text-gray-700" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
 
+          {/* RIGHT */}
           <button
-            onClick={scrollRight}
-            className="bg-[#5C039B] rounded-md p-2 sm:p-3 shadow-xl hover:bg-purple-800"
+            onClick={() => {
+              scrollRight();
+              setActiveBtn("right");
+            }}
+            className={`p-3 rounded-sm border transition 
+              ${
+                activeBtn === "right"
+                  ? "bg-[var(--color-primary)] text-white border-transparent"
+                  : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+              }
+            `}
           >
-            <ChevronRight className="w-6 h-6 sm:w-6 sm:h-6 text-white" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
+
       </div>
 
       {/* Wave */}

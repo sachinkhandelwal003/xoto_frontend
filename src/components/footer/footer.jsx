@@ -231,7 +231,7 @@ const Footer = () => {
               Customers: <span className="text-white">care@xoto.ae</span>
             </p>
 
-            <div className="flex flex-col gap-4 mt-4 items-start">
+            <div className="flex flex-col gap-4 mt-4 items-end">
               <a className="bg-green-500 p-3 rounded-full" href="#">
                 <FaWhatsapp size={20} />
               </a>
