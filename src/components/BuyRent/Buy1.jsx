@@ -60,7 +60,7 @@ export default function HeroSection() {
           {/* BUTTONS */}
           <div className="flex items-center gap-3 flex-wrap justify-center">
             <button
-              onClick={() => handleOpenModal("Rent a Home")}
+              // onClick={() => handleOpenModal("Rent a Home")}
               className="px-10 py-4 bg-[#5C039B] text-white font-extrabold rounded-lg shadow-md hover:bg-[#4A0080] transition"
             >
               Rent a Home
@@ -93,131 +93,123 @@ export default function HeroSection() {
       </section>
 
       {/* MODAL FORM */}
-  {openModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-8 relative animate-fadeIn">
-            {/* Close Button */}
+      {/* MODAL */}
+      {openModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-[#EEE5FF] to-[#C8B3FF] max-w-3xl w-full p-8 rounded-3xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setOpenModal(false)}
-              className="absolute right-6 top-6 text-gray-500 hover:text-gray-800 text-3xl leading-none"
+              className="absolute top-4 right-4 bg-green-500 text-white w-8 h-8 rounded-full text-xl"
             >
               ×
             </button>
 
-            {/* BUY / SELL Toggle */}
+            {/* TOGGLE */}
             <div className="flex justify-center mb-6">
-              <div className="flex bg-[#5C039B] rounded-full p-1 gap-2">
-                <button
-                  onClick={() => setActionType("Buy")}
-                  className={`px-6 py-2 rounded-full text-lg font-extrabold ${
-                    actionType === "Buy"
-                      ? "bg-white text-[#5C039B]"
-                      : "text-white"
-                  }`}
-                >
-                  BUY
-                </button>
-
-                <button
-                  onClick={() => setActionType("Sell")}
-                  className={`px-6 py-2 rounded-full text-lg font-extrabold ${
-                    actionType === "Sell"
-                      ? "bg-white text-[#5C039B]"
-                      : "text-white"
-                  }`}
-                >
-                  SELL
-                </button>
+              <div className="flex bg-[#5C039B] p-1 rounded-full">
+                {["Buy", "Sell"].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setActionType(t)}
+                    className={`px-6 py-2 rounded-full font-bold ${
+                      actionType === t
+                        ? "bg-white text-[#5C039B]"
+                        : "text-white"
+                    }`}
+                  >
+                    {t.toUpperCase()}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* HEADING */}
-            <h1 className="text-center text-4xl font-extrabold text-[#4a0075]">
-              LET'S GET STARTED
-            </h1>
+            <h2 className="text-4xl text-center font-extrabold text-[#5C039B] mb-3">
+              LETS GET STARTED
+            </h2>
 
-            {/* DESCRIPTION */}
-            <p className="text-center text-[#5F4A7A] mt-3 mb-8 text-lg font-medium">
+            <p className="text-center text-[#5C039B] mb-8">
               {actionType === "Sell"
                 ? "We Have Buyers Waiting – Just Need Your Property Details!"
                 : "Almost There! Share Your Information to Finalize Your Property Search."}
             </p>
 
-            {/* BUY / RENT FORM */}
+            {/* BUY FORM */}
             {actionType === "Buy" && (
-              <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* NAME & PHONE */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input
                     name="firstName"
                     placeholder="Name"
-                    className=" w-full px-4 py-3 rounded-lg border border-[#5C039B] text-lg outline-none"
                     onChange={handleChange}
-                    value={formData.firstName}
+                    className="w-full px-4 py-3 rounded-xl border border-[#5C039B]
+                   placeholder:text-[#5C039B] outline-none"
                     required
                   />
-
                   <input
                     name="number"
                     placeholder="Phone No."
-                    className=" w-full px-4 py-3 rounded-lg border border-[#5C039B] text-lg outline-none"
                     onChange={handleChange}
-                    value={formData.number}
+                    className="w-full px-4 py-3 rounded-xl border border-[#5C039B]
+                   placeholder:text-[#5C039B] outline-none"
                     required
                   />
                 </div>
 
+                {/* EMAIL */}
                 <input
                   name="email"
                   placeholder="Your Email"
-                  className=" w-full px-4 py-3 rounded-lg border border-[#5C039B] text-lg outline-none mb-4"
                   onChange={handleChange}
-                  value={formData.email}
+                  className="w-full px-4 py-3 rounded-xl border border-[#5C039B]
+                 placeholder:text-[#5C039B] outline-none"
                   required
                 />
 
+                {/* BEDROOM */}
                 <input
                   name="lookingTo"
-                  placeholder="No. of bedrooms you are looking for"
-                  className=" w-full px-4 py-3 rounded-lg border border-[#5C039B] text-lg outline-none mb-6"
+                  placeholder="No. of bedrooms you are looking for in the property"
                   onChange={handleChange}
-                  value={formData.lookingTo}
+                  className="w-full px-4 py-3 rounded-xl border border-[#5C039B]
+                 placeholder:text-[#5C039B] outline-none"
                   required
                 />
 
-                {/* Contact Preference */}
-                <p className="text-[#4a0075] font-semibold text-lg mb-3">
-                  How do you prefer to be contacted?
-                </p>
+                {/* CONTACT */}
+                <div>
+                  <p className="text-[#5C039B] text-lg font-semibold mb-3">
+                    How do you prefer to be contacted?
+                  </p>
 
-                <div className="flex gap-4 mb-6">
-                  {["Call", "WhatsApp", "Email"].map((c) => (
-                    <label key={c} className="flex items-center gap-2">
-                      <input type="radio" name="contact" required />
-                      <span className="bg-[#5C039B] text-white px-4 py-1 rounded-full text-lg font-bold">
-                        {c}
-                      </span>
-                    </label>
-                  ))}
+                  <div className="flex flex-wrap gap-6">
+                    {["Call", "WhatsApp", "Email"].map((type) => (
+                      <label key={type} className="flex items-center gap-2">
+                        <input type="radio" name="contact" />
+                        <span className="bg-[#5C039B] text-white px-4 py-1 rounded-full font-semibold">
+                          {type}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Checkboxes */}
-                <label className="flex items-start gap-3 mb-4">
-                  <input type="checkbox" />
-                  <p className="text-sm text-[#4a0075]">
-                    I agree to receive newsletters and updates.
-                  </p>
+                {/* CHECKBOXES */}
+                <label className="flex gap-3 text-[#5C039B] text-sm">
+                  <input type="checkbox" />I agree to receive newsletters and
+                  marketing communications from via digital media, and
+                  understand I can unsubscribe at any time.
                 </label>
 
-                <label className="flex items-start gap-3 mb-6">
-                  <input type="checkbox" required />
-                  <p className="text-sm text-[#4a0075]">
-                    I accept the Terms & Conditions.
-                  </p>
+                <label className="flex gap-3 text-[#5C039B] text-sm">
+                  <input type="checkbox" required />I have read, understood, and
+                  accept the Terms and Conditions and Privacy Policy of Xoto. *
                 </label>
 
+                {/* SUBMIT */}
                 <button
                   type="submit"
-                  className="w-full bg-[#5C039B] text-white py-3 rounded-full text-xl font-extrabold hover:bg-[#4A0080] transition"
+                  className="w-full bg-[#5C039B] text-white py-4 rounded-full text-xl font-bold"
                 >
                   SUBMIT
                 </button>
@@ -226,181 +218,143 @@ export default function HeroSection() {
 
             {/* SELL FORM */}
             {actionType === "Sell" && (
-              <form onSubmit={handleSubmit}>
-                {/* SELL FIELD CLASS */}
-                <style>{`
-      .sellInput {
-        @apply w-full px-4 py-3 rounded-2xl border-2 border-[#5C039B]  bg-white text-base
-               placeholder:text-[#5C039B] placeholder:font-medium placeholder:text-base;
-      }
-      .sellTextarea {
-        @apply w-full px-4 py-3 rounded-2xl border-2 border-[#5C039B]  bg-white text-base h-40
-               placeholder:text-[#5C039B] placeholder:font-medium placeholder:text-base;
-      }
-    `}</style>
-
-                {/* Basic */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <input
-                    className="sellInput bg-white rounded-lg"
-                    placeholder="Name"
-                    required
-                  />
-                  <input
-                    className="sellInput bg-white rounded-lg"
-                    placeholder="Phone No."
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <input
-                    className="sellInput bg-white rounded-lg"
-                    placeholder="Your Email"
-                    required
-                  />
-                  <input
-                    className="sellInput bg-white rounded-lg"
-                    placeholder="Listing type"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <input
-                    className="sellInput bg-white rounded-lg"
-                    placeholder="City"
-                    required
-                  />
-                  <input
-                    className="sellInput bg-white rounded-lg"
-                    placeholder="Area"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <input
-                    className="sellInput bg-white rounded-lg"
-                    placeholder="Project Name"
-                  />
-                  <input
-                    className="sellInput bg-white rounded-lg"
-                    placeholder="Developer"
-                  />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[
+                    "Name",
+                    "Phone No.",
+                    "Your Email",
+                    "Listing type",
+                    "City",
+                    "Area",
+                    "Project Name",
+                    "Developer",
+                  ].map((f) => (
+                    <input key={f} placeholder={f} className="input" />
+                  ))}
                 </div>
 
                 <input
-                  className="sellInput mb-8 bg-white rounded-lg"
-                  placeholder="No. of bedrooms you are looking for"
+                  placeholder="No. of bedrooms you are looking for in the property"
+                  className="input"
                 />
 
-                {/* Unit Type */}
-                <p className="font-semibold text-[#4a0075] text-lg mb-3">
-                  Unit Type
-                </p>
-                <div className="flex flex-wrap gap-4 mb-8">
-                  {[
-                    "Apartment",
-                    "Villa",
-                    "Townhouse",
-                    "Duplex",
-                    "Penthouse",
-                  ].map((u) => (
-                    <label key={u} className="flex items-center gap-3">
-                      <input type="radio" name="unit" />
-                      <span className="px-5 py-2 bg-[#5C039B] text-white rounded-full text-lg font-bold">
-                        {u}
-                      </span>
-                    </label>
-                  ))}
+                <div>
+                  <p className="label">Unit type</p>
+                  <div className="flex flex-wrap gap-4">
+                    {[
+                      "Apartment",
+                      "Villa",
+                      "Townhouse",
+                      "Duplex",
+                      "Penthouse",
+                    ].map((t) => (
+                      <label key={t} className="pill">
+                        <input type="radio" name="unit" />
+                        <span>{t}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Bedrooms */}
-                <p className="font-semibold text-[#4a0075] text-lg mb-3">
-                  Bedrooms
-                </p>
-                <div className="flex flex-wrap gap-4 mb-8">
-                  {[
-                    "Studio",
-                    "1 Bed",
-                    "2 Bed",
-                    "3 Bed",
-                    "4 Bed",
-                    "5 Bed",
-                    "6 Bed",
-                    "7 Bed",
-                    "8+ Bed",
-                  ].map((b) => (
-                    <label key={b} className="flex items-center gap-3">
-                      <input type="radio" name="bed" />
-                      <span className="px-5 py-2 bg-[#5C039B] text-white rounded-full text-lg font-bold ">
-                        {b}
-                      </span>
-                    </label>
-                  ))}
+                <div>
+                  <p className="label">Bedroom</p>
+                  <div className="flex flex-wrap gap-4">
+                    {[
+                      "Studio",
+                      "1 Bed",
+                      "2 Bed",
+                      "3 Bed",
+                      "4 Bed",
+                      "5 Bed",
+                      "6 Bed",
+                      "7 Bed",
+                      "8+ Bed",
+                    ].map((b) => (
+                      <label key={b} className="pill">
+                        <input type="radio" name="bed" />
+                        <span>{b}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Price + Area */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <input
-                    className="sellInput rounded-lg  bg-white"
-                    placeholder="Unit Price (AED)"
-                  />
-                  <input
-                    className="sellInput bg-white rounded-lg h-full"
-                    placeholder="Unit Area (Sq. Ft.)"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <input placeholder="Unit price (AED)" className="input" />
+                  <input placeholder="Unit area (Sq. Ft.)" className="input" />
                 </div>
 
-                {/* Description */}
-                <textarea
-                  className="sellTextarea mb-8 rounded-lg bg-white"
-                  placeholder="Description"
-                ></textarea>
-
-                {/* Contact Preference */}
-                <p className="font-semibold text-[#4a0075] text-lg mb-3">
-                  Preferred Contact
-                </p>
-                <div className="flex gap-4 mb-8">
-                  {["Call", "WhatsApp", "Email"].map((c) => (
-                    <label key={c} className="flex items-center gap-3">
-                      <input type="radio" name="contactSell" />
-                      <span className="bg-[#5C039B] text-white px-5 py-2 rounded-full text-lg font-bold">
-                        {c}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-
-                {/* Checkboxes */}
-                <label className="flex items-start gap-3 mb-4">
-                  <input type="checkbox" />
-                  <p className="text-sm text-[#4a0075]">
-                    I agree to receive newsletters & marketing communications.
+                <textarea placeholder="Description" className="input h-40" />
+                {/* CONTACT */}
+                <div>
+                  <p className="text-[#5C039B] text-lg font-semibold mb-3">
+                    How do you prefer to be contacted?
                   </p>
+
+                  <div className="flex flex-wrap gap-6">
+                    {["Call", "WhatsApp", "Email"].map((type) => (
+                      <label key={type} className="flex items-center gap-2">
+                        <input type="radio" name="contact" />
+                        <span className="bg-[#5C039B] text-white px-4 py-1 rounded-full font-semibold">
+                          {type}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* CHECKBOXES */}
+                <label className="flex gap-3 text-[#5C039B] text-sm">
+                  <input type="checkbox" />I agree to receive newsletters and
+                  marketing communications from via digital media, and
+                  understand I can unsubscribe at any time.
                 </label>
 
-                <label className="flex items-start gap-3 mb-8">
-                  <input type="checkbox" required />
-                  <p className="text-sm text-[#4a0075]">
-                    I accept the Terms & Conditions.
-                  </p>
+                <label className="flex gap-3 text-[#5C039B] text-sm">
+                  <input type="checkbox" required />I have read, understood, and
+                  accept the Terms and Conditions and Privacy Policy of Xoto. *
                 </label>
-
-                {/* Submit */}
-                <button
-                  type="submit"
-                  className="w-full bg-[#5C039B] text-white py-4 rounded-full text-2xl font-extrabold hover:bg-[#4A0080] transition"
-                >
-                  SUBMIT
-                </button>
+                <button className="submit-btn">SUBMIT</button>
               </form>
             )}
           </div>
         </div>
       )}
+
+      {/* REUSABLE STYLES */}
+      <style>{`
+        .input {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-radius: 0.75rem;
+          border: 1px solid #5C039B;
+          outline: none;
+        }
+        .pill {
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+          background: #5C039B;
+          padding: 0.4rem 1rem;
+          color: white;
+          border-radius: 9999px;
+          font-weight: 600;
+        }
+        .submit-btn {
+          width: 100%;
+          background: #5C039B;
+          color: white;
+          padding: 1rem;
+          border-radius: 9999px;
+          font-size: 1.25rem;
+          font-weight: 700;
+        }
+        .label {
+          font-weight: bold;
+          color: #5C039B;
+          margin-bottom: 0.5rem;
+        }
+      `}</style>
     </>
   );
 }

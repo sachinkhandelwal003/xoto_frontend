@@ -1,28 +1,22 @@
 import React, { useState } from "react";
-import {
-  Heart,
-  Bed,
-  Bath,
-  Square,
-  ChevronLeft,
-  ChevronRight,
-  X,
-} from "lucide-react";
+import { Bed, Bath, Square, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import waveint4 from "../../assets/img/wave/waveint.png";
 import { Navigation, Autoplay } from "swiper/modules";
+import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/navigation";
+import waveint4 from "../../assets/img/wave/waveint.png";
 
 const OurProperty = () => {
+  const navigate = useNavigate();
+  const [openModal, setOpenModal] = useState(false);
+
   const properties = [
     {
       id: 1,
-      type: "Sell",
       image:
         "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
       name: "Sobha Solis",
-      price: "$150,000",
       location: "Motor City, Dubai",
       bedrooms: 1,
       bathrooms: 1,
@@ -30,47 +24,19 @@ const OurProperty = () => {
     },
     {
       id: 2,
-      type: "Rent",
-      image:
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
-      name: "City Apartment",
-      price: "$180,000",
-      location: "Texas",
-      bedrooms: 2,
-      bathrooms: 1,
-      area: "85m²",
-    },
-    {
-      id: 3,
-      type: "Sell",
-      image:
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
-      name: "Luxury Apartment",
-      price: "$220,000",
-      location: "New York",
-      bedrooms: 3,
-      bathrooms: 2,
-      area: "110m²",
-    },
-    {
-      id: 4,
-      type: "Sell",
       image:
         "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=800&q=80",
       name: "Green Villa",
-      price: "$320,000",
       location: "California",
       bedrooms: 4,
       bathrooms: 3,
       area: "150m²",
     },
     {
-      id: 5,
-      type: "Rent",
+      id: 3,
       image:
         "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80",
       name: "Urban Loft",
-      price: "$140,000",
       location: "Chicago",
       bedrooms: 2,
       bathrooms: 2,
@@ -78,26 +44,9 @@ const OurProperty = () => {
     },
   ];
 
-  /* NEW STATE FOR VIEW MORE FUNCTIONALITY */
-  const [visibleCount, setVisibleCount] = useState(3);
-
-  const [selectedProperty, setSelectedProperty] = useState(null);
-
-  const openPrevProperty = (currentId) => {
-    const index = properties.findIndex((p) => p.id === currentId);
-    const prev = index === 0 ? properties.length - 1 : index - 1;
-    setSelectedProperty(properties[prev]);
-  };
-
-  const openNextProperty = (currentId) => {
-    const index = properties.findIndex((p) => p.id === currentId);
-    const next = index === properties.length - 1 ? 0 : index + 1;
-    setSelectedProperty(properties[next]);
-  };
-
   const PropertyCard = ({ property }) => (
-    <div className="relative z-30 bg-white rounded-[28px] shadow-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-      <div className="w-full h-[240px] rounded-t-[28px] overflow-hidden">
+    <div className=" relative z-20 bg-white rounded-[28px] shadow-xl overflow-hidden hover:-translate-y-2 transition">
+      <div className="h-[240px]">
         <img
           src={property.image}
           alt={property.name}
@@ -106,39 +55,24 @@ const OurProperty = () => {
       </div>
 
       <div className="p-6 bg-gradient-to-b from-white to-[#f2edff]">
-        <h3 className="text-[22px] font-semibold text-[#1a1a1a]">
-          {property.name}
-        </h3>
+        <h3 className="text-[22px] font-semibold">{property.name}</h3>
+        <p className="text-gray-600 text-sm">{property.location}</p>
 
-        <p className="text-gray-600 text-[14px] mt-1">{property.location}</p>
-
-        <div className="flex items-center gap-6 text-gray-700 text-[14px] mt-5">
+        <div className="flex gap-5 mt-4 text-sm text-gray-700">
           <span className="flex items-center gap-1">
-            <Square className="w-4 h-4" /> {property.area}
+            <Square size={16} /> {property.area}
           </span>
-
           <span className="flex items-center gap-1">
-            <Bed className="w-4 h-4" /> {property.bedrooms} Beds
+            <Bed size={16} /> {property.bedrooms}
           </span>
-
           <span className="flex items-center gap-1">
-            <Bath className="w-4 h-4" /> {property.bathrooms} Baths
+            <Bath size={16} /> {property.bathrooms}
           </span>
         </div>
 
         <button
-          onClick={() => setSelectedProperty(property)}
-          className="
-            w-full mt-7 py-3 
-            rounded-full 
-            bg-[#6A00C1] 
-            text-white 
-            font-medium 
-            transition-all duration-300
-            hover:bg-white hover:text-[#5C039B]
-            hover:-translate-y-1
-            hover:shadow-lg
-          "
+          onClick={() => setOpenModal(true)}
+          className="w-full mt-6 py-3 rounded-full bg-[#6A00C1] text-white hover:bg-white hover:text-[#6A00C1] border-2 border-transparent hover:border-[#6A00C1] transition"
         >
           Schedule Visit
         </button>
@@ -148,126 +82,109 @@ const OurProperty = () => {
 
   return (
     <>
-      <section className="relative pt-20 pb-40 bg-white overflow-hidden">
+      <section className="relative pt-20 pb-40 bg-white overflow-hidden z-20">
         <img
           src={waveint4}
-          alt="wave"
-          className="absolute -bottom-[350px] left-0 w-full z-0 pointer-events-none select-none"
+          alt=""
+          className="absolute -bottom-[350px] left-0 w-full"
         />
 
-        <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-          <h2 className="text-center card-heading-1 text-gray-900 mb-16 mt-5">
+        <div className="max-w-7xl mx-auto px-5">
+          <h2 className="text-center card-heading-1 mb-16">
             Explore Properties
           </h2>
 
-          {/* MOBILE SWIPER */}
+          {/* MOBILE */}
           <div className="block md:hidden">
             <Swiper
               modules={[Navigation, Autoplay]}
               spaceBetween={20}
               slidesPerView={1}
-              loop
               autoplay={{ delay: 3500 }}
-              navigation={{
-                nextEl: ".mobile-next",
-                prevEl: ".mobile-prev",
-              }}
+              loop
             >
-              {properties.map((property) => (
-                <SwiperSlide key={property.id}>
-                  <PropertyCard property={property} />
+              {properties.map((p) => (
+                <SwiperSlide key={p.id}>
+                  <PropertyCard property={p} />
                 </SwiperSlide>
               ))}
-
-              <button className="mobile-prev absolute left-3 top-1/2 -translate-y-1/2 z-40 bg-white text-[#6A00C1] w-11 h-11 rounded-full shadow-lg flex items-center justify-center">
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-
-              <button className="mobile-next absolute right-3 top-1/2 -translate-y-1/2 z-40 bg-white text-[#6A00C1] w-11 h-11 rounded-full shadow-lg flex items-center justify-center">
-                <ChevronRight className="w-6 h-6" />
-              </button>
             </Swiper>
           </div>
 
-          {/* DESKTOP GRID WITH VIEW MORE LOGIC */}
+          {/* DESKTOP */}
           <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-10">
-            {properties.slice(0, visibleCount).map((property) => (
-              <PropertyCard key={property.id} property={property} />
+            {properties.map((p) => (
+              <PropertyCard key={p.id} property={p} />
             ))}
           </div>
 
-          {/* VIEW MORE BUTTON (auto hides when done) */}
-          {visibleCount < properties.length && (
-            <div className="flex justify-center mt-16">
-              <button
-                onClick={() => setVisibleCount(properties.length)}
-                className="bg-[#6A00C1] text-white px-10 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl"
-              >
-                View More
-              </button>
-            </div>
-          )}
+          {/* VIEW MORE → PAGE NAVIGATION */}
+          <div className="flex justify-center mt-16 relative z-20">
+            <button
+              onClick={() => navigate("/properties")}
+              className="bg-[#6A00C1] text-white px-10 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl"
+            >
+              View More
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* MODAL */}
-      {selectedProperty && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl max-w-md w-full p-6 relative">
+      {/* CALLBACK MODAL */}
+      {openModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
+          <div className="bg-gradient-to-br from-[#F5EFFF] to-[#E8E0FF] rounded-[30px] p-6 max-w-md w-full relative">
             <button
-              onClick={() => setSelectedProperty(null)}
-              className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200"
+              onClick={() => setOpenModal(false)}
+              className="absolute top-4 right-4 bg-green-400 w-8 h-8 rounded-full flex items-center justify-center"
             >
-              <X className="w-5 h-5" />
+              <X size={16} />
             </button>
 
-            <img
-              src={selectedProperty.image}
-              alt={selectedProperty.name}
-              className="w-full h-48 object-cover rounded-2xl mb-4"
-            />
-
-            <h3 className="text-xl font-bold text-gray-900 mb-1">
-              {selectedProperty.name}
+            <h3 className="text-center text-2xl font-bold text-[#6A00C1]">
+              GET A CALL BACK FROM US!
             </h3>
-            <p className="text-2xl font-bold text-[#6A00C1] mb-2">
-              {selectedProperty.price}
-            </p>
-            <p className="text-sm text-gray-600 mb-3">
-              {selectedProperty.location}
+            <p className="text-center text-sm mt-2">
+              Get Started by completing the form below.
             </p>
 
-            <div className="flex gap-4 text-sm text-gray-600 mb-6">
-              <span className="flex items-center gap-1">
-                <Bed className="w-4 h-4 text-[#6A00C1]" />
-                {selectedProperty.bedrooms} Bed
-              </span>
-              <span className="flex items-center gap-1">
-                <Bath className="w-4 h-4 text-[#6A00C1]" />
-                {selectedProperty.bathrooms} Bath
-              </span>
-              <span className="flex items-center gap-1">
-                <Square className="w-4 h-4 text-[#6A00C1]" />
-                {selectedProperty.area}
-              </span>
-            </div>
+            <form className="mt-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input className="input" placeholder="First name" />
+                <input className="input" placeholder="Last name" />
+              </div>
+              <input className="input" placeholder="Your Email" />
+              <input className="input" placeholder="Your phone number" />
+              <input className="input" placeholder="Your occupation" />
+              <input className="input" placeholder="Your location" />
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => openPrevProperty(selectedProperty.id)}
-                className="flex-1 bg-purple-100 text-purple-700 py-3 rounded-xl hover:bg-purple-200"
-              >
-                Previous
-              </button>
+              <label className="flex gap-2 text-xs">
+                <input type="checkbox" />
+                <span>
+                  I agree to receive newsletters and marketing communications.
+                </span>
+              </label>
 
-              <button
-                onClick={() => openNextProperty(selectedProperty.id)}
-                className="flex-1 bg-[#6A00C1] text-white py-3 rounded-xl hover:bg-[#5A00A6]"
-              >
-                Next
+              <label className="flex gap-2 text-xs">
+                <input type="checkbox" defaultChecked />
+                <span>I accept the Terms & Conditions and Privacy Policy.</span>
+              </label>
+              <button className="w-full bg-[#6A00C1] text-white py-3 rounded-md font-bold mt-2">
+                SUBMIT
               </button>
-            </div>
+            </form>
           </div>
+
+          <style>{`
+            .input {
+              width: 100%;
+              padding: 12px;
+              border-radius: 999px;
+              border: 1px solid #6A00C1;
+              background: transparent;
+              outline: none;
+            }
+          `}</style>
         </div>
       )}
     </>
