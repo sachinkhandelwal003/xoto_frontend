@@ -4,60 +4,75 @@ import waveBottom from "../../assets/img/1.png";
 
 const Article5 = () => {
   return (
-    <section className="relative  bg-gradient-to-b from-white to-[#F8FDF8] overflow-hidden  ">
-      {/* Green wave at bottom - unchanged */}
+    <section className="relative bg-gradient-to-b from-white to-[#F8FDF8] overflow-hidden">
+      {/* Green wave */}
       <img
         src={waveBottom}
         alt=""
-        className="absolute bottom-0 left-0 w-full pointer-events-none opacity-70 z-10"
-        style={{ transform: "translateY(600px)" }} // keep your current position
+        className="absolute bottom-0 left-0 w-full pointer-events-none opacity-70 z-10
+                   translate-y-32 sm:translate-y-48 lg:translate-y-[600px]"
       />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20 ">
-        {/* Main Centered Heading (Single Div - Exact Figma Match) */}
-        <div className="text-center  mt-10">
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+        {/* HEADING */}
+        <div className="text-center mt-10">
           <h2 className="font-semibold text-black heading-dark-1 mt-5">
             Building a Greener Tomorrow,
             <br className="hidden lg:block" />
-            <span className="block relative">
-              One Space at a Time
-              <span
-                className="absolute left-0 right-0 h-[3px] "
-                style={{ bottom: "-12px" }}
-              />
-            </span>
+            <span className="block mt-2">One Space at a Time</span>
           </h2>
         </div>
 
-        {/* Image + Paragraphs in One Grid Container */}
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start max-w-5xl  my-[90px]">
-          {/* Left: Image */}
-          <div className="flex justify-center lg:justify-start w-full">
+        {/* IMAGE + TEXT */}
+        <div
+          className="grid grid-cols-1 lg:grid-cols-2
+                     gap-12 lg:gap-20
+                     items-center
+                     max-w-6xl mx-auto
+                     my-16 sm:my-20"
+        >
+          {/* IMAGE – mobile centered & larger */}
+          <div className="flex justify-center">
             <img
               src={greenHouse}
               alt="Sustainable modern home"
-              className="w-[627px] h-auto mt-[60px] -translate-x-[20px] object-contain"
+              className="
+                w-full max-w-[320px]
+                sm:max-w-[120px]
+                md:max-w-[520px]
+                lg:max-w-[627px]
+                object-contain lg:object-contain
+              "
             />
           </div>
 
-          {/* Right: All Text Content */}
-          <div className="w-[711px] paragraph-light-1 space-y-7 font-medium text-[#547593] ">
-            <p>
+          {/* TEXT – centered on mobile, left on desktop */}
+          {/* TEXT – responsive & readable */}
+          <div
+            className="
+    w-full
+    max-w-none sm:max-w-xl
+    mx-auto lg:mx-0
+    text-center lg:text-left
+    space-y-5
+    font-medium
+    text-[#547593]
+  "
+          >
+            <p className="text-sm leading-relaxed sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
               At XOTO, we believe sustainability isn’t a choice — it’s the
               foundation of future living. In a world where conscious living
               defines progress, embracing sustainable practices means creating
               spaces that thrive in harmony with nature and innovation. From
               eco-friendly landscaping and energy-efficient interiors to
-              responsible partnerships and mindful material sourcing, every XOTO
-              solution is designed to minimize impact and maximize value.
+              responsible partnerships and mindful material sourcing,
             </p>
 
-            <p>
+            <p className="text-sm leading-relaxed sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
               Through our integrated approach, we help property owners,
               developers, and partners align with global sustainability goals —
               enhancing not just aesthetics, but long-term property worth and
-              community wellbeing. Together, let’s design a future where living
-              beautifully also means living responsibly.
+              community wellbeing.
             </p>
           </div>
         </div>
