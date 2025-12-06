@@ -3,8 +3,6 @@ import xotoLogo from "../../assets/img/image_109-removebg-preview.png";
 import wave1 from "../../assets/img/wave/waveint2.png";
 
 const Article2 = () => {
-
-
   return (
     <div>
       <section className="relative w-full bg-[var(--color-body)] min-h-screen overflow-hidden pb-32 pt-20">
@@ -100,8 +98,6 @@ const Article2 = () => {
           </div>
         </div>
         {/* BOTTOM BUTTON GROUP - EXACT SAME POSITION AS BEFORE */}
-
-      
       </section>
     </div>
   );
