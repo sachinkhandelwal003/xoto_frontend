@@ -59,7 +59,7 @@ const Article3 = () => {
       </div>
 
       {/* Wave */}
-      <div className="pointer-events-none absolute bottom-0 left-0 w-full">
+      <div className="pointer-events-none absolute bottom-[-100px] left-0 w-full">
         <img src={waveImg} alt="" className="w-full object-cover" />
       </div>
 

@@ -195,7 +195,7 @@ export const languages = [
 
 /* ------------------- SERVICES DROPDOWN ITEMS ------------------- */
 const servicesItems = [
-  { title: "Mortgage", path: "/services/mortgage" },
+  { title: "Mortgage", path: "/mortgage/services" },
   { title: "Maintenance", path: "/services/maintenance" },
 ];
 

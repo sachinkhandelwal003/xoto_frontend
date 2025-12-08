@@ -133,7 +133,7 @@ const BuiltForEveryone = () => {
                 {cards.map((card, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 bg-white rounded-xl p-6 transition-all duration-300 ${
+                    className={`flex-shrink-0 bg-[var(--color-body)] rounded-xl p-6 transition-all duration-300 ${
                       index >= currentIndex &&
                       index < currentIndex + cardsToShow
                         ? "shadow-xl scale-100 opacity-100"

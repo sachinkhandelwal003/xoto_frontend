@@ -39,8 +39,10 @@ export default function HeroSection() {
         </div>
 
         {/* RIGHT FORM CARD */}
-        <div className="bg-white     shadow-[0_0_25px_rgba(92,3,155,0.35)]
- rounded-xl p-5 w-full max-w-lg relative z-20  justify-self-end-safe">
+        <div
+          className="bg-white     shadow-[0_0_25px_rgba(92,3,155,0.35)]
+ rounded-xl p-5 w-full max-w-lg relative z-20  justify-self-end-safe"
+        >
           <h2 className="text-3xl font-bold text-gray-900">
             Discover, Decide, Deal
           </h2>
@@ -75,7 +77,7 @@ export default function HeroSection() {
 
             <div className="grid grid-cols-2 gap-4">
               <select className="border border-gray-300 rounded-lg p-3 text-gray-500">
-                <option>I am Looking to*</option>
+                {/* <option>I am Looking to*</option> */}
                 <option>Buy</option>
                 <option>Sell</option>
                 <option>Rent</option>

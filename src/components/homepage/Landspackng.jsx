@@ -83,7 +83,10 @@ export default function Landspackng() {
       icon: <Home className="w-5 h-5" />,
       title: "Hardscaping & Surface Works",
       desc: "Durable patios, walkways, and retaining walls",
-    },
+    }
+  ];
+  const services1 = [
+   
     {
       icon: <Droplets className="w-5 h-5" />,
       title: "Swimming Pools & Water Features",
@@ -239,26 +242,54 @@ export default function Landspackng() {
             <span className="text-white">Outdoor Solution</span>
           </motion.h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="grid grid-cols-2 gap-4 max-w-5xl mx-auto mb-10 items-end "
-          >
-            {services.map((service, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: i < 2 ? 0.9 : 1 }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2  flex-col inline-flex"
-              >
-                <div className="flex items-center justify-center">
-                  <h3 className=" text-white text-xl">{service.title}</h3>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+   {/* FIRST SERVICES SECTION */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.3 }}
+  className="grid grid-cols-2 md:grid-cols-2 gap-3 w-full max-w-[780px] mx-auto mb-5 items-end"
+>
+  {services.map((service, i) => (
+    <motion.div
+      key={i}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: i < 2 ? 0.9 : 1 }}
+      transition={{ delay: 0.4 + i * 0.1 }}
+      className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2 flex-col flex"
+    >
+      <div className="flex items-center justify-center">
+        <h3 className="text-white text-sm sm:text-base md:text-xl text-center">
+          {service.title}
+        </h3>
+      </div>
+    </motion.div>
+  ))}
+</motion.div>
+
+{/* SECOND SERVICES SECTION */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.3 }}
+  className="grid grid-cols-2 md:grid-cols-2 gap-3 w-full max-w-[850px] mx-auto mb-10 items-end"
+>
+  {services1.map((service, i) => (
+    <motion.div
+      key={i}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: i < 2 ? 0.9 : 1 }}
+      transition={{ delay: 0.4 + i * 0.1 }}
+      className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2 flex-col flex"
+    >
+      <div className="flex items-center justify-center">
+        <h3 className="text-white text-sm sm:text-base md:text-xl text-center">
+          {service.title}
+        </h3>
+      </div>
+    </motion.div>
+  ))}
+</motion.div>
+
 
 
 

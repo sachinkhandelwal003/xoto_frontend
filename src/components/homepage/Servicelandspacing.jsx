@@ -10,7 +10,6 @@ const Servicelandspacing = () => {
   const [cardsPerSlide, setCardsPerSlide] = useState(2);
   const [activeBtn, setActiveBtn] = useState("right"); // right is active on load
 
-
   const services = [
     {
       title: "Hardscape",
@@ -18,8 +17,8 @@ const Servicelandspacing = () => {
       items: [
         "Paving (interlock, tiles, stone)",
         "Pergolas & gazebos",
-        "Decking (wood, WPC, Composite)",
-        "Boundary walls & retaining walls",
+        "Decking (Wood, WPC, Composite)",
+        "Boundary walls & fencing  Retaining walls",
         "Outdoor kitchens & BBQ stations",
         "Water features (fountains, waterfalls)",
       ],
@@ -28,10 +27,10 @@ const Servicelandspacing = () => {
       title: "Softscape",
       icon: <img src={softScape} alt="Softscape" />,
       items: [
-        "Soil preparation & leveling",
+        "Paving (interlock, tiles, stone)",
+        "Soil preparation & levelling",
         "Plantation (trees, shrubs, groundcover)",
-        "Granite/iron installation (natural & artificial)",
-        "Flower beds & vertical gardens",
+        "Grass/lawn installation (natural & artificial) Flower beds & vertical gardens",
         "Mulching & soil amendments",
         "Seasonal planting & color themes",
       ],
@@ -40,24 +39,21 @@ const Servicelandspacing = () => {
       title: "Swimming Pools",
       icon: <img src={swimming} alt="Swimming Pools" />,
       items: [
-        "Custom pool design & construction",
-        "Pool decking & surrounding areas",
-        "Pool maintenance systems",
-        "Water filtration & treatment",
-        "Pool lighting & features",
-        "Safety covers & fencing",
+        "Pool design & construction Jacuzzis & spas",
+        "Reflecting pools & koi ponds Filtration & circulation systems",
       ],
     },
     {
       title: "Other Solutions",
       icon: <img src={other} alt="Other Solutions" />,
       items: [
-        "Regular lawn care and mowing",
-        "Pruning and trimming services",
-        "Fertilization and soil care",
-        "Weed and pest control",
-        "Seasonal cleanup",
-        "Irrigation system maintenance",
+        "Umbrellas",
+        "Decking",
+        "Gazebos",
+        "Planters",
+        "Flooring",
+        "BBQ",
+        "Pots & Fountain",
       ],
     },
   ];
@@ -151,68 +147,64 @@ const Servicelandspacing = () => {
           </div>
 
           {/* Navigation */}
-<div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
-
-  {/* Prev */}
-  <button
-    onClick={() => {
-      prevSlide();
-      setActiveBtn("left");
-    }}
-    className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center 
+          <div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
+            {/* Prev */}
+            <button
+              onClick={() => {
+                prevSlide();
+                setActiveBtn("left");
+              }}
+              className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center 
       
       ${
         activeBtn === "left"
           ? "bg-[var(--color-primary)] text-white border border-transparent"
           : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
       }`}
-  >
-    <svg
-      className="w-5 h-5 md:w-6 md:h-6"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M15 19l-7-7 7-7"
-      />
-    </svg>
-  </button>
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
 
-  {/* Next */}
-  <button
-    onClick={() => {
-      nextSlide();
-      setActiveBtn("right");
-    }}
-    className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center 
+            {/* Next */}
+            <button
+              onClick={() => {
+                nextSlide();
+                setActiveBtn("right");
+              }}
+              className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center 
       ${
         activeBtn === "right"
           ? "bg-[var(--color-primary)] text-white border border-transparent"
           : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
       }`}
-  >
-    <svg
-      className="w-5 h-5 md:w-6 md:h-6"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M9 5l7 7-7 7"
-      />
-    </svg>
-  </button>
-
-</div>
-
-
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </section>

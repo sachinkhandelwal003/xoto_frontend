@@ -1,6 +1,13 @@
 import React from "react";
 import waveBg from "../../assets/img/wave/wave2.png";
 
+// ✅ Local image imports
+import solarLighting from "../../assets/img/solar.png";
+import lowWaterPlant from "../../assets/img/jungle.png";
+import ecoMaterials from "../../assets/img/wooden.png";
+import automatedControl from "../../assets/img/mobile.png";
+import futureReady from "../../assets/img/something.png";
+
 const features = [
   {
     title: "Smart Irrigation",
@@ -8,29 +15,24 @@ const features = [
     gradient: true,
   },
   {
-    title: "Solar Lightning",
-    image:
-      "https://images.unsplash.com/photo-1509395176047-4a66953fd231?w=400&q=80",
+    title: "Solar Lighting",
+    image: solarLighting,
   },
   {
     title: "Low Water Plant",
-    image:
-      "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=400&q=80",
+    image: lowWaterPlant,
   },
   {
     title: "Eco Materials",
-    image:
-      "https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&q=80",
+    image: ecoMaterials,
   },
   {
     title: "Automated Control",
-    image:
-      "https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&q=80",
+    image: automatedControl,
   },
   {
     title: "Future-Ready Design",
-    image:
-      "https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&q=80",
+    image: futureReady,
   },
 ];
 
@@ -52,7 +54,7 @@ export default function EcoSmartLiving() {
           EcoSmart Living
         </h1>
 
-        <p className="mt-4 text-[#547593] paragraph-light-1 max-w-3xl mx-auto text-lg ">
+        <p className="mt-4 text-[#547593] paragraph-light-1 max-w-3xl mx-auto text-lg">
           At XOTO, EcoSmart Living means creating landscapes that balance
           beauty, sustainability, and technology. Our designs use smart
           automation and eco-friendly solutions to make outdoor spaces
@@ -67,26 +69,9 @@ export default function EcoSmartLiving() {
         <div className="mt-14 flex flex-col items-center gap-10">
           {/* Row 1 */}
           <div className="flex flex-wrap justify-center gap-20">
-            {/* Smart Irrigation */}
-            <div
-              className="
-              rounded-full p-[12px] 
-              ring-4 ring-transparent
-              hover:ring-[#5C039B]
-              hover:ring-4
-              transition-all duration-300
-            "
-            >
-              <div
-                className="
-                  w-[200px] h-[200px] rounded-full 
-                  flex flex-col items-center justify-center text-center
-                  text-white font-semibold shadow-xl
-                  bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400
-                  hover:scale-105 hover:shadow-2xl transition-all duration-300
-                  sm:hover:scale-105 sm:hover:shadow-2xl
-                "
-              >
+            {/* Smart Irrigation (gradient card) */}
+            <div className="rounded-full p-[12px] ring-4 ring-transparent hover:ring-[#5C039B] transition-all duration-300">
+              <div className="w-[200px] h-[200px] rounded-full flex flex-col items-center justify-center text-center text-white font-semibold shadow-xl bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400 hover:scale-105 hover:shadow-2xl transition-all duration-300">
                 <span className="text-lg font-bold">Smart Irrigation</span>
                 <p className="text-xs mt-1 px-3 opacity-90">
                   Sensor-based watering systems that conserve water.
@@ -94,24 +79,14 @@ export default function EcoSmartLiving() {
               </div>
             </div>
 
-            {/* Solar + Low Water */}
+            {/* Solar Lighting + Low Water Plant */}
             {features.slice(1, 3).map((item, i) => (
               <div
                 key={i}
-                className="
-                  rounded-full p-[12px]
-                  ring-4 ring-transparent
-                  hover:ring-[#5C039B]
-                  hover:ring-4
-                  transition-all duration-300
-                "
+                className="rounded-full p-[12px] ring-4 ring-transparent hover:ring-[#5C039B] transition-all duration-300"
               >
                 <div
-                  className="
-                    w-[200px] h-[200px] rounded-full bg-cover bg-center shadow-lg
-                    flex items-center justify-center
-                    hover:scale-105 hover:shadow-2xl transition-all duration-300
-                  "
+                  className="w-[200px] h-[200px] rounded-full bg-cover bg-center shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-2xl transition-all duration-300"
                   style={{ backgroundImage: `url(${item.image})` }}
                 >
                   <div className="bg-black/40 w-full h-full rounded-full flex items-center justify-center px-2 text-center text-white font-semibold">
@@ -127,20 +102,10 @@ export default function EcoSmartLiving() {
             {features.slice(3).map((item, i) => (
               <div
                 key={i}
-                className="
-                  rounded-full p-[12px]
-                  ring-4 ring-transparent
-                  hover:ring-[#5C039B]
-                  hover:ring-4
-                  transition-all duration-300
-                "
+                className="rounded-full p-[12px] ring-4 ring-transparent hover:ring-[#5C039B] transition-all duration-300"
               >
                 <div
-                  className="
-                    w-[200px] h-[200px] rounded-full bg-cover bg-center shadow-lg
-                    flex items-center justify-center
-                    hover:scale-105 hover:shadow-2xl transition-all duration-300
-                  "
+                  className="w-[200px] h-[200px] rounded-full bg-cover bg-center shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-2xl transition-all duration-300"
                   style={{ backgroundImage: `url(${item.image})` }}
                 >
                   <div className="bg-black/40 w-full h-full rounded-full flex items-center justify-center px-2 text-center text-white font-semibold">

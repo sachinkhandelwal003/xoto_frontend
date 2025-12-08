@@ -276,7 +276,7 @@ function App() {
           />
                     <Route path="/ai" element={<Ai />} />
 
-          <Route path="/Services" element={<Service />} />
+          <Route path="/mortgage/services" element={<Service />} />
           <Route path="/properties" element={<Page2 />} />
           <Route path="/explore" element={<Page3 />} />
           <Route path="/contact" element={<Page />} />
