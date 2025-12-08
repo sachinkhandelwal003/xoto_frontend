@@ -1,403 +1,446 @@
+// src/components/home/HeroSection.jsx
 import React, { useState } from "react";
 import Imagemain from "../../assets/img/buy.jpg";
 import toast, { Toaster } from "react-hot-toast";
+import { apiService } from "../../manageApi/utils/custom.apiservice";
+import { X, ArrowRight, Building, Home, Phone, Mail, MessageCircle } from "lucide-react";
 
 export default function HeroSection() {
   const [openModal, setOpenModal] = useState(false);
-  const [actionType, setActionType] = useState("Buy"); // BUY or SELL FORM
+  const [actionType, setActionType] = useState("Buy");
+  const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+  const [buyForm, setBuyForm] = useState({
+    first_name: "",
+    last_name: "",
     email: "",
-    number: "",
-    lookingTo: "",
+    mobile: "",
+    desired_bedrooms: "",
+    preferred_contact: "whatsapp"
+  });
+
+  const [sellForm, setSellForm] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    mobile: "",
+    listing_type: "",
     city: "",
-    budget: "",
+    area: "",
+    project_name: "",
+    bedroom_config: "",
+    price: "",
+    description: "",
+    preferred_contact: "call"
   });
 
   const handleOpenModal = (type) => {
-    if (type === "Sell a Home") setActionType("Sell");
-    else setActionType("Buy");
-
+    setActionType(type === "Sell a Home" ? "Sell" : "Buy");
     setOpenModal(true);
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleBuyChange = (e) => {
+    const { name, value } = e.target;
+    setBuyForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSellChange = (e) => {
+    const { name, value } = e.target;
+    setSellForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    toast.success(
-      `Thank you, ${formData.firstName}! Your request for "${actionType}" has been submitted.`
-    );
+    const payload = actionType === "Buy" ? {
+      type: "buy",
+      name: {
+        first_name: buyForm.first_name.trim(),
+        last_name: buyForm.last_name.trim()
+      },
+      mobile: { number: buyForm.mobile.replace(/\D/g, "").slice(-10) },
+      email: buyForm.email.toLowerCase().trim(),
+      desired_bedrooms: buyForm.desired_bedrooms,
+      preferred_contact: buyForm.preferred_contact
+    } : {
+      type: "sell",
+      name: {
+        first_name: sellForm.first_name.trim(),
+        last_name: sellForm.last_name.trim()
+      },
+      mobile: { number: sellForm.mobile.replace(/\D/g, "").slice(-10) },
+      email: sellForm.email.toLowerCase().trim(),
+      listing_type: sellForm.listing_type,
+      city: sellForm.city,
+      area: sellForm.area,
+      project_name: sellForm.project_name,
+      bedroom_config: sellForm.bedroom_config,
+      price: Number(sellForm.price) || undefined,
+      description: sellForm.description,
+      preferred_contact: sellForm.preferred_contact
+    };
 
-    setOpenModal(false);
+    try {
+      const response = await apiService.post("/property/lead", payload);
+      
+      if (response.success) {
+        toast.success(`Thank you, ${actionType === "Buy" ? buyForm.first_name : sellForm.first_name}! We'll contact you soon.`);
+        setOpenModal(false);
+        
+        if (actionType === "Buy") {
+          setBuyForm({
+            first_name: "", last_name: "", email: "", mobile: "",
+            desired_bedrooms: "", preferred_contact: "whatsapp"
+          });
+        } else {
+          setSellForm({
+            first_name: "", last_name: "", email: "", mobile: "",
+            listing_type: "", city: "", area: "", project_name: "",
+            bedroom_config: "", price: "", description: "", preferred_contact: "call"
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Lead submission error:", err);
+      toast.error(err.response?.data?.message || "Submission failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
-      {/* TOASTER */}
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white',
+            borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          },
+        }}
+      />
 
       {/* HERO SECTION */}
-      <section className="relative w-full overflow-hidden font-dm h-140">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        <section className="relative w-full overflow-hidden font-dm h-140">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
           style={{ backgroundImage: `url(${Imagemain})` }}
         >
           <div className="absolute inset-0 bg-black/40" />
         </div>
 
-        {/* CONTENT */}
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
           <h1 className="mx-auto mb-8 max-w-5xl heading-light">
             Transforming the Way You <br /> Rent, Buy, & Sell Your Home.
           </h1>
 
-          {/* BUTTONS */}
-      <div className="flex items-center gap-3 flex-wrap justify-center">
-
-  {/* Rent a Home – Primary button */}
-  <button
-    className="
-      px-10 py-4 
-      bg-[#5C039B] 
-      text-white 
-      font-extrabold 
-      rounded-lg 
-      shadow-md 
-      transition-all 
-      duration-300
-      hover:bg-[#4A0080]
-      hover:shadow-xl
-      hover:scale-105
-    "
-  >
-    Rent a Home
-  </button>
-
-  {/* Find a Home – Outline button */}
-  <button
-    onClick={() => handleOpenModal('Find a Home')}
-    className="
-      px-10 py-4 
-      bg-transparent 
-      border-2 border-white 
-      text-white 
-      font-extrabold 
-      rounded-lg 
-      shadow-md 
-      transition-all 
-      duration-300
-      hover:bg-[#5C039B]
-      hover:border-[#5C039B]
-      hover:shadow-xl
-      hover:scale-105
-    "
-  >
-    Find a Home
-  </button>
-
-  {/* Sell a Home – Outline button */}
-  <button
-    onClick={() => handleOpenModal('Sell a Home')}
-    className="
-      px-10 py-4 
-      bg-transparent 
-      border-2 border-white 
-      text-white 
-      font-extrabold 
-      rounded-lg 
-      shadow-md 
-      transition-all 
-      duration-300
-      hover:bg-[#5C039B]
-      hover:border-[#5C039B]
-      hover:shadow-xl
-      hover:scale-105
-    "
-  >
-    Sell a Home
-  </button>
-
-</div>
-
+          <div className="flex items-center gap-3 flex-wrap justify-center">
+            <button className="px-10 py-4 bg-[#5C039B] text-white font-extrabold rounded-lg shadow-md hover:bg-[#4A0080] hover:scale-105 transition-all">
+              Rent a Home
+            </button>
+            <button 
+              onClick={() => handleOpenModal('Find a Home')} 
+              className="px-10 py-4 bg-transparent border-2 border-white text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:border-[#5C039B] hover:scale-105 transition-all"
+            >
+              Find a Home
+            </button>
+            <button 
+              onClick={() => handleOpenModal('Sell a Home')} 
+              className="px-10 py-4 bg-transparent border-2 border-white text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:border-[#5C039B] hover:scale-105 transition-all"
+            >
+              Sell a Home
+            </button>
+          </div>
         </div>
 
-        {/* Bottom clipping shapes */}
         <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
         <div className="absolute bottom-0 right-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-right-shape" />
-
-        <style>{`
+        <style jsx>{`
           .clip-left-shape { clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%); }
           .clip-right-shape { clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%); }
         `}</style>
       </section>
 
-      {/* MODAL FORM */}
-      {/* MODAL */}
+      {/* PREMIUM MODAL */}
       {openModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-[#EEE5FF] to-[#C8B3FF] max-w-3xl w-full p-8 rounded-3xl relative max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={() => setOpenModal(false)}
-              className="absolute top-4 right-4 bg-green-500 text-white w-8 h-8 rounded-full text-xl"
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-white via-blue-50 to-purple-50 max-w-4xl w-full rounded-3xl shadow-2xl relative max-h-[90vh] overflow-hidden border border-white/20">
+            {/* Close Button */}
+            <button 
+              onClick={() => setOpenModal(false)} 
+              className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-pink-500 text-white w-10 h-10 rounded-full text-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg z-20"
             >
-              ×
+              <X size={24} />
             </button>
 
-            {/* TOGGLE */}
-            <div className="flex justify-center mb-6">
-              <div className="flex bg-[#5C039B] p-1 rounded-full">
-                {["Buy", "Sell"].map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setActionType(t)}
-                    className={`px-6 py-2 rounded-full font-bold ${
-                      actionType === t
-                        ? "bg-white text-[#5C039B]"
-                        : "text-white"
-                    }`}
-                  >
-                    {t.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <h2 className="text-4xl text-center font-extrabold text-[#5C039B] mb-3">
-              LETS GET STARTED
-            </h2>
-
-            <p className="text-center text-[#5C039B] mb-8">
-              {actionType === "Sell"
-                ? "We Have Buyers Waiting – Just Need Your Property Details!"
-                : "Almost There! Share Your Information to Finalize Your Property Search."}
-            </p>
-
-            {/* BUY FORM */}
-            {actionType === "Buy" && (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* NAME & PHONE */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <input
-                    name="firstName"
-                    placeholder="Name"
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-[#5C039B]
-                   placeholder:text-[#5C039B] outline-none"
-                    required
-                  />
-                  <input
-                    name="number"
-                    placeholder="Phone No."
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-[#5C039B]
-                   placeholder:text-[#5C039B] outline-none"
-                    required
-                  />
-                </div>
-
-                {/* EMAIL */}
-                <input
-                  name="email"
-                  placeholder="Your Email"
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-[#5C039B]
-                 placeholder:text-[#5C039B] outline-none"
-                  required
-                />
-
-                {/* BEDROOM */}
-                <input
-                  name="lookingTo"
-                  placeholder="No. of bedrooms you are looking for in the property"
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-[#5C039B]
-                 placeholder:text-[#5C039B] outline-none"
-                  required
-                />
-
-                {/* CONTACT */}
-                <div>
-                  <p className="text-[#5C039B] text-lg font-semibold mb-3">
-                    How do you prefer to be contacted?
-                  </p>
-
-                  <div className="flex flex-wrap gap-6">
-                    {["Call", "WhatsApp", "Email"].map((type) => (
-                      <label key={type} className="flex items-center gap-2">
-                        <input type="radio" name="contact" />
-                        <span className="bg-[#5C039B] text-white px-4 py-1 rounded-full font-semibold">
-                          {type}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* CHECKBOXES */}
-                <label className="flex gap-3 text-[#5C039B] text-sm">
-                  <input type="checkbox" />I agree to receive newsletters and
-                  marketing communications from via digital media, and
-                  understand I can unsubscribe at any time.
-                </label>
-
-                <label className="flex gap-3 text-[#5C039B] text-sm">
-                  <input type="checkbox" required />I have read, understood, and
-                  accept the Terms and Conditions and Privacy Policy of Xoto. *
-                </label>
-
-                {/* SUBMIT */}
-                <button
-                  type="submit"
-                  className="w-full bg-[#5C039B] text-white py-4 rounded-full text-xl font-bold"
-                >
-                  SUBMIT
-                </button>
-              </form>
-            )}
-
-            {/* SELL FORM */}
-            {actionType === "Sell" && (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    "Name",
-                    "Phone No.",
-                    "Your Email",
-                    "Listing type",
-                    "City",
-                    "Area",
-                    "Project Name",
-                    "Developer",
-                  ].map((f) => (
-                    <input key={f} placeholder={f} className="input" />
+            {/* Modal Header */}
+            <div className="p-8 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 border-b border-white/10">
+              <div className="flex flex-col items-center mb-6">
+                <div className="flex bg-gradient-to-r from-blue-600 to-purple-600 p-1 rounded-2xl shadow-lg mb-6">
+                  {["Buy", "Sell"].map(t => (
+                    <button 
+                      key={t}
+                      onClick={() => setActionType(t)}
+                      className={`px-10 py-4 rounded-xl font-bold transition-all duration-300 ${
+                        actionType === t 
+                          ? "bg-white text-gray-900 shadow-lg" 
+                          : "text-white/80 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {t.toUpperCase()}
+                    </button>
                   ))}
                 </div>
 
-                <input
-                  placeholder="No. of bedrooms you are looking for in the property"
-                  className="input"
-                />
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-purple-700 bg-clip-text text-transparent mb-2">
+                  {actionType === "Sell" ? "SELL YOUR PROPERTY" : "FIND YOUR DREAM HOME"}
+                </h2>
+                <p className="text-gray-600 text-center text-lg font-medium max-w-2xl">
+                  {actionType === "Sell" 
+                    ? "Connect with serious buyers and get the best value for your property" 
+                    : "Tell us what you're looking for and we'll find the perfect match"}
+                </p>
+              </div>
+            </div>
 
-                <div>
-                  <p className="label">Unit type</p>
-                  <div className="flex flex-wrap gap-4">
-                    {[
-                      "Apartment",
-                      "Villa",
-                      "Townhouse",
-                      "Duplex",
-                      "Penthouse",
-                    ].map((t) => (
-                      <label key={t} className="pill">
-                        <input type="radio" name="unit" />
-                        <span>{t}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="label">Bedroom</p>
-                  <div className="flex flex-wrap gap-4">
-                    {[
-                      "Studio",
-                      "1 Bed",
-                      "2 Bed",
-                      "3 Bed",
-                      "4 Bed",
-                      "5 Bed",
-                      "6 Bed",
-                      "7 Bed",
-                      "8+ Bed",
-                    ].map((b) => (
-                      <label key={b} className="pill">
-                        <input type="radio" name="bed" />
-                        <span>{b}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
+            {/* Modal Content */}
+            <div className="p-8 overflow-y-auto max-h-[60vh] custom-scrollbar">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Name Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <input placeholder="Unit price (AED)" className="input" />
-                  <input placeholder="Unit area (Sq. Ft.)" className="input" />
-                </div>
-
-                <textarea placeholder="Description" className="input h-40" />
-                {/* CONTACT */}
-                <div>
-                  <p className="text-[#5C039B] text-lg font-semibold mb-3">
-                    How do you prefer to be contacted?
-                  </p>
-
-                  <div className="flex flex-wrap gap-6">
-                    {["Call", "WhatsApp", "Email"].map((type) => (
-                      <label key={type} className="flex items-center gap-2">
-                        <input type="radio" name="contact" />
-                        <span className="bg-[#5C039B] text-white px-4 py-1 rounded-full font-semibold">
-                          {type}
-                        </span>
-                      </label>
-                    ))}
+                  <div className="relative">
+                    <input 
+                      name="first_name" 
+                      value={actionType === "Buy" ? buyForm.first_name : sellForm.first_name}
+                      onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                      placeholder="First Name" 
+                      required 
+                      className="premium-input pl-12" 
+                    />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                      👤
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <input 
+                      name="last_name" 
+                      value={actionType === "Buy" ? buyForm.last_name : sellForm.last_name}
+                      onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                      placeholder="Last Name" 
+                      required 
+                      className="premium-input pl-12" 
+                    />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                      👤
+                    </div>
                   </div>
                 </div>
 
-                {/* CHECKBOXES */}
-                <label className="flex gap-3 text-[#5C039B] text-sm">
-                  <input type="checkbox" />I agree to receive newsletters and
-                  marketing communications from via digital media, and
-                  understand I can unsubscribe at any time.
-                </label>
+                <div className="relative">
+                  <input 
+                    name="email" 
+                    type="email"
+                    value={actionType === "Buy" ? buyForm.email : sellForm.email}
+                    onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                    placeholder="Your Email Address" 
+                    required 
+                    className="premium-input pl-12" 
+                  />
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                    <Mail size={20} />
+                  </div>
+                </div>
 
-                <label className="flex gap-3 text-[#5C039B] text-sm">
-                  <input type="checkbox" required />I have read, understood, and
-                  accept the Terms and Conditions and Privacy Policy of Xoto. *
-                </label>
-                <button className="submit-btn">SUBMIT</button>
+                <div className="relative">
+                  <input 
+                    name="mobile" 
+                    value={actionType === "Buy" ? buyForm.mobile : sellForm.mobile}
+                    onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                    placeholder="Phone Number (e.g. 501234567)" 
+                    required 
+                    className="premium-input pl-12" 
+                  />
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                    <Phone size={20} />
+                  </div>
+                </div>
+
+                {actionType === "Buy" ? (
+                  <>
+                    <div className="relative">
+                      <input 
+                        name="desired_bedrooms" 
+                        value={buyForm.desired_bedrooms}
+                        onChange={handleBuyChange}
+                        placeholder="No. of bedrooms you're looking for" 
+                        required 
+                        className="premium-input pl-12" 
+                      />
+                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                        🛌
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-gray-700 font-semibold mb-4 text-lg">Preferred Contact Method</p>
+                      <div className="grid grid-cols-3 gap-4">
+                        {[
+                          { value: "call", icon: <Phone size={18} />, label: "Phone Call" },
+                          { value: "whatsapp", icon: <MessageCircle size={18} />, label: "WhatsApp" },
+                          { value: "email", icon: <Mail size={18} />, label: "Email" }
+                        ].map(({ value, icon, label }) => (
+                          <label key={value} className="relative">
+                            <input 
+                              type="radio" 
+                              name="preferred_contact" 
+                              value={value} 
+                              checked={buyForm.preferred_contact === value}
+                              onChange={handleBuyChange}
+                              className="sr-only peer"
+                            />
+                            <div className="p-4 rounded-xl border-2 border-gray-200 bg-white cursor-pointer transition-all duration-300 hover:border-blue-400 hover:shadow-md peer-checked:border-blue-600 peer-checked:bg-gradient-to-r peer-checked:from-blue-50 peer-checked:to-purple-50 peer-checked:shadow-lg">
+                              <div className="flex flex-col items-center gap-2">
+                                <div className={`p-2 rounded-full ${buyForm.preferred_contact === value ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+                                  {icon}
+                                </div>
+                                <span className="text-sm font-medium">{label}</span>
+                              </div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {[
+                        { name: "listing_type", placeholder: "Listing Type (e.g. Apartment)", icon: "🏠" },
+                        { name: "city", placeholder: "City", icon: "🌆" },
+                        { name: "area", placeholder: "Area", icon: "📍" },
+                        { name: "project_name", placeholder: "Project Name", icon: "🏢" },
+                        { name: "bedroom_config", placeholder: "Bedroom Config (e.g. 2 Bed)", icon: "🛏️" },
+                        { name: "price", placeholder: "Price (AED)", icon: "💰" }
+                      ].map(({ name, placeholder, icon }) => (
+                        <div key={name} className="relative">
+                          <input 
+                            name={name} 
+                            value={sellForm[name]}
+                            onChange={handleSellChange}
+                            placeholder={placeholder}
+                            className="premium-input pl-12" 
+                          />
+                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                            {icon}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="relative">
+                      <textarea 
+                        name="description" 
+                        value={sellForm.description} 
+                        onChange={handleSellChange} 
+                        placeholder="Tell us more about your property (optional)" 
+                        rows={4}
+                        className="premium-input pl-12 pt-4 resize-none"
+                      />
+                      <div className="absolute left-4 top-6 transform text-blue-600">
+                        📝
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <div className="space-y-4 pt-4">
+                  <label className="flex items-start gap-3 text-gray-700 text-sm p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
+                    <input type="checkbox" className="mt-1" />
+                    <span>I agree to receive newsletters and marketing communications via digital media, and understand I can unsubscribe at any time.</span>
+                  </label>
+
+                  <label className="flex items-start gap-3 text-gray-700 text-sm p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
+                    <input type="checkbox" required className="mt-1" />
+                    <span>I have read, understood, and accept the Terms and Conditions and Privacy Policy of Xoto. *</span>
+                  </label>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="group w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-xl text-xl font-bold hover:shadow-xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      {actionType === "Buy" ? "FIND MY DREAM HOME" : "SELL MY PROPERTY"}
+                      <ArrowRight className="group-hover:translate-x-2 transition-transform" size={20} />
+                    </>
+                  )}
+                </button>
               </form>
-            )}
+            </div>
           </div>
         </div>
       )}
 
-      {/* REUSABLE STYLES */}
-      <style>{`
-        .input {
+      <style jsx>{`
+        .premium-input {
           width: 100%;
-          padding: 0.75rem 1rem;
+          padding: 1rem 1.25rem 1rem 3rem;
           border-radius: 0.75rem;
-          border: 1px solid #5C039B;
+          border: 2px solid #e2e8f0;
+          background: white;
           outline: none;
+          font-size: 1rem;
+          transition: all 0.3s;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-        .pill {
-          display: flex;
-          gap: 0.5rem;
-          align-items: center;
-          background: #5C039B;
-          padding: 0.4rem 1rem;
-          color: white;
-          border-radius: 9999px;
-          font-weight: 600;
+        .premium-input:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+          transform: translateY(-1px);
         }
-        .submit-btn {
-          width: 100%;
-          background: #5C039B;
-          color: white;
-          padding: 1rem;
-          border-radius: 9999px;
-          font-size: 1.25rem;
-          font-weight: 700;
+        .premium-input::placeholder {
+          color: #94a3b8;
         }
-        .label {
-          font-weight: bold;
-          color: #5C039B;
-          margin-bottom: 0.5rem;
+        
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #2563eb, #7c3aed);
+        }
+        
+        /* Animation for modal */
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        .fixed.inset-0 {
+          animation: slideIn 0.3s ease-out;
         }
       `}</style>
     </>

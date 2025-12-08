@@ -50,6 +50,7 @@ import Bookings from "./pages/dashboardPages/consult/Bookings";
 import Packages from "./pages/packages/Packages";
 import MasterCategory from "./pages/estimateMaster/MasterCategory";
 import Enquiry from "./pages/dashboardPages/consult/Enquiry";
+import PropertyLeads from "./pages/dashboardPages/consult/PropertyLeads";
 
 const roleSlugMap = {
   0: "superadmin",
@@ -105,6 +106,8 @@ const componentMap = {
   "estimate/master/categories":<MasterCategory/>,
   deals: <Leads />,
 bookings:<Bookings/>,
+  "property/leads":<PropertyLeads/>,
+
 enquiries:<Enquiry/>,
 packages:<Packages/>};
 

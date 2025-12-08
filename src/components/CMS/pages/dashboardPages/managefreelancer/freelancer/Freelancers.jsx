@@ -29,6 +29,7 @@ import {
 import moment from "moment";
 import { apiService } from "../../../../../../manageApi/utils/custom.apiservice";
 import CustomTable from "../../../custom/CustomTable";
+import { showConfirmDialog } from "../../../../../../manageApi/utils/sweetAlert";
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
