@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import wave1 from "../../assets/img/wave/wave1.png";
-import round from "../../assets/img/round1.mp4"; // ✅ VIDEO IMPORT
+import round from "../../assets/img/round23.mp4"; // ✅ VIDEO IMPORT
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/icons/Homeicons/partners.png";
 import vector from "../../assets/icons/Homeicons/Vector.png";
