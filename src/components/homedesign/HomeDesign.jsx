@@ -1,108 +1,143 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import houseimage from "../../assets/img/home/house1.png";
+import { Link, useNavigate } from "react-router-dom";
+import houseimage from "../../assets/img/home/houseimage1.png";
 import wave1 from "../../assets/img/wave/wave1.png";
+import interior from "../../assets/img/icons123/interior.png";
+import exterior from "../../assets/img/icons123/extterior.png";
+import landscaping from "../../assets/img/icons123/landscaping.png";
+import virtual from "../../assets/img/icons123/virtual.png";
+import image from "../../assets/img/icons123/image.png";
+import smart from "../../assets/img/icons123/smart.png";
 
 const HomeDesign = () => {
+  const navigate = useNavigate();
+
+  // ✅ ONLY BUTTON POSITIONS UPDATED
+  const hotspots = [
+    {
+      label: "Exterior Upgrade",
+      icon: exterior,
+      link: "/exterior",
+      style: "top-[6%] left-[60%] -translate-x-1/2",
+    },
+    {
+      label: "Interior Transformation",
+      icon: interior,
+      link: "/interior",
+      style: "top-[33%] right-[7%]",
+    },
+    {
+      label: "Smart Furniture Swap",
+      icon: smart,
+      link: "/furniture",
+      style: "bottom-[31%] right-[12%]",
+    },
+    {
+      label: "Landscaping",
+      icon: landscaping,
+      link: "/landscaping",
+      style: "bottom-[-3%] left-[56%] -translate-x-1/2",
+    },
+    {
+      label: "Image Perfection",
+      icon: image,
+      link: "/image-perfection",
+      style: "bottom-[24%] left-[13%]",
+    },
+    {
+      label: "Virtual Design Studio",
+      icon: virtual,
+      link: "/landscaping",
+      style: "top-[35%] left-[17%]",
+    },
+  ];
+
   return (
-<section
-  className="
-    relative bg-[var(--color-body)] 
-    pt-0 pb-10         /* mobile */
-    sm:pt-24 sm:pb-12   /* small screens */
-    md:pt-28 md:pb-14   /* medium screens */
-    lg:pt-32 lg:pb-20   /* large screens */
-    xl:pt-36 xl:pb-24   /* extra large */
-    overflow-hidden
-  "
->
-
+    <section
+      className="
+        relative bg-[var(--color-body)]
+        pt-0 pb-10
+        sm:pt-24 sm:pb-12
+        md:pt-28 md:pb-14
+        lg:pt-32 lg:pb-20
+        xl:pt-36 xl:pb-24
+        overflow-hidden
+      "
+    >
       <div className="w-full relative">
+        {/* WAVE */}
+        <div className="absolute bottom-[-180px] left-65 w-full z-0">
+          <img
+            src={wave1}
+            alt=""
+            className="w-full scale-[1.3] pointer-events-none select-none"
+          />
+        </div>
 
-        {/* ---------- WAVE BEHIND EVERYTHING ---------- */}
-       <div
-  className="
-    absolute 
-    bottom-[-20px]        /* mobile */
-    sm:bottom-[-40px]     /* small screens */
-    md:bottom-[-70px]     /* medium screens */
-    lg:bottom-[-110px]    /* large screens */
-    xl:bottom-[-150px]    /* extra large */
-    left-0 w-full z-0 overflow-hidden
-  "
->
-  <img
-    src={wave1}
-    alt=""
-    className="
-      w-[180%]            /* mobile wider */
-      sm:w-[160%]
-      md:w-[150%]
-      lg:w-full           /* normal on large screens */
-
-      -ml-[20%]           /* mobile adjustment */
-      sm:-ml-[12%]
-      md:-ml-[8%]
-      lg:ml-0
-
-      scale-[1.6]         /* mobile scale */
-      sm:scale-[1.4]
-      md:scale-[1.2]
-      lg:scale-100
-
-      pointer-events-none 
-      select-none
-    "
-  />
-</div>
-
-
-        {/* ---------- GRID LAYOUT ---------- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center relative z-10">
-
-          {/* LEFT CONTENT */}
-          <div className="
-            space-y-8  
-            flex flex-col lg:ps-25  sm:ps-0
-            items-center lg:items-start 
-            text-center lg:text-left
-          ">
+          {/* LEFT TEXT */}
+          <div className="space-y-8 flex flex-col items-center lg:items-start text-center lg:text-left px-30">
             <h2 className="heading-light text-black">
               Your Space, <br />
               <span>Redefined Instantly.</span>
             </h2>
 
-            <p
-              className="paragraph-light-1 max-w-max"
-              style={{ color: "var(--color-grey)" }}
-            >
-              Upload your villa layout and let <span>Xoto AI</span> craft <br />
-              stunning outdoor and design options — tailored <br /> to your taste.
+            <p className="paragraph-light-1 text-gray-600">
+              Upload your villa layout and let <span>Xoto AI</span> craft
+              stunning outdoor and design options — tailored to your taste.
             </p>
 
             <Link
               to="/estimate/calculator"
-              className="relative z-20 inline-block bg-[var(--color-primary)] text-white px-15 py-3 rounded-lg font-semibold"
+              className="inline-block bg-[var(--color-primary)] text-white px-15 py-3 rounded-lg font-semibold"
             >
               Get Free Estimate Now
             </Link>
           </div>
 
-          {/* RIGHT IMAGE */}
-          <div className="
-            order-last lg:order-none 
-            flex justify-center lg:justify-end md:justify-center sm:justify-center
-            w-full relative z-10 
-            mt-10 lg:mt-0 
-            px-4 sm:px-8 lg:px-0
-          ">
+          {/* RIGHT IMAGE WITH HOTSPOTS */}
+          <div className="relative flex  w-full h-full justify-center lg:justify-end mt-10 lg:mt-0 px-10">
             <img
               src={houseimage}
               alt="3D House"
-              className="w-full max-w-5xl object-cover drop-shadow-2xl select-none"
+              className="h-[620px] w-auto max-w-none object-contain drop-shadow-2xl"
+              style={{ transform: "translateX(170px)" }}
             />
-          </div>
 
+            {/* HOTSPOT BUTTONS */}
+            {hotspots.map((spot, index) => (
+              <button
+                key={index}
+                onClick={() => navigate(spot.link)}
+                className={`
+                  absolute ${spot.style}
+                  flex items-center gap-2
+                  bg-white
+                  px-3 py-1
+                  rounded-lg
+                  shadow-xl
+                  font-semibold
+                  text-gray-800
+                  hover:bg-[#5C039B]
+                  hover:text-white
+                  transition
+                  whitespace-nowrap
+                `}
+              >
+                <span className="bg-green-500 p-2 rounded-full flex items-center justify-center shrink-0">
+                  <img
+                    src={spot.icon}
+                    alt={spot.label}
+                    className="w-4 h-4 object-contain"
+                  />
+                </span>
+
+                <span className="text-sm font-semibold leading-none">
+                  {spot.label}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import wave1 from "../../assets/img/wave/waveint2.png";
-import round from "../../assets/img/home/round.png";
+// import round from "../../assets/img/home/round.png";
+import round from "../../assets/img/round1.mp4";
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/icons/Homeicons/partners.png";
 import vector from "../../assets/icons/Homeicons/Vector.png";
@@ -12,7 +13,7 @@ import target from "../../assets/icons/Homeicons/target.png";
 
 const BuiltForEveryone = () => {
   const cards = [
-     {
+    {
       icon: vector,
       title: "Business Associates",
       desc: "Elite Contractors Network",
@@ -22,7 +23,7 @@ const BuiltForEveryone = () => {
       title: "Contractors",
       desc: "Elite Contractors Network",
     },
-   
+
     {
       icon: partner,
       title: "Execution Partner",
@@ -95,58 +96,68 @@ const BuiltForEveryone = () => {
   };
 
   return (
-    <section className="relative bg-[var(--color-body)] overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
-      
+    <section className="relative bg-white overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
       {/* Background Wave */}
       <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0">
-             <img
-               src={wave1}
-               alt=""
-               className="w-[180%] sm:w-[165%] md:w-[150%] lg:w-full -ml-[20%] sm:-ml-[12%] md:-ml-[8%] lg:ml-0 scale-[1.6] sm:scale-[1.4] md:scale-[1.2] lg:scale-100 pointer-events-none select-none"
-             />
-           </div>
+        <img
+          src={wave1}
+          alt=""
+          className="w-[180%] sm:w-[165%] md:w-[150%] lg:w-full -ml-[20%] sm:-ml-[12%] md:-ml-[8%] lg:ml-0 scale-[1.6] sm:scale-[1.4] md:scale-[1.2] lg:scale-100 pointer-events-none select-none"
+        />
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-
         {/* Title */}
-        <h2 className="text-5xl  text-center mb-12 lg:mb-16 heading-dark-1"
-         style={{ color: "var(--color-black)" }}
-         >
-          Our Partner Ecosystem
+        <h2
+          className="text-center mb-12 lg:mb-16 heading-light"
+          style={{ color: "var(--color-black)" }}
+        >
+          Built For Everyone
         </h2>
 
-        <div className="flex flex-col lg:flex-row items-center justify-between" 
-        
-        >
-          
-          {/* Left Image */}
-          <div className="w-full lg:w-1/2 flex justify-start items-start lg:justify-start mb-10 lg:mb-0">
-            <div className="relative w-60 h-60 sm:w-80 sm:h-80 lg:w-96 lg:h-96 mx-auto">
-              <img src={round} alt="Round decoration" className="w-full h-full object-contain" />
+        <div className="flex flex-col lg:flex-row items-center justify-between">
+          {/* LEFT VIDEO (replaced image) */}
+          <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-25">
+            <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
+              <video
+                src={round}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full  object-contain"
+              />
             </div>
           </div>
 
-          {/* Slider Section */}
+          {/* Slider */}
           <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
-
             <div className="relative w-full max-w-sm lg:max-w-2xl overflow-hidden">
               <div
                 className="flex transition-transform duration-500 ease-in-out gap-4"
                 style={{
-                  transform: `translateX(-${currentIndex * (100 / cardsToShow)}%)`,
+                  transform: `translateX(-${
+                    isMobile
+                      ? currentIndex * 100
+                      : currentIndex * (100 / cardsToShow)
+                  }%)`,
                 }}
               >
                 {cards.map((card, index) => (
                   <div
                     key={index}
                     className={`flex-shrink-0 bg-white rounded-xl p-6 transition-all duration-300 ${
-                      index >= currentIndex && index < currentIndex + cardsToShow
+                      index >= currentIndex &&
+                      index < currentIndex + cardsToShow
                         ? "shadow-xl scale-100 opacity-100"
                         : "opacity-70 scale-95"
                     }`}
-                    style={{ width: getCardWidth() }}
+                    style={{
+                      width: isMobile
+                        ? "100%"
+                        : `calc(${100 / cardsToShow}% - 16px)`,
+                    }}
                   >
-                    {/* Card Content */}
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-xl card-heading">{card.title}</h3>
 
@@ -155,45 +166,44 @@ const BuiltForEveryone = () => {
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 leading-relaxed">{card.desc}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {card.desc}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Navigation Arrows */}
+            {/* Navigation Buttons */}
             <div className="flex gap-3 mt-8">
-                        {/* LEFT */}
-                        <button
-                          onClick={() => {
-                            prevSlide();
-                            setActiveBtn("left");
-                          }}
-                          className={`p-3 rounded-sm border transition ${
-                            activeBtn === "left"
-                              ? "bg-[var(--color-primary)] text-white border-transparent"
-                              : " bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-                          }`}
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </button>
-          
-                        {/* RIGHT */}
-                        <button
-                          onClick={() => {
-                            nextSlide();
-                            setActiveBtn("right");
-                          }}
-                          className={`p-3 rounded-sm transition ${
-                            activeBtn === "right"
-                              ? "bg-[var(--color-primary)] text-white"
-                              : " bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-                          }`}
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </button>
-                      </div>
+              <button
+                onClick={() => {
+                  prevSlide();
+                  setActiveBtn("left");
+                }}
+                className={`p-3 rounded-sm border transition ${
+                  activeBtn === "left"
+                    ? "bg-[var(--color-primary)] text-white border-transparent"
+                    : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+                }`}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
 
+              <button
+                onClick={() => {
+                  nextSlide();
+                  setActiveBtn("right");
+                }}
+                className={`p-3 rounded-sm transition ${
+                  activeBtn === "right"
+                    ? "bg-[var(--color-primary)] text-white"
+                    : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+                }`}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
