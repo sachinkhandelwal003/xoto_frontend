@@ -1229,12 +1229,7 @@ const AssignedLeadsList = () => {
                                         </div>
                                     </div>
                                     
-                                    <div className="text-right">
-                                        <div className="text-sm font-medium text-gray-600">Lead ID</div>
-                                        <div className="font-mono text-sm" style={{ color: PURPLE_THEME.primary }}>
-                                            {selectedLead._id}
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                             </Card>
 
@@ -1707,30 +1702,8 @@ const AssignedLeadsList = () => {
                                             }
                                             extra={
                                                 <Space>
-                                                    <Button 
-                                                        type="link" 
-                                                        size="small"
-                                                        onClick={() => {
-                                                            loadQuotationData(quotation);
-                                                            setFinalQuotationModalVisible(true);
-                                                        }}
-                                                        style={{ color: PURPLE_THEME.primary }}
-                                                    >
-                                                        Edit & Use
-                                                    </Button>
-                                                    <Button 
-                                                        type="link" 
-                                                        size="small"
-                                                        onClick={() => {
-                                                            finalQuotationForm.setFieldsValue({
-                                                                quotation_id: quotation._id
-                                                            });
-                                                            setFinalQuotationModalVisible(true);
-                                                        }}
-                                                        style={{ color: PURPLE_THEME.success }}
-                                                    >
-                                                        Use As Is
-                                                    </Button>
+                                                   
+                                                   
                                                 </Space>
                                             }
                                         >
@@ -1792,7 +1765,7 @@ const AssignedLeadsList = () => {
                                                         }}
                                                         style={{ background: PURPLE_THEME.primary, borderColor: PURPLE_THEME.primary }}
                                                     >
-                                                        Edit & Create Final
+                                                        Use  & Create Final
                                                     </Button>
                                                 </div>
                                             </div>

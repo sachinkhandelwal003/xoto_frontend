@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import wave1 from "../../assets/img/wave/wave1.png";
-import round from "../../assets/img/home/round.png";
+import round from "../../assets/img/round1.mp4"; // ✅ VIDEO IMPORT
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/icons/Homeicons/partners.png";
 import vector from "../../assets/icons/Homeicons/Vector.png";
@@ -14,32 +14,32 @@ const BuiltForEveryone = () => {
   const cards = [
     {
       icon: rating,
-      title: "For Customers",
+      title: "Customers",
       desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
     },
     {
       icon: vector,
-      title: "For Business Associates",
+      title: "Business Associates",
       desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
     },
     {
       icon: partner,
-      title: "For Execution Partner",
+      title: "Execution Partner",
       desc: "Unlock new growth opportunities through seamless integrations and partner solutions.",
     },
     {
       icon: dollar,
-      title: "For Strategic Alliances",
+      title: "Strategic Alliances",
       desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
     },
     {
       icon: target,
-      title: "For Developers",
+      title: "Developers",
       desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
     },
     {
       icon: finance,
-      title: "For Financial Institutions",
+      title: "Financial Institutions",
       desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
     },
   ];
@@ -83,7 +83,7 @@ const BuiltForEveryone = () => {
   }, [cardsToShow]);
 
   return (
-    <section className="relative bg-[var(--color-body)] overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
+    <section className="relative bg-white overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
       {/* Background Wave */}
       <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0">
         <img
@@ -103,13 +103,16 @@ const BuiltForEveryone = () => {
         </h2>
 
         <div className="flex flex-col lg:flex-row items-center justify-between">
-          {/* Left Image */}
-          <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-0">
+          {/* LEFT VIDEO (replaced image) */}
+          <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-25">
             <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
-              <img
+              <video
                 src={round}
-                alt=""
-                className="w-full h-full object-contain"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full  object-contain"
               />
             </div>
           </div>
@@ -122,7 +125,7 @@ const BuiltForEveryone = () => {
                 style={{
                   transform: `translateX(-${
                     isMobile
-                      ? currentIndex * 100 // FIX FOR MOBILE
+                      ? currentIndex * 100
                       : currentIndex * (100 / cardsToShow)
                   }%)`,
                 }}
@@ -160,7 +163,6 @@ const BuiltForEveryone = () => {
 
             {/* Navigation Buttons */}
             <div className="flex gap-3 mt-8">
-              {/* LEFT */}
               <button
                 onClick={() => {
                   prevSlide();
@@ -169,13 +171,12 @@ const BuiltForEveryone = () => {
                 className={`p-3 rounded-sm border transition ${
                   activeBtn === "left"
                     ? "bg-[var(--color-primary)] text-white border-transparent"
-                    : " bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+                    : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
                 }`}
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
 
-              {/* RIGHT */}
               <button
                 onClick={() => {
                   nextSlide();
@@ -184,7 +185,7 @@ const BuiltForEveryone = () => {
                 className={`p-3 rounded-sm transition ${
                   activeBtn === "right"
                     ? "bg-[var(--color-primary)] text-white"
-                    : " bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+                    : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
                 }`}
               >
                 <ChevronRight className="w-5 h-5" />

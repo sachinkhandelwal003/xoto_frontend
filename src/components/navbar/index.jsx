@@ -193,32 +193,40 @@ export const languages = [
   },
 ];
 
+/* ------------------- SERVICES DROPDOWN ITEMS ------------------- */
+const servicesItems = [
+  { title: "Mortgage", path: "/services/mortgage" },
+  { title: "Maintenance", path: "/services/maintenance" },
+];
+
 /* ------------------- NAV ITEMS ------------------- */
 const navItems = [
   { title: "Home", path: "/" },
   { title: "Landscaping", path: "/landscaping" },
   { title: "Interiors", path: "/services/interior" },
   { title: "Properties", path: "/marketplace" },
-  { title: "Services", path: "/Services" },
+  // Services will be handled separately as dropdown
   { title: "Partner Eco-System", path: "/ecosystem" },
   { title: "Xoto Store", path: "/ecommerce/b2c" },
-    { title: "Blogs", path: "/explore" },
-
+  { title: "Blogs", path: "/explore" },
 ];
 
 /* ------------------- MAIN NAVBAR ------------------- */
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState(languages[0]);
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef(null);
+  const servicesRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
+      if (servicesRef.current && !servicesRef.current.contains(e.target)) setServicesOpen(false);
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target) && !e.target.closest('button')) {
         setMobileOpen(false);
       }
@@ -279,6 +287,32 @@ const Navbar = () => {
                   {item.title}
                 </Link>
               ))}
+              
+              {/* Services Dropdown */}
+              <div ref={servicesRef} className="relative">
+                <button
+                  onClick={() => setServicesOpen(!servicesOpen)}
+                  className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all duration-200 hover:bg-purple-50 hover:text-purple-700"
+                >
+                  Services
+                  <ChevronDown className={`w-4 h-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {servicesOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    {servicesItems.map((service) => (
+                      <Link
+                        key={service.title}
+                        to={service.path}
+                        onClick={() => setServicesOpen(false)}
+                        className="block px-4 py-3 text-sm text-gray-700 transition-all hover:bg-purple-50 hover:text-purple-700"
+                      >
+                        {service.title}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Desktop: Language + Contact */}
@@ -320,12 +354,12 @@ const Navbar = () => {
               </div>
 
               <Link to="/contact">
-                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl  hover:from-purple-700  transform hover:scale-105 transition-all duration-200">
+                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl hover:from-purple-700 transform hover:scale-105 transition-all duration-200">
                   Contact Us
                 </button>
               </Link>
                <Link to="/login">
-                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl  hover:from-purple-700  transform hover:scale-105 transition-all duration-200">
+                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl hover:from-purple-700 transform hover:scale-105 transition-all duration-200">
                   Login
                 </button>
               </Link>
@@ -400,6 +434,23 @@ const Navbar = () => {
                 {item.title}
               </Link>
             ))}
+            
+            {/* Services Dropdown in Mobile */}
+            <div className="px-4 py-3">
+              <div className="mb-2 text-sm font-semibold text-gray-900">Services</div>
+              <div className="pl-4 space-y-2">
+                {servicesItems.map((service) => (
+                  <Link
+                    key={service.title}
+                    to={service.path}
+                    onClick={closeMobileMenu}
+                    className="block px-4 py-2 text-base font-medium text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-700 transition"
+                  >
+                    {service.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
 
             {/* Contact Button in Mobile Menu */}
             <Link to="/contact" onClick={closeMobileMenu} className="block mt-4 px-4">
@@ -412,7 +463,7 @@ const Navbar = () => {
       </nav>
 
       {/* Spacer */}
-      <div className="h-16" />
+      <div className="h-20"></div>
     </>
   );
 };

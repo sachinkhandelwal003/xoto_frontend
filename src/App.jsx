@@ -51,7 +51,6 @@ import Calculator from "./components/homepage/AiPlanner/Calculator";
 import OtherLogin from "./components/login/OtherLogin";
 import InteriorPlanner from "./components/homepage/AiPlanner/InteriorPlanner";
 import InteriorCalculator from "./components/homepage/AiPlanner/InteriorCalculator";
-import MaincalculatorPage from "./components/homepage/AiPlanner/MainCalculatorPage";
 import MainCalculatorPage from "./components/homepage/AiPlanner/MainCalculatorPage";
 
 // Lazy-loaded components

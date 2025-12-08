@@ -1,114 +1,142 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import houseimage from "../../assets/img/home/house1.png";
+import houseimage from "../../assets/img/home/houseimage1.png";
 import wave1 from "../../assets/img/wave/wave1.png";
+import interior from "../../assets/img/icons123/interior.png";
+import exterior from "../../assets/img/icons123/extterior.png";
+import landscaping from "../../assets/img/icons123/landscaping.png";
+import virtual from "../../assets/img/icons123/virtual.png";
+import image from "../../assets/img/icons123/image.png";
+import smart from "../../assets/img/icons123/smart.png";
 
 const HomeDesign = () => {
   const navigate = useNavigate();
 
-  return (
-    <section className="relative bg-[var(--color-body)] pt-0 pb-10 overflow-hidden">
-      <div className="w-full relative">
+  // ✅ ONLY BUTTON POSITIONS UPDATED
+  const hotspots = [
+    {
+      label: "Exterior Upgrade",
+      icon: exterior,
+      link: "/exterior",
+      style: "top-[6%] left-[60%] -translate-x-1/2",
+    },
+    {
+      label: "Interior Transformation",
+      icon: interior,
+      link: "/interior",
+      style: "top-[33%] right-[7%]",
+    },
+    {
+      label: "Smart Furniture Swap",
+      icon: smart,
+      link: "/furniture",
+      style: "bottom-[31%] right-[12%]",
+    },
+    {
+      label: "Landscaping",
+      icon: landscaping,
+      link: "/landscaping",
+      style: "bottom-[-3%] left-[56%] -translate-x-1/2",
+    },
+    {
+      label: "Image Perfection",
+      icon: image,
+      link: "/image-perfection",
+      style: "bottom-[24%] left-[13%]",
+    },
+    {
+      label: "Virtual Design Studio",
+      icon: virtual,
+      link: "/landscaping",
+      style: "top-[35%] left-[17%]",
+    },
+  ];
 
-        {/* Background Wave Image */}
-        <div className="absolute bottom-[-150px] left-0 w-full z-0">
-          <img src={wave1} alt="wave" className="w-full pointer-events-none select-none" />
+  return (
+    <section
+      className="
+        relative bg-[var(--color-body)]
+        pt-0 pb-10
+        sm:pt-24 sm:pb-12
+        md:pt-28 md:pb-14
+        lg:pt-32 lg:pb-20
+        xl:pt-36 xl:pb-24
+        overflow-hidden
+      "
+    >
+      <div className="w-full relative">
+        {/* WAVE */}
+        <div className="absolute bottom-[-180px] left-0 w-full z-0">
+          <img
+            src={wave1}
+            alt=""
+            className="w-full scale-[1.3] pointer-events-none select-none"
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center relative z-10">
-
-          {/* LEFT SIDE TEXT */}
-          <div className="space-y-8 flex flex-col items-center lg:items-start text-center lg:text-left">
+          {/* LEFT TEXT */}
+          <div className="space-y-8 flex flex-col items-center lg:items-start text-center lg:text-left px-20 ">
             <h2 className="heading-light text-black">
               Your Space, <br />
               <span>Redefined Instantly.</span>
             </h2>
 
-            <p className="paragraph-light-1" style={{ color: "var(--color-grey)" }}>
-              Upload your villa layout and let <span>Xoto AI</span>
-              craft stunning outdoor and design options — tailored to your taste.
+            <p className="paragraph-light-1 text-gray-600">
+              Upload your villa layout and let <span>Xoto AI</span> craft
+              stunning outdoor and design options — tailored to your taste.
             </p>
 
             <Link
               to="/schedule/estimate"
-              className="bg-[var(--color-primary)] text-white px-15 py-3 rounded-lg font-semibold"
+              className="inline-block bg-[var(--color-primary)] text-white px-15 py-3 rounded-lg font-semibold"
             >
               Get Free Estimate Now
             </Link>
           </div>
 
-          {/* RIGHT SIDE — HOUSE IMAGE WITH CLICKABLE MAP */}
-          <div className="relative flex justify-center lg:justify-end mt-10 lg:mt-0 px-4 sm:px-8">
+          {/* RIGHT IMAGE WITH HOTSPOTS */}
+          <div className="relative flex  w-full h-full justify-center lg:justify-end mt-10 lg:mt-0 px-10">
             <img
               src={houseimage}
-              alt="House Map"
-              useMap="#house-map"
-              className="w-full max-w-5xl object-cover drop-shadow-2xl select-none"
+              alt="3D House"
+              className="h-[500px] w-auto max-w-none object-contain drop-shadow-2xl"
+              style={{ transform: "translateX(170px)" }}
             />
 
-            {/* IMAGE MAP */}
-            <map name="house-map">
-              {/* Image Perfection */}
-              <area
-                coords="80,420,280,500"
-                shape="rect"
-                alt="Image Perfection"
-                title="Image Perfection"
-                onClick={() => navigate("/image-perfection")}
-                style={{ cursor: "pointer" }}
-              />
+            {/* HOTSPOT BUTTONS */}
+            {hotspots.map((spot, index) => (
+              <button
+                key={index}
+                onClick={() => navigate(spot.link)}
+                className={`
+                  absolute ${spot.style}
+                  flex items-center gap-2
+                  bg-white
+                  px-3 py-1
+                  rounded-lg
+                  shadow-xl
+                  font-semibold
+                  text-gray-800
+                  hover:bg-[#5C039B]
+                  hover:text-white
+                  transition
+                  whitespace-nowrap
+                `}
+              >
+                <span className="bg-green-500 p-2 rounded-full flex items-center justify-center shrink-0">
+                  <img
+                    src={spot.icon}
+                    alt={spot.label}
+                    className="w-4 h-4 object-contain"
+                  />
+                </span>
 
-              {/* Virtual Design Studio */}
-              <area
-                coords="100,250,300,330"
-                shape="rect"
-                alt="Virtual Design Studio"
-                title="Virtual Design Studio"
-                onClick={() => navigate("/virtual-design")}
-                style={{ cursor: "pointer" }}
-              />
-
-              {/* Exterior Upgrade */}
-              <area
-                coords="330,40,520,120"
-                shape="rect"
-                alt="Exterior Upgrade"
-                title="Exterior Upgrade"
-                onClick={() => navigate("/exterior-upgrade")}
-                style={{ cursor: "pointer" }}
-              />
-
-              {/* Interior Transformation */}
-              <area
-                coords="640,230,850,310"
-                shape="rect"
-                alt="Interior Transformation"
-                title="Interior Transformation"
-                onClick={() => navigate("/interior-transformation")}
-                style={{ cursor: "pointer" }}
-              />
-
-              {/* Smart Furniture Swap */}
-              <area
-                coords="600,350,820,430"
-                shape="rect"
-                alt="Smart Furniture Swap"
-                title="Smart Furniture Swap"
-                onClick={() => navigate("/smart-furniture")}
-                style={{ cursor: "pointer" }}
-              />
-
-              {/* Landscaping */}
-             <area
-  alt="Landscaping"
-  title="Landscaping"
-  coords="300,520,550,630"
-  shape="rect"
-  onClick={() => navigate('/landscaping')}
-  style={{ cursor: "pointer" }}
-/>
-
-            </map>
+                <span className="text-sm font-semibold leading-none">
+                  {spot.label}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
