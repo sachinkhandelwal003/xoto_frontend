@@ -29,8 +29,7 @@ export default function PartnerForm() {
       err.email = "Enter a valid email.";
     }
 
-    if (!formData.partnerType.trim())
-      err.partnerType = "Partner Type is required.";
+    if (!formData.partnerType) err.partnerType = "Partner Type is required.";
 
     if (!formData.proposal.trim())
       err.proposal = "Proposal description is required.";
@@ -49,16 +48,10 @@ export default function PartnerForm() {
 
   return (
     <div className="relative w-full bg-[var(--color-body)] flex flex-col items-center py-10 overflow-visible">
-
-      {/* ==============================
-          MAIN CONTENT WRAPPER (z-10)
-      =============================== */}
       <div className="w-full flex flex-col items-center relative z-10">
-
         {/* TOP SECTION */}
         <div className="w-full flex justify-center px-4">
-          <div className="max-w-7xl w-full p-6 sm:p-8 flex flex-col md:flex-row justify-between items-center gap-10 md:gap-16">
-
+          <div className="max-w-7xl w-full p-6 sm:p-8 flex flex-col md:flex-row gap-10 md:gap-16">
             {/* LEFT CONTENT */}
             <div className="md:w-1/2 flex flex-col gap-6">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-black">
@@ -71,20 +64,20 @@ export default function PartnerForm() {
                 Tell us more about your business or project.
               </p>
 
-              {/* IMAGE */}
               <div
-                className="w-full h-56 sm:h-64 md:h-72 flex justify-center bg-center bg-no-repeat bg-contain"
+                className="w-full h-56 sm:h-64 md:h-72 bg-center bg-no-repeat bg-contain"
                 style={{ backgroundImage: `url(${Picture1})` }}
-              ></div>
+              />
             </div>
 
-            {/* RIGHT SIDE — FORM */}
+            {/* RIGHT — FORM */}
             <div className="md:w-1/2 w-full bg-white rounded-xl shadow-md p-6 sm:p-8 border border-gray-200">
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
-                {/* Organization Name */}
+                {/* Organization */}
                 <div>
-                  <label className="text-sm font-medium">Organization Name*</label>
+                  <label className="text-sm font-medium">
+                    Organization Name*
+                  </label>
                   <input
                     type="text"
                     name="organization"
@@ -98,7 +91,9 @@ export default function PartnerForm() {
                     }`}
                   />
                   {errors.organization && (
-                    <p className="text-red-500 text-sm mt-1">{errors.organization}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.organization}
+                    </p>
                   )}
                 </div>
 
@@ -122,29 +117,44 @@ export default function PartnerForm() {
                   )}
                 </div>
 
-                {/* Partner Type */}
+                {/* ✅ Partner Type Dropdown */}
                 <div>
                   <label className="text-sm font-medium">Partner Type*</label>
-                  <input
-                    type="text"
+                  <select
                     name="partnerType"
                     value={formData.partnerType}
                     onChange={handleChange}
-                    placeholder="Enter Partner Type"
-                    className={`border rounded-md p-3 w-full focus:outline-none focus:ring-2 ${
+                    className={`border rounded-md p-3 w-full bg-white focus:outline-none focus:ring-2 ${
                       errors.partnerType
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-purple-500"
                     }`}
-                  />
+                  >
+                    <option value="">Select Partner Type</option>
+                    <option value="Business Associates">
+                      Business Associates
+                    </option>
+                    <option value="Execution Partner">Execution Partner</option>
+                    <option value="Strategic Alliances">
+                      Strategic Alliances
+                    </option>
+                    <option value="Developers">Developers</option>
+                    <option value="Financial Institution">
+                      Financial Institution
+                    </option>
+                  </select>
                   {errors.partnerType && (
-                    <p className="text-red-500 text-sm mt-1">{errors.partnerType}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.partnerType}
+                    </p>
                   )}
                 </div>
 
                 {/* Proposal */}
                 <div>
-                  <label className="text-sm font-medium">Describe Your Proposal*</label>
+                  <label className="text-sm font-medium">
+                    Describe Your Proposal*
+                  </label>
                   <textarea
                     name="proposal"
                     rows="3"
@@ -156,9 +166,11 @@ export default function PartnerForm() {
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-purple-500"
                     }`}
-                  ></textarea>
+                  />
                   {errors.proposal && (
-                    <p className="text-red-500 text-sm mt-1">{errors.proposal}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.proposal}
+                    </p>
                   )}
                 </div>
 
@@ -168,87 +180,42 @@ export default function PartnerForm() {
                 >
                   Submit Now
                 </button>
-
               </form>
             </div>
           </div>
         </div>
 
-        {/* BOTTOM CHAT SECTION */}
+        {/* CHAT SECTION */}
         <div className="w-full flex justify-center px-4 mt-10">
-          <div
-            className="max-w-6xl w-full
-              bg-gradient-to-t from-[#03A4F4] to-[#5C039B] text-white 
-              rounded-2xl shadow-xl
-              flex flex-col md:flex-row justify-between items-center 
-              gap-8 md:gap-0 px-8 "
-          >
-            {/* LEFT TEXT */}
-            <div className="md:w-1/2 w-full">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4">
+          <div className="max-w-6xl w-full bg-gradient-to-t from-[#03A4F4] to-[#5C039B] text-white rounded-2xl shadow-xl flex flex-col md:flex-row gap-8 px-8 py-8">
+            <div className="md:w-1/2">
+              <h2 className="text-3xl font-extrabold mb-4">
                 Xobia Chat (24/7 AI Help)
               </h2>
-
-              <p className="text-base sm:text-lg md:text-xl text-gray-100 mb-5 leading-relaxed">
-                Have a question right now? Xobia, our AI assistant, is available 24/7
-                to guide you through product details, support requests, or general inquiries.
+              <p className="text-lg mb-5">
+                Have a question right now? Xobia, our AI assistant, is available
+                24/7 to guide you.
               </p>
-
-              <button className="bg-[#5C039B] text-white font-semibold px-6 py-3 rounded-md hover:bg-opacity-90 transition">
+              <button className="bg-[#5C039B] px-6 py-3 rounded-md font-semibold">
                 Chat With Xobia
               </button>
             </div>
 
-            {/* RIGHT IMAGE */}
-            <div className="md:w-1/2 w-full flex justify-center items-center">
-              <img
-                src={Picture2}
-                alt="xobia"
-                className="w-48 sm:w-56 md:w-72 lg:w-80 object-contain"
-              />
+            <div className="md:w-1/2 flex justify-center">
+              <img src={Picture2} alt="xobia" className="w-72 object-contain" />
             </div>
-
           </div>
         </div>
-
       </div>
 
-      {/* ============================================
-          BOTTOM WAVE (always behind content)
-      =============================================== */}
-      <div
-        className="
-          absolute 
-          bottom-[-80px]
-          sm:bottom-[-120px]
-          md:bottom-[-200px]
-          lg:bottom-[-500px]
-          xl:bottom-[-500px]
-          left-0 
-          w-full 
-          z-0 
-          overflow-hidden
-        "
-      >
+      {/* WAVE */}
+      <div className="absolute bottom-[-200px] left-0 w-full z-0 overflow-hidden">
         <img
           src={wave2}
           alt=""
-          className="
-            w-[200%]
-            sm:w-[180%]
-            md:w-[160%]
-            lg:w-full
-            mx-auto
-            scale-[1.7]
-            sm:scale-[1.5]
-            md:scale-[1.3]
-            lg:scale-100
-            pointer-events-none 
-            select-none
-          "
+          className="w-full scale-[1.4] pointer-events-none select-none"
         />
       </div>
-
     </div>
   );
 }

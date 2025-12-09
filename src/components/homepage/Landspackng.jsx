@@ -9,8 +9,8 @@ import threeImage from "../../assets/img/three.png";
 import lasttImage from "../../assets/img/lastt.jpg";
 import interImage from "../../assets/img/inter.png";
 import { motion } from "framer-motion";
-import Dreamspacking from './Dreamspacking';
-import Eco from './Eco';
+import Dreamspacking from "./Dreamspacking";
+import Eco from "./Eco";
 import wave1 from "../../assets/img/wave/wave1.png";
 
 import { Link } from "react-router-dom";
@@ -47,7 +47,6 @@ import Consultation from "./Consultation";
 export default function Landspackng() {
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
 
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -83,10 +82,9 @@ export default function Landspackng() {
       icon: <Home className="w-5 h-5" />,
       title: "Hardscaping & Surface Works",
       desc: "Durable patios, walkways, and retaining walls",
-    }
+    },
   ];
   const services1 = [
-   
     {
       icon: <Droplets className="w-5 h-5" />,
       title: "Swimming Pools & Water Features",
@@ -109,9 +107,9 @@ export default function Landspackng() {
   ];
 
   const softscapeItems = [
-    "Soil preparation & leveling",
+    "Soil preparation & levelling",
     "Plantation (trees, shrubs, groundcover)",
-    "Grass lawns (natural, artificial) & vertical gardens",
+    "Grass/lawn installation (natural & artificial) Flower beds & vertical gardens",
     "Mulching & soil amendments",
     "Seasonal planting & color themes",
   ];
@@ -161,16 +159,19 @@ export default function Landspackng() {
   const dreamSpaces = [
     {
       title: "Luxury Pool Villa",
-      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=500&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=500&fit=crop",
     },
     {
       title: "Rooftop Garden Oasis",
-      image: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=600&h=550&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=600&h=550&fit=crop",
       badge: "Seamless Indoor-Outdoor Lounge & Pool",
     },
     {
       title: "Modern Terrace Retreat",
-      image: "https://images.unsplash.com/photo-1587502537745-84b86da1204f?w=600&h=500&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1587502537745-84b86da1204f?w=600&h=500&fit=crop",
     },
   ];
 
@@ -179,7 +180,9 @@ export default function Landspackng() {
   };
 
   const prevDreamSpace = () => {
-    setCurrentDreamSpace((prev) => (prev - 1 + dreamSpaces.length) % dreamSpaces.length);
+    setCurrentDreamSpace(
+      (prev) => (prev - 1 + dreamSpaces.length) % dreamSpaces.length
+    );
   };
 
   // === NEW: SCIENCE & TECHNOLOGY SECTION ===
@@ -187,28 +190,34 @@ export default function Landspackng() {
     {
       icon: <Brain className="w-6 h-6" />,
       title: "Innovative Awareness",
-      description: "Bringing new awareness of science through technology"
+      description: "Bringing new awareness of science through technology",
     },
     {
       icon: <Rocket className="w-6 h-6" />,
       title: "Transformative Success",
-      description: "Striving to offer transformative success into comprehensive life experience"
+      description:
+        "Striving to offer transformative success into comprehensive life experience",
     },
     {
       icon: <Zap className="w-6 h-6" />,
       title: "Modern Management",
-      description: "Creative and modern management-friendly solutions"
+      description: "Creative and modern management-friendly solutions",
     },
     {
       icon: <Target className="w-6 h-6" />,
       title: "Curated Excellence",
-      description: "Our portfolio showcases our passion for crafting dream spaces"
-    }
+      description:
+        "Our portfolio showcases our passion for crafting dream spaces",
+    },
   ];
 
   return (
     <>
-      <QuoteModal isOpen={quoteModalOpen} onClose={() => setQuoteModalOpen(false)} />      {/* === HERO SECTION === */}
+      <QuoteModal
+        isOpen={quoteModalOpen}
+        onClose={() => setQuoteModalOpen(false)}
+      />{" "}
+      {/* === HERO SECTION === */}
       <section className="relative  flex items-center py-20 pb-20 md:py-20 lg:py-28 xl:py-36 justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -242,60 +251,55 @@ export default function Landspackng() {
             <span className="text-white">Outdoor Solution</span>
           </motion.h1>
 
-   {/* FIRST SERVICES SECTION */}
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.3 }}
-  className="grid grid-cols-2 md:grid-cols-2 gap-3 w-full max-w-[780px] mx-auto mb-5 items-end"
->
-  {services.map((service, i) => (
-    <motion.div
-      key={i}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: i < 2 ? 0.9 : 1 }}
-      transition={{ delay: 0.4 + i * 0.1 }}
-      className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2 flex-col flex"
-    >
-      <div className="flex items-center justify-center">
-        <h3 className="text-white text-sm sm:text-base md:text-xl text-center">
-          {service.title}
-        </h3>
-      </div>
-    </motion.div>
-  ))}
-</motion.div>
+          {/* FIRST SERVICES SECTION */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="grid grid-cols-2 md:grid-cols-2 gap-3 w-full max-w-[780px] mx-auto mb-5 items-end"
+          >
+            {services.map((service, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: i < 2 ? 0.9 : 1 }}
+                transition={{ delay: 0.4 + i * 0.1 }}
+                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2 flex-col flex"
+              >
+                <div className="flex items-center justify-center">
+                  <h3 className="text-white text-sm sm:text-base md:text-xl text-center">
+                    {service.title}
+                  </h3>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
 
-{/* SECOND SERVICES SECTION */}
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.3 }}
-  className="grid grid-cols-2 md:grid-cols-2 gap-3 w-full max-w-[850px] mx-auto mb-10 items-end"
->
-  {services1.map((service, i) => (
-    <motion.div
-      key={i}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: i < 2 ? 0.9 : 1 }}
-      transition={{ delay: 0.4 + i * 0.1 }}
-      className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2 flex-col flex"
-    >
-      <div className="flex items-center justify-center">
-        <h3 className="text-white text-sm sm:text-base md:text-xl text-center">
-          {service.title}
-        </h3>
-      </div>
-    </motion.div>
-  ))}
-</motion.div>
-
-
-
+          {/* SECOND SERVICES SECTION */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="grid grid-cols-2 md:grid-cols-2 gap-3 w-full max-w-[850px] mx-auto mb-10 items-end"
+          >
+            {services1.map((service, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: i < 2 ? 0.9 : 1 }}
+                transition={{ delay: 0.4 + i * 0.1 }}
+                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl py-2 flex-col flex"
+              >
+                <div className="flex items-center justify-center">
+                  <h3 className="text-white text-sm sm:text-base md:text-xl text-center">
+                    {service.title}
+                  </h3>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
 
           <div className="flex items-center justify-center gap-4 mt-6">
-          
-
             {/* <Link to='/aiPlanner'>
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -308,7 +312,7 @@ export default function Landspackng() {
                 AI Planner
               </motion.button>
             </Link> */}
-            <Link to='/estimate/calculator'>
+            <Link to="/estimate/calculator">
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -320,67 +324,61 @@ export default function Landspackng() {
                 Get a free estimate
               </motion.button>
             </Link>
-            
           </div>
-
         </div>
       </section>
-
       {/* === NEW: SCIENCE & TECHNOLOGY INNOVATION SECTION === */}
       {/* ────────────────────── INTERACTIVE BUILDER ────────────────────── */}
       <section className="relative z-20 bg-[#f5f5f5] pt-8 sm:pt-12 md:pt-16 lg:pt-24 overflow-hidden">
-
-  {/* Wave Background - Mobile Friendly */}
-  <div className="absolute left-0 w-full z-0 overflow-visible bottom-[-120px] sm:bottom-[-100px] md:bottom-[-60px] lg:bottom-[-500px]">
-    <img
-      src={wave2}
-      alt=""
-      className="pointer-events-none select-none w-full scale-[1.4] sm:scale-[1.2] md:scale-[1.05] lg:scale-100"
-    />
-  </div>
-
-  {/* Content Wrapper */}
-  <div className="mx-auto relative z-20 max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div className="grid grid-cols-1 items-center gap-8 sm:gap-10 md:gap-12 lg:grid-cols-2">
-
-      {/* Left Content Column */}
-      <div className="space-y-6 p-4 sm:p-6 md:p-8 lg:p-10">
-        <div className="inline-block border-cyan-500 p-1 mx-auto lg:mx-0">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl heading-dark-1 text-black text-center lg:text-left">
-            Bring your vision to  <br />life with our interactive builder
-          </h2>
+        {/* Wave Background - Mobile Friendly */}
+        <div className="absolute left-0 w-full z-0 overflow-visible bottom-[-80px] sm:bottom-[-100px] md:bottom-[-60px] lg:bottom-[-500px]">
+          <img
+            src={wave2}
+            alt=""
+            className="pointer-events-none select-none w-full scale-[1.4] sm:scale-[1.2] md:scale-[1.05] lg:scale-100"
+          />
         </div>
 
-        <p className="text-lg sm:text-xl md:text-2xl text-[#547593] max-w-md mx-auto lg:mx-0 text-center lg:text-left paragrapah-light-1">
-          Upload your space or choose a template, and get instant AI-powered design previews.
-        </p>
+        {/* Content Wrapper */}
+        <div className="mx-auto relative z-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 items-center gap-8 sm:gap-10 md:gap-12 lg:grid-cols-2">
+            {/* Left Content Column */}
+            <div className="space-y-6 p-4 sm:p-6 md:p-8 lg:p-10">
+              <div className="inline-block border-cyan-500 p-1 mx-auto lg:mx-0">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl heading-dark-1 text-black text-center lg:text-left">
+                  Bring your vision to <br />
+                  life with our interactive builder
+                </h2>
+              </div>
 
-        <Link to="/aiPlanner" className="flex justify-center lg:justify-start mt-4">
-          <button className="rounded-md bg-[var(--color-primary)] px-8 sm:px-10 py-3 text-lg font-medium text-white shadow-lg transition-all ">
-            Take a first step
-          </button>
-        </Link>
-      </div>
+              <p className="text-lg sm:text-xl md:text-2xl text-[#547593] max-w-md mx-auto lg:mx-0 text-center lg:text-left paragrapah-light-1">
+                Upload your space or choose a template, and get instant
+                AI-powered design previews.
+              </p>
 
-      {/* Right Image Column */}
-      <div className="flex justify-center lg:justify-end self-stretch mt-6 lg:mt-0">
-        <img
-          src={interImage}
-          alt="3D rendered modern living room"
-          className="w-full h-full object-cover max-w-none drop-shadow-2xl"
-        />
-      </div>
+              <Link
+                to="/aiPlanner"
+                className="flex justify-center lg:justify-start mt-4"
+              >
+                <button className="rounded-md bg-[var(--color-primary)] px-8 sm:px-10 py-3 text-lg font-medium text-white shadow-lg transition-all ">
+                  Take a first step
+                </button>
+              </Link>
+            </div>
 
-    </div>
-  </div>
-</section>
-
-
-
+            {/* Right Image Column */}
+            <div className="flex justify-center lg:justify-end self-stretch mt-6 lg:mt-0">
+              <img
+                src={interImage}
+                alt="3D rendered modern living room"
+                className="w-full h-full object-cover max-w-none drop-shadow-2xl"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
       {/* === BOOK CONSULTATION === */}
-
       <Consultation />
-
       {/* === OUR SERVICES PORTFOLIO === */}
       {/* <section className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
       
@@ -459,10 +457,8 @@ export default function Landspackng() {
       <Servicelandspacing />
       {/* exploreeee */}
       <Dreamspacking />
-
       {/* === WHAT OUR CLIENTS SAY === */}
       <TestimonialsSection />
-
       {/* === EXPLORE CURATED DREAM SPACES === */}
       <Eco />
     </>

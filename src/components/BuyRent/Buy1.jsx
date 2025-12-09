@@ -3,7 +3,15 @@ import React, { useState } from "react";
 import Imagemain from "../../assets/img/buy.jpg";
 import toast, { Toaster } from "react-hot-toast";
 import { apiService } from "../../manageApi/utils/custom.apiservice";
-import { X, ArrowRight, Building, Home, Phone, Mail, MessageCircle } from "lucide-react";
+import {
+  X,
+  ArrowRight,
+  Building,
+  Home,
+  Phone,
+  Mail,
+  MessageCircle,
+} from "lucide-react";
 
 export default function HeroSection() {
   const [openModal, setOpenModal] = useState(false);
@@ -16,7 +24,7 @@ export default function HeroSection() {
     email: "",
     mobile: "",
     desired_bedrooms: "",
-    preferred_contact: "whatsapp"
+    preferred_contact: "whatsapp",
   });
 
   const [sellForm, setSellForm] = useState({
@@ -31,7 +39,7 @@ export default function HeroSection() {
     bedroom_config: "",
     price: "",
     description: "",
-    preferred_contact: "call"
+    preferred_contact: "call",
   });
 
   const handleOpenModal = (type) => {
@@ -41,69 +49,89 @@ export default function HeroSection() {
 
   const handleBuyChange = (e) => {
     const { name, value } = e.target;
-    setBuyForm(prev => ({ ...prev, [name]: value }));
+    setBuyForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSellChange = (e) => {
     const { name, value } = e.target;
-    setSellForm(prev => ({ ...prev, [name]: value }));
+    setSellForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const payload = actionType === "Buy" ? {
-      type: "buy",
-      name: {
-        first_name: buyForm.first_name.trim(),
-        last_name: buyForm.last_name.trim()
-      },
-      mobile: { number: buyForm.mobile.replace(/\D/g, "").slice(-10) },
-      email: buyForm.email.toLowerCase().trim(),
-      desired_bedrooms: buyForm.desired_bedrooms,
-      preferred_contact: buyForm.preferred_contact
-    } : {
-      type: "sell",
-      name: {
-        first_name: sellForm.first_name.trim(),
-        last_name: sellForm.last_name.trim()
-      },
-      mobile: { number: sellForm.mobile.replace(/\D/g, "").slice(-10) },
-      email: sellForm.email.toLowerCase().trim(),
-      listing_type: sellForm.listing_type,
-      city: sellForm.city,
-      area: sellForm.area,
-      project_name: sellForm.project_name,
-      bedroom_config: sellForm.bedroom_config,
-      price: Number(sellForm.price) || undefined,
-      description: sellForm.description,
-      preferred_contact: sellForm.preferred_contact
-    };
+    const payload =
+      actionType === "Buy"
+        ? {
+            type: "buy",
+            name: {
+              first_name: buyForm.first_name.trim(),
+              last_name: buyForm.last_name.trim(),
+            },
+            mobile: { number: buyForm.mobile.replace(/\D/g, "").slice(-10) },
+            email: buyForm.email.toLowerCase().trim(),
+            desired_bedrooms: buyForm.desired_bedrooms,
+            preferred_contact: buyForm.preferred_contact,
+          }
+        : {
+            type: "sell",
+            name: {
+              first_name: sellForm.first_name.trim(),
+              last_name: sellForm.last_name.trim(),
+            },
+            mobile: { number: sellForm.mobile.replace(/\D/g, "").slice(-10) },
+            email: sellForm.email.toLowerCase().trim(),
+            listing_type: sellForm.listing_type,
+            city: sellForm.city,
+            area: sellForm.area,
+            project_name: sellForm.project_name,
+            bedroom_config: sellForm.bedroom_config,
+            price: Number(sellForm.price) || undefined,
+            description: sellForm.description,
+            preferred_contact: sellForm.preferred_contact,
+          };
 
     try {
       const response = await apiService.post("/property/lead", payload);
-      
+
       if (response.success) {
-        toast.success(`Thank you, ${actionType === "Buy" ? buyForm.first_name : sellForm.first_name}! We'll contact you soon.`);
+        toast.success(
+          `Thank you, ${actionType === "Buy" ? buyForm.first_name : sellForm.first_name}! We'll contact you soon.`
+        );
         setOpenModal(false);
-        
+
         if (actionType === "Buy") {
           setBuyForm({
-            first_name: "", last_name: "", email: "", mobile: "",
-            desired_bedrooms: "", preferred_contact: "whatsapp"
+            first_name: "",
+            last_name: "",
+            email: "",
+            mobile: "",
+            desired_bedrooms: "",
+            preferred_contact: "whatsapp",
           });
         } else {
           setSellForm({
-            first_name: "", last_name: "", email: "", mobile: "",
-            listing_type: "", city: "", area: "", project_name: "",
-            bedroom_config: "", price: "", description: "", preferred_contact: "call"
+            first_name: "",
+            last_name: "",
+            email: "",
+            mobile: "",
+            listing_type: "",
+            city: "",
+            area: "",
+            project_name: "",
+            bedroom_config: "",
+            price: "",
+            description: "",
+            preferred_contact: "call",
           });
         }
       }
     } catch (err) {
       console.error("Lead submission error:", err);
-      toast.error(err.response?.data?.message || "Submission failed. Please try again.");
+      toast.error(
+        err.response?.data?.message || "Submission failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -111,22 +139,22 @@ export default function HeroSection() {
 
   return (
     <>
-      <Toaster 
+      <Toaster
         position="top-center"
         toastOptions={{
           style: {
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-            borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "white",
+            borderRadius: "12px",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
           },
         }}
       />
 
       {/* HERO SECTION */}
-        <section className="relative w-full overflow-hidden font-dm h-140">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+      <section className="relative w-full overflow-hidden font-dm h-140">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${Imagemain})` }}
         >
           <div className="absolute inset-0 bg-black/40" />
@@ -138,17 +166,17 @@ export default function HeroSection() {
           </h1>
 
           <div className="flex items-center gap-3 flex-wrap justify-center">
-            <button className="px-10 py-4 bg-[#5C039B] text-white font-extrabold rounded-lg shadow-md hover:bg-[#4A0080] hover:scale-105 transition-all">
+            <button className="px-10 py-4 bg-[#5C039B] text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:scale-105 transition-all">
               Rent a Home
             </button>
-            <button 
-              onClick={() => handleOpenModal('Find a Home')} 
+            <button
+              onClick={() => handleOpenModal("Find a Home")}
               className="px-10 py-4 bg-transparent border-2 border-white text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:border-[#5C039B] hover:scale-105 transition-all"
             >
               Find a Home
             </button>
-            <button 
-              onClick={() => handleOpenModal('Sell a Home')} 
+            <button
+              onClick={() => handleOpenModal("Sell a Home")}
               className="px-10 py-4 bg-transparent border-2 border-white text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:border-[#5C039B] hover:scale-105 transition-all"
             >
               Sell a Home
@@ -159,8 +187,12 @@ export default function HeroSection() {
         <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
         <div className="absolute bottom-0 right-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-right-shape" />
         <style jsx>{`
-          .clip-left-shape { clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%); }
-          .clip-right-shape { clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%); }
+          .clip-left-shape {
+            clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
+          }
+          .clip-right-shape {
+            clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
+          }
         `}</style>
       </section>
 
@@ -169,8 +201,8 @@ export default function HeroSection() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-gradient-to-br from-white via-blue-50 to-purple-50 max-w-4xl w-full rounded-3xl shadow-2xl relative max-h-[90vh] overflow-hidden border border-white/20">
             {/* Close Button */}
-            <button 
-              onClick={() => setOpenModal(false)} 
+            <button
+              onClick={() => setOpenModal(false)}
               className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-pink-500 text-white w-10 h-10 rounded-full text-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg z-20"
             >
               <X size={24} />
@@ -180,13 +212,13 @@ export default function HeroSection() {
             <div className="p-8 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 border-b border-white/10">
               <div className="flex flex-col items-center mb-6">
                 <div className="flex bg-gradient-to-r from-blue-600 to-purple-600 p-1 rounded-2xl shadow-lg mb-6">
-                  {["Buy", "Sell"].map(t => (
-                    <button 
+                  {["Buy", "Sell"].map((t) => (
+                    <button
                       key={t}
                       onClick={() => setActionType(t)}
                       className={`px-10 py-4 rounded-xl font-bold transition-all duration-300 ${
-                        actionType === t 
-                          ? "bg-white text-gray-900 shadow-lg" 
+                        actionType === t
+                          ? "bg-white text-gray-900 shadow-lg"
                           : "text-white/80 hover:text-white hover:bg-white/10"
                       }`}
                     >
@@ -196,11 +228,13 @@ export default function HeroSection() {
                 </div>
 
                 <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-purple-700 bg-clip-text text-transparent mb-2">
-                  {actionType === "Sell" ? "SELL YOUR PROPERTY" : "FIND YOUR DREAM HOME"}
+                  {actionType === "Sell"
+                    ? "SELL YOUR PROPERTY"
+                    : "FIND YOUR DREAM HOME"}
                 </h2>
                 <p className="text-gray-600 text-center text-lg font-medium max-w-2xl">
-                  {actionType === "Sell" 
-                    ? "Connect with serious buyers and get the best value for your property" 
+                  {actionType === "Sell"
+                    ? "Connect with serious buyers and get the best value for your property"
                     : "Tell us what you're looking for and we'll find the perfect match"}
                 </p>
               </div>
@@ -212,26 +246,42 @@ export default function HeroSection() {
                 {/* Name Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="relative">
-                    <input 
-                      name="first_name" 
-                      value={actionType === "Buy" ? buyForm.first_name : sellForm.first_name}
-                      onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
-                      placeholder="First Name" 
-                      required 
-                      className="premium-input pl-12" 
+                    <input
+                      name="first_name"
+                      value={
+                        actionType === "Buy"
+                          ? buyForm.first_name
+                          : sellForm.first_name
+                      }
+                      onChange={
+                        actionType === "Buy"
+                          ? handleBuyChange
+                          : handleSellChange
+                      }
+                      placeholder="First Name"
+                      required
+                      className="premium-input pl-12"
                     />
                     <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
                       👤
                     </div>
                   </div>
                   <div className="relative">
-                    <input 
-                      name="last_name" 
-                      value={actionType === "Buy" ? buyForm.last_name : sellForm.last_name}
-                      onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
-                      placeholder="Last Name" 
-                      required 
-                      className="premium-input pl-12" 
+                    <input
+                      name="last_name"
+                      value={
+                        actionType === "Buy"
+                          ? buyForm.last_name
+                          : sellForm.last_name
+                      }
+                      onChange={
+                        actionType === "Buy"
+                          ? handleBuyChange
+                          : handleSellChange
+                      }
+                      placeholder="Last Name"
+                      required
+                      className="premium-input pl-12"
                     />
                     <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
                       👤
@@ -240,14 +290,18 @@ export default function HeroSection() {
                 </div>
 
                 <div className="relative">
-                  <input 
-                    name="email" 
+                  <input
+                    name="email"
                     type="email"
-                    value={actionType === "Buy" ? buyForm.email : sellForm.email}
-                    onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
-                    placeholder="Your Email Address" 
-                    required 
-                    className="premium-input pl-12" 
+                    value={
+                      actionType === "Buy" ? buyForm.email : sellForm.email
+                    }
+                    onChange={
+                      actionType === "Buy" ? handleBuyChange : handleSellChange
+                    }
+                    placeholder="Your Email Address"
+                    required
+                    className="premium-input pl-12"
                   />
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
                     <Mail size={20} />
@@ -255,13 +309,17 @@ export default function HeroSection() {
                 </div>
 
                 <div className="relative">
-                  <input 
-                    name="mobile" 
-                    value={actionType === "Buy" ? buyForm.mobile : sellForm.mobile}
-                    onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
-                    placeholder="Phone Number (e.g. 501234567)" 
-                    required 
-                    className="premium-input pl-12" 
+                  <input
+                    name="mobile"
+                    value={
+                      actionType === "Buy" ? buyForm.mobile : sellForm.mobile
+                    }
+                    onChange={
+                      actionType === "Buy" ? handleBuyChange : handleSellChange
+                    }
+                    placeholder="Phone Number (e.g. 501234567)"
+                    required
+                    className="premium-input pl-12"
                   />
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
                     <Phone size={20} />
@@ -271,13 +329,13 @@ export default function HeroSection() {
                 {actionType === "Buy" ? (
                   <>
                     <div className="relative">
-                      <input 
-                        name="desired_bedrooms" 
+                      <input
+                        name="desired_bedrooms"
                         value={buyForm.desired_bedrooms}
                         onChange={handleBuyChange}
-                        placeholder="No. of bedrooms you're looking for" 
-                        required 
-                        className="premium-input pl-12" 
+                        placeholder="No. of bedrooms you're looking for"
+                        required
+                        className="premium-input pl-12"
                       />
                       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
                         🛌
@@ -285,28 +343,46 @@ export default function HeroSection() {
                     </div>
 
                     <div>
-                      <p className="text-gray-700 font-semibold mb-4 text-lg">Preferred Contact Method</p>
+                      <p className="text-gray-700 font-semibold mb-4 text-lg">
+                        Preferred Contact Method
+                      </p>
                       <div className="grid grid-cols-3 gap-4">
                         {[
-                          { value: "call", icon: <Phone size={18} />, label: "Phone Call" },
-                          { value: "whatsapp", icon: <MessageCircle size={18} />, label: "WhatsApp" },
-                          { value: "email", icon: <Mail size={18} />, label: "Email" }
+                          {
+                            value: "call",
+                            icon: <Phone size={18} />,
+                            label: "Phone Call",
+                          },
+                          {
+                            value: "whatsapp",
+                            icon: <MessageCircle size={18} />,
+                            label: "WhatsApp",
+                          },
+                          {
+                            value: "email",
+                            icon: <Mail size={18} />,
+                            label: "Email",
+                          },
                         ].map(({ value, icon, label }) => (
                           <label key={value} className="relative">
-                            <input 
-                              type="radio" 
-                              name="preferred_contact" 
-                              value={value} 
+                            <input
+                              type="radio"
+                              name="preferred_contact"
+                              value={value}
                               checked={buyForm.preferred_contact === value}
                               onChange={handleBuyChange}
                               className="sr-only peer"
                             />
                             <div className="p-4 rounded-xl border-2 border-gray-200 bg-white cursor-pointer transition-all duration-300 hover:border-blue-400 hover:shadow-md peer-checked:border-blue-600 peer-checked:bg-gradient-to-r peer-checked:from-blue-50 peer-checked:to-purple-50 peer-checked:shadow-lg">
                               <div className="flex flex-col items-center gap-2">
-                                <div className={`p-2 rounded-full ${buyForm.preferred_contact === value ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+                                <div
+                                  className={`p-2 rounded-full ${buyForm.preferred_contact === value ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-500"}`}
+                                >
                                   {icon}
                                 </div>
-                                <span className="text-sm font-medium">{label}</span>
+                                <span className="text-sm font-medium">
+                                  {label}
+                                </span>
                               </div>
                             </div>
                           </label>
@@ -318,20 +394,36 @@ export default function HeroSection() {
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {[
-                        { name: "listing_type", placeholder: "Listing Type (e.g. Apartment)", icon: "🏠" },
+                        {
+                          name: "listing_type",
+                          placeholder: "Listing Type (e.g. Apartment)",
+                          icon: "🏠",
+                        },
                         { name: "city", placeholder: "City", icon: "🌆" },
                         { name: "area", placeholder: "Area", icon: "📍" },
-                        { name: "project_name", placeholder: "Project Name", icon: "🏢" },
-                        { name: "bedroom_config", placeholder: "Bedroom Config (e.g. 2 Bed)", icon: "🛏️" },
-                        { name: "price", placeholder: "Price (AED)", icon: "💰" }
+                        {
+                          name: "project_name",
+                          placeholder: "Project Name",
+                          icon: "🏢",
+                        },
+                        {
+                          name: "bedroom_config",
+                          placeholder: "Bedroom Config (e.g. 2 Bed)",
+                          icon: "🛏️",
+                        },
+                        {
+                          name: "price",
+                          placeholder: "Price (AED)",
+                          icon: "💰",
+                        },
                       ].map(({ name, placeholder, icon }) => (
                         <div key={name} className="relative">
-                          <input 
-                            name={name} 
+                          <input
+                            name={name}
                             value={sellForm[name]}
                             onChange={handleSellChange}
                             placeholder={placeholder}
-                            className="premium-input pl-12" 
+                            className="premium-input pl-12"
                           />
                           <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
                             {icon}
@@ -340,11 +432,11 @@ export default function HeroSection() {
                       ))}
                     </div>
                     <div className="relative">
-                      <textarea 
-                        name="description" 
-                        value={sellForm.description} 
-                        onChange={handleSellChange} 
-                        placeholder="Tell us more about your property (optional)" 
+                      <textarea
+                        name="description"
+                        value={sellForm.description}
+                        onChange={handleSellChange}
+                        placeholder="Tell us more about your property (optional)"
                         rows={4}
                         className="premium-input pl-12 pt-4 resize-none"
                       />
@@ -358,17 +450,24 @@ export default function HeroSection() {
                 <div className="space-y-4 pt-4">
                   <label className="flex items-start gap-3 text-gray-700 text-sm p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
                     <input type="checkbox" className="mt-1" />
-                    <span>I agree to receive newsletters and marketing communications via digital media, and understand I can unsubscribe at any time.</span>
+                    <span>
+                      I agree to receive newsletters and marketing
+                      communications via digital media, and understand I can
+                      unsubscribe at any time.
+                    </span>
                   </label>
 
                   <label className="flex items-start gap-3 text-gray-700 text-sm p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
                     <input type="checkbox" required className="mt-1" />
-                    <span>I have read, understood, and accept the Terms and Conditions and Privacy Policy of Xoto. *</span>
+                    <span>
+                      I have read, understood, and accept the Terms and
+                      Conditions and Privacy Policy of Xoto. *
+                    </span>
                   </label>
                 </div>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={loading}
                   className="group w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-xl text-xl font-bold hover:shadow-xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                 >
@@ -379,8 +478,13 @@ export default function HeroSection() {
                     </>
                   ) : (
                     <>
-                      {actionType === "Buy" ? "FIND MY DREAM HOME" : "SELL MY PROPERTY"}
-                      <ArrowRight className="group-hover:translate-x-2 transition-transform" size={20} />
+                      {actionType === "Buy"
+                        ? "FIND MY DREAM HOME"
+                        : "SELL MY PROPERTY"}
+                      <ArrowRight
+                        className="group-hover:translate-x-2 transition-transform"
+                        size={20}
+                      />
                     </>
                   )}
                 </button>
@@ -410,7 +514,7 @@ export default function HeroSection() {
         .premium-input::placeholder {
           color: #94a3b8;
         }
-        
+
         /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px;
@@ -426,7 +530,7 @@ export default function HeroSection() {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(to bottom, #2563eb, #7c3aed);
         }
-        
+
         /* Animation for modal */
         @keyframes slideIn {
           from {
@@ -438,7 +542,7 @@ export default function HeroSection() {
             transform: translateY(0) scale(1);
           }
         }
-        
+
         .fixed.inset-0 {
           animation: slideIn 0.3s ease-out;
         }

@@ -18,37 +18,37 @@ const HomeDesign = () => {
       label: "Exterior Upgrade",
       icon: exterior,
       link: "/exterior",
-      style: "top-[6%] left-[60%] -translate-x-1/2",
+      style: "top-[4%] left-[75%] -translate-x-1/2",
     },
     {
       label: "Interior Transformation",
       icon: interior,
       link: "/interior",
-      style: "top-[33%] right-[7%]",
+      style: "top-[33%] right-[3%]",
     },
     {
       label: "Smart Furniture Swap",
       icon: smart,
       link: "/furniture",
-      style: "bottom-[31%] right-[12%]",
+      style: "bottom-[31%] right-[5%]",
     },
     {
       label: "Landscaping",
       icon: landscaping,
       link: "/landscaping",
-      style: "bottom-[-3%] left-[56%] -translate-x-1/2",
+      style: "bottom-[-7%] left-[60%] -translate-x-1/2",
     },
     {
       label: "Image Perfection",
       icon: image,
       link: "/image-perfection",
-      style: "bottom-[24%] left-[13%]",
+      style: "bottom-[24%] left-[29%]",
     },
     {
       label: "Virtual Design Studio",
       icon: virtual,
       link: "/landscaping",
-      style: "top-[35%] left-[17%]",
+      style: "top-[35%] left-[32%]",
     },
   ];
 

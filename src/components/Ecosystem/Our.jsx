@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import wave1 from "../../assets/img/wave/waveint2.png";
 // import round from "../../assets/img/home/round.png";
-import round from "../../assets/img/round1.mp4";
+import round from "../../assets/img/round23.mp4";
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/icons/Homeicons/partners.png";
 import vector from "../../assets/icons/Homeicons/Vector.png";

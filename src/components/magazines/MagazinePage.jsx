@@ -15,32 +15,32 @@ const BuiltForEveryone = () => {
     {
       icon: rating,
       title: "Customers",
-      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+      desc: "Reimagine your home and outdoors with effortless, Al-powered landscaping and upgrade solutions.",
     },
     {
       icon: vector,
       title: "Business Associates",
-      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+      desc: "Empower your real estate network with Al-driven tools that simplify client management, boost lead conversion, and accelerate deal closures.",
     },
     {
       icon: partner,
       title: "Execution Partner",
-      desc: "Unlock new growth opportunities through seamless integrations and partner solutions.",
+      desc: "Deliver projects efficiently with real-time task allocation, transparent progress tracking, and seamless coordination across landscaping, real estate, and financing workflows.",
     },
     {
       icon: dollar,
       title: "Strategic Alliances",
-      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+      desc: "Partner with XOTO to expand market presence through an integrated, growth-focused ecosystem.",
     },
     {
       icon: target,
       title: "Developers",
-      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+      desc: "Access pre-qualified buyers and accelerate sales with data-driven insights.",
     },
     {
       icon: finance,
       title: "Financial Institutions",
-      desc: "Reimagine your home and outdoors with effortless, AI-powered landscaping and upgrade solutions.",
+      desc: "Boost mortgage conversions through integrated property and financing solutions.",
     },
   ];
 

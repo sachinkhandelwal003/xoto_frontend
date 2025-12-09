@@ -1,12 +1,11 @@
 import emailIcon from "../../assets/icons/Homeicons/email.png";
 import addressIcon from "../../assets/icons/Homeicons/Career.png";
-import phoneIcon from "../../assets/icons/Homeicons/Career.png";
+import phoneIcon from "../../assets/icons/Homeicons/phone.png";
 import wave1 from "../../assets/img/wave/wave1.png";
 
 export default function ContactSection() {
   return (
     <section className="relative bg-[var(--color-body)] py-16 sm:py-20 lg:py-24 overflow-hidden">
-
       {/* 🌊 Background Wave */}
       <div
         className="
@@ -29,7 +28,6 @@ export default function ContactSection() {
 
       {/* Content on top of wave */}
       <div className="relative z-10">
-
         {/* Heading */}
         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-center text-black mb-10 sm:mb-14 md:mb-16">
           Contact Information
@@ -37,27 +35,40 @@ export default function ContactSection() {
 
         {/* Contact info cards */}
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 px-6">
-
           {/* Email */}
           <div className="flex items-start gap-4 sm:gap-5">
             <div className="bg-[#5C039B] text-white rounded-full p-3 sm:p-4 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
-              <img src={emailIcon} alt="email icon" className="w-6 h-6 sm:w-8 sm:h-8" />
+              <img
+                src={emailIcon}
+                alt="email icon"
+                className="w-6 h-6 sm:w-8 sm:h-8"
+              />
             </div>
             <div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-1">Email Us</h3>
-              <p className="text-gray-600 text-sm sm:text-base">Feel free to contact us at</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-1">
+                Email Us
+              </h3>
+              <p className="text-gray-600 text-sm sm:text-base">
+                Feel free to contact us at
+              </p>
               <p className="text-gray-800 font-medium text-sm sm:text-base mt-1">
                 sales.support@xoto.ae <br />
                 info@xoto.ae
               </p>
-              <p className="text-gray-600 text-xs sm:text-sm mt-1">We’ll respond promptly</p>
+              <p className="text-gray-600 text-xs sm:text-sm mt-1">
+                We’ll respond promptly
+              </p>
             </div>
           </div>
 
           {/* Address */}
           <div className="flex items-start gap-4 sm:gap-5">
             <div className="bg-[#5C039B] text-white rounded-full p-3 sm:p-4 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
-              <img src={addressIcon} alt="address icon" className="w-6 h-6 sm:w-8 sm:h-8" />
+              <img
+                src={addressIcon}
+                alt="address icon"
+                className="w-6 h-6 sm:w-8 sm:h-8"
+              />
             </div>
             <div>
               <h3 className="text-lg sm:text-xl font-semibold mb-1">Address</h3>
@@ -70,16 +81,23 @@ export default function ContactSection() {
 
           {/* Phone */}
           <div className="flex items-start gap-4 sm:gap-5">
-            <div className="bg-[#5C039B] text-white rounded-full p-3 sm:p-4 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
-              <img src={phoneIcon} alt="phone icon" className="w-6 h-6 sm:w-8 sm:h-8" />
+            <div className="bg-[#5C039B] text-white rounded-full p-3 sm:p-4 w-9 h-9 sm:w-14 sm:h-14 flex items-center justify-center">
+              <img
+                src={phoneIcon}
+                alt="phone icon"
+                className="w-6 h-6 sm:w-8 sm:h-8"
+              />
             </div>
             <div>
               <h3 className="text-lg sm:text-xl font-semibold mb-1">Phone</h3>
-              <p className="text-gray-600 text-sm sm:text-base">+971 50 918 0967</p>
-              <p className="text-gray-600 text-xs sm:text-sm">Mon–Sat | 9AM–6PM</p>
+              <p className="text-gray-600 text-sm sm:text-base">
+                +971 50 918 0967
+              </p>
+              <p className="text-gray-600 text-xs sm:text-sm">
+                Mon–Sat | 9AM–6PM
+              </p>
             </div>
           </div>
-
         </div>
 
         {/* Google Map */}
@@ -92,7 +110,6 @@ export default function ContactSection() {
             className=" shadow-md w-[92%] sm:w-[88%] md:w-[80%] h-[300px] sm:h-[350px] md:h-[450px] lg:h-[500px] "
           ></iframe>
         </div>
-
       </div>
     </section>
   );

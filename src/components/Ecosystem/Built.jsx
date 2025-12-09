@@ -8,7 +8,7 @@ import leftbottom from "../../assets/img/home/group/leftbottom.png";
 import righttop from "../../assets/img/home/group/righttop.png";
 import rightbottom from "../../assets/img/home/group/rightbottom.png";
 
-// Dynamic Content
+// ================= DYNAMIC CONTENT =================
 const tabContent = {
   "Business Associates": {
     heading: "Business Associates",
@@ -19,8 +19,11 @@ const tabContent = {
       },
       {
         question: "What's in it for them?",
-        answer:
-          "Simplified client management, AI-driven insights, faster deal closures.",
+        answer: [
+          "Simplified client management",
+          "AI-driven insights",
+          "Faster deal closures",
+        ],
       },
       {
         question: "Why XOTO?",
@@ -36,15 +39,20 @@ const tabContent = {
       {
         question: "Who?",
         answer:
-          "Contractors, architects, interior designers, service partners.",
+          "Contractors, landscapers, interior designers, and project managers.",
       },
       {
         question: "What's in it for them?",
-        answer: "Streamlined workflows, project coordination, faster payments.",
+        answer: [
+          "Real-time task allocation",
+          "Transparent progress tracking",
+          "Seamless project coordination",
+        ],
       },
       {
         question: "Why XOTO?",
-        answer: "Verified leads and integrated collaboration tools.",
+        answer:
+          "Efficiently manage projects and connect with pre-qualified clients.",
       },
     ],
   },
@@ -54,16 +62,19 @@ const tabContent = {
     qa: [
       {
         question: "Who?",
-        answer: "Banks, insurance firms, legal advisors, tech partners.",
+        answer: "Businesses looking to collaborate and expand market reach.",
       },
       {
         question: "What's in it for them?",
-        answer:
-          "Shared audience, co-marketing, seamless platform integrations.",
+        answer: [
+          "Integrated growth-focused ecosystem",
+          "Access to new markets and partnerships",
+        ],
       },
       {
         question: "Why XOTO?",
-        answer: "Expand reach inside a trusted property tech ecosystem.",
+        answer:
+          "Accelerate market presence and revenue through a single platform.",
       },
     ],
   },
@@ -73,15 +84,19 @@ const tabContent = {
     qa: [
       {
         question: "Who?",
-        answer: "Builders, developers launching new real estate projects.",
+        answer: "Property developers seeking buyers and market insights.",
       },
       {
         question: "What's in it for them?",
-        answer: "Buyer database, virtual tours, instant booking engine.",
+        answer: [
+          "Access to pre-qualified buyers",
+          "Data-driven to accelerate sales",
+        ],
       },
       {
         question: "Why XOTO?",
-        answer: "Faster project sell-outs using data-driven tools.",
+        answer:
+          "Close deals faster and optimize sales strategy using AI-powered data.",
       },
     ],
   },
@@ -89,14 +104,21 @@ const tabContent = {
   "Financial Institution": {
     heading: "Financial Institution",
     qa: [
-      { question: "Who?", answer: "Banks, NBFCs and loan providers." },
+      {
+        question: "Who?",
+        answer: "Banks, mortgage providers, and lending institutions.",
+      },
       {
         question: "What's in it for them?",
-        answer: "Pre-qualified leads, digital loan applications.",
+        answer: [
+          "Boost mortgage conversions",
+          "Integrated property + financing  ecosystem",
+        ],
       },
       {
         question: "Why XOTO?",
-        answer: "Boost loan conversions with automated workflows.",
+        answer:
+          "Offer a seamless customer experience while increasing financing revenue.",
       },
     ],
   },
@@ -104,6 +126,21 @@ const tabContent = {
 
 const tabs = Object.keys(tabContent);
 
+// ================= ANSWER RENDERER =================
+const RenderAnswer = ({ answer }) => {
+  if (Array.isArray(answer)) {
+    return (
+      <ul className="list-disc pl-5 space-y-1">
+        {answer.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    );
+  }
+  return <p>{answer}</p>;
+};
+
+// ================= MAIN COMPONENT =================
 const StakeholderSection = () => {
   const [activeTab, setActiveTab] = useState("Business Associates");
   const content = tabContent[activeTab];
@@ -112,22 +149,19 @@ const StakeholderSection = () => {
     <section className="w-full bg-white relative z-20 py-16 md:py-24 overflow-hidden">
       {/* Heading */}
       <div className="text-center mb-12 px-6">
-        <h2 className="text-4xl md:text-6xl font-semibold text-black heading-dark-1">
+        <h2 className="text-4xl md:text-6xl font-semibold text-black">
           Built for Every Stakeholder
         </h2>
-        <p className="mt-4 text-[#547593] text-lg paragraph-light-1">
+        <p className="mt-4 text-[#547593] text-lg">
           Our platform serves diverse stakeholders in the home ecosystem, each
           with tailored solutions and benefits
         </p>
       </div>
 
-      {/* ===========================
-          🔥 MOBILE: Horizontal Scroll Tabs
-          🔥 DESKTOP: Same flex layout
-      ============================ */}
+      {/* Tabs */}
       <div className="flex justify-center mb-8 px-4">
         <div
-          className="flex gap-2 px-3 py-2 rounded-2xl shadow-lg max-w-6xl w-full justify-start md:justify-center overflow-x-auto scrollbar-hide"
+          className="flex gap-2 px-3 py-2 rounded-2xl shadow-lg max-w-6xl  overflow-x-auto"
           style={{
             background: "linear-gradient(167deg, #03A4F4 10%, #64EF0A 90%)",
           }}
@@ -150,78 +184,72 @@ const StakeholderSection = () => {
         </div>
       </div>
 
-      {/* ===========================
-          4 BOXES + CENTER CIRCLE
-          SAME PATTERN ON MOBILE
-      ============================ */}
+      {/* Boxes */}
       <div className="relative max-w-6xl mx-auto py-10 px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
-          {/* BOX 1 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Box 1 */}
           <div
-            className="h-[230px] md:h-[260px] rounded-3xl bg-cover bg-center shadow-lg p-6 
-            text-white flex items-start"
+            className="h-[230px] md:h-[260px] rounded-3xl bg-cover bg-center shadow-lg p-6 text-white"
             style={{ backgroundImage: `url(${lefttop})` }}
           >
-            <h1 className="text-2xl md:text-4xl font-bold drop-shadow-lg mt-6">
+            <h1 className="text-2xl md:text-4xl font-semibold mt-6">
               {content.heading}
             </h1>
           </div>
 
-          {/* BOX 2 */}
+          {/* Box 2 */}
           <div
-            className="h-[230px] md:h-[260px] rounded-3xl bg-cover bg-center shadow-lg p-6 
-            text-white flex flex-col justify-center items-end text-right"
+            className="h-[230px] md:h-[260px] rounded-3xl bg-cover bg-center shadow-lg p-6 text-white text-right flex flex-col justify-center items-end"
             style={{ backgroundImage: `url(${righttop})` }}
           >
-            <h3 className="text-2xl md:text-3xl font-bold drop-shadow-md">
+            <h3 className="text-2xl md:text-3xl font-semibold">
               {content.qa[0].question}
             </h3>
-            <p className="mt-3 text-base md:text-lg w-[260px] md:w-[300px] font-medium">
-              {content.qa[0].answer}
-            </p>
+            <div className="mt-3 text-lg w-[300px]">
+              <RenderAnswer answer={content.qa[0].answer} />
+            </div>
           </div>
 
-          {/* BOX 3 */}
+          {/* Box 3 */}
           <div
-            className="h-[230px] md:h-[260px] rounded-3xl bg-cover bg-center shadow-lg p-6 
-            text-white"
+            className="h-[230px] md:h-[260px] rounded-3xl bg-cover bg-center shadow-lg p-6 text-white"
             style={{ backgroundImage: `url(${leftbottom})` }}
           >
-            <h3 className="text-2xl md:text-3xl font-bold drop-shadow-md">
+            <h3 className="text-2xl md:text-3xl font-semibold">
               {content.qa[1].question}
             </h3>
-            <p className="mt-3 text-base md:text-lg w-[260px] md:w-[300px] font-medium">
-              {content.qa[1].answer}
-            </p>
+            <div className="mt-3 text-lg w-[300px]">
+              <RenderAnswer answer={content.qa[1].answer} />
+            </div>
           </div>
 
-          {/* BOX 4 */}
+          {/* Box 4 */}
           <div
-            className="h-[230px] md:h-[260px] rounded-3xl bg-cover bg-center shadow-lg p-6 
-            text-white flex flex-col justify-center items-end text-right"
+            className="h-[230px] md:h-[260px] rounded-3xl bg-cover bg-center shadow-lg p-6 text-white text-right flex flex-col justify-center items-end"
             style={{ backgroundImage: `url(${rightbottom})` }}
           >
-            <h3 className="text-2xl md:text-3xl font-bold drop-shadow-md">
+            <h3 className="text-2xl md:text-3xl font-semibold">
               {content.qa[2].question}
             </h3>
-            <p className="mt-3 text-base md:text-lg w-[260px] md:w-[300px] font-medium">
-              {content.qa[2].answer}
-            </p>
+            <div className="mt-3 text-lg w-[300px]">
+              <RenderAnswer answer={content.qa[2].answer} />
+            </div>
           </div>
         </div>
 
-        {/* CENTER CIRCLE — same for all screen sizes */}
+        {/* Center Circle */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-          <div className="w-40 h-40 md:w-72 md:h-72 rounded-full bg-[var(--color-primary)] shadow-2xl border-4 border-white overflow-hidden flex items-center justify-center">
+          <div className="w-40 h-40 md:w-72 md:h-72 rounded-full bg-[#6F2DBD] border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden">
             <img
               src={realImage}
-              className="w-[75%] md:w-[80%] object-contain"
+              alt="Center"
+              className="w-[80%] object-contain"
             />
           </div>
         </div>
       </div>
 
-      <button className="justify-center border bg-[#5C039B] rounded-md text-white px-6 py-3 mt-10 w-40 flex mx-auto">
+      <button className="mx-auto block mt-10 bg-[#5C039B] text-white px-6 py-3 rounded-md">
         Sign Up
       </button>
     </section>

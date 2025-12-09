@@ -1,8 +1,15 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronDown, Facebook, Instagram, Twitter, Linkedin, Phone } from 'lucide-react';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  ChevronDown,
+  Facebook,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Phone,
+} from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import logoNewImage from "../../assets/img/logoNew.png";
 
@@ -17,7 +24,8 @@ const footerData = {
     ),
     description: (
       <p>
-        Scalable. AI–powered. <br />Asset–light.
+        Scalable. AI–powered. <br />
+        Asset–light.
       </p>
     ),
   },
@@ -28,8 +36,8 @@ const footerData = {
     { label: "Rentals", path: "/rentals" },
     { label: "Buy", path: "/buy" },
     { label: "Sell", path: "/sell" },
-    { label: "Mortgages", path: "/mortgages" },
-    { label: "Maintenance", path: "/maintenance" },
+    { label: "Mortgages", path: "/mortgage/services" },
+    // { label: "Maintenance", path: "/maintenance" },
   ],
 
   resources: [
@@ -41,7 +49,7 @@ const footerData = {
   ],
 
   knowledge: [
-    { label: "About Us", path: "/about" },      // <-- Your requested About Us link
+    { label: "About Us", path: "/about" },
     { label: "Knowledge Centre", path: "/knowledge-centre" },
     { label: "Our Sustainability Focus", path: "/sustainability" },
     { label: "Submit Your Feedback", path: "/feedback" },
@@ -83,14 +91,12 @@ const Accordion = ({ title, children, isOpen, toggle }) => (
 const Footer = () => {
   const { company, offerings, resources, knowledge, social } = footerData;
 
-  // Accordion State
   const [open, setOpen] = useState(null);
   const toggle = (id) => setOpen(open === id ? null : id);
 
   return (
-    <footer className="border-purple-700/30 main-gradient-color  text-white relative">
-
-      {/* LOGO CENTERED ON MOBILE */}
+    <footer className="border-purple-700/30 main-gradient-color text-white relative">
+      {/* MOBILE LOGO */}
       <div className="text-center pt-10 lg:hidden">
         <img
           src={company.logo}
@@ -103,8 +109,6 @@ const Footer = () => {
 
       {/* MOBILE ACCORDIONS */}
       <div className="px-6 sm:px-10 lg:hidden mt-10">
-
-        {/* Offerings */}
         <Accordion
           title="Our Offerings"
           isOpen={open === 1}
@@ -119,7 +123,6 @@ const Footer = () => {
           </ul>
         </Accordion>
 
-        {/* Partner Ecosystem */}
         <Accordion
           title="Partner Ecosystem"
           isOpen={open === 2}
@@ -134,7 +137,6 @@ const Footer = () => {
           </ul>
         </Accordion>
 
-        {/* About Us */}
         <Accordion
           title="About Us"
           isOpen={open === 3}
@@ -149,7 +151,6 @@ const Footer = () => {
           </ul>
         </Accordion>
 
-        {/* Location */}
         <Accordion
           title="Location"
           isOpen={open === 4}
@@ -158,77 +159,91 @@ const Footer = () => {
           <p className="text-purple-200 text-sm">UAE</p>
         </Accordion>
 
-        {/* Email */}
-        <Accordion
-          title="Email"
-          isOpen={open === 5}
-          toggle={() => toggle(5)}
-        >
+        <Accordion title="Email" isOpen={open === 5} toggle={() => toggle(5)}>
           <p className="text-purple-200 text-sm">
-            For Partners: <span className="text-white">connect@xoto.ae</span>
+            For Partners:{" "}
+            <span className="text-white">sales.support@xoto.ae</span>
           </p>
           <p className="text-purple-200 text-sm mt-1">
-            For Customers: <span className="text-white">care@xoto.ae</span>
+            For Customers: <span className="text-white">info@xoto.ae</span>
           </p>
         </Accordion>
       </div>
 
-      {/* DESKTOP GRID (unchanged but responsive) */}
+      {/* DESKTOP */}
       <div className="hidden lg:block max-w-screen-2xl mx-auto px-24 pt-16">
         <div className="grid grid-cols-6 gap-10 pb-14">
-
-          {/* Company */}
           <div className="col-span-2">
             <img src={company.logo} className="h-20 mb-4" alt="logo" />
             <p className="text-xl font-semibold">{company.slogan}</p>
             <p className="text-purple-200 mt-3">{company.description}</p>
           </div>
 
-          {/* Offerings */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4 uppercase">Our Offerings</h4>
+            <h4 className="text-white font-semibold text-sm mb-4 uppercase">
+              Our Offerings
+            </h4>
             <ul className="space-y-2">
               {offerings.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34]">{item.label}</Link>
+                  <Link
+                    to={item.path}
+                    className="text-purple-200 hover:text-[#C45A34]"
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Partner */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4 uppercase">Partner Ecosystem</h4>
+            <h4 className="text-white font-semibold text-sm mb-4 uppercase">
+              Partner Ecosystem
+            </h4>
             <ul className="space-y-2">
               {resources.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34]">{item.label}</Link>
+                  <Link
+                    to={item.path}
+                    className="text-purple-200 hover:text-[#C45A34]"
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* About */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4 uppercase">About Us</h4>
+            <h4 className="text-white font-semibold text-sm mb-4 uppercase">
+              About Us
+            </h4>
             <ul className="space-y-2">
               {knowledge.map((item, i) => (
                 <li key={i}>
-                  <Link to={item.path} className="text-purple-200 hover:text-[#C45A34]">{item.label}</Link>
+                  <Link
+                    to={item.path}
+                    className="text-purple-200 hover:text-[#C45A34]"
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4 uppercase">Contact</h4>
+            <h4 className="text-white font-semibold text-sm mb-4 uppercase">
+              Contact
+            </h4>
             <p className="text-purple-200 text-sm">UAE</p>
             <p className="text-purple-200 text-sm mt-3">
-              Partners: <span className="text-white">connect@xoto.ae</span>
+              Partners:{" "}
+              <span className="text-white">sales.support@xoto.ae</span>
             </p>
             <p className="text-purple-200 text-sm mt-1">
-              Customers: <span className="text-white">care@xoto.ae</span>
+              Customers: <span className="text-white">info@xoto.ae</span>
             </p>
 
             <div className="flex flex-col gap-4 mt-4 items-end">
@@ -243,7 +258,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Row */}
+      {/* BOTTOM */}
       <div className="w-full border-t border-purple-500/20 mt-6">
         <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-purple-300 text-sm">
@@ -252,14 +267,17 @@ const Footer = () => {
 
           <div className="flex gap-5">
             {social.map((item, i) => (
-              <a key={i} href={item.url} className="text-purple-300 hover:text-white">
+              <a
+                key={i}
+                href={item.url}
+                className="text-purple-300 hover:text-white"
+              >
                 {item.icon}
               </a>
             ))}
           </div>
         </div>
       </div>
-
     </footer>
   );
 };

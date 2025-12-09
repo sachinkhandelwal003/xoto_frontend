@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
@@ -10,11 +10,14 @@ import { ChevronDown } from "lucide-react";
 export const languages = [
   {
     code: "en",
-   name: "EN",
+    name: "EN",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#012169" />
-        <path fill="#FFF" d="M0,0 L20,15 M0,15 L20,0 M8,0 L8,15 M0,7.5 L20,7.5" />
+        <path
+          fill="#FFF"
+          d="M0,0 L20,15 M0,15 L20,0 M8,0 L8,15 M0,7.5 L20,7.5"
+        />
         <path
           fill="#C8102E"
           d="M0,0 L8,0 L20,7 L20,8 L12,8 L0,1 M0,14 L8,15 L20,8 L20,7 L12,7 L0,14"
@@ -26,7 +29,7 @@ export const languages = [
 
   {
     code: "hi",
-  name: "HI",
+    name: "HI",
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="5" fill="#FF9933" />
@@ -75,10 +78,7 @@ export const languages = [
     Flag: () => (
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#EE1C25" />
-        <polygon
-          fill="#FFFF00"
-          points="3,2 4,4.5 1.5,3.5 4.5,3.5 2,4.5"
-        />
+        <polygon fill="#FFFF00" points="3,2 4,4.5 1.5,3.5 4.5,3.5 2,4.5" />
       </svg>
     ),
   },
@@ -183,20 +183,11 @@ export const languages = [
       <svg viewBox="0 0 20 15" className="w-full h-full">
         <rect width="20" height="15" fill="#01411C" />
         <rect width="5" height="15" fill="#FFF" />
-        <path
-          fill="#FFF"
-          d="M13,7.5a3,3 0 1,1 -1,-5a2,2 0 1,0 1,5Z"
-        />
+        <path fill="#FFF" d="M13,7.5a3,3 0 1,1 -1,-5a2,2 0 1,0 1,5Z" />
         <circle cx="14" cy="5.5" r="0.8" fill="#FFF" />
       </svg>
     ),
   },
-];
-
-/* ------------------- SERVICES DROPDOWN ITEMS ------------------- */
-const servicesItems = [
-  { title: "Mortgage", path: "/mortgage/services" },
-  { title: "Maintenance", path: "/services/maintenance" },
 ];
 
 /* ------------------- NAV ITEMS ------------------- */
@@ -204,30 +195,31 @@ const navItems = [
   { title: "Home", path: "/" },
   { title: "Landscaping", path: "/landscaping" },
   { title: "Interiors", path: "/services/interior" },
-  { title: "Properties", path: "/marketplace" },
-  // Services will be handled separately as dropdown
   { title: "Partner Eco-System", path: "/ecosystem" },
   { title: "Xoto Store", path: "/ecommerce/b2c" },
   { title: "Blogs", path: "/explore" },
+  { title: "Properties", path: "/marketplace" },
 ];
 
-/* ------------------- MAIN NAVBAR ------------------- */
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [servicesOpen, setServicesOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState(languages[0]);
   const [scrolled, setScrolled] = useState(false);
+
   const langRef = useRef(null);
-  const servicesRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
-  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
-      if (servicesRef.current && !servicesRef.current.contains(e.target)) setServicesOpen(false);
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target) && !e.target.closest('button')) {
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setLangOpen(false);
+      }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(e.target) &&
+        !e.target.closest("button")
+      ) {
         setMobileOpen(false);
       }
     };
@@ -235,46 +227,26 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Shadow on scroll
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLangSelect = (lang) => {
-    setSelectedLang(lang);
-    setLangOpen(false);
-  };
-
-  const closeMobileMenu = () => setMobileOpen(false);
-
   return (
     <>
-      {/* Sticky Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"}`}
       >
-        <div className="max-w-8xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+        <div className="max-w-8xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between h-12">
-
             {/* Logo */}
-          <div className="flex flex-col items-center justify-center text-center ">
-  <Link to="/" className="flex items-center justify-center group">
-    <img
-      src={logoNew}
-      alt="Sawtar Logo"
-      className="h-14 w-auto transition-transform group-hover:scale-105"
-    />
-  </Link>
-
-  <span className="text-gray-900" style={{fontSize:"10px"}}>
-    Powered by AI. Inspired by you.
-  </span>
-</div>
-
+            <Link to="/" className="flex flex-col items-center">
+              <img src={logoNew} alt="Logo" className="h-14 w-auto" />
+              <span className="text-gray-900 text-[10px]">
+                Powered by AI. Inspired by you.
+              </span>
+            </Link>
 
             {/* Desktop Nav */}
             <div className="hidden lg:flex items-center space-x-1">
@@ -282,190 +254,277 @@ const Navbar = () => {
                 <Link
                   key={item.title}
                   to={item.path}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all duration-200 hover:bg-purple-50 hover:text-purple-700"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-[#5C039B]"
                 >
                   {item.title}
                 </Link>
               ))}
-              
-              {/* Services Dropdown */}
-              <div ref={servicesRef} className="relative">
-                <button
-                  onClick={() => setServicesOpen(!servicesOpen)}
-                  className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all duration-200 hover:bg-purple-50 hover:text-purple-700"
-                >
-                  Services
-                  <ChevronDown className={`w-4 h-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
-                </button>
 
-                {servicesOpen && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    {servicesItems.map((service) => (
-                      <Link
-                        key={service.title}
-                        to={service.path}
-                        onClick={() => setServicesOpen(false)}
-                        className="block px-4 py-3 text-sm text-gray-700 transition-all hover:bg-purple-50 hover:text-purple-700"
-                      >
-                        {service.title}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
+              {/* ✅ Mortgage (no dropdown) */}
+              <Link
+                to="/mortgage/services"
+                className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-[#5C039B]"
+              >
+                Mortgage
+              </Link>
             </div>
 
-            {/* Desktop: Language + Contact */}
+            {/* Desktop Right */}
             <div className="hidden lg:flex items-center space-x-4">
-              {/* Language Dropdown */}
               <div ref={langRef} className="relative">
                 <button
                   onClick={() => setLangOpen(!langOpen)}
-                  className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl hover:border-purple-400 transition-all duration-200 group"
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-50 border rounded-xl"
                 >
-                  <div className="w-5 h-5 rounded-full overflow-hidden ring-2 ring-white">
+                  <div className="w-5 h-5">
                     <selectedLang.Flag />
                   </div>
-                  <span className="text-sm font-semibold text-gray-800">{selectedLang.name}</span>
-                  <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${langOpen ? "rotate-180" : ""}`} />
+                  <span className="text-sm font-semibold">
+                    {selectedLang.name}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 ${langOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
 
                 {langOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    {languages.map((lang) => {
-                      const isActive = selectedLang.code === lang.code;
-                      return (
-                        <button
-                          key={lang.code}
-                          onClick={() => handleLangSelect(lang)}
-                          className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${
-                            isActive ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-gray-50 text-gray-700"
-                          }`}
-                        >
-                          <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white">
-                            <lang.Flag />
-                          </div>
-                          <span className="text-sm">{lang.name}</span>
-                        </button>
-                      );
-                    })}
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setSelectedLang(lang);
+                          setLangOpen(false);
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-3 hover:bg-[#5C039B]"
+                      >
+                        <div className="w-5 h-5">
+                          <lang.Flag />
+                        </div>
+                        {lang.name}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
 
               <Link to="/contact">
-                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl hover:from-purple-700 transform hover:scale-105 transition-all duration-200">
+                <button className="px-6 py-2 bg-[#5C039B] text-white rounded-xl">
                   Contact Us
                 </button>
               </Link>
-               <Link to="/login">
-                <button className="px-6 py-2.5 bg-[var(--color-primary)] text-white font-semibold text-sm rounded-xl hover:from-purple-700 transform hover:scale-105 transition-all duration-200">
+              <Link to="/login">
+                <button className="px-6 py-2 bg-[#5C039B] text-white rounded-xl">
                   Login
                 </button>
               </Link>
             </div>
 
-            {/* Mobile: Country Selector + Menu Icon */}
-            <div className="flex items-center gap-2 lg:hidden">
-              {/* Country Selector (Mobile) */}
-              <div ref={langRef} className="relative">
-                <button
-                  onClick={() => setLangOpen(!langOpen)}
-                  className="flex items-center gap-1.5 px-2 py-1.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all"
-                  aria-label="Select Language"
-                >
-                  <div className="w-6 h-6 rounded-full overflow-hidden ring-1 ring-white shadow-sm">
-                    <selectedLang.Flag />
-                  </div>
-                  <ChevronDown className={`w-3.5 h-3.5 text-gray-600 transition-transform ${langOpen ? "rotate-180" : ""}`} />
-                </button>
-
-                {/* Mobile Language Dropdown */}
-                {langOpen && (
-                  <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                    {languages.map((lang) => {
-                      const isActive = selectedLang.code === lang.code;
-                      return (
-                        <button
-                          key={lang.code}
-                          onClick={() => handleLangSelect(lang)}
-                          className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${
-                            isActive ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-gray-50 text-gray-700"
-                          }`}
-                        >
-                          <div className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white">
-                            <lang.Flag />
-                          </div>
-                          <span className="text-sm">{lang.name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition"
-                aria-label="Toggle menu"
-              >
+            {/* Mobile */}
+            <div className="lg:hidden flex items-center gap-2">
+              <button onClick={() => setMobileOpen(!mobileOpen)}>
                 {mobileOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Menu - Full Slide In */}
+        {/* Mobile Menu */}
         <div
           ref={mobileMenuRef}
-          className={`lg:hidden fixed inset-x-0 top-16 bg-white shadow-2xl border-t border-gray-100 transition-all duration-300 ease-out ${
-            mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
-          }`}
+          className={`lg:hidden fixed inset-x-0 top-16 bg-white transition-all ${mobileOpen ? "translate-y-0" : "-translate-y-full"}`}
         >
           <div className="px-4 py-4 space-y-1">
             {navItems.map((item) => (
               <Link
                 key={item.title}
                 to={item.path}
-                onClick={closeMobileMenu}
-                className="block px-4 py-3 text-base font-medium text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-700 transition"
+                onClick={() => setMobileOpen(false)}
+                className="block px-4 py-3 hover:bg-purple-50"
               >
                 {item.title}
               </Link>
             ))}
-            
-            {/* Services Dropdown in Mobile */}
-            <div className="px-4 py-3">
-              <div className="mb-2 text-sm font-semibold text-gray-900">Services</div>
-              <div className="pl-4 space-y-2">
-                {servicesItems.map((service) => (
-                  <Link
-                    key={service.title}
-                    to={service.path}
-                    onClick={closeMobileMenu}
-                    className="block px-4 py-2 text-base font-medium text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-700 transition"
-                  >
-                    {service.title}
-                  </Link>
-                ))}
-              </div>
-            </div>
 
-            {/* Contact Button in Mobile Menu */}
-            <Link to="/contact" onClick={closeMobileMenu} className="block mt-4 px-4">
-              <button className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
-                Contact Us
-              </button>
+            {/* ✅ Mobile Mortgage */}
+            <Link
+              to="/mortgage/services"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-3 hover:bg-purple-50"
+            >
+              Mortgage
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* Spacer */}
-      <div className="h-20"></div>
+      <div className="h-20" />
     </>
   );
 };
 
 export default Navbar;
+
+("use client");
+
+// import React, { useState, useRef, useEffect } from "react";
+// import { FaBars, FaTimes } from "react-icons/fa";
+// import { Link } from "react-router-dom";
+// import logoNew from "../../assets/img/logoNew.png";
+// import { ChevronDown } from "lucide-react";
+
+// /* ------------------- LANGUAGE DATA ------------------- */
+// export const languages = [
+//   { code: "en", name: "EN", Flag: () => (<svg viewBox="0 0 20 15" className="w-full h-full"><rect width="20" height="15" fill="#012169"/></svg>) },
+//   { code: "hi", name: "HI", Flag: () => (<svg viewBox="0 0 20 15" className="w-full h-full"><rect width="20" height="15" fill="#FF9933"/></svg>) },
+//   { code: "ar", name: "AR", Flag: () => (<svg viewBox="0 0 20 15" className="w-full h-full"><rect width="20" height="15" fill="#007A3D"/></svg>) },
+//   { code: "ru", name: "RU", Flag: () => (<svg viewBox="0 0 20 15" className="w-full h-full"><rect width="20" height="15" fill="#0039A6"/></svg>) },
+// ];
+
+// /* ------------------- NAV ITEMS ------------------- */
+// const navItems = [
+//   { title: "Home", path: "/" },
+//   { title: "Landscaping", path: "/landscaping" },
+//   { title: "Interiors", path: "/services/interior" },
+//   { title: "Partner Eco-System", path: "/ecosystem" },
+//   { title: "Xoto Store", path: "/ecommerce/b2c" },
+//   { title: "Blogs", path: "/explore" },
+//   { title: "Properties", path: "/marketplace" },
+// ];
+
+// const Navbar = () => {
+//   const [mobileOpen, setMobileOpen] = useState(false);
+//   const [langOpen, setLangOpen] = useState(false);
+//   const [selectedLang, setSelectedLang] = useState(languages[0]);
+//   const [scrolled, setScrolled] = useState(false);
+
+//   const langRef = useRef(null);
+//   const mobileMenuRef = useRef(null);
+
+//   useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (langRef.current && !langRef.current.contains(e.target)) {
+//         setLangOpen(false);
+//       }
+//       if (
+//         mobileMenuRef.current &&
+//         !mobileMenuRef.current.contains(e.target) &&
+//         !e.target.closest("button")
+//       ) {
+//         setMobileOpen(false);
+//       }
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   useEffect(() => {
+//     const handleScroll = () => setScrolled(window.scrollY > 10);
+//     window.addEventListener("scroll", handleScroll);
+//     return () => window.removeEventListener("scroll", handleScroll);
+//   }, []);
+
+//   return (
+//     <>
+//       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"}`}>
+//         <div className="max-w-8xl mx-auto px-4 py-5">
+//           <div className="flex items-center justify-between h-12">
+
+//             {/* Logo */}
+//             <Link to="/" className="flex flex-col items-center">
+//               <img src={logoNew} alt="Logo" className="h-14 w-auto" />
+//               <span className="text-gray-900 text-[10px]">Powered by AI. Inspired by you.</span>
+//             </Link>
+
+//             {/* Desktop Nav */}
+//             <div className="hidden lg:flex items-center space-x-1">
+//               {navItems.map((item) => (
+//                 <Link
+//                   key={item.title}
+//                   to={item.path}
+//                   className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-purple-700"
+//                 >
+//                   {item.title}
+//                 </Link>
+//               ))}
+
+//               {/* ✅ Mortgage (no dropdown) */}
+//               <Link
+//                 to="/mortgage/services"
+//                 className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-purple-700"
+//               >
+//                 Mortgage
+//               </Link>
+//             </div>
+
+//             {/* Desktop Right */}
+//             <div className="hidden lg:flex items-center space-x-4">
+//               <div ref={langRef} className="relative">
+//                 <button
+//                   onClick={() => setLangOpen(!langOpen)}
+//                   className="flex items-center gap-2 px-3 py-2 bg-gray-50 border rounded-xl"
+//                 >
+//                   <div className="w-5 h-5"><selectedLang.Flag /></div>
+//                   <span className="text-sm font-semibold">{selectedLang.name}</span>
+//                   <ChevronDown className={`w-4 h-4 ${langOpen ? "rotate-180" : ""}`} />
+//                 </button>
+
+//                 {langOpen && (
+//                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl">
+//                     {languages.map((lang) => (
+//                       <button
+//                         key={lang.code}
+//                         onClick={() => { setSelectedLang(lang); setLangOpen(false); }}
+//                         className="flex w-full items-center gap-3 px-4 py-3 hover:bg-purple-50"
+//                       >
+//                         <div className="w-5 h-5"><lang.Flag /></div>
+//                         {lang.name}
+//                       </button>
+//                     ))}
+//                   </div>
+//                 )}
+//               </div>
+
+//               <Link to="/contact"><button className="px-6 py-2 bg-purple-600 text-white rounded-xl">Contact Us</button></Link>
+//               <Link to="/login"><button className="px-6 py-2 bg-purple-600 text-white rounded-xl">Login</button></Link>
+//             </div>
+
+//             {/* Mobile */}
+//             <div className="lg:hidden flex items-center gap-2">
+//               <button onClick={() => setMobileOpen(!mobileOpen)}>
+//                 {mobileOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Mobile Menu */}
+//         <div
+//           ref={mobileMenuRef}
+//           className={`lg:hidden fixed inset-x-0 top-16 bg-white transition-all ${mobileOpen ? "translate-y-0" : "-translate-y-full"}`}
+//         >
+//           <div className="px-4 py-4 space-y-1">
+//             {navItems.map((item) => (
+//               <Link key={item.title} to={item.path} onClick={() => setMobileOpen(false)} className="block px-4 py-3 hover:bg-purple-50">
+//                 {item.title}
+//               </Link>
+//             ))}
+
+//             {/* ✅ Mobile Mortgage */}
+//             <Link
+//               to="/mortgage/services"
+//               onClick={() => setMobileOpen(false)}
+//               className="block px-4 py-3 hover:bg-purple-50"
+//             >
+//               Mortgage
+//             </Link>
+//           </div>
+//         </div>
+//       </nav>
+
+//       <div className="h-20" />
+//     </>
+//   );
+// };
+
+// export default Navbar;

@@ -27,7 +27,6 @@ const Servicelandspacing = () => {
       title: "Softscape",
       icon: <img src={softScape} alt="Softscape" />,
       items: [
-        "Paving (interlock, tiles, stone)",
         "Soil preparation & levelling",
         "Plantation (trees, shrubs, groundcover)",
         "Grass/lawn installation (natural & artificial) Flower beds & vertical gardens",
