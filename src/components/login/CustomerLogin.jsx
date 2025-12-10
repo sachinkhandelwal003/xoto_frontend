@@ -1,5 +1,5 @@
 // src/pages/auth/CustomerLogin.jsx
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Form,
   InputNumber,
@@ -10,39 +10,70 @@ import {
   message,
   Row,
   Col,
+  Grid,
 } from 'antd';
 import { motion } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../manageApi/context/AuthContext.jsx';
 import loginimage from '../../assets/img/one.png';
 import logoNew from '../../assets/img/logoNew.png';
-import { UserOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { UserOutlined, CheckCircleFilled, ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const CustomerLogin = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
-  const { login } = useContext(AuthContext);
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+  const [welcomeUser, setWelcomeUser] = useState(null);
+
+  const { login, isAuthenticated, user, token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
+
+  // Auto redirect after successful login (same logic as Partner Login)
+  useEffect(() => {
+    if (isAuthenticated && user && token) {
+      const userName = user?.name || user?.firstName || user?.mobile || 'Customer';
+      const roleName = user?.role?.name || 'Customer';
+
+      setWelcomeUser({ name: userName, role: roleName });
+      setShowSuccessBanner(true);
+
+      const timer = setTimeout(() => {
+        const roleCode = user?.role?.code?.toString() || user?.role;
+        const rolePathMap = {
+          "2": "/dashboard/customer",     // Customer role
+          // Add more if you have sub-roles under customer
+        };
+        const path = rolePathMap[roleCode] || "/dashboard/customer";
+        navigate(path, { replace: true });
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, user, token, navigate]);
 
   const onFinish = async (values) => {
     setLoading(true);
     setGeneralError('');
+
     try {
       const mobile = values.mobile.toString();
       await login('/users/login/customer', { mobile });
       message.success('Login successful!');
-      // Navigation will be handled by AuthContext useEffect
     } catch (err) {
-      const errorMessage = typeof err === 'object' 
+      const errorMessage = typeof err === 'object'
         ? err.message || err.status || 'Login failed'
         : err || 'Login failed';
-      
+
       const msg = errorMessage.includes('not found')
         ? 'Customer not found. Please register first.'
         : errorMessage;
+
       setGeneralError(msg);
       message.error(msg);
     } finally {
@@ -51,79 +82,112 @@ const CustomerLogin = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: `url(${loginimage}) center/cover no-repeat fixed`,
-      position: 'relative',
-      fontFamily: "'Poppins', sans-serif",
-    }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: `url(${loginimage}) center/cover no-repeat fixed`,
+        position: 'relative',
+        fontFamily: "'Poppins', sans-serif",
+      }}
+    >
       {/* Dark Overlay */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'rgba(0, 0, 0, 0.65)',
-        backdropFilter: 'blur(5px)',
-      }} />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(5px)',
+        }}
+      />
+
+      {/* Success Banner */}
+      {showSuccessBanner && welcomeUser && (
+        <motion.div
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 9999,
+            padding: isMobile ? '0.8rem' : '1rem',
+            background: '#ffffff',
+            color: '#1f1f1f',
+            textAlign: 'center',
+            fontWeight: 'bold',
+            fontSize: isMobile ? '0.9rem' : '1.3rem',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            borderBottom: '4px solid #64EF0A',
+          }}
+        >
+          <CheckCircleFilled
+            style={{
+              fontSize: isMobile ? '1.2rem' : '1.8rem',
+              marginRight: isMobile ? '6px' : '12px',
+              color: '#64EF0A',
+            }}
+          />
+          Welcome back, {welcomeUser.name}! ({welcomeUser.role})
+          <br />
+          <Text style={{ fontSize: isMobile ? '0.75rem' : '1rem', opacity: 0.8, color: '#333' }}>
+            Redirecting you to your dashboard...
+          </Text>
+        </motion.div>
+      )}
 
       <Row style={{ minHeight: '100vh', position: 'relative', zIndex: 10 }}>
-        {/* Left Side - Branding */}
-        <Col xs={0} md={12} lg={14}>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            padding: '3rem',
-            color: 'white',
-          }}>
-            <motion.div
-              initial={{ opacity: 0, x: -100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+        {/* Left Side - Branding (Desktop) */}
+        {!isMobile && (
+          <Col xs={0} lg={12}>
+            <div
               style={{
-                maxWidth: '600px',
-                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                padding: '3rem',
+                color: 'white',
               }}
             >
-              <img
-                src={logoNew}
-                alt="Logo"
-                style={{
-                  width: '150px',
-                  height: 'auto',
-                  marginBottom: '2rem',
-                  filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))',
-                }}
-              />
-              <Title level={1} style={{ color: '#03A4F4', fontSize: '3.5rem', fontWeight: 800, marginBottom: '1rem' }}>
-                Customer Login
-              </Title>
-              <Text style={{ fontSize: '1.3rem', opacity: 0.9, color: 'white', display: 'block' }}>
-                Welcome back! Enter your mobile number to access your account
-              </Text>
-              <div style={{ marginTop: '3rem', textAlign: 'left', background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: '15px' }}>
-                <Title level={4} style={{ color: 'white', marginBottom: '1rem' }}>Why Shop With Us?</Title>
-                <ul style={{ color: 'rgba(255,255,255,0.9)', fontSize: '16px', paddingLeft: '1rem' }}>
-                  <li>Wide selection of products</li>
-                  <li>Secure & easy payments</li>
-                  <li>Fast delivery options</li>
-                  <li>24/7 customer support</li>
-                </ul>
-              </div>
-            </motion.div>
-          </div>
-        </Col>
+              <motion.div
+                initial={{ opacity: 0, x: -100 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                style={{ maxWidth: '600px', textAlign: 'center' }}
+              >
+                <img
+                  src={logoNew}
+                  alt="Logo"
+                  style={{
+                    width: '140px',
+                    marginBottom: '2rem',
+                    filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))',
+                  }}
+                />
+                <Title level={1} style={{ color: '#03A4F4', fontSize: '3.5rem', fontWeight: 800 }}>
+                  Customer Login
+                </Title>
+                <Text style={{ fontSize: '1.4rem', opacity: 0.9 }}>
+                  Enter your mobile number to access your account
+                </Text>
+              </motion.div>
+            </div>
+          </Col>
+        )}
 
         {/* Right Side - Form */}
-        <Col xs={24} md={12} lg={10}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            padding: '2rem',
-          }}>
+        <Col xs={24} lg={isMobile ? 24 : 12}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+              padding: '2rem',
+            }}
+          >
             <motion.div
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
@@ -132,57 +196,42 @@ const CustomerLogin = () => {
             >
               <Card
                 style={{
-                  width: '100%',
                   borderRadius: '20px',
                   boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
                   background: 'rgba(255,255,255,0.98)',
-                  border: '1px solid rgba(255,255,255,0.1)',
                 }}
                 bodyStyle={{ padding: '2.5rem' }}
               >
                 {/* Back Button */}
-                <Button
-                  type="text"
-                  onClick={() => navigate('/auth')}
-                  style={{
-                    color: '#5C039B',
-                    padding: '4px 8px',
-                    height: 'auto',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '1.5rem',
-                  }}
-                >
-                  <ArrowLeftOutlined />
-                  Back to Selection
-                </Button>
+             
 
                 {/* Header */}
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                  <div style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '16px',
-                    background: '#1890ff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#fff',
-                    fontSize: '28px',
-                    margin: '0 auto 1rem',
-                  }}>
+                  <div
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '16px',
+                      background: '#1890ff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                      fontSize: '28px',
+                      margin: '0 auto 1rem',
+                    }}
+                  >
                     <UserOutlined />
                   </div>
                   <Title level={3} style={{ color: '#5C039B', margin: 0 }}>
                     Customer Login
                   </Title>
-                  <Text type="secondary" style={{ display: 'block', marginTop: '0.5rem' }}>
-                    Enter your mobile number to continue
+                  <Text type="secondary">
+                    Enter your registered mobile number
                   </Text>
                 </div>
 
-                {/* Error Alert */}
+                {/* Error */}
                 {generalError && (
                   <Alert
                     message={generalError}
@@ -190,21 +239,18 @@ const CustomerLogin = () => {
                     showIcon
                     closable
                     onClose={() => setGeneralError('')}
-                    style={{
-                      marginBottom: '1.5rem',
-                      borderRadius: '10px',
-                    }}
+                    style={{ marginBottom: '1.5rem', borderRadius: '10px' }}
                   />
                 )}
 
-                {/* Login Form */}
+                {/* Form */}
                 <Form form={form} onFinish={onFinish} layout="vertical">
                   <Form.Item
                     name="mobile"
                     label={<span style={{ color: '#5C039B', fontWeight: 600 }}>Mobile Number</span>}
                     rules={[
                       { required: true, message: 'Please enter your mobile number' },
-                      { pattern: /^\d{10}$/, message: 'Please enter a valid 10-digit mobile number' }
+                      { pattern: /^\d{10}$/, message: 'Enter a valid 10-digit number' },
                     ]}
                   >
                     <InputNumber
@@ -230,7 +276,6 @@ const CustomerLogin = () => {
                       borderRadius: '10px',
                       fontSize: '16px',
                       fontWeight: '600',
-                      border: 'none',
                       boxShadow: '0 4px 15px rgba(24,144,255,0.3)',
                     }}
                   >
@@ -238,37 +283,17 @@ const CustomerLogin = () => {
                   </Button>
                 </Form>
 
-                {/* Register Link */}
                 <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
                   <Text type="secondary">
-                    Don't have an account?{' '}
-                    <Link to="/customer/registration" style={{ color: '#1890ff', fontWeight: 'bold' }}>
-                      Register Here
-                    </Link>
+                    New here?{' '}
+                    <span
+                      onClick={() => navigate('/customer/registration')}
+                      style={{ color: '#1890ff', fontWeight: 'bold', cursor: 'pointer' }}
+                    >
+                      Register Now
+                    </span>
                   </Text>
                 </div>
-
-                {/* Divider */}
-                <div style={{ margin: '1.5rem 0', display: 'flex', alignItems: 'center' }}>
-                  <div style={{ flex: 1, height: '1px', background: '#f0f0f0' }} />
-                  <Text type="secondary" style={{ margin: '0 1rem' }}>OR</Text>
-                  <div style={{ flex: 1, height: '1px', background: '#f0f0f0' }} />
-                </div>
-
-                {/* Alternative Login Option */}
-                <Button
-                  type="default"
-                  block
-                  onClick={() => navigate('/auth/partner/login')}
-                  style={{
-                    height: '48px',
-                    borderRadius: '10px',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                  }}
-                >
-                  Login as Partner
-                </Button>
               </Card>
             </motion.div>
           </div>

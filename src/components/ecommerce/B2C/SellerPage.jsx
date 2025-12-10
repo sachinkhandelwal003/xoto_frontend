@@ -36,36 +36,6 @@ const SellerPage = () => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   
-  // Sample data for testing
-  const sampleData = {
-    first_name: "",
-    last_name: "Sharma",
-    email: "rahul@example.com",
-    mobile: {
-      country_code: "+91",
-      number: "9876543210"
-    },
-    password: "secret123",
-    confirmPassword: "secret123",
-    store_details: {
-      store_name: "Rahul Fashion Store",
-      store_description: "Best clothes in town",
-      store_type: "Individual / Sole Proprietor",
-      store_address: "123 MG Road",
-      city: "Mumbai",
-      country: "India",
-      pincode: "400001",
-      categories: ["68ef95060d671000edce65ab", "68ef95770d671000edce65b4"]
-    },
-    registration: {
-      pan_number: "ABCDE1234F",
-      gstin: "27ABCDE1234F1Z5"
-    },
-    meta: {
-      agreed_to_terms: true
-    }
-  };
-
   const businessTypes = [
     { label: 'Individual / Sole Proprietor', value: 'Individual / Sole Proprietor' },
     { label: 'Partnership', value: 'Partnership' },
@@ -77,46 +47,15 @@ const SellerPage = () => {
 
   const countries = [
     { label: 'India', value: 'India' },
-    { label: 'United Arab Emirates', value: 'United Arab Emirates' },
     { label: 'United States', value: 'United States' },
     { label: 'United Kingdom', value: 'United Kingdom' },
     { label: 'Canada', value: 'Canada' },
     { label: 'Australia', value: 'Australia' }
   ];
 
-  // City options based on selected country
-  const cityOptions = {
-    'India': [
-      'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 
-      'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow'
-    ],
-    'United Arab Emirates': [
-      'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah',
-      'Fujairah', 'Umm Al Quwain', 'Al Ain'
-    ],
-    'United States': [
-      'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix',
-      'Philadelphia', 'San Antonio', 'San Diego', 'Dallas'
-    ],
-    'United Kingdom': [
-      'London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds',
-      'Glasgow', 'Bristol', 'Sheffield', 'Edinburgh'
-    ],
-    'Canada': [
-      'Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton',
-      'Ottawa', 'Winnipeg', 'Quebec City', 'Hamilton'
-    ],
-    'Australia': [
-      'Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide',
-      'Gold Coast', 'Canberra', 'Hobart', 'Darwin'
-    ]
-  };
-
   // Fetch categories on component mount
   useEffect(() => {
     fetchCategories();
-    // Populate form with sample data (for testing/demo purposes)
-    populateFormWithSampleData();
   }, []);
 
   const fetchCategories = async () => {
@@ -139,14 +78,6 @@ const SellerPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Populate form with sample data
-  const populateFormWithSampleData = () => {
-    // Simulate API response with sample data
-    setTimeout(() => {
-      form.setFieldsValue(sampleData);
-    }, 1000);
   };
 
   // Password validation rules
@@ -212,7 +143,6 @@ const SellerPage = () => {
           >
             <Select>
               <Select.Option value="+91">India (+91)</Select.Option>
-              <Select.Option value="+971">UAE (+971)</Select.Option>
               <Select.Option value="+1">USA (+1)</Select.Option>
               <Select.Option value="+44">UK (+44)</Select.Option>
               <Select.Option value="+61">Australia (+61)</Select.Option>
@@ -262,217 +192,151 @@ const SellerPage = () => {
           </Form.Item>
         </Col>
       </Row>
-
-      {/* Demo Data Button */}
-      <div style={{ marginTop: 24, textAlign: 'center' }}>
-        <Button 
-          type="dashed" 
-          onClick={() => form.setFieldsValue(sampleData)}
-          size="small"
-        >
-          Load Sample Data
-        </Button>
-        <Text type="secondary" style={{ display: 'block', marginTop: 8, fontSize: 12 }}>
-          Click to populate form with sample data for testing
-        </Text>
-      </div>
     </>
   );
 
   // Step 2: Store Information
-  const Step2 = () => {
-    const country = Form.useWatch(['store_details', 'country'], form);
-    
-    return (
-      <>
-        <Title level={4} style={{ marginBottom: 24 }}>
-          <ShopOutlined /> Store Information
-        </Title>
+  const Step2 = () => (
+    <>
+      <Title level={4} style={{ marginBottom: 24 }}>
+        <ShopOutlined /> Store Information
+      </Title>
 
-        <Form.Item
-          label="Store Name"
-          name={['store_details', 'store_name']}
-          rules={[{ required: true, message: 'Please input your store name!' }]}
-        >
-          <Input placeholder="Enter store name" />
-        </Form.Item>
+      <Form.Item
+        label="Store Name"
+        name={['store_details', 'store_name']}
+        rules={[{ required: true, message: 'Please input your store name!' }]}
+      >
+        <Input placeholder="Enter store name" />
+      </Form.Item>
 
-        <Form.Item
-          label="Business Type"
-          name={['store_details', 'store_type']}
-          rules={[{ required: true, message: 'Please select business type!' }]}
-        >
-          <Select placeholder="Select business type" options={businessTypes} />
-        </Form.Item>
+      <Form.Item
+        label="Business Type"
+        name={['store_details', 'store_type']}
+        rules={[{ required: true, message: 'Please select business type!' }]}
+      >
+        <Select placeholder="Select business type" options={businessTypes} />
+      </Form.Item>
 
-        <Form.Item
-          label="Store Categories"
-          name={['store_details', 'categories']}
-          rules={[{ required: true, message: 'Please select at least one category!' }]}
-        >
-          <Select
-            mode="multiple"
-            placeholder="Select categories"
-            options={categories}
-            loading={loading}
-            optionFilterProp="label"
-            showSearch
-            allowClear
-          />
-        </Form.Item>
+      <Form.Item
+        label="Store Categories"
+        name={['store_details', 'categories']}
+        rules={[{ required: true, message: 'Please select at least one category!' }]}
+      >
+        <Select
+          mode="multiple"
+          placeholder="Select categories"
+          options={categories}
+          loading={loading}
+          optionFilterProp="label"
+          showSearch
+          allowClear
+        />
+      </Form.Item>
 
-        <Form.Item
-          label="Store Description"
-          name={['store_details', 'store_description']}
-        >
-          <TextArea 
-            rows={4} 
-            placeholder="Tell customers about your store, products, and brand story..." 
-            maxLength={500}
-            showCount
-          />
-        </Form.Item>
-      </>
-    );
-  };
+      <Form.Item
+        label="Store Description"
+        name={['store_details', 'store_description']}
+      >
+        <TextArea 
+          rows={4} 
+          placeholder="Tell customers about your store, products, and brand story..." 
+          maxLength={500}
+          showCount
+        />
+      </Form.Item>
+    </>
+  );
 
   // Step 3: Business Details
-  const Step3 = () => {
-    const country = Form.useWatch(['store_details', 'country'], form);
-    
-    return (
-      <>
-        <Title level={4} style={{ marginBottom: 24 }}>
-          <FileTextOutlined /> Business Details
-        </Title>
+  const Step3 = () => (
+    <>
+      <Title level={4} style={{ marginBottom: 24 }}>
+        <FileTextOutlined /> Business Details
+      </Title>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="PAN Number"
-              name={['registration', 'pan_number']}
-              rules={[{ required: true, message: 'Please input your PAN number!' }]}
-            >
-              <Input placeholder="ABCDE1234F" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label="GSTIN (Optional)"
-              name={['registration', 'gstin']}
-            >
-              <Input placeholder="27ABCDE1234F1Z5" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item
-          label="Business Address"
-          name={['store_details', 'store_address']}
-          rules={[{ required: true, message: 'Please input your business address!' }]}
-        >
-          <Input placeholder="Street address, P.O. box, company name" />
-        </Form.Item>
-
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item
-              label="Country"
-              name={['store_details', 'country']}
-              rules={[{ required: true, message: 'Please select your country!' }]}
-            >
-              <Select 
-                placeholder="Select country" 
-                options={countries}
-                onChange={() => {
-                  // Clear city when country changes
-                  form.setFieldsValue({ store_details: { city: undefined } });
-                }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              label="City"
-              name={['store_details', 'city']}
-              rules={[{ required: true, message: 'Please select your city!' }]}
-            >
-              <Select 
-                placeholder={country ? "Select city" : "Select country first"}
-                disabled={!country}
-                options={country && cityOptions[country] 
-                  ? cityOptions[country].map(city => ({ label: city, value: city }))
-                  : []
-                }
-                showSearch
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              label="PIN Code"
-              name={['store_details', 'pincode']}
-              rules={[{ required: true, message: 'Please input your PIN code!' }]}
-            >
-              <Input placeholder="Enter PIN code" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item
-          name={['meta', 'agreed_to_terms']}
-          valuePropName="checked"
-          rules={[
-            {
-              validator: (_, value) =>
-                value ? Promise.resolve() : Promise.reject(new Error('You must agree to the terms and conditions')),
-            },
-          ]}
-        >
-          <Checkbox>
-            I agree to the{' '}
-            <a href="/terms" target="_blank" rel="noopener noreferrer">
-              Terms and Conditions
-            </a>
-            {' '}and{' '}
-            <a href="/privacy" target="_blank" rel="noopener noreferrer">
-              Privacy Policy
-            </a>
-            . I confirm that all information provided is accurate and complete.
-          </Checkbox>
-        </Form.Item>
-
-        {/* JSON Preview */}
-        <div style={{ marginTop: 32, padding: 16, background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 6 }}>
-          <Title level={5} style={{ marginBottom: 12 }}>
-            <FileTextOutlined /> Form Data Preview
-          </Title>
-          <pre style={{ 
-            background: '#fafafa', 
-            padding: 16, 
-            borderRadius: 4,
-            fontSize: 12,
-            maxHeight: 200,
-            overflow: 'auto'
-          }}>
-            {JSON.stringify(form.getFieldsValue(true), null, 2)}
-          </pre>
-          <Button 
-            type="dashed" 
-            onClick={() => {
-              const data = form.getFieldsValue(true);
-              console.log('Form Data:', data);
-              message.success('Data logged to console');
-            }}
-            size="small"
-            style={{ marginTop: 8 }}
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label="PAN Number"
+            name={['registration', 'pan_number']}
+            rules={[{ required: true, message: 'Please input your PAN number!' }]}
           >
-            Log Form Data to Console
-          </Button>
-        </div>
-      </>
-    );
-  };
+            <Input placeholder="ABCDE1234F" />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label="GSTIN (Optional)"
+            name={['registration', 'gstin']}
+          >
+            <Input placeholder="27ABCDE1234F1Z5" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Form.Item
+        label="Business Address"
+        name={['store_details', 'store_address']}
+        rules={[{ required: true, message: 'Please input your business address!' }]}
+      >
+        <Input placeholder="Street address, P.O. box, company name" />
+      </Form.Item>
+
+      <Row gutter={16}>
+        <Col span={8}>
+          <Form.Item
+            label="City"
+            name={['store_details', 'city']}
+            rules={[{ required: true, message: 'Please input your city!' }]}
+          >
+            <Input placeholder="Enter city" />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            label="Country"
+            name={['store_details', 'country']}
+            rules={[{ required: true, message: 'Please select your country!' }]}
+          >
+            <Select placeholder="Select country" options={countries} />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            label="PIN Code"
+            name={['store_details', 'pincode']}
+            rules={[{ required: true, message: 'Please input your PIN code!' }]}
+          >
+            <Input placeholder="Enter PIN code" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Form.Item
+        name={['meta', 'agreed_to_terms']}
+        valuePropName="checked"
+        rules={[
+          {
+            validator: (_, value) =>
+              value ? Promise.resolve() : Promise.reject(new Error('You must agree to the terms and conditions')),
+          },
+        ]}
+      >
+        <Checkbox>
+          I agree to the{' '}
+          <a href="/terms" target="_blank" rel="noopener noreferrer">
+            Terms and Conditions
+          </a>
+          {' '}and{' '}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer">
+            Privacy Policy
+          </a>
+          . I confirm that all information provided is accurate and complete.
+        </Checkbox>
+      </Form.Item>
+    </>
+  );
 
   // Steps configuration
   const steps = [
@@ -527,112 +391,74 @@ const SellerPage = () => {
 
   // Handle form submission
   const handleSubmit = async (values) => {
-  setSubmitting(true);
-
-  try {
-    const payload = {
-      first_name: values.first_name,
-      last_name: values.last_name,
-      email: values.email,
-      mobile: {
-        country_code: values.mobile.country_code,
-        number: values.mobile.number
-      },
-      password: values.password,
-      confirmPassword: values.confirmPassword,
-      store_details: {
-        store_name: values.store_details.store_name,
-        store_description: values.store_details.store_description,
-        store_type: values.store_details.store_type,
-        store_address: values.store_details.store_address,
-        city: values.store_details.city,
-        country: values.store_details.country,
-        pincode: values.store_details.pincode,
-        categories: values.store_details.categories
-      },
-      registration: {
-        pan_number: values.registration.pan_number,
-        gstin: values.registration.gstin || ''
-      },
-      meta: {
-        agreed_to_terms: values.meta.agreed_to_terms
-      }
-    };
-
-    console.log("📦 FINAL API PAYLOAD →", JSON.parse(JSON.stringify(payload)));
-    console.log("📌 Categories sent →", payload.store_details.categories);
-
-    const response = await apiService.post('vendor/b2c', payload);
-
-    if (response.success) {
-      message.success("Registration submitted successfully!");
-      form.resetFields();
-      setCurrentStep(0);
-    }
-  } catch (error) {
-    console.error("❌ Registration Error:", error);
-    message.error("An error occurred. Please try again.");
-  } finally {
-    setSubmitting(false);
-  }
-};
-
-
-  // Determine which step an error belongs to
-  const determineErrorStep = (fieldName) => {
-    const fieldNameStr = Array.isArray(fieldName) ? fieldName.join('.') : fieldName;
+    setSubmitting(true);
     
-    if (['first_name', 'last_name', 'email', 'mobile', 'password', 'confirmPassword'].includes(fieldNameStr) || 
-        fieldNameStr.includes('mobile.')) {
-      return 0; // Step 1
-    } else if (fieldNameStr.includes('store_details.store_name') || 
-               fieldNameStr.includes('store_details.store_type') || 
-               fieldNameStr.includes('store_details.categories')) {
-      return 1; // Step 2
-    } else {
-      return 2; // Step 3
+    try {
+      // Prepare payload matching your API structure
+      const payload = {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        mobile: {
+          country_code: values.mobile.country_code,
+          number: values.mobile.number
+        },
+        password: values.password,
+        confirmPassword: values.confirmPassword,
+        store_details: {
+          store_name: values.store_details.store_name,
+          store_description: values.store_details.store_description,
+          store_type: values.store_details.store_type,
+          store_address: values.store_details.store_address,
+          city: values.store_details.city,
+          country: values.store_details.country,
+          pincode: values.store_details.pincode,
+          categories: values.store_details.categories
+        },
+        registration: {
+          pan_number: values.registration.pan_number,
+          gstin: values.registration.gstin || ''
+        },
+        meta: {
+          agreed_to_terms: values.meta.agreed_to_terms
+        }
+      };
+
+      console.log('Submitting data:', payload);
+      
+      const response = await apiService.post('vendor/b2c', payload);
+      
+      if (response.success) {
+        message.success('Registration submitted successfully!');
+        form.resetFields();
+        setCurrentStep(0);
+      } else {
+        // Handle API validation errors
+        if (response.errors && Array.isArray(response.errors)) {
+          const errorFields = [];
+          response.errors.forEach(error => {
+            errorFields.push({
+              name: error.field,
+              errors: [error.message]
+            });
+          });
+          form.setFields(errorFields);
+          message.error('Please fix the errors in the form');
+        } else {
+          message.error(response.message || 'Registration failed. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      message.error('An error occurred. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   // Handle form submission failure
   const handleFinishFailed = (errorInfo) => {
     console.log('Form submission failed:', errorInfo);
-    message.error('Please fill in all required fields correctly.');
-  };
-
-  // Function to load sample Dubai data
-  const loadDubaiData = () => {
-    const dubaiData = {
-      first_name: "Ahmed",
-      last_name: "Al Mansoori",
-      email: "ahmed@example.com",
-      mobile: {
-        country_code: "+971",
-        number: "501234567"
-      },
-      password: "dubai123",
-      confirmPassword: "dubai123",
-      store_details: {
-        store_name: "Dubai Luxury Store",
-        store_description: "Premium products from Dubai",
-        store_type: "Individual / Sole Proprietor",
-        store_address: "Sheikh Zayed Road",
-        city: "Dubai",
-        country: "United Arab Emirates",
-        pincode: "00000",
-        categories: sampleData.store_details.categories
-      },
-      registration: {
-        pan_number: "TRN123456789",
-        gstin: ""
-      },
-      meta: {
-        agreed_to_terms: true
-      }
-    };
-    
-    form.setFieldsValue(dubaiData);
-    message.success('Loaded Dubai sample data');
   };
 
   return (
@@ -765,29 +591,6 @@ const SellerPage = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Demo Data Buttons */}
-              <div style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
-                <Title level={5} style={{ color: '#fff', marginBottom: 16 }}>
-                  Demo Data
-                </Title>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <Button 
-                    type="dashed" 
-                    onClick={() => form.setFieldsValue(sampleData)}
-                    style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
-                  >
-                    Load Sample Data
-                  </Button>
-                  <Button 
-                    type="dashed" 
-                    onClick={loadDubaiData}
-                    style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
-                  >
-                    Load Dubai Data
-                  </Button>
-                </div>
-              </div>
             </Card>
           </Col>
 
@@ -814,15 +617,6 @@ const SellerPage = () => {
                   }}>
                     Step {currentStep + 1} of {steps.length}
                   </span>
-                </div>
-                <div>
-                  <Button 
-                    type="link" 
-                    onClick={() => console.log('Form Data:', form.getFieldsValue(true))}
-                    size="small"
-                  >
-                    View Data
-                  </Button>
                 </div>
               </div>
 
