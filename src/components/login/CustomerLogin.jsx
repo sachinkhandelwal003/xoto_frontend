@@ -1,8 +1,8 @@
-// src/pages/auth/PartnerLogin.jsx
+// src/pages/auth/CustomerLogin.jsx
 import React, { useState, useContext } from 'react';
 import {
   Form,
-  Input,
+  InputNumber,
   Button,
   Card,
   Typography,
@@ -10,23 +10,20 @@ import {
   message,
   Row,
   Col,
-  Select,
 } from 'antd';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../manageApi/context/AuthContext.jsx';
 import loginimage from '../../assets/img/one.png';
 import logoNew from '../../assets/img/logoNew.png';
-import { RocketOutlined, ShopOutlined, UserOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { UserOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
-const Login = () => {
+const CustomerLogin = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
-  const [partnerType, setPartnerType] = useState('freelancer'); // freelancer or vendor-b2c
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -34,44 +31,24 @@ const Login = () => {
     setLoading(true);
     setGeneralError('');
     try {
-      let endpoint = '';
-      
-      // Determine endpoint based on partner type
-      if (partnerType === 'freelancer') {
-        endpoint = '/freelancer/login';
-      } else if (partnerType === 'vendor-b2c') {
-        endpoint = '/vendor/b2c/login';
-      }
-      
-      await login(endpoint, { email: values.email, password: values.password });
+      const mobile = values.mobile.toString();
+      await login('/users/login/customer', { mobile });
       message.success('Login successful!');
+      // Navigation will be handled by AuthContext useEffect
     } catch (err) {
       const errorMessage = typeof err === 'object' 
-        ? err.message || err.status || 'Invalid credentials' 
-        : err || 'Invalid credentials';
-      setGeneralError(errorMessage);
-      message.error(errorMessage);
+        ? err.message || err.status || 'Login failed'
+        : err || 'Login failed';
+      
+      const msg = errorMessage.includes('not found')
+        ? 'Customer not found. Please register first.'
+        : errorMessage;
+      setGeneralError(msg);
+      message.error(msg);
     } finally {
       setLoading(false);
     }
   };
-
-  const partnerTypes = [
-    {
-      value: 'freelancer',
-      label: 'Execution Partner',
-      desc: 'Provide services and expertise',
-      icon: <UserOutlined />,
-      color: '#5C039B',
-    },
-    {
-      value: 'vendor-b2c',
-      label: 'Strategic Alliances',
-      desc: 'Sell products directly to customers',
-      icon: <ShopOutlined />,
-      color: '#1890ff',
-    },
-  ];
 
   return (
     <div style={{
@@ -120,18 +97,18 @@ const Login = () => {
                 }}
               />
               <Title level={1} style={{ color: '#03A4F4', fontSize: '3.5rem', fontWeight: 800, marginBottom: '1rem' }}>
-                Partner Login
+                Customer Login
               </Title>
               <Text style={{ fontSize: '1.3rem', opacity: 0.9, color: 'white', display: 'block' }}>
-                Welcome back to the Xoto Partner Network
+                Welcome back! Enter your mobile number to access your account
               </Text>
               <div style={{ marginTop: '3rem', textAlign: 'left', background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: '15px' }}>
-                <Title level={4} style={{ color: 'white', marginBottom: '1rem' }}>Partner Benefits</Title>
+                <Title level={4} style={{ color: 'white', marginBottom: '1rem' }}>Why Shop With Us?</Title>
                 <ul style={{ color: 'rgba(255,255,255,0.9)', fontSize: '16px', paddingLeft: '1rem' }}>
-                  <li>Access to exclusive partner tools</li>
-                  <li>Revenue sharing opportunities</li>
-                  <li>Priority support</li>
-                  <li>Marketing resources</li>
+                  <li>Wide selection of products</li>
+                  <li>Secure & easy payments</li>
+                  <li>Fast delivery options</li>
+                  <li>24/7 customer support</li>
                 </ul>
               </div>
             </motion.div>
@@ -187,7 +164,7 @@ const Login = () => {
                     width: '64px',
                     height: '64px',
                     borderRadius: '16px',
-                    background: '#5C039B',
+                    background: '#1890ff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -195,50 +172,13 @@ const Login = () => {
                     fontSize: '28px',
                     margin: '0 auto 1rem',
                   }}>
-                    <RocketOutlined />
+                    <UserOutlined />
                   </div>
                   <Title level={3} style={{ color: '#5C039B', margin: 0 }}>
-                    Partner Login
+                    Customer Login
                   </Title>
                   <Text type="secondary" style={{ display: 'block', marginTop: '0.5rem' }}>
-                    Welcome to the Xoto Partner Network
-                  </Text>
-                </div>
-
-                {/* Partner Type Selection */}
-                <Form.Item
-                  label={<span style={{ color: '#5C039B', fontWeight: 600 }}>Partner Type</span>}
-                  initialValue="freelancer"
-                >
-                  <Select
-                    value={partnerType}
-                    onChange={setPartnerType}
-                    style={{ width: '100%' }}
-                  >
-                    {partnerTypes.map(type => (
-                      <Option key={type.value} value={type.value}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ color: type.color }}>{type.icon}</span>
-                          <span>{type.label}</span>
-                        </div>
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-
-                {/* Partner Type Description */}
-                <div style={{
-                  background: '#f9f0ff',
-                  padding: '1rem',
-                  borderRadius: '10px',
-                  marginBottom: '1.5rem',
-                  borderLeft: `4px solid ${partnerType === 'freelancer' ? '#5C039B' : '#1890ff'}`,
-                }}>
-                  <Text strong style={{ color: partnerType === 'freelancer' ? '#5C039B' : '#1890ff' }}>
-                    {partnerTypes.find(t => t.value === partnerType)?.label}
-                  </Text>
-                  <Text type="secondary" style={{ display: 'block', marginTop: '4px' }}>
-                    {partnerTypes.find(t => t.value === partnerType)?.desc}
+                    Enter your mobile number to continue
                   </Text>
                 </div>
 
@@ -260,31 +200,18 @@ const Login = () => {
                 {/* Login Form */}
                 <Form form={form} onFinish={onFinish} layout="vertical">
                   <Form.Item
-                    name="email"
-                    label={<span style={{ color: '#5C039B', fontWeight: 600 }}>Email</span>}
+                    name="mobile"
+                    label={<span style={{ color: '#5C039B', fontWeight: 600 }}>Mobile Number</span>}
                     rules={[
-                      { required: true, message: 'Please enter your email' },
-                      { type: 'email', message: 'Please enter a valid email' }
+                      { required: true, message: 'Please enter your mobile number' },
+                      { pattern: /^\d{10}$/, message: 'Please enter a valid 10-digit mobile number' }
                     ]}
                   >
-                    <Input
-                      placeholder="you@example.com"
+                    <InputNumber
+                      controls={false}
+                      placeholder="9876543210"
                       style={{
-                        height: '48px',
-                        borderRadius: '10px',
-                        fontSize: '16px',
-                      }}
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="password"
-                    label={<span style={{ color: '#5C039B', fontWeight: 600 }}>Password</span>}
-                    rules={[{ required: true, message: 'Please enter your password' }]}
-                  >
-                    <Input.Password
-                      placeholder="••••••••"
-                      style={{
+                        width: '100%',
                         height: '48px',
                         borderRadius: '10px',
                         fontSize: '16px',
@@ -299,31 +226,25 @@ const Login = () => {
                     block
                     style={{
                       height: '48px',
-                      background: '#5C039B',
+                      background: '#1890ff',
                       borderRadius: '10px',
                       fontSize: '16px',
                       fontWeight: '600',
                       border: 'none',
-                      boxShadow: '0 4px 15px rgba(92,3,155,0.3)',
+                      boxShadow: '0 4px 15px rgba(24,144,255,0.3)',
                     }}
                   >
                     {loading ? 'Signing In...' : 'Login Now'}
                   </Button>
                 </Form>
 
-                {/* Register Links */}
-                <div style={{ marginTop: '1.5rem' }}>
+                {/* Register Link */}
+                <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
                   <Text type="secondary">
                     Don't have an account?{' '}
-                    {partnerType === 'freelancer' ? (
-                      <Link to="/freelancer/registration" style={{ color: '#5C039B', fontWeight: 'bold' }}>
-                        Register as Freelancer
-                      </Link>
-                    ) : (
-                      <Link to="/ecommerce/seller" style={{ color: '#1890ff', fontWeight: 'bold' }}>
-                        Register as Vendor
-                      </Link>
-                    )}
+                    <Link to="/customer/registration" style={{ color: '#1890ff', fontWeight: 'bold' }}>
+                      Register Here
+                    </Link>
                   </Text>
                 </div>
 
@@ -338,7 +259,7 @@ const Login = () => {
                 <Button
                   type="default"
                   block
-                  onClick={() => navigate('/auth/customer/login')}
+                  onClick={() => navigate('/auth/partner/login')}
                   style={{
                     height: '48px',
                     borderRadius: '10px',
@@ -346,7 +267,7 @@ const Login = () => {
                     fontWeight: '600',
                   }}
                 >
-                  Login as Customer
+                  Login as Partner
                 </Button>
               </Card>
             </motion.div>
@@ -357,4 +278,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default CustomerLogin;

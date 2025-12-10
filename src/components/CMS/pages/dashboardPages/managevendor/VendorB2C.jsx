@@ -20,7 +20,6 @@ import { showToast } from "../../../../../manageApi/utils/toast";
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 
-// Role Slug Map
 const roleSlugMap = {
   0: "superadmin",
   1: "admin",
@@ -30,7 +29,6 @@ const roleSlugMap = {
   11: "accountant",
 };
 
-// Permission Hook - Same as others
 const useVendorPermission = () => {
   const { permissions } = useSelector((s) => s.auth);
   const p = permissions?.["Request→All Sellers"] ?? {};
@@ -68,7 +66,6 @@ const VendorB2C = () => {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
-  // Fetch Vendors + Stats
   const fetchVendors = useCallback(
     async (page = 1, limit = 10) => {
       if (!token || !perm.canView) return;
@@ -80,14 +77,30 @@ const VendorB2C = () => {
           page,
           limit,
           status: statusMap[activeTab],
-          role: "Vendor-B2C",
         });
 
-        const data = (res.vendors || []).map((v, i) => ({
-          ...v,
-          key: v._id,
-          sno: (page - 1) * limit + i + 1,
-        }));
+        const data = (res.vendors || []).map((v, i) => {
+          const fullName = `${v.name?.first_name || ""} ${v.name?.last_name || ""}`.trim() || "—";
+          const mobile = v.mobile ? `${v.mobile.country_code}${v.mobile.number}` : "—";
+          const categories = v.store_details?.categories
+            ? v.store_details.categories.map(c => c.name).join(", ")
+            : "—";
+
+          return {
+            ...v,
+            key: v._id,
+            sno: (page - 1) * limit + i + 1,
+            full_name: fullName,
+            email: v.email || "—",
+            mobile: mobile,
+            store_name: v.store_details?.store_name || "—",
+            store_type: v.store_details?.store_type || "—",
+            categories: categories,
+            status: v.status_info?.status || 0,
+            rejection_reason: v.status_info?.rejection_reason || "",
+            created_at: v.meta?.created_at || v.createdAt,
+          };
+        });
 
         setVendors(data);
 
@@ -148,7 +161,10 @@ const VendorB2C = () => {
   };
 
   const handleReject = async () => {
-    if (!rejectionReason.trim()) return;
+    if (!rejectionReason.trim()) {
+      showToast("Rejection reason is required", "error");
+      return;
+    }
     try {
       await apiService.put(`/vendor/b2c/${selectedVendor._id}/status`, {
         status: 2,
@@ -164,21 +180,16 @@ const VendorB2C = () => {
 
   const columns = useMemo(
     () => [
-      {
-        title: "S.No",
-        key: "sno",
-        width: 80,
-        render: (_, r) => <span className="font-medium">{r.sno}</span>,
-      },
+    
       {
         title: "Vendor",
-        width: 250,
+        width: 280,
         render: (_, r) => (
           <div>
-            <div className="font-medium">{r.full_name || "—"}</div>
-            <div className="text-xs text-gray-500">{r.email}</div>
-            <div className="text-xs text-purple-600 mt-1">
-              {r.store_details?.store_name || "No store name"}
+            <div className="font-semibold text-gray-900">{r.full_name}</div>
+            <div className="text-sm text-gray-500">{r.email}</div>
+            <div className="text-xs text-purple-600 font-medium mt-1">
+              {r.store_name}
             </div>
           </div>
         ),
@@ -187,30 +198,39 @@ const VendorB2C = () => {
         title: "Mobile",
         width: 140,
         render: (_, r) => (
-          <Space>
-            {r.mobile || "—"}
-            {r.is_mobile_verified && <Tag color="green">Verified</Tag>}
+          <Space direction="vertical" size={0}>
+            <span>{r.mobile}</span>
+            {r.is_mobile_verified && <Tag color="green" className="text-xs">Verified</Tag>}
           </Space>
+        ),
+      },
+      {
+        title: "Categories",
+        width: 200,
+        render: (_, r) => (
+          <div className="text-sm">
+            {r.categories}
+          </div>
         ),
       },
       {
         title: "Store Type",
         width: 160,
-        render: (_, r) => r.store_details?.store_type || "—",
+        render: (_, r) => r.store_type,
       },
       {
         title: "Status",
-        width: 120,
+        width: 130,
         render: (_, r) => {
-          const status = r.status_info?.status;
+          const status = r.status;
           const map = { 0: "warning", 1: "success", 2: "error" };
           const label = { 0: "Pending", 1: "Approved", 2: "Rejected" };
           return (
             <div>
               <Tag color={map[status]}>{label[status]}</Tag>
-              {status === 2 && r.status_info?.rejection_reason && (
-                <div className="text-xs text-gray-500 mt-1">
-                  {r.status_info.rejection_reason}
+              {status === 2 && r.rejection_reason && (
+                <div className="text-xs text-red-600 mt-1 max-w-xs truncate">
+                  {r.rejection_reason}
                 </div>
               )}
             </div>
@@ -219,20 +239,21 @@ const VendorB2C = () => {
       },
       {
         title: "Registered",
-        width: 130,
+        width: 120,
         render: (_, r) =>
-          r.meta?.created_at
-            ? new Date(r.meta.created_at).toLocaleDateString("en-GB")
+          r.created_at
+            ? new Date(r.created_at).toLocaleDateString("en-GB")
             : "—",
       },
       {
         title: "Actions",
         fixed: "right",
-        width: 200,
+        width: 180,
         render: (_, r) => (
           <Space>
             <Button
               type="link"
+              size="small"
               icon={<FiEye />}
               onClick={() => navigate(`/dashboard/${roleSlug}/seller/${r._id}`)}
             />
@@ -240,6 +261,7 @@ const VendorB2C = () => {
             {activeTab === "pending" && perm.canApprove && (
               <Button
                 type="link"
+                size="small"
                 icon={<FiCheck />}
                 className="text-green-600"
                 onClick={() => handleApprove(r._id)}
@@ -249,6 +271,7 @@ const VendorB2C = () => {
             {activeTab === "pending" && perm.canReject && (
               <Button
                 type="link"
+                size="small"
                 danger
                 icon={<FiX />}
                 onClick={() => openRejectModal(r)}
@@ -257,6 +280,7 @@ const VendorB2C = () => {
 
             <Button
               type="link"
+              size="small"
               icon={<FiShoppingBag />}
               className="text-purple-600"
               onClick={() =>
@@ -274,9 +298,9 @@ const VendorB2C = () => {
 
   if (!perm.canView) {
     return (
-      <div className="p-6 text-center">
-        <h2 className="text-xl font-semibold">Access Denied</h2>
-        <p>You don't have permission to view B2C vendors.</p>
+      <div className="p-10 text-center">
+        <h2 className="text-2xl font-bold text-red-600">Access Denied</h2>
+        <p className="text-gray-600 mt-2">You don't have permission to view B2C vendors.</p>
       </div>
     );
   }
@@ -284,13 +308,20 @@ const VendorB2C = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <Card className="mb-6" bodyStyle={{ padding: "16px 24px" }}>
+      <Card className="mb-6 shadow-sm">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">B2C Vendor Requests</h1>
+            <h1 className="text-2xl font-bold text-gray-900">B2C Vendor Requests</h1>
             <p className="text-gray-500">Manage and approve B2C seller applications</p>
           </div>
-          
+          <Button
+            type="primary"
+            icon={<FiRefreshCw />}
+            onClick={handleRefresh}
+            loading={loading}
+          >
+            Refresh
+          </Button>
         </div>
       </Card>
 
@@ -301,20 +332,20 @@ const VendorB2C = () => {
         <TabPane tab={`Rejected (${stats.rejected})`} key="rejected" />
       </Tabs>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
           { title: "Total Vendors", value: stats.total, icon: FiUser, color: "#5C039B" },
           { title: "Pending", value: stats.pending, icon: FiClock, color: "#ff9800" },
           { title: "Approved", value: stats.approved, icon: FiCheck, color: "#4caf50" },
           { title: "Rejected", value: stats.rejected, icon: FiX, color: "#f44336" },
         ].map((s) => (
-          <Card key={s.title} className="shadow-md">
+          <Card key={s.title} className="shadow-md hover:shadow-lg transition-shadow">
             <Statistic
               title={s.title}
               value={s.value}
-              prefix={<s.icon style={{ color: s.color }} />}
-              valueStyle={{ color: s.color }}
+              prefix={<s.icon className="text-xl" style={{ color: s.color }} />}
+              valueStyle={{ color: s.color, fontWeight: "bold" }}
             />
           </Card>
         ))}
@@ -330,40 +361,43 @@ const VendorB2C = () => {
           currentPage={pagination.currentPage}
           itemsPerPage={pagination.itemsPerPage}
           onPageChange={handlePageChange}
-          scroll={{ x: 1400 }}
+          scroll={{ x: 1500 }}
         />
       </Card>
 
       {/* Reject Modal */}
       <Modal
+        title="Reject Vendor Application"
         open={showRejectModal}
-        title="Reject B2C Vendor"
         onCancel={() => setShowRejectModal(false)}
         footer={null}
+        width={500}
       >
         {selectedVendor && (
-          <>
-            <p className="font-medium mb-4">
-              {selectedVendor.full_name} ({selectedVendor.store_details?.store_name})
+          <div>
+            <p className="mb-4">
+              <strong>Vendor:</strong> {selectedVendor.full_name}<br />
+              <strong>Store:</strong> {selectedVendor.store_name}
             </p>
             <TextArea
               rows={4}
-              placeholder="Enter rejection reason (required)"
+              placeholder="Please provide a reason for rejection (required)"
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
+              className="mb-4"
             />
-            <div className="mt-4 flex justify-end gap-2">
+            <div className="flex justify-end gap-3">
               <Button onClick={() => setShowRejectModal(false)}>Cancel</Button>
               <Button
                 type="primary"
                 danger
-                disabled={!rejectionReason.trim()}
                 onClick={handleReject}
+                disabled={!rejectionReason.trim()}
               >
                 Reject Vendor
               </Button>
             </div>
-          </>
+          </div>
         )}
       </Modal>
     </div>

@@ -28,7 +28,10 @@ import {
   FiEye,
   FiArrowRight 
 } from 'react-icons/fi';
-import { Button, Card, Spin, Avatar, Tag, Modal, Input, Divider, Space, Tooltip, Image, Row, Col } from 'antd';
+import { 
+  Button, Card, Spin, Avatar, Tag, Modal, Input, 
+  Divider, Space, Tooltip, Image, Row, Col, Timeline, Badge 
+} from 'antd';
 
 const { TextArea } = Input;
 
@@ -112,14 +115,54 @@ const VendorB2CProfile = () => {
 
   if (!vendor) return null;
 
+  // Get full name from nested structure
+  const getFullName = () => {
+    if (vendor.name) {
+      return `${vendor.name.first_name} ${vendor.name.last_name || ''}`.trim();
+    }
+    return vendor.full_name || 'N/A';
+  };
+
+  // Get mobile number from nested structure
+  const getMobileNumber = () => {
+    if (vendor.mobile) {
+      if (typeof vendor.mobile === 'object') {
+        return `${vendor.mobile.country_code || ''} ${vendor.mobile.number || ''}`.trim();
+      }
+      return vendor.mobile;
+    }
+    return 'N/A';
+  };
+
   const docs = [
-    { type: 'identity_proof', label: 'Identity Proof', icon: <FiUser /> },
-    { type: 'address_proof', label: 'Address Proof', icon: <FiMapPin /> },
-    { type: 'gst_certificate', label: 'GST Certificate', icon: <FiFileText /> },
-  ].map(item => ({
-    ...item,
-    data: vendor.documents?.[item.type] || null,
-  }));
+    { 
+      type: 'identity_proof', 
+      label: 'Identity Proof', 
+      icon: <FiUser />,
+      data: vendor.documents?.identity_proof || null
+    },
+    { 
+      type: 'address_proof', 
+      label: 'Address Proof', 
+      icon: <FiMapPin />,
+      data: vendor.documents?.address_proof || null
+    },
+    { 
+      type: 'gst_certificate', 
+      label: 'GST Certificate', 
+      icon: <FiFileText />,
+      data: vendor.documents?.gst_certificate || null
+    },
+  ];
+
+  const getStatusInfo = () => {
+    const status = vendor.status_info?.status;
+    if (status === 1) return { text: 'Approved', color: 'green' };
+    if (status === 2) return { text: 'Rejected', color: 'red' };
+    return { text: 'Pending', color: 'orange' };
+  };
+
+  const statusInfo = getStatusInfo();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100">
@@ -136,20 +179,21 @@ const VendorB2CProfile = () => {
               />
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-[#5C039B] to-[#8B3DFF] bg-clip-text text-transparent">
-                  {vendor.store_details?.store_name || 'B2C Vendor Profile'}
+                  {vendor.store_details?.store_name || getFullName()}
                 </h1>
                 <p className="text-gray-600">Complete vendor information & verification</p>
               </div>
             </div>
             <Tag 
-              color={
-                vendor.status_info?.status === 1 ? 'green' : 
-                vendor.status_info?.status === 2 ? 'red' : 'orange'
-              } 
+              color={statusInfo.color}
               className="text-lg px-4 py-2 font-semibold"
             >
-              {vendor.status_info?.status === 0 ? 'Pending' : 
-               vendor.status_info?.status === 1 ? 'Approved' : 'Rejected'}
+              {statusInfo.text}
+              {vendor.status_info?.approved_at && (
+                <span className="ml-2 text-sm font-normal">
+                  • {new Date(vendor.status_info.approved_at).toLocaleDateString()}
+                </span>
+              )}
             </Tag>
           </div>
         </div>
@@ -170,7 +214,7 @@ const VendorB2CProfile = () => {
                   icon={<FiUser />}
                   className="ring-8 ring-white/30 shadow-2xl"
                 />
-                <h2 className="text-2xl font-bold mt-4">{vendor.full_name}</h2>
+                <h2 className="text-2xl font-bold mt-4">{getFullName()}</h2>
                 <p className="opacity-90">{vendor.email}</p>
               </div>
               <div className="p-6 space-y-4">
@@ -180,7 +224,7 @@ const VendorB2CProfile = () => {
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <FiPhone className="text-purple-600 text-lg" />
-                  <span className="text-gray-700">{vendor.mobile}</span>
+                  <span className="text-gray-700">{getMobileNumber()}</span>
                   {vendor.is_mobile_verified && (
                     <Tag color="green" className="ml-auto">Verified</Tag>
                   )}
@@ -211,15 +255,48 @@ const VendorB2CProfile = () => {
                       {doc.icon} {doc.label}
                     </span>
                     <Tag 
-                      color={doc.data?.verified ? 'green' : 'orange'} 
+                      color={doc.data?.verified ? 'green' : doc.data ? 'orange' : 'red'} 
                       className="font-semibold"
                     >
-                      {doc.data?.verified ? 'Verified' : 'Pending'}
+                      {doc.data?.verified ? 'Verified' : doc.data ? 'Pending' : 'Not Uploaded'}
                     </Tag>
                   </div>
                 ))}
               </div>
             </Card>
+
+            {/* Activity Timeline */}
+            {vendor.meta?.change_history && (
+              <Card 
+                title={
+                  <span className="flex items-center gap-2 text-purple-800 font-semibold">
+                    <FiClock className="text-purple-600" /> 
+                    Activity Timeline
+                  </span>
+                } 
+                className="shadow-xl rounded-3xl"
+              >
+                <Timeline
+                  items={vendor.meta.change_history
+                    .slice()
+                    .reverse()
+                    .slice(0, 5)
+                    .map((item, index) => ({
+                      color: index === 0 ? 'green' : 'gray',
+                      children: (
+                        <div key={index}>
+                          <p className="text-sm font-medium">
+                            {item.changes?.[0] || 'Status Updated'}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(item.updated_at).toLocaleString()}
+                          </p>
+                        </div>
+                      ),
+                    }))}
+                />
+              </Card>
+            )}
           </div>
 
           {/* Right Column - Detailed Information */}
@@ -255,66 +332,51 @@ const VendorB2CProfile = () => {
                 <Col xs={24}>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Store Description
+                    </label>
+                    <p className="text-gray-800 font-semibold">
+                      {vendor.store_details?.store_description || '—'}
+                    </p>
+                  </div>
+                </Col>
+                <Col xs={24}>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
                       Store Address
                     </label>
                     <p className="text-gray-800 font-semibold">
                       {vendor.store_details?.store_address || '—'}
+                      {vendor.store_details?.city && `, ${vendor.store_details.city}`}
+                      {vendor.store_details?.country && `, ${vendor.store_details.country}`}
                     </p>
+                    {vendor.store_details?.pincode && (
+                      <p className="text-sm text-gray-600 mt-1">
+                        Pincode: {vendor.store_details.pincode}
+                      </p>
+                    )}
                   </div>
                 </Col>
-                <Col xs={24} sm={12}>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Pincode
-                    </label>
-                    <p className="text-gray-800 font-semibold">
-                      {vendor.store_details?.pincode || '—'}
-                    </p>
-                  </div>
-                </Col>
+                {vendor.store_details?.categories && vendor.store_details.categories.length > 0 && (
+                  <Col xs={24}>
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <label className="block text-sm font-medium text-gray-600 mb-2">
+                        Categories
+                      </label>
+                      <Space wrap>
+                        {vendor.store_details.categories.map(cat => (
+                          <Tag key={cat._id} color="purple">
+                            {cat.name}
+                          </Tag>
+                        ))}
+                      </Space>
+                    </div>
+                  </Col>
+                )}
               </Row>
             </Card>
 
             {/* Bank & Registration Details Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Bank Details Card */}
-              <Card 
-                title={
-                  <span className="flex items-center gap-2 text-purple-800 font-semibold">
-                    <FiCreditCard className="text-purple-600" />
-                    Bank Details
-                  </span>
-                } 
-                className="shadow-xl rounded-3xl border-0"
-              >
-                <Space direction="vertical" className="w-full space-y-3">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Account Number
-                    </label>
-                    <p className="text-gray-800 font-semibold">
-                      {vendor.bank_details?.bank_account_number || '—'}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      IFSC Code
-                    </label>
-                    <p className="text-gray-800 font-semibold">
-                      {vendor.bank_details?.ifsc_code || '—'}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      Account Holder
-                    </label>
-                    <p className="text-gray-800 font-semibold">
-                      {vendor.bank_details?.account_holder_name || '—'}
-                    </p>
-                  </div>
-                </Space>
-              </Card>
-
               {/* Registration Details Card */}
               <Card 
                 title={
@@ -344,6 +406,52 @@ const VendorB2CProfile = () => {
                   </div>
                 </Space>
               </Card>
+
+              {/* Meta Information Card */}
+              <Card 
+                title={
+                  <span className="flex items-center gap-2 text-purple-800 font-semibold">
+                    <FiInfo className="text-purple-600" />
+                    Account Information
+                  </span>
+                } 
+                className="shadow-xl rounded-3xl border-0"
+              >
+                <Space direction="vertical" className="w-full space-y-3">
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Account Created
+                    </label>
+                    <p className="text-gray-800 font-semibold">
+                      {new Date(vendor.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Last Updated
+                    </label>
+                    <p className="text-gray-800 font-semibold">
+                      {new Date(vendor.updatedAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Terms Accepted
+                    </label>
+                    <Tag color={vendor.meta?.agreed_to_terms ? 'green' : 'red'} className="font-semibold">
+                      {vendor.meta?.agreed_to_terms ? 'Yes' : 'No'}
+                    </Tag>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Portal Access
+                    </label>
+                    <Tag color={vendor.meta?.vendor_portal_access ? 'green' : 'orange'} className="font-semibold">
+                      {vendor.meta?.vendor_portal_access ? 'Enabled' : 'Disabled'}
+                    </Tag>
+                  </div>
+                </Space>
+              </Card>
             </div>
           </div>
         </div>
@@ -368,9 +476,11 @@ const VendorB2CProfile = () => {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-purple-700">
-                  {docs.filter(d => d.data?.verified).length} / {docs.length}
+                  {docs.filter(d => d.data?.verified).length} / {docs.filter(d => d.data).length}
                 </div>
-                <div className="text-sm text-gray-500">Documents Verified</div>
+                <div className="text-sm text-gray-500">
+                  {docs.filter(d => d.data).length} Documents Found
+                </div>
               </div>
             </div>
 
@@ -381,18 +491,22 @@ const VendorB2CProfile = () => {
                   const d = doc.data;
                   const isImage = d?.path && /\.(jpg|jpeg|png|webp)$/i.test(d.path);
                   const fileUrl = d?.path ? `https://kotiboxglobaltech.online/api/${d.path}` : null;
+                  const hasDocument = !!d;
 
                   return (
                     <div
                       key={doc.type}
-                      className="flex-shrink-0  bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-2"
+                      className="flex-shrink-0 bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-2"
+                      style={{ width: '350px' }}
                     >
                       {/* Card Header */}
-                      <div className="bg-gradient-to-br from-purple-600 to-fuchsia-600 p-6 text-white text-center relative">
+                      <div className={`p-6 text-white text-center relative ${
+                        hasDocument ? 'bg-gradient-to-br from-purple-600 to-fuchsia-600' : 'bg-gradient-to-br from-gray-600 to-gray-700'
+                      }`}>
                         <div className="text-6xl mb-4 opacity-90">{doc.icon}</div>
                         <h4 className="text-xl font-bold tracking-wide">{doc.label}</h4>
                         <div className="absolute top-4 right-4">
-                          {d ? (
+                          {hasDocument ? (
                             <Tag
                               color={d.verified ? "green" : "orange"}
                               className="px-4 py-1 font-bold text-sm rounded-full shadow-lg"
@@ -405,12 +519,17 @@ const VendorB2CProfile = () => {
                             </Tag>
                           )}
                         </div>
+                        {d?.uploaded_at && (
+                          <p className="text-xs opacity-80 mt-2">
+                            Uploaded: {new Date(d.uploaded_at).toLocaleDateString()}
+                          </p>
+                        )}
                       </div>
 
                       {/* Card Body */}
                       <div className="p-6 space-y-5">
                         {/* Document Preview */}
-                        {d ? (
+                        {hasDocument ? (
                           isImage ? (
                             <div className="relative group cursor-pointer overflow-hidden rounded-2xl">
                               <Image
@@ -428,7 +547,10 @@ const VendorB2CProfile = () => {
                               </div>
                             </div>
                           ) : (
-                            <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
+                            <div 
+                              className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-300 cursor-pointer"
+                              onClick={() => fileUrl && downloadDoc(d.path)}
+                            >
                               <FiFileText className="text-7xl text-gray-400 mb-4" />
                               <p className="text-gray-600 font-medium text-lg">PDF Document</p>
                               <p className="text-gray-500 text-sm mt-2">Click to download</p>
@@ -463,7 +585,7 @@ const VendorB2CProfile = () => {
 
                         {/* Action Buttons */}
                         <div className="flex flex-col gap-3 pt-3">
-                          {d && (
+                          {hasDocument && d.path && (
                             <Button
                               icon={<FiDownload />}
                               block
@@ -475,7 +597,7 @@ const VendorB2CProfile = () => {
                             </Button>
                           )}
 
-                          {d && !d.verified && (
+                          {hasDocument && !d.verified && (
                             <div className="grid grid-cols-2 gap-3">
                               <Button
                                 type="primary"
@@ -495,6 +617,14 @@ const VendorB2CProfile = () => {
                               >
                                 Reject
                               </Button>
+                            </div>
+                          )}
+
+                          {d?.verified && (
+                            <div className="text-center">
+                              <Tag color="green" className="px-4 py-2 text-lg">
+                                ✓ Verified
+                              </Tag>
                             </div>
                           )}
                         </div>

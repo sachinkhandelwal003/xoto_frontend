@@ -1,574 +1,911 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Form, 
+  Input, 
+  Select, 
+  Button, 
+  Steps, 
+  Card, 
+  Row, 
+  Col, 
+  Checkbox,
+  Typography,
+  Alert,
+  Spin,
+  message
+} from 'antd';
+import { 
+  UserOutlined, 
+  ShopOutlined, 
+  FileTextOutlined,
+  CheckCircleOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  SafetyOutlined
+} from '@ant-design/icons';
+import { apiService } from '../../../manageApi/utils/custom.apiservice';
+
+const { Title, Text, Paragraph } = Typography;
+const { Step } = Steps;
+const { TextArea } = Input;
 
 const SellerPage = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    // Basic Information
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-    
-    // Store Information
-    storeName: '',
-    storeCategory: '',
-    storeDescription: '',
-    
-    // Business Information
-    businessType: '',
-    businessRegistrationNumber: '',
-    taxId: '',
-    address: '',
-    city: '',
-    country: '',
-    zipCode: ''
-  });
-
-  const categories = [
-    'Electronics',
-    'Fashion',
-    'Home & Garden',
-    'Beauty & Health',
-    'Sports & Outdoors',
-    'Books & Media',
-    'Toys & Games',
-    'Food & Grocery',
-    'Automotive',
-    'Other'
-  ];
-
-  const businessTypes = [
-    'Sole Proprietorship',
-    'Partnership',
-    'LLC',
-    'Corporation',
-    'Non-profit'
-  ];
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleNext = () => {
-    if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
+  const [form] = Form.useForm();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  
+  // Sample data for testing
+  const sampleData = {
+    first_name: "",
+    last_name: "Sharma",
+    email: "rahul@example.com",
+    mobile: {
+      country_code: "+91",
+      number: "9876543210"
+    },
+    password: "secret123",
+    confirmPassword: "secret123",
+    store_details: {
+      store_name: "Rahul Fashion Store",
+      store_description: "Best clothes in town",
+      store_type: "Individual / Sole Proprietor",
+      store_address: "123 MG Road",
+      city: "Mumbai",
+      country: "India",
+      pincode: "400001",
+      categories: ["68ef95060d671000edce65ab", "68ef95770d671000edce65b4"]
+    },
+    registration: {
+      pan_number: "ABCDE1234F",
+      gstin: "27ABCDE1234F1Z5"
+    },
+    meta: {
+      agreed_to_terms: true
     }
   };
 
-  const handleBack = () => {
-    if (currentStep > 1) {
+  const businessTypes = [
+    { label: 'Individual / Sole Proprietor', value: 'Individual / Sole Proprietor' },
+    { label: 'Partnership', value: 'Partnership' },
+    { label: 'Limited Liability Partnership (LLP)', value: 'Limited Liability Partnership (LLP)' },
+    { label: 'Private Limited Company', value: 'Private Limited Company' },
+    { label: 'Public Limited Company', value: 'Public Limited Company' },
+    { label: 'Non-profit Organization', value: 'Non-profit Organization' }
+  ];
+
+  const countries = [
+    { label: 'India', value: 'India' },
+    { label: 'United Arab Emirates', value: 'United Arab Emirates' },
+    { label: 'United States', value: 'United States' },
+    { label: 'United Kingdom', value: 'United Kingdom' },
+    { label: 'Canada', value: 'Canada' },
+    { label: 'Australia', value: 'Australia' }
+  ];
+
+  // City options based on selected country
+  const cityOptions = {
+    'India': [
+      'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 
+      'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow'
+    ],
+    'United Arab Emirates': [
+      'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah',
+      'Fujairah', 'Umm Al Quwain', 'Al Ain'
+    ],
+    'United States': [
+      'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix',
+      'Philadelphia', 'San Antonio', 'San Diego', 'Dallas'
+    ],
+    'United Kingdom': [
+      'London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds',
+      'Glasgow', 'Bristol', 'Sheffield', 'Edinburgh'
+    ],
+    'Canada': [
+      'Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton',
+      'Ottawa', 'Winnipeg', 'Quebec City', 'Hamilton'
+    ],
+    'Australia': [
+      'Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide',
+      'Gold Coast', 'Canberra', 'Hobart', 'Darwin'
+    ]
+  };
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+    // Populate form with sample data (for testing/demo purposes)
+    populateFormWithSampleData();
+  }, []);
+
+  const fetchCategories = async () => {
+    setLoading(true);
+    try {
+      const response = await apiService.get('categories');
+      if (response.success) {
+        const categoryOptions = response.categories.map(category => ({
+          label: category.parent ? `${category.name} (${category.parent.name})` : category.name,
+          value: category._id
+        }));
+        setCategories(categoryOptions);
+      } else {
+        console.error('Failed to fetch categories:', response.message);
+        message.error('Failed to load categories');
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      message.error('Error loading categories');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Populate form with sample data
+  const populateFormWithSampleData = () => {
+    // Simulate API response with sample data
+    setTimeout(() => {
+      form.setFieldsValue(sampleData);
+    }, 1000);
+  };
+
+  // Password validation rules
+  const passwordRules = [
+    { required: true, message: 'Please input your password!' },
+    { min: 6, message: 'Password must be at least 6 characters!' }
+  ];
+
+  // Email validation rules
+  const emailRules = [
+    { required: true, message: 'Please input your email!' },
+    { type: 'email', message: 'Please enter a valid email address!' }
+  ];
+
+  // Mobile validation rules
+  const mobileRules = [
+    { required: true, message: 'Please input your mobile number!' },
+    { pattern: /^\d{10}$/, message: 'Mobile number must be 10 digits!' }
+  ];
+
+  // Step 1: Personal Information
+  const Step1 = () => (
+    <>
+      <Title level={4} style={{ marginBottom: 24 }}>
+        <UserOutlined /> Personal Information
+      </Title>
+      
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label="First Name"
+            name="first_name"
+            rules={[{ required: true, message: 'Please input your first name!' }]}
+          >
+            <Input placeholder="Enter first name" />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label="Last Name"
+            name="last_name"
+            rules={[{ required: true, message: 'Please input your last name!' }]}
+          >
+            <Input placeholder="Enter last name" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Form.Item
+        label="Email Address"
+        name="email"
+        rules={emailRules}
+      >
+        <Input type="email" placeholder="Enter email address" />
+      </Form.Item>
+
+      <Row gutter={16}>
+        <Col span={6}>
+          <Form.Item
+            label="Country Code"
+            name={['mobile', 'country_code']}
+            initialValue="+91"
+          >
+            <Select>
+              <Select.Option value="+91">India (+91)</Select.Option>
+              <Select.Option value="+971">UAE (+971)</Select.Option>
+              <Select.Option value="+1">USA (+1)</Select.Option>
+              <Select.Option value="+44">UK (+44)</Select.Option>
+              <Select.Option value="+61">Australia (+61)</Select.Option>
+              <Select.Option value="+1">Canada (+1)</Select.Option>
+            </Select>
+          </Form.Item>
+        </Col>
+        <Col span={18}>
+          <Form.Item
+            label="Phone Number"
+            name={['mobile', 'number']}
+            rules={mobileRules}
+          >
+            <Input placeholder="9876543210" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={passwordRules}
+          >
+            <Input.Password placeholder="Enter password" />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label="Confirm Password"
+            name="confirmPassword"
+            dependencies={['password']}
+            rules={[
+              { required: true, message: 'Please confirm your password!' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Passwords do not match!'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password placeholder="Confirm password" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      {/* Demo Data Button */}
+      <div style={{ marginTop: 24, textAlign: 'center' }}>
+        <Button 
+          type="dashed" 
+          onClick={() => form.setFieldsValue(sampleData)}
+          size="small"
+        >
+          Load Sample Data
+        </Button>
+        <Text type="secondary" style={{ display: 'block', marginTop: 8, fontSize: 12 }}>
+          Click to populate form with sample data for testing
+        </Text>
+      </div>
+    </>
+  );
+
+  // Step 2: Store Information
+  const Step2 = () => {
+    const country = Form.useWatch(['store_details', 'country'], form);
+    
+    return (
+      <>
+        <Title level={4} style={{ marginBottom: 24 }}>
+          <ShopOutlined /> Store Information
+        </Title>
+
+        <Form.Item
+          label="Store Name"
+          name={['store_details', 'store_name']}
+          rules={[{ required: true, message: 'Please input your store name!' }]}
+        >
+          <Input placeholder="Enter store name" />
+        </Form.Item>
+
+        <Form.Item
+          label="Business Type"
+          name={['store_details', 'store_type']}
+          rules={[{ required: true, message: 'Please select business type!' }]}
+        >
+          <Select placeholder="Select business type" options={businessTypes} />
+        </Form.Item>
+
+        <Form.Item
+          label="Store Categories"
+          name={['store_details', 'categories']}
+          rules={[{ required: true, message: 'Please select at least one category!' }]}
+        >
+          <Select
+            mode="multiple"
+            placeholder="Select categories"
+            options={categories}
+            loading={loading}
+            optionFilterProp="label"
+            showSearch
+            allowClear
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Store Description"
+          name={['store_details', 'store_description']}
+        >
+          <TextArea 
+            rows={4} 
+            placeholder="Tell customers about your store, products, and brand story..." 
+            maxLength={500}
+            showCount
+          />
+        </Form.Item>
+      </>
+    );
+  };
+
+  // Step 3: Business Details
+  const Step3 = () => {
+    const country = Form.useWatch(['store_details', 'country'], form);
+    
+    return (
+      <>
+        <Title level={4} style={{ marginBottom: 24 }}>
+          <FileTextOutlined /> Business Details
+        </Title>
+
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="PAN Number"
+              name={['registration', 'pan_number']}
+              rules={[{ required: true, message: 'Please input your PAN number!' }]}
+            >
+              <Input placeholder="ABCDE1234F" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="GSTIN (Optional)"
+              name={['registration', 'gstin']}
+            >
+              <Input placeholder="27ABCDE1234F1Z5" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item
+          label="Business Address"
+          name={['store_details', 'store_address']}
+          rules={[{ required: true, message: 'Please input your business address!' }]}
+        >
+          <Input placeholder="Street address, P.O. box, company name" />
+        </Form.Item>
+
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item
+              label="Country"
+              name={['store_details', 'country']}
+              rules={[{ required: true, message: 'Please select your country!' }]}
+            >
+              <Select 
+                placeholder="Select country" 
+                options={countries}
+                onChange={() => {
+                  // Clear city when country changes
+                  form.setFieldsValue({ store_details: { city: undefined } });
+                }}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item
+              label="City"
+              name={['store_details', 'city']}
+              rules={[{ required: true, message: 'Please select your city!' }]}
+            >
+              <Select 
+                placeholder={country ? "Select city" : "Select country first"}
+                disabled={!country}
+                options={country && cityOptions[country] 
+                  ? cityOptions[country].map(city => ({ label: city, value: city }))
+                  : []
+                }
+                showSearch
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item
+              label="PIN Code"
+              name={['store_details', 'pincode']}
+              rules={[{ required: true, message: 'Please input your PIN code!' }]}
+            >
+              <Input placeholder="Enter PIN code" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item
+          name={['meta', 'agreed_to_terms']}
+          valuePropName="checked"
+          rules={[
+            {
+              validator: (_, value) =>
+                value ? Promise.resolve() : Promise.reject(new Error('You must agree to the terms and conditions')),
+            },
+          ]}
+        >
+          <Checkbox>
+            I agree to the{' '}
+            <a href="/terms" target="_blank" rel="noopener noreferrer">
+              Terms and Conditions
+            </a>
+            {' '}and{' '}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </a>
+            . I confirm that all information provided is accurate and complete.
+          </Checkbox>
+        </Form.Item>
+
+        {/* JSON Preview */}
+        <div style={{ marginTop: 32, padding: 16, background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 6 }}>
+          <Title level={5} style={{ marginBottom: 12 }}>
+            <FileTextOutlined /> Form Data Preview
+          </Title>
+          <pre style={{ 
+            background: '#fafafa', 
+            padding: 16, 
+            borderRadius: 4,
+            fontSize: 12,
+            maxHeight: 200,
+            overflow: 'auto'
+          }}>
+            {JSON.stringify(form.getFieldsValue(true), null, 2)}
+          </pre>
+          <Button 
+            type="dashed" 
+            onClick={() => {
+              const data = form.getFieldsValue(true);
+              console.log('Form Data:', data);
+              message.success('Data logged to console');
+            }}
+            size="small"
+            style={{ marginTop: 8 }}
+          >
+            Log Form Data to Console
+          </Button>
+        </div>
+      </>
+    );
+  };
+
+  // Steps configuration
+  const steps = [
+    {
+      title: 'Personal Info',
+      content: <Step1 />,
+      icon: <UserOutlined />,
+    },
+    {
+      title: 'Store Setup',
+      content: <Step2 />,
+      icon: <ShopOutlined />,
+    },
+    {
+      title: 'Business Details',
+      content: <Step3 />,
+      icon: <FileTextOutlined />,
+    },
+  ];
+
+  // Handle next step
+  const handleNext = async () => {
+    try {
+      // Validate current step fields
+      const fields = getStepFields(currentStep);
+      await form.validateFields(fields);
+      
+      if (currentStep < steps.length - 1) {
+        setCurrentStep(currentStep + 1);
+      }
+    } catch (error) {
+      console.error('Validation failed:', error);
+    }
+  };
+
+  // Handle previous step
+  const handlePrev = () => {
+    if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    alert('Registration submitted successfully!');
-    // Add your API call here
+  // Get fields for current step
+  const getStepFields = (stepIndex) => {
+    const stepFields = {
+      0: ['first_name', 'last_name', 'email', ['mobile', 'country_code'], ['mobile', 'number'], 'password', 'confirmPassword'],
+      1: [['store_details', 'store_name'], ['store_details', 'store_type'], ['store_details', 'categories']],
+      2: [['registration', 'pan_number'], ['store_details', 'store_address'], ['store_details', 'city'], ['store_details', 'country'], ['store_details', 'pincode'], ['meta', 'agreed_to_terms']]
+    };
+    return stepFields[stepIndex] || [];
   };
 
-  const StepCard = () => (
-    <div className="bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 rounded-2xl p-8 md:p-10 h-full text-white shadow-2xl">
-      <div className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold mb-3">Become a Vendor</h1>
-        <p className="text-purple-200 opacity-90">
-          Join our marketplace in just 3 simple steps
-        </p>
-      </div>
+  // Handle form submission
+  const handleSubmit = async (values) => {
+  setSubmitting(true);
 
-      {/* Steps with icons */}
-      <div className="space-y-8">
-        {/* Step 1 */}
-        <div className={`flex items-start space-x-4 p-4 rounded-xl transition-all duration-300 ${currentStep >= 1 ? 'bg-white/10 backdrop-blur-sm' : 'opacity-70'}`}>
-          <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= 1 ? 'bg-white text-purple-700' : 'bg-purple-700/50'}`}>
-            {currentStep >= 1 ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-            ) : (
-              <span className="text-lg font-bold">1</span>
-            )}
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-1">Basic Information</h3>
-            <p className="text-purple-200 text-sm opacity-90">
-              Provide your personal details and contact information
-            </p>
-          </div>
-        </div>
+  try {
+    const payload = {
+      first_name: values.first_name,
+      last_name: values.last_name,
+      email: values.email,
+      mobile: {
+        country_code: values.mobile.country_code,
+        number: values.mobile.number
+      },
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+      store_details: {
+        store_name: values.store_details.store_name,
+        store_description: values.store_details.store_description,
+        store_type: values.store_details.store_type,
+        store_address: values.store_details.store_address,
+        city: values.store_details.city,
+        country: values.store_details.country,
+        pincode: values.store_details.pincode,
+        categories: values.store_details.categories
+      },
+      registration: {
+        pan_number: values.registration.pan_number,
+        gstin: values.registration.gstin || ''
+      },
+      meta: {
+        agreed_to_terms: values.meta.agreed_to_terms
+      }
+    };
 
-        {/* Step 2 */}
-        <div className={`flex items-start space-x-4 p-4 rounded-xl transition-all duration-300 ${currentStep >= 2 ? 'bg-white/10 backdrop-blur-sm' : 'opacity-70'}`}>
-          <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= 2 ? 'bg-white text-purple-700' : 'bg-purple-700/50'}`}>
-            {currentStep >= 2 ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-            ) : (
-              <span className="text-lg font-bold">2</span>
-            )}
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-1">Store Setup</h3>
-            <p className="text-purple-200 text-sm opacity-90">
-              Tell us about your store name and what you'll be selling
-            </p>
-          </div>
-        </div>
+    console.log("📦 FINAL API PAYLOAD →", JSON.parse(JSON.stringify(payload)));
+    console.log("📌 Categories sent →", payload.store_details.categories);
 
-        {/* Step 3 */}
-        <div className={`flex items-start space-x-4 p-4 rounded-xl transition-all duration-300 ${currentStep >= 3 ? 'bg-white/10 backdrop-blur-sm' : 'opacity-70'}`}>
-          <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= 3 ? 'bg-white text-purple-700' : 'bg-purple-700/50'}`}>
-            {currentStep >= 3 ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-            ) : (
-              <span className="text-lg font-bold">3</span>
-            )}
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-1">Business Details</h3>
-            <p className="text-purple-200 text-sm opacity-90">
-              Enter your business registration and tax information
-            </p>
-          </div>
-        </div>
-      </div>
+    const response = await apiService.post('vendor/b2c', payload);
 
-      {/* Progress bar */}
-      <div className="mt-12">
-        <div className="flex justify-between text-sm mb-2">
-          <span>Progress</span>
-          <span>{Math.round((currentStep / 3) * 100)}%</span>
-        </div>
-        <div className="h-2 bg-purple-700/50 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-white rounded-full transition-all duration-500"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
-          ></div>
-        </div>
-      </div>
+    if (response.success) {
+      message.success("Registration submitted successfully!");
+      form.resetFields();
+      setCurrentStep(0);
+    }
+  } catch (error) {
+    console.error("❌ Registration Error:", error);
+    message.error("An error occurred. Please try again.");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
-      {/* Benefits */}
-      <div className="mt-12 pt-8 border-t border-purple-700/50">
-        <h4 className="text-lg font-semibold mb-4">Why Join Us?</h4>
-        <ul className="space-y-3">
-          <li className="flex items-center text-sm">
-            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-            </svg>
-            Zero commission for first 3 months
-          </li>
-          <li className="flex items-center text-sm">
-            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-            </svg>
-            Marketing support & promotion
-          </li>
-          <li className="flex items-center text-sm">
-            <svg className="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-            </svg>
-            Real-time analytics dashboard
-          </li>
-        </ul>
-      </div>
-    </div>
-  );
 
-  const Step1 = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-purple-800 mb-2">Personal Information</h2>
-      <p className="text-gray-600 mb-6">Tell us about yourself</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            First Name *
-          </label>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Last Name *
-          </label>
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-            required
-          />
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Email Address *
-        </label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleInputChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Phone Number *
-        </label>
-        <input
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleInputChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-          required
-        />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Password *
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Confirm Password *
-          </label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-            required
-          />
-        </div>
-      </div>
-    </div>
-  );
+  // Determine which step an error belongs to
+  const determineErrorStep = (fieldName) => {
+    const fieldNameStr = Array.isArray(fieldName) ? fieldName.join('.') : fieldName;
+    
+    if (['first_name', 'last_name', 'email', 'mobile', 'password', 'confirmPassword'].includes(fieldNameStr) || 
+        fieldNameStr.includes('mobile.')) {
+      return 0; // Step 1
+    } else if (fieldNameStr.includes('store_details.store_name') || 
+               fieldNameStr.includes('store_details.store_type') || 
+               fieldNameStr.includes('store_details.categories')) {
+      return 1; // Step 2
+    } else {
+      return 2; // Step 3
+    }
+  };
 
-  const Step2 = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-purple-800 mb-2">Store Information</h2>
-      <p className="text-gray-600 mb-6">Create your store identity</p>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Store Name *
-        </label>
-        <input
-          type="text"
-          name="storeName"
-          value={formData.storeName}
-          onChange={handleInputChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Store Category *
-        </label>
-        <select
-          name="storeCategory"
-          value={formData.storeCategory}
-          onChange={handleInputChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition appearance-none bg-white"
-          required
-        >
-          <option value="">Select a category</option>
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Store Description
-        </label>
-        <textarea
-          name="storeDescription"
-          value={formData.storeDescription}
-          onChange={handleInputChange}
-          rows="4"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-          placeholder="Tell customers about your store, products, and brand story..."
-        ></textarea>
-        <p className="text-xs text-gray-500 mt-1">Maximum 500 characters</p>
-      </div>
-    </div>
-  );
+  // Handle form submission failure
+  const handleFinishFailed = (errorInfo) => {
+    console.log('Form submission failed:', errorInfo);
+    message.error('Please fill in all required fields correctly.');
+  };
 
-  const Step3 = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-purple-800 mb-2">Business Details</h2>
-      <p className="text-gray-600 mb-6">Legal and tax information</p>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Business Type *
-        </label>
-        <select
-          name="businessType"
-          value={formData.businessType}
-          onChange={handleInputChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition appearance-none bg-white"
-          required
-        >
-          <option value="">Select business type</option>
-          {businessTypes.map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Business Registration Number
-          </label>
-          <input
-            type="text"
-            name="businessRegistrationNumber"
-            value={formData.businessRegistrationNumber}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-            placeholder="e.g., 123456789"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tax ID / VAT Number
-          </label>
-          <input
-            type="text"
-            name="taxId"
-            value={formData.taxId}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-            placeholder="e.g., GB123456789"
-          />
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Business Address *
-        </label>
-        <input
-          type="text"
-          name="address"
-          value={formData.address}
-          onChange={handleInputChange}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition mb-4"
-          required
-          placeholder="Street address, P.O. box, company name"
-        />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            City *
-          </label>
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Country *
-          </label>
-          <select
-            name="country"
-            value={formData.country}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition appearance-none bg-white"
-            required
-          >
-            <option value="">Select country</option>
-            <option value="US">United States</option>
-            <option value="UK">United Kingdom</option>
-            <option value="CA">Canada</option>
-            <option value="AU">Australia</option>
-            <option value="IN">India</option>
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            ZIP Code *
-          </label>
-          <input
-            type="text"
-            name="zipCode"
-            value={formData.zipCode}
-            onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
-            required
-          />
-        </div>
-      </div>
-    </div>
-  );
+  // Function to load sample Dubai data
+  const loadDubaiData = () => {
+    const dubaiData = {
+      first_name: "Ahmed",
+      last_name: "Al Mansoori",
+      email: "ahmed@example.com",
+      mobile: {
+        country_code: "+971",
+        number: "501234567"
+      },
+      password: "dubai123",
+      confirmPassword: "dubai123",
+      store_details: {
+        store_name: "Dubai Luxury Store",
+        store_description: "Premium products from Dubai",
+        store_type: "Individual / Sole Proprietor",
+        store_address: "Sheikh Zayed Road",
+        city: "Dubai",
+        country: "United Arab Emirates",
+        pincode: "00000",
+        categories: sampleData.store_details.categories
+      },
+      registration: {
+        pan_number: "TRN123456789",
+        gstin: ""
+      },
+      meta: {
+        agreed_to_terms: true
+      }
+    };
+    
+    form.setFieldsValue(dubaiData);
+    message.success('Loaded Dubai sample data');
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div style={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      padding: '40px 20px'
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 80,
+            height: 80,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '50%',
+            marginBottom: 20
+          }}>
+            <ShopOutlined style={{ fontSize: 36, color: '#fff' }} />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <Title level={2} style={{ color: '#fff', marginBottom: 8 }}>
             Vendor Registration
-          </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          </Title>
+          <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16 }}>
             Complete your registration in 3 simple steps to start selling on our platform
-          </p>
+          </Text>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Card - Steps */}
-          <div className="lg:col-span-1">
-            <StepCard />
-          </div>
+        <Row gutter={[32, 32]}>
+          {/* Left Sidebar - Steps */}
+          <Col xs={24} lg={8}>
+            <Card
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                height: '100%'
+              }}
+              bodyStyle={{ padding: 32, height: '100%' }}
+            >
+              <Title level={3} style={{ color: '#fff', marginBottom: 24 }}>
+                Become a Vendor
+              </Title>
+              
+              <Steps
+                direction="vertical"
+                current={currentStep}
+                style={{ marginBottom: 40 }}
+                items={steps.map((step, index) => ({
+                  title: (
+                    <Text style={{ 
+                      color: currentStep >= index ? '#fff' : 'rgba(255,255,255,0.7)',
+                      fontSize: 16,
+                      fontWeight: currentStep >= index ? 600 : 400
+                    }}>
+                      {step.title}
+                    </Text>
+                  ),
+                  description: (
+                    <Text style={{ 
+                      color: currentStep >= index ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
+                      fontSize: 14
+                    }}>
+                      {index === 0 && 'Provide your personal details and contact information'}
+                      {index === 1 && 'Tell us about your store name and what you\'ll be selling'}
+                      {index === 2 && 'Enter your business registration and tax information'}
+                    </Text>
+                  ),
+                  icon: (
+                    <div style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      background: currentStep >= index ? '#fff' : 'rgba(255,255,255,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: currentStep >= index ? '#667eea' : 'rgba(255,255,255,0.7)'
+                    }}>
+                      {currentStep > index ? <CheckCircleOutlined /> : step.icon}
+                    </div>
+                  ),
+                  status: currentStep >= index ? 'finish' : 'wait'
+                }))}
+              />
 
-          {/* Right Card - Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 h-full">
-              <div className="mb-2 flex items-center justify-between">
+              {/* Progress Section */}
+              <div style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)' }}>Progress</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)' }}>
+                    {Math.round(((currentStep + 1) / steps.length) * 100)}%
+                  </Text>
+                </div>
+                <div style={{
+                  height: 6,
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: 3,
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    height: '100%',
+                    background: '#fff',
+                    borderRadius: 3,
+                    width: `${((currentStep + 1) / steps.length) * 100}%`,
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
+              </div>
+
+              {/* Benefits Section */}
+              <div style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+                <Title level={5} style={{ color: '#fff', marginBottom: 16 }}>
+                  Why Join Us?
+                </Title>
+                <div style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+                    <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
+                    <Text>Zero commission for first 3 months</Text>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+                    <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
+                    <Text>Marketing support & promotion</Text>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <CheckCircleOutlined style={{ color: '#52c41a', marginRight: 8 }} />
+                    <Text>Real-time analytics dashboard</Text>
+                  </div>
+                </div>
+              </div>
+
+              {/* Demo Data Buttons */}
+              <div style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+                <Title level={5} style={{ color: '#fff', marginBottom: 16 }}>
+                  Demo Data
+                </Title>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <Button 
+                    type="dashed" 
+                    onClick={() => form.setFieldsValue(sampleData)}
+                    style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
+                  >
+                    Load Sample Data
+                  </Button>
+                  <Button 
+                    type="dashed" 
+                    onClick={loadDubaiData}
+                    style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
+                  >
+                    Load Dubai Data
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </Col>
+
+          {/* Right Side - Form */}
+          <Col xs={24} lg={16}>
+            <Card
+              style={{
+                borderRadius: 12,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                height: '100%'
+              }}
+              bodyStyle={{ padding: 40 }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
                 <div>
-                  <span className="inline-block px-4 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-2">
-                    Step {currentStep} of 3
+                  <span style={{
+                    display: 'inline-block',
+                    padding: '4px 16px',
+                    background: '#f0f5ff',
+                    color: '#2f54eb',
+                    borderRadius: 20,
+                    fontSize: 14,
+                    fontWeight: 500
+                  }}>
+                    Step {currentStep + 1} of {steps.length}
                   </span>
                 </div>
-               
+                <div>
+                  <Button 
+                    type="link" 
+                    onClick={() => console.log('Form Data:', form.getFieldsValue(true))}
+                    size="small"
+                  >
+                    View Data
+                  </Button>
+                </div>
               </div>
 
-              <form onSubmit={handleSubmit}>
-                <div className="mb-8">
-                  {currentStep === 1 && <Step1 />}
-                  {currentStep === 2 && <Step2 />}
-                  {currentStep === 3 && <Step3 />}
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+                onFinishFailed={handleFinishFailed}
+                initialValues={{
+                  mobile: { country_code: '+91' },
+                  meta: { agreed_to_terms: false }
+                }}
+                scrollToFirstError
+              >
+                {/* Current Step Content */}
+                <div style={{ marginBottom: 40 }}>
+                  {steps[currentStep].content}
                 </div>
-                
+
                 {/* Navigation Buttons */}
-                <div className="flex justify-between pt-8 border-t border-gray-200">
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className={`flex items-center px-6 py-3 rounded-lg font-medium transition-all ${currentStep === 1 
-                      ? 'opacity-0 cursor-default' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'}`}
-                    disabled={currentStep === 1}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  paddingTop: 32,
+                  borderTop: '1px solid #f0f0f0'
+                }}>
+                  <Button
+                    icon={<ArrowLeftOutlined />}
+                    onClick={handlePrev}
+                    disabled={currentStep === 0}
+                    size="large"
                   >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
                     Back
-                  </button>
+                  </Button>
                   
-                  {currentStep < 3 ? (
-                    <button
-                      type="button"
+                  {currentStep < steps.length - 1 ? (
+                    <Button
+                      type="primary"
+                      icon={<ArrowRightOutlined />}
                       onClick={handleNext}
-                      className="flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all hover:shadow-lg"
+                      size="large"
                     >
                       Continue
-                      <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                      </svg>
-                    </button>
+                    </Button>
                   ) : (
-                    <button
-                      type="submit"
-                      className="flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all hover:shadow-lg hover:scale-105"
+                    <Button
+                      type="primary"
+                      icon={<CheckCircleOutlined />}
+                      htmlType="submit"
+                      loading={submitting}
+                      size="large"
                     >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                      </svg>
                       Complete Registration
-                    </button>
+                    </Button>
                   )}
                 </div>
-              </form>
 
-              {/* Footer */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-                  <div className="mb-4 md:mb-0">
-                    <p className="flex items-center">
-                      <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                      </svg>
-                      Your information is secure and encrypted
-                    </p>
-                  </div>
-                  <div className="text-center md:text-right">
-                    <p>
-                      Already have an account?{' '}
-                      <a href="/login" className="text-purple-600 hover:text-purple-800 font-medium">
-                        Sign in
-                      </a>
-                    </p>
-                    <p className="text-xs mt-1 text-gray-500">
-                      By registering, you agree to our Terms & Privacy Policy
-                    </p>
-                  </div>
+                {/* Footer */}
+                <div style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid #f0f0f0' }}>
+                  <Row justify="space-between" align="middle">
+                    <Col>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <SafetyOutlined style={{ color: '#52c41a', marginRight: 8 }} />
+                        <Text type="secondary">Your information is secure and encrypted</Text>
+                      </div>
+                    </Col>
+                    <Col>
+                      <div style={{ textAlign: 'right' }}>
+                        <Text type="secondary">
+                          Already have an account?{' '}
+                          <a href="/login" style={{ fontWeight: 500 }}>Sign in</a>
+                        </Text>
+                        <div style={{ fontSize: 12, color: '#bfbfbf', marginTop: 4 }}>
+                          By registering, you agree to our Terms & Privacy Policy
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              </Form>
+            </Card>
+          </Col>
+        </Row>
       </div>
     </div>
   );

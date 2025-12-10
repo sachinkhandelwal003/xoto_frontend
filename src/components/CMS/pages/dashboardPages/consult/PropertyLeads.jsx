@@ -7,7 +7,8 @@ import {
 import {
   PhoneOutlined, MailOutlined, UserOutlined,
   HomeOutlined, DollarCircleOutlined, CalendarOutlined,
-  CheckCircleOutlined, EyeOutlined, DeleteOutlined, BellOutlined
+  CheckCircleOutlined, EyeOutlined, DeleteOutlined, BellOutlined,
+  UsergroupAddOutlined, BankOutlined
 } from '@ant-design/icons';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
 import { showSuccessAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
@@ -16,7 +17,9 @@ import CustomTable from '../../../pages/custom/CustomTable';
 const typeConfig = {
   buy: { label: 'Buy Property', color: 'blue', icon: <HomeOutlined /> },
   sell: { label: 'Sell Property', color: 'purple', icon: <DollarCircleOutlined /> },
-  schedule_visit: { label: 'Schedule Visit', color: 'orange', icon: <CalendarOutlined /> }
+  schedule_visit: { label: 'Schedule Visit', color: 'orange', icon: <CalendarOutlined /> },
+  rent: { label: 'Rent Property', color: 'cyan', icon: <BankOutlined /> },
+  partner: { label: 'Partner', color: 'green', icon: <UsergroupAddOutlined /> }
 };
 
 const statusConfig = {
@@ -103,6 +106,14 @@ const PropertyLeads = () => {
     }
   };
 
+  const getFullName = (record) => {
+    if (record.full_name) return record.full_name;
+    if (record.name && record.name.first_name) {
+      return `${record.name.first_name} ${record.name.last_name || ''}`.trim();
+    }
+    return 'N/A';
+  };
+
   const columns = [
     {
       title: 'Name',
@@ -111,7 +122,7 @@ const PropertyLeads = () => {
           <Avatar size="small" icon={<UserOutlined />} />
           <div>
             <div className="font-medium">
-              {record.full_name || `${record.name.first_name} ${record.name.last_name}`}
+              {getFullName(record)}
             </div>
             <div className="text-xs text-gray-500">
               {new Date(record.createdAt).toLocaleDateString()}
@@ -123,7 +134,7 @@ const PropertyLeads = () => {
     {
       title: 'Type',
       render: (_, record) => {
-        const config = typeConfig[record.type];
+        const config = typeConfig[record.type] || { label: 'Unknown', color: 'default', icon: <UserOutlined /> };
         return <Tag icon={config.icon} color={config.color}>{config.label}</Tag>;
       }
     },
@@ -131,15 +142,15 @@ const PropertyLeads = () => {
       title: 'Contact',
       render: (_, record) => (
         <Space direction="vertical" size={0}>
-          <Space><MailOutlined className="text-gray-500" /> {record.email}</Space>
-          <Space><PhoneOutlined className="text-gray-500" /> {record.mobile?.country_code || '+91'} {record.mobile?.number}</Space>
+          <Space><MailOutlined className="text-gray-500" /> {record.email || 'N/A'}</Space>
+          <Space><PhoneOutlined className="text-gray-500" /> {record.mobile?.country_code || ''} {record.mobile?.number || 'N/A'}</Space>
         </Space>
       )
     },
     {
       title: 'Status',
       render: (_, record) => {
-        const config = statusConfig[record.status];
+        const config = statusConfig[record.status] || { label: 'Unknown', color: 'default', icon: <BellOutlined /> };
         return <Tag icon={config.icon} color={config.color}>{config.label}</Tag>;
       }
     },
@@ -204,11 +215,78 @@ const PropertyLeads = () => {
     }))
   ];
 
+  const renderTypeSpecificDetails = (lead) => {
+    switch (lead.type) {
+      case 'buy':
+        return (
+          <Card title="Looking For">
+            <Descriptions bordered column={1} size="small">
+              <Descriptions.Item label="Country">{lead.country || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Preferred City">{lead.preferred_city || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Budget">{lead.budget || 'N/A'}</Descriptions.Item>
+            </Descriptions>
+          </Card>
+        );
+
+      case 'sell':
+        return (
+          <Card title="Property Details">
+            <Descriptions bordered column={1} size="small">
+              <Descriptions.Item label="Country">{lead.country || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Preferred City">{lead.preferred_city || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Budget">{lead.budget || 'N/A'}</Descriptions.Item>
+              {lead.project_name && <Descriptions.Item label="Project">{lead.project_name}</Descriptions.Item>}
+              {lead.unit_type && <Descriptions.Item label="Unit Type">{lead.unit_type}</Descriptions.Item>}
+              {lead.bedroom_config && <Descriptions.Item label="Bedroom Config">{lead.bedroom_config}</Descriptions.Item>}
+              {lead.price && <Descriptions.Item label="Price">AED {lead.price.toLocaleString()}</Descriptions.Item>}
+              {lead.size_sqft && <Descriptions.Item label="Size">{lead.size_sqft} Sq.ft</Descriptions.Item>}
+              {lead.description && <Descriptions.Item label="Description">{lead.description}</Descriptions.Item>}
+            </Descriptions>
+          </Card>
+        );
+
+      case 'schedule_visit':
+        return (
+          <Card title="Visit Request">
+            <Descriptions bordered column={1} size="small">
+              <Descriptions.Item label="Occupation">{lead.occupation || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Location">{lead.location || 'N/A'}</Descriptions.Item>
+            </Descriptions>
+          </Card>
+        );
+
+      case 'rent':
+        return (
+          <Card title="Rental Requirements">
+            <Descriptions bordered column={1} size="small">
+              <Descriptions.Item label="Country">{lead.country || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Preferred City">{lead.preferred_city || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Budget">{lead.budget || 'N/A'}</Descriptions.Item>
+            </Descriptions>
+          </Card>
+        );
+
+      case 'partner':
+        return (
+          <Card title="Partner Details">
+            <Descriptions bordered column={1} size="small">
+              <Descriptions.Item label="Company">{lead.company || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Stakeholder Type">{lead.stakeholder_type || 'N/A'}</Descriptions.Item>
+              <Descriptions.Item label="Message">{lead.message || 'N/A'}</Descriptions.Item>
+            </Descriptions>
+          </Card>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Property Leads</h1>
-        <p className="text-gray-600 mt-1">Manage all Buy, Sell & Visit requests</p>
+        <p className="text-gray-600 mt-1">Manage all Buy, Sell, Rent & Partner requests</p>
       </div>
 
       {/* New Leads Alert */}
@@ -230,7 +308,7 @@ const PropertyLeads = () => {
         <Row gutter={16} align="middle">
           <Col flex="auto">
             <Input.Search
-              placeholder="Search by name, email, mobile, project..."
+              placeholder="Search by name, email, mobile, company..."
               allowClear
               size="large"
               value={searchTerm}
@@ -259,7 +337,7 @@ const PropertyLeads = () => {
 
       {/* Detail Drawer */}
       <Drawer
-        title="Property Lead Details"
+        title="Lead Details"
         placement="right"
         width={650}
         onClose={() => setDrawerVisible(false)}
@@ -270,9 +348,12 @@ const PropertyLeads = () => {
             <div className="flex items-center space-x-4">
               <Avatar size={70} icon={<UserOutlined />} />
               <div>
-                <h3 className="text-2xl font-bold">{selectedLead.full_name}</h3>
-                <Tag icon={typeConfig[selectedLead.type].icon} color={typeConfig[selectedLead.type].color}>
-                  {typeConfig[selectedLead.type].label}
+                <h3 className="text-2xl font-bold">{getFullName(selectedLead)}</h3>
+                <Tag 
+                  icon={typeConfig[selectedLead.type]?.icon || <UserOutlined />} 
+                  color={typeConfig[selectedLead.type]?.color || 'default'}
+                >
+                  {typeConfig[selectedLead.type]?.label || 'Unknown Type'}
                 </Tag>
                 <p className="text-gray-500 mt-1">
                   Submitted: {new Date(selectedLead.createdAt).toLocaleString()}
@@ -282,45 +363,26 @@ const PropertyLeads = () => {
 
             <Descriptions bordered column={1}>
               <Descriptions.Item label="Email">
-                <Space><MailOutlined /> {selectedLead.email}</Space>
+                <Space><MailOutlined /> {selectedLead.email || 'N/A'}</Space>
               </Descriptions.Item>
               <Descriptions.Item label="Mobile">
-                <Space><PhoneOutlined /> {selectedLead.mobile?.country_code} {selectedLead.mobile?.number}</Space>
+                <Space><PhoneOutlined /> {selectedLead.mobile?.country_code || ''} {selectedLead.mobile?.number || 'N/A'}</Space>
               </Descriptions.Item>
               <Descriptions.Item label="Preferred Contact">
-                <Tag>{selectedLead.preferred_contact?.toUpperCase()}</Tag>
+                <Tag>{selectedLead.preferred_contact?.toUpperCase() || 'N/A'}</Tag>
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag icon={statusConfig[selectedLead.status].icon} color={statusConfig[selectedLead.status].color}>
-                  {statusConfig[selectedLead.status].label}
+                <Tag 
+                  icon={statusConfig[selectedLead.status]?.icon || <BellOutlined />} 
+                  color={statusConfig[selectedLead.status]?.color || 'default'}
+                >
+                  {statusConfig[selectedLead.status]?.label || 'Unknown'}
                 </Tag>
               </Descriptions.Item>
             </Descriptions>
 
             {/* Type-specific Details */}
-            {selectedLead.type === 'buy' && (
-              <Card title="Looking For">
-                <p><strong>Bedrooms:</strong> {selectedLead.desired_bedrooms}</p>
-              </Card>
-            )}
-
-            {selectedLead.type === 'sell' && (
-              <Card title="Property Details">
-                <p><strong>Project:</strong> {selectedLead.project_name || 'N/A'}</p>
-                <p><strong>Location:</strong> {selectedLead.city}, {selectedLead.area}</p>
-                <p><strong>Type:</strong> {selectedLead.unit_type} • {selectedLead.bedroom_config}</p>
-                {selectedLead.price && <p><strong>Price:</strong> AED {selectedLead.price.toLocaleString()}</p>}
-                {selectedLead.size_sqft && <p><strong>Size:</strong> {selectedLead.size_sqft} Sq.ft</p>}
-                {selectedLead.description && <p className="mt-3 italic">"{selectedLead.description}"</p>}
-              </Card>
-            )}
-
-            {selectedLead.type === 'schedule_visit' && (
-              <Card title="Visit Request">
-                <p><strong>Occupation:</strong> {selectedLead.occupation}</p>
-                <p><strong>Location:</strong> {selectedLead.location}</p>
-              </Card>
-            )}
+            {renderTypeSpecificDetails(selectedLead)}
 
             {selectedLead.status === 'submit' && (
               <Button
