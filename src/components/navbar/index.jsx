@@ -197,8 +197,9 @@ const navItems = [
   { title: "Interiors", path: "/services/interior" },
   { title: "Partner Eco-System", path: "/ecosystem" },
   { title: "Xoto Store", path: "/ecommerce/b2c" },
-  { title: "Blogs", path: "/explore" },
+
   { title: "Properties", path: "/marketplace" },
+  { title: "Blogs", path: "/explore" },
 ];
 
 const Navbar = () => {
@@ -265,7 +266,7 @@ const Navbar = () => {
                 to="/mortgage/services"
                 className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-[#5C039B]"
               >
-                Mortgage
+                Mortgages
               </Link>
             </div>
 
@@ -365,7 +366,7 @@ const Navbar = () => {
 
 export default Navbar;
 
-("use client");
+// ("use client");
 
 // import React, { useState, useRef, useEffect } from "react";
 // import { FaBars, FaTimes } from "react-icons/fa";
