@@ -195,11 +195,13 @@ const navItems = [
   { title: "Home", path: "/" },
   { title: "Landscaping", path: "/landscaping" },
   { title: "Interiors", path: "/services/interior" },
+  { title: "Mortgages", path: "/mortgage/services" },
   { title: "Partner Eco-System", path: "/ecosystem" },
   { title: "Xoto Store", path: "/ecommerce/b2c" },
 
   { title: "Properties", path: "/marketplace" },
-  { title: "Blogs", path: "/explore" },
+
+  { title: "Blogs", path: "/explore" }, // ✅ LAST
 ];
 
 const Navbar = () => {
@@ -237,7 +239,9 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"}`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"
+        }`}
       >
         <div className="max-w-8xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between h-12">
@@ -249,7 +253,7 @@ const Navbar = () => {
               </span>
             </Link>
 
-            {/* Desktop Nav */}
+            {/* ---------------- DESKTOP NAV ---------------- */}
             <div className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => (
                 <Link
@@ -260,17 +264,9 @@ const Navbar = () => {
                   {item.title}
                 </Link>
               ))}
-
-              {/* ✅ Mortgage (no dropdown) */}
-              <Link
-                to="/mortgage/services"
-                className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-[#5C039B]"
-              >
-                Mortgages
-              </Link>
             </div>
 
-            {/* Desktop Right */}
+            {/* ---------------- DESKTOP RIGHT ---------------- */}
             <div className="hidden lg:flex items-center space-x-4">
               <div ref={langRef} className="relative">
                 <button
@@ -297,7 +293,7 @@ const Navbar = () => {
                           setSelectedLang(lang);
                           setLangOpen(false);
                         }}
-                        className="flex w-full items-center gap-3 px-4 py-3 hover:bg-[#5C039B]"
+                        className="flex w-full items-center gap-3 px-4 py-3 hover:bg-purple-50"
                       >
                         <div className="w-5 h-5">
                           <lang.Flag />
@@ -321,8 +317,8 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Mobile */}
-            <div className="lg:hidden flex items-center gap-2">
+            {/* ---------------- MOBILE TOGGLE ---------------- */}
+            <div className="lg:hidden">
               <button onClick={() => setMobileOpen(!mobileOpen)}>
                 {mobileOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
               </button>
@@ -330,10 +326,12 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* ---------------- MOBILE MENU ---------------- */}
         <div
           ref={mobileMenuRef}
-          className={`lg:hidden fixed inset-x-0 top-16 bg-white transition-all ${mobileOpen ? "translate-y-0" : "-translate-y-full"}`}
+          className={`lg:hidden fixed inset-x-0 top-16 bg-white transition-all duration-300 ${
+            mobileOpen ? "translate-y-0" : "-translate-y-full"
+          }`}
         >
           <div className="px-4 py-4 space-y-1">
             {navItems.map((item) => (
@@ -346,24 +344,15 @@ const Navbar = () => {
                 {item.title}
               </Link>
             ))}
-
-            {/* ✅ Mobile Mortgage */}
-            <Link
-              to="/mortgage/services"
-              onClick={() => setMobileOpen(false)}
-              className="block px-4 py-3 hover:bg-purple-50"
-            >
-              Mortgage
-            </Link>
           </div>
         </div>
       </nav>
 
+      {/* Spacer */}
       <div className="h-20" />
     </>
   );
 };
-
 export default Navbar;
 
 // ("use client");
