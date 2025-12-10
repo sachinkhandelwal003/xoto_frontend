@@ -93,6 +93,7 @@
     "reactflow": "^11.11.4",
     "recharts": "^3.4.1",
     "redux-persist": "^6.0.0",
+    "rollup": "^4.53.3",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.19",
     "sweetalert2": "^11.22.2",
