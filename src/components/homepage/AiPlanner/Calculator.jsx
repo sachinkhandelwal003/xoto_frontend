@@ -286,7 +286,7 @@ const Calculator = () => {
                          {pkg.popular && <div className="absolute top-0 right-0 bg-gradient-to-l from-purple-600 to-indigo-600 text-white text-xs px-4 py-1 rounded-bl-xl font-bold">POPULAR</div>}
                          <div className={`p-6 ${isSel ? 'bg-purple-50' : 'bg-white'}`}>
                             <Title level={3} className={`m-0 ${isSel ? 'text-purple-700' : 'text-gray-800'}`}>{pkg.name}</Title>
-                            <Text type="secondary" className="text-xs uppercase tracking-wide font-bold mt-2 block">{pkg.price} AED Est.</Text>
+                            {/* <Text type="secondary" className="text-xs uppercase tracking-wide font-bold mt-2 block">{pkg.price} AED Est.</Text> */}
                          </div>
                          <div className="p-6 pt-2 flex-1">
                             <Text type="secondary" className="block mb-4 text-sm min-h-[40px]">{pkg.description}</Text>
@@ -324,7 +324,7 @@ const Calculator = () => {
                         <div className="pt-4 border-t border-purple-600/50">
                             <div className="text-purple-300 text-xs uppercase">Package</div>
                             <div className="text-2xl font-bold text-yellow-400">{pkg?.name}</div>
-                            <div className="opacity-80">{pkg?.price} AED</div>
+                            {/* <div className="opacity-80">{pkg?.price} AED</div> */}
                         </div>
                     </div>
                   </div>
@@ -526,12 +526,12 @@ const Calculator = () => {
                 </Button>
 
                 <div className="flex items-center gap-4">
-                    {activeStep === 3 && (
+                    {/* {activeStep === 3 && (
                         <div className="hidden sm:block text-right mr-2">
                             <div className="text-xs text-gray-400 uppercase">Estimated Total</div>
                             <div className="text-purple-700 font-bold text-lg">{packages.find(p => p._id === selectedPackage)?.price || 0} AED</div>
                         </div>
-                    )}
+                    )} */}
 
                     {activeStep === 4 ? (
                        <span className="text-sm text-gray-400 italic mr-2">Fill the form to submit</span>
