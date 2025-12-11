@@ -63,7 +63,7 @@ import trHome5 from "./locales/tr/home5.json";
 import trFooter from "./locales/tr/footer.json";
 
 /* -----------------------------
-   RUSSIAN (RU)
+   RUSSIAN (RU)addad
 ------------------------------ */
 import ruHome3 from "./locales/ru/home3.json";
 import ruHome4 from "./locales/ru/home4.json";
