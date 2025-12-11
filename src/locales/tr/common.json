@@ -1,0 +1,15 @@
+{
+  "nav": {
+    "home": "Ana Sayfa",
+    "landscaping": "Peyzaj",
+    "interiors": "İç Mekan",
+    "mortgages": "Konut Kredileri",
+    "ecosystem": "Partner Ekosistemi",
+    "store": "Xoto Mağaza",
+    "properties": "İlanlar",
+    "blogs": "Bloglar",
+    "contact": "İletişim",
+    "login": "Giriş Yap",
+    "tagline": "Yapay zeka ile güçlendirilmiş, sizden ilham alan."
+  }
+}

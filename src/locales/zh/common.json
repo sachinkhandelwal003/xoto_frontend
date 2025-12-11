@@ -1,0 +1,15 @@
+{
+  "nav": {
+    "home": "主页",
+    "landscaping": "景观设计",
+    "interiors": "室内设计",
+    "mortgages": "贷款服务",
+    "ecosystem": "合作生态系统",
+    "store": "XOTO 商城",
+    "properties": "物业",
+    "blogs": "博客",
+    "contact": "联系我们",
+    "login": "登录",
+    "tagline": "由 AI 驱动，由您启发。"
+  }
+}

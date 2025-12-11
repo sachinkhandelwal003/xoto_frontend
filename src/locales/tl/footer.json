@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "Isang Pinag-isang Ecosystem <br/> Lumilikha ng Haba-buhay <br/> na Halaga sa Property.",
+    "description": "Scalable. Pinapagana ng AI. Magaang pamahalaan."
+  },
+
+  "titles": {
+    "offerings": "Ating Mga Alok",
+    "resources": "Partner Ecosystem",
+    "knowledge": "Tungkol sa Amin",
+    "location": "Lokasyon",
+    "email": "Email",
+    "contact": "Contact"
+  },
+
+  "offerings": [
+    { "label": "Landscaping", "path": "/landscaping" },
+    { "label": "Interiors", "path": "/interiors" },
+    { "label": "Rentals", "path": "/rentals" },
+    { "label": "Buy", "path": "/buy" },
+    { "label": "Sell", "path": "/sell" },
+    { "label": "Mortgages", "path": "/mortgage/services" }
+  ],
+
+  "resources": [
+    { "label": "Xoto Properties", "path": "/properties" },
+    { "label": "Explore Xoto", "path": "/explore" },
+    { "label": "AI Driven", "path": "/ai" },
+    { "label": "Free Consultation", "path": "/consultation" },
+    { "label": "Hire Freelancers", "path": "/freelancers" }
+  ],
+
+  "knowledge": [
+    { "label": "About Us", "path": "/about" },
+    { "label": "Knowledge Centre", "path": "/knowledge-centre" },
+    { "label": "Our Sustainability Focus", "path": "/sustainability" },
+    { "label": "Submit Your Feedback", "path": "/feedback" },
+    { "label": "Contact Us", "path": "/contact" },
+    { "label": "Privacy Policy", "path": "/privacy" },
+    { "label": "Terms Of Use", "path": "/terms" }
+  ],
+
+  "location": "UAE",
+
+  "email": {
+    "partners": "Para sa Partners:",
+    "customers": "Para sa Customers:"
+  },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "Linkedin", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "©2025 Xoto. Lahat ng karapatan ay nakalaan."
+  }
+}

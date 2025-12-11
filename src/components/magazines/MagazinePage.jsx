@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next"; // ✅ ADD
 import wave1 from "../../assets/img/wave/wave1.png";
-import round from "../../assets/img/round23.mp4"; // ✅ VIDEO IMPORT
+import round from "../../assets/img/round23.mp4";
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/icons/Homeicons/partners.png";
 import vector from "../../assets/icons/Homeicons/Vector.png";
@@ -11,36 +12,38 @@ import finance from "../../assets/icons/Homeicons/finance.png";
 import target from "../../assets/icons/Homeicons/target.png";
 
 const BuiltForEveryone = () => {
+  const { t } = useTranslation("home3"); // ✅ i18n namespace
+
   const cards = [
     {
       icon: rating,
-      title: "Customers",
-      desc: "Reimagine your home and outdoors with effortless, Al-powered landscaping and upgrade solutions.",
+      titleKey: "customers.title",
+      descKey: "customers.desc",
     },
     {
       icon: vector,
-      title: "Business Associates",
-      desc: "Empower your real estate network with Al-driven tools that simplify client management, boost lead conversion, and accelerate deal closures.",
+      titleKey: "business.title",
+      descKey: "business.desc",
     },
     {
       icon: partner,
-      title: "Execution Partner",
-      desc: "Deliver projects efficiently with real-time task allocation, transparent progress tracking, and seamless coordination across landscaping, real estate, and financing workflows.",
+      titleKey: "execution.title",
+      descKey: "execution.desc",
     },
     {
       icon: dollar,
-      title: "Strategic Alliances",
-      desc: "Partner with XOTO to expand market presence through an integrated, growth-focused ecosystem.",
+      titleKey: "alliances.title",
+      descKey: "alliances.desc",
     },
     {
       icon: target,
-      title: "Developers",
-      desc: "Access pre-qualified buyers and accelerate sales with data-driven insights.",
+      titleKey: "developers.title",
+      descKey: "developers.desc",
     },
     {
       icon: finance,
-      title: "Financial Institutions",
-      desc: "Boost mortgage conversions through integrated property and financing solutions.",
+      titleKey: "finance.title",
+      descKey: "finance.desc",
     },
   ];
 
@@ -49,7 +52,6 @@ const BuiltForEveryone = () => {
   const [cardsToShow, setCardsToShow] = useState(2);
   const [activeBtn, setActiveBtn] = useState("right");
 
-  // Detect screen width
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
@@ -61,7 +63,6 @@ const BuiltForEveryone = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Next / Prev
   const nextSlide = () => {
     const maxIndex = cards.length - cardsToShow;
     setCurrentIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
@@ -72,7 +73,6 @@ const BuiltForEveryone = () => {
     setCurrentIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
   };
 
-  // Auto-slide
   useEffect(() => {
     const autoSlide = setInterval(() => {
       const maxIndex = cards.length - cardsToShow;
@@ -84,26 +84,23 @@ const BuiltForEveryone = () => {
 
   return (
     <section className="relative bg-white overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
-      {/* Background Wave */}
       <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0">
         <img
           src={wave1}
           alt=""
-          className="w-[180%] sm:w-[165%] md:w-[150%] lg:w-full -ml-[20%] sm:-ml-[12%] md:-ml-[8%] lg:ml-0 scale-[1.6] sm:scale-[1.4] md:scale-[1.2] lg:scale-100 pointer-events-none select-none"
+          className="w-[180%] sm:w-[165%] md:w-[150%] lg:w-full -ml-[20%] sm:-ml-[12%] md:-ml-[8%] lg:ml-0 scale-[1.6] sm:scale-[1.4] md:scale-[1.2] lg:scale-100"
         />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Title */}
         <h2
           className="text-center mb-12 lg:mb-16 heading-light"
           style={{ color: "var(--color-black)" }}
         >
-          Built For Everyone
+          {t("title")} {/* ✅ i18n title */}
         </h2>
 
         <div className="flex flex-col lg:flex-row items-center justify-between">
-          {/* LEFT VIDEO (replaced image) */}
           <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-25">
             <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
               <video
@@ -112,12 +109,11 @@ const BuiltForEveryone = () => {
                 loop
                 muted
                 playsInline
-                className="w-full  object-contain"
+                className="w-full object-contain"
               />
             </div>
           </div>
 
-          {/* Slider */}
           <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
             <div className="relative w-full max-w-sm lg:max-w-2xl overflow-hidden">
               <div
@@ -146,7 +142,9 @@ const BuiltForEveryone = () => {
                     }}
                   >
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl card-heading">{card.title}</h3>
+                      <h3 className="text-xl card-heading">
+                        {t(card.titleKey)}
+                      </h3>
 
                       <div className="bg-[var(--color-primary)] p-2 rounded-full">
                         <img src={card.icon} alt="" className="w-6 h-6" />
@@ -154,14 +152,13 @@ const BuiltForEveryone = () => {
                     </div>
 
                     <p className="text-sm text-gray-600 leading-relaxed">
-                      {card.desc}
+                      {t(card.descKey)}
                     </p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Navigation Buttons */}
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => {

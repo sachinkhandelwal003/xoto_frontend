@@ -11,60 +11,8 @@ import {
   Phone,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { useTranslation } from "react-i18next"; // ✅ ADDED
 import logoNewImage from "../../assets/img/logoNew.png";
-
-const footerData = {
-  company: {
-    logo: logoNewImage,
-    slogan: (
-      <p>
-        A Unified Ecosystem <br />
-        Creating life time <br /> property Value.
-      </p>
-    ),
-    description: (
-      <p>
-        Scalable. AI–powered. <br />
-        Asset–light.
-      </p>
-    ),
-  },
-
-  offerings: [
-    { label: "Landscaping", path: "/landscaping" },
-    { label: "Interiors", path: "/interiors" },
-    { label: "Rentals", path: "/rentals" },
-    { label: "Buy", path: "/buy" },
-    { label: "Sell", path: "/sell" },
-    { label: "Mortgages", path: "/mortgage/services" },
-    // { label: "Maintenance", path: "/maintenance" },
-  ],
-
-  resources: [
-    { label: "Xoto Properties", path: "/properties" },
-    { label: "Explore Xoto", path: "/explore" },
-    { label: "AI Driven", path: "/ai" },
-    { label: "Free Consultation", path: "/consultation" },
-    { label: "Hire Freelancers", path: "/freelancers" },
-  ],
-
-  knowledge: [
-    { label: "About Us", path: "/about" },
-    { label: "Knowledge Centre", path: "/knowledge-centre" },
-    { label: "Our Sustainability Focus", path: "/sustainability" },
-    { label: "Submit Your Feedback", path: "/feedback" },
-    { label: "Contact Us", path: "/contact" },
-    { label: "Privacy Policy", path: "/privacy" },
-    { label: "Terms Of Use", path: "/terms" },
-  ],
-
-  social: [
-    { name: "Facebook", icon: <Facebook size={18} />, url: "#" },
-    { name: "Instagram", icon: <Instagram size={18} />, url: "#" },
-    { name: "Twitter", icon: <Twitter size={18} />, url: "#" },
-    { name: "Linkedin", icon: <Linkedin size={18} />, url: "#" },
-  ],
-};
 
 const Accordion = ({ title, children, isOpen, toggle }) => (
   <div className="border-b border-purple-500/20 py-2">
@@ -88,29 +36,38 @@ const Accordion = ({ title, children, isOpen, toggle }) => (
   </div>
 );
 
-const Footer = () => {
-  const { company, offerings, resources, knowledge, social } = footerData;
+export default function Footer() {
+  const { t } = useTranslation("footer"); // ✅ NEW NAMESPACE
 
   const [open, setOpen] = useState(null);
   const toggle = (id) => setOpen(open === id ? null : id);
+
+  const offerings = t("offerings", { returnObjects: true });
+  const resources = t("resources", { returnObjects: true });
+  const knowledge = t("knowledge", { returnObjects: true });
+  const social = t("social", { returnObjects: true });
+  const company = t("company", { returnObjects: true });
 
   return (
     <footer className="border-purple-700/30 main-gradient-color text-white relative">
       {/* MOBILE LOGO */}
       <div className="text-center pt-10 lg:hidden">
         <img
-          src={company.logo}
+          src={logoNewImage}
           className="h-16 sm:h-20 object-contain mx-auto"
-          alt="Xoto logo"
+          alt="Xoto"
         />
-        <p className="text-lg font-semibold mt-2">{company.slogan}</p>
+        <p
+          className="text-lg font-semibold mt-2"
+          dangerouslySetInnerHTML={{ __html: company.slogan }}
+        />
         <p className="text-purple-200 mt-2 text-sm">{company.description}</p>
       </div>
 
       {/* MOBILE ACCORDIONS */}
       <div className="px-6 sm:px-10 lg:hidden mt-10">
         <Accordion
-          title="Our Offerings"
+          title={t("titles.offerings")}
           isOpen={open === 1}
           toggle={() => toggle(1)}
         >
@@ -124,7 +81,7 @@ const Footer = () => {
         </Accordion>
 
         <Accordion
-          title="Partner Ecosystem"
+          title={t("titles.resources")}
           isOpen={open === 2}
           toggle={() => toggle(2)}
         >
@@ -138,7 +95,7 @@ const Footer = () => {
         </Accordion>
 
         <Accordion
-          title="About Us"
+          title={t("titles.knowledge")}
           isOpen={open === 3}
           toggle={() => toggle(3)}
         >
@@ -152,20 +109,25 @@ const Footer = () => {
         </Accordion>
 
         <Accordion
-          title="Location"
+          title={t("titles.location")}
           isOpen={open === 4}
           toggle={() => toggle(4)}
         >
-          <p className="text-purple-200 text-sm">UAE</p>
+          <p className="text-purple-200 text-sm">{t("location")}</p>
         </Accordion>
 
-        <Accordion title="Email" isOpen={open === 5} toggle={() => toggle(5)}>
+        <Accordion
+          title={t("titles.email")}
+          isOpen={open === 5}
+          toggle={() => toggle(5)}
+        >
           <p className="text-purple-200 text-sm">
-            For Partners:{" "}
+            {t("email.partners")}{" "}
             <span className="text-white">sales.support@xoto.ae</span>
           </p>
           <p className="text-purple-200 text-sm mt-1">
-            For Customers: <span className="text-white">info@xoto.ae</span>
+            {t("email.customers")}{" "}
+            <span className="text-white">info@xoto.ae</span>
           </p>
         </Accordion>
       </div>
@@ -174,14 +136,17 @@ const Footer = () => {
       <div className="hidden lg:block max-w-screen-2xl mx-auto px-24 pt-16">
         <div className="grid grid-cols-6 gap-10 pb-14">
           <div className="col-span-2">
-            <img src={company.logo} className="h-20 mb-4" alt="logo" />
-            <p className="text-xl font-semibold">{company.slogan}</p>
+            <img src={logoNewImage} className="h-20 mb-4" alt="logo" />
+            <p
+              className="text-xl font-semibold"
+              dangerouslySetInnerHTML={{ __html: company.slogan }}
+            />
             <p className="text-purple-200 mt-3">{company.description}</p>
           </div>
 
           <div>
             <h4 className="text-white font-semibold text-sm mb-4 uppercase">
-              Our Offerings
+              {t("titles.offerings")}
             </h4>
             <ul className="space-y-2">
               {offerings.map((item, i) => (
@@ -199,7 +164,7 @@ const Footer = () => {
 
           <div>
             <h4 className="text-white font-semibold text-sm mb-4 uppercase">
-              Partner Ecosystem
+              {t("titles.resources")}
             </h4>
             <ul className="space-y-2">
               {resources.map((item, i) => (
@@ -217,7 +182,7 @@ const Footer = () => {
 
           <div>
             <h4 className="text-white font-semibold text-sm mb-4 uppercase">
-              About Us
+              {t("titles.knowledge")}
             </h4>
             <ul className="space-y-2">
               {knowledge.map((item, i) => (
@@ -235,15 +200,16 @@ const Footer = () => {
 
           <div>
             <h4 className="text-white font-semibold text-sm mb-4 uppercase">
-              Contact
+              {t("titles.contact")}
             </h4>
-            <p className="text-purple-200 text-sm">UAE</p>
+            <p className="text-purple-200 text-sm">{t("location")}</p>
             <p className="text-purple-200 text-sm mt-3">
-              Partners:{" "}
+              {t("email.partners")}{" "}
               <span className="text-white">sales.support@xoto.ae</span>
             </p>
             <p className="text-purple-200 text-sm mt-1">
-              Customers: <span className="text-white">info@xoto.ae</span>
+              {t("email.customers")}{" "}
+              <span className="text-white">info@xoto.ae</span>
             </p>
 
             <div className="flex flex-col gap-4 mt-4 items-end">
@@ -261,9 +227,7 @@ const Footer = () => {
       {/* BOTTOM */}
       <div className="w-full border-t border-purple-500/20 mt-6">
         <div className="max-w-screen-xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-purple-300 text-sm">
-            ©2025 Xoto. All rights reserved
-          </p>
+          <p className="text-purple-300 text-sm">{t("bottom.copyright")}</p>
 
           <div className="flex gap-5">
             {social.map((item, i) => (
@@ -280,6 +244,4 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

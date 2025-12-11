@@ -5,6 +5,7 @@ import { FaBars, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import logoNew from "../../assets/img/logoNew.png";
 import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 /* ------------------- LANGUAGE DATA ------------------- */
 export const languages = [
@@ -192,16 +193,14 @@ export const languages = [
 
 /* ------------------- NAV ITEMS ------------------- */
 const navItems = [
-  { title: "Home", path: "/" },
-  { title: "Landscaping", path: "/landscaping" },
-  { title: "Interiors", path: "/services/interior" },
-  { title: "Mortgages", path: "/mortgage/services" },
-  { title: "Partner Eco-System", path: "/ecosystem" },
-  { title: "Xoto Store", path: "/ecommerce/b2c" },
-
-  { title: "Properties", path: "/marketplace" },
-
-  { title: "Blogs", path: "/explore" }, // ✅ LAST
+  { key: "home", path: "/" },
+  { key: "landscaping", path: "/landscaping" },
+  { key: "interiors", path: "/services/interior" },
+  { key: "mortgages", path: "/mortgage/services" },
+  { key: "ecosystem", path: "/ecosystem" },
+  { key: "store", path: "/ecommerce/b2c" },
+  { key: "properties", path: "/marketplace" },
+  { key: "blogs", path: "/explore" },
 ];
 
 const Navbar = () => {
@@ -209,6 +208,8 @@ const Navbar = () => {
   const [langOpen, setLangOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState(languages[0]);
   const [scrolled, setScrolled] = useState(false);
+
+  const { t, i18n } = useTranslation("common");
 
   const langRef = useRef(null);
   const mobileMenuRef = useRef(null);
@@ -249,7 +250,7 @@ const Navbar = () => {
             <Link to="/" className="flex flex-col items-center">
               <img src={logoNew} alt="Logo" className="h-14 w-auto" />
               <span className="text-gray-900 text-[10px]">
-                Powered by AI. Inspired by you.
+                {t("nav.tagline")}
               </span>
             </Link>
 
@@ -257,11 +258,11 @@ const Navbar = () => {
             <div className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => (
                 <Link
-                  key={item.title}
+                  key={item.key}
                   to={item.path}
                   className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-[#5C039B]"
                 >
-                  {item.title}
+                  {t(`nav.${item.key}`)}
                 </Link>
               ))}
             </div>
@@ -291,6 +292,7 @@ const Navbar = () => {
                         key={lang.code}
                         onClick={() => {
                           setSelectedLang(lang);
+                          i18n.changeLanguage(lang.code); // 🔥 STEP 5
                           setLangOpen(false);
                         }}
                         className="flex w-full items-center gap-3 px-4 py-3 hover:bg-purple-50"
@@ -307,12 +309,12 @@ const Navbar = () => {
 
               <Link to="/contact">
                 <button className="px-6 py-2 bg-[#5C039B] text-white rounded-xl">
-                  Contact Us
+                  {t("nav.contact")}
                 </button>
               </Link>
               <Link to="/login">
                 <button className="px-6 py-2 bg-[#5C039B] text-white rounded-xl">
-                  Login
+                  {t("nav.login")}
                 </button>
               </Link>
             </div>
@@ -336,12 +338,12 @@ const Navbar = () => {
           <div className="px-4 py-4 space-y-1">
             {navItems.map((item) => (
               <Link
-                key={item.title}
+                key={item.key}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
                 className="block px-4 py-3 hover:bg-purple-50"
               >
-                {item.title}
+                {t(`nav.${item.key}`)}
               </Link>
             ))}
           </div>
@@ -353,6 +355,7 @@ const Navbar = () => {
     </>
   );
 };
+
 export default Navbar;
 
 // ("use client");
