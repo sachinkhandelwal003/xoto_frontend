@@ -65,13 +65,15 @@ import trFooter from "./locales/tr/footer.json";
 /* -----------------------------
    RUSSIAN (RU)
 ------------------------------ */
-import ruCommon from "./locales/ru/common.json";
-import ruHome from "./locales/ru/home.json";
-import ruHome1 from "./locales/ru/home1.json";
-import ruHome2 from "./locales/ru/home2.json";
 import ruHome3 from "./locales/ru/home3.json";
 import ruHome4 from "./locales/ru/home4.json";
 import ruHome5 from "./locales/ru/home5.json";
+import ruHome from "./locales/ru/home.json";
+
+import ruCommon from "./locales/ru/common.json";
+import ruHome1 from "./locales/ru/home1.json";
+import ruHome2 from "./locales/ru/home2.json";
+
 import ruFooter from "./locales/ru/footer.json";
 
 /* -----------------------------
