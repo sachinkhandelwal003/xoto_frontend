@@ -1,5 +1,5 @@
 // src/pages/auth/Login.jsx
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   Form,
   Input,
@@ -7,57 +7,180 @@ import {
   Card,
   Typography,
   Alert,
-  message,
   Row,
   Col,
-  Divider,
   Grid,
+  ConfigProvider,
+  Spin
 } from "antd";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../manageApi/context/AuthContext.jsx";
+import { toast } from 'react-toastify';
+import styled from 'styled-components';
+
+// Assets
 import loginimage from "../../assets/img/one.png";
 import logoNew from "../../assets/img/logoNew.png";
 import { 
-  CheckCircleFilled, 
   ShopOutlined, 
   UserOutlined,
-  ArrowLeftOutlined
+  ArrowLeftOutlined,
+  MailOutlined,
+  LockOutlined,
+  CheckCircleFilled,
+  RocketFilled,
+  ShoppingFilled
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
+// --- Styled Components ---
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+  background: url(${props => props.$bgImage}) center/cover no-repeat fixed;
+  overflow: hidden;
+`;
+
+// Adds a purple/blue tint over the image to match the theme
+const GradientOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(92, 3, 155, 0.85), rgba(3, 164, 244, 0.8));
+  backdrop-filter: blur(2px);
+  z-index: 1;
+`;
+
+const ContentLayer = styled.div`
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const GlassCard = styled(Card)`
+  width: 100%;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+  .ant-card-body {
+    padding: ${props => props.$isMobile ? "30px 20px" : "40px"} !important;
+  }
+`;
+
+const SelectionCard = styled.div`
+  background: ${props => props.$active ? `${props.$color}15` : 'rgba(255,255,255,0.5)'};
+  border: 2px solid ${props => props.$active ? props.$color : 'transparent'};
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-5px);
+    background: #fff;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: ${props => props.$color};
+  }
+`;
+
 const Login = () => {
   const [form] = Form.useForm();
-  const [selectedPartnerType, setSelectedPartnerType] = useState(null); // null, 'freelancer', or 'vendor-b2c'
+  const [selectedPartnerType, setSelectedPartnerType] = useState(null); 
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState("");
-  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
-  const [welcomeUser, setWelcomeUser] = useState(null);
+  const hasRedirected = useRef(false);
 
   const { login, isAuthenticated, user, token } = useContext(AuthContext);
   const navigate = useNavigate();
   const screens = useBreakpoint();
-
-  // Responsive values
   const isMobile = !screens.md;
-  const cardPadding = isMobile ? "1.2rem" : "2.5rem";
-  const titleLevel = isMobile ? 2 : 1;
-  const logoSize = isMobile ? "70px" : "120px";
 
-  // Success Banner + Auto Redirect after login
+  // --- Partner Configuration ---
+  const partnerTypes = [
+    {
+      value: 'freelancer',
+      label: 'Execution Partner',
+      desc: 'For Service Providers',
+      icon: <UserOutlined style={{ fontSize: "24px" }} />,
+      color: "#5C039B", // Purple
+      gradient: "linear-gradient(135deg, #5C039B, #8E44AD)"
+    },
+    {
+      value: 'vendor-b2c',
+      label: 'Strategic Alliance',
+      desc: 'For Product Sellers',
+      icon: <ShopOutlined style={{ fontSize: "24px" }} />,
+      color: "#03A4F4", // Blue
+      gradient: "linear-gradient(135deg, #03A4F4, #0077b6)"
+    },
+  ];
+
+  const getSelectedPartner = () => partnerTypes.find(t => t.value === selectedPartnerType);
+
+  // --- Auth Effect (Success Toast) ---
   useEffect(() => {
-    if (isAuthenticated && user && token) {
-      const userName = user?.name || user?.firstName || "User";
-      const roleName = user?.role?.name || "User";
+    if (isAuthenticated && user && token && !hasRedirected.current) {
+      hasRedirected.current = true;
+      const userName = user?.name || user?.firstName || "Partner";
+      const roleCode = user?.role?.code?.toString() || user?.role;
+      
+      // Determine style based on partner type/role logic
+      // Default to Purple if unknown, Blue for Vendor roles
+      const isVendor = ['5', '6'].includes(roleCode); 
+      const themeColor = isVendor ? "#03A4F4" : "#5C039B";
+      const themeIcon = isVendor ? <ShoppingFilled /> : <RocketFilled />;
 
-      setWelcomeUser({ name: userName, role: roleName });
-      setShowSuccessBanner(true);
+      // Custom Toast
+      toast.success(
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ 
+            background: 'rgba(255,255,255,0.2)', 
+            borderRadius: '50%', 
+            width: 40, height: 40, 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}>
+            {React.cloneElement(themeIcon, { style: { color: '#fff', fontSize: 20 } })}
+          </div>
+          <div>
+            <div style={{ fontWeight: 'bold', fontSize: '16px' }}>Welcome, {userName}</div>
+            <div style={{ fontSize: '13px', opacity: 0.9 }}>Login Successful</div>
+          </div>
+        </div>, 
+        {
+          position: "top-center",
+          autoClose: 2000,
+          style: {
+            background: isVendor 
+              ? "linear-gradient(135deg, #03A4F4, #0077b6)" 
+              : "linear-gradient(135deg, #5C039B, #8E44AD)",
+            color: "#fff",
+            borderRadius: "16px",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.45)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            padding: "16px"
+          }
+        }
+      );
 
-      // Auto navigate after 2 seconds
-      const timer = setTimeout(() => {
-        const roleCode = user?.role?.code?.toString() || user?.role;
+      // Redirect Logic
+      setTimeout(() => {
         const rolePathMap = {
           "0": "/dashboard/superadmin",
           "1": "/dashboard/admin",
@@ -65,17 +188,14 @@ const Login = () => {
           "5": "/dashboard/vendor-b2c",
           "6": "/dashboard/vendor-b2b",
           "7": "/dashboard/freelancer",
-          "11": "/dashboard/accountant",
-          "12": "/dashboard/supervisor",
         };
-
         const path = rolePathMap[roleCode] || "/dashboard";
         navigate(path, { replace: true });
       }, 2000);
-
-      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, user, token, navigate]);
+
+  // --- Handlers ---
 
   const handlePartnerSelect = (type) => {
     setSelectedPartnerType(type);
@@ -94,574 +214,217 @@ const Login = () => {
     setGeneralError("");
     try {
       let endpoint = '';
-      
-      // Determine endpoint based on partner type
-      if (selectedPartnerType === 'freelancer') {
-        endpoint = '/freelancer/login';
-      } else if (selectedPartnerType === 'vendor-b2c') {
-        endpoint = '/vendor/b2c/login';
-      }
+      if (selectedPartnerType === 'freelancer') endpoint = '/freelancer/login';
+      else if (selectedPartnerType === 'vendor-b2c') endpoint = '/vendor/b2c/login';
       
       await login(endpoint, { email: values.email, password: values.password });
-      message.success('Login successful!');
+      // Toast handled in useEffect
     } catch (err) {
-      const errorMessage = typeof err === 'object' 
-        ? err.message || err.status || 'Invalid credentials' 
-        : err || 'Invalid credentials';
+      const errorMessage = err?.message || err?.status || 'Invalid credentials';
       setGeneralError(errorMessage);
-      message.error(errorMessage);
+      toast.error(errorMessage, { position: 'top-center' });
     } finally {
       setLoading(false);
     }
   };
 
-  const partnerTypes = [
-    {
-      value: 'freelancer',
-      label: 'Execution Partner',
-      desc: 'Provide services and expertise',
-      icon: <UserOutlined style={{ fontSize: isMobile ? "20px" : "24px" }} />,
-      color: "#5C039B",
-    },
-    {
-      value: 'vendor-b2c',
-      label: 'Strategic Alliances',
-      desc: 'Sell products directly to customers',
-      icon: <ShopOutlined style={{ fontSize: isMobile ? "20px" : "24px" }} />,
-      color: "#1890ff",
-    },
-  ];
-
-  const getSelectedPartner = () => {
-    return partnerTypes.find(t => t.value === selectedPartnerType);
-  };
-
   const handleRegister = () => {
-    if (selectedPartnerType === 'freelancer') {
-      navigate('/freelancer/registration');
-    } else if (selectedPartnerType === 'vendor-b2c') {
-      navigate('/ecommerce/seller');
-    }
+    if (selectedPartnerType === 'freelancer') navigate('/freelancer/registration');
+    else if (selectedPartnerType === 'vendor-b2c') navigate('/ecommerce/seller');
   };
+
+  // --- RENDER CONTENT ---
 
   const renderPartnerSelection = () => (
     <motion.div
-      key="partner-selection"
+      key="selection"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
+      exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
     >
-      <Title 
-        level={isMobile ? 5 : 4} 
-        style={{ 
-          textAlign: "center", 
-          color: "#5C039B",
-          marginBottom: isMobile ? "1rem" : "1.5rem",
-          fontSize: isMobile ? "18px" : "24px",
-          fontWeight: "600"
-        }}
-      >
-        Select Partner Type
-      </Title>
-      <Text 
-        type="secondary" 
-        style={{ 
-          textAlign: "center", 
-          display: "block", 
-          marginBottom: "2rem",
-          fontSize: isMobile ? "14px" : "16px"
-        }}
-      >
-        Choose your account type to continue
-      </Text>
+      <div style={{ textAlign: 'center', marginBottom: 30 }}>
+        <Title level={3} style={{ margin: 0, color: '#333' }}>Select Partner Type</Title>
+        <Text type="secondary">Choose your account type to continue</Text>
+      </div>
 
-      <Row gutter={[isMobile ? 8 : 16, isMobile ? 8 : 16]} justify="center">
+      <Row gutter={[16, 16]}>
         {partnerTypes.map((type) => (
           <Col xs={24} sm={12} key={type.value}>
-            <motion.div
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
+            <SelectionCard 
+              $active={selectedPartnerType === type.value} 
+              $color={type.color}
+              onClick={() => handlePartnerSelect(type.value)}
             >
-              <Card
-                hoverable
-                onClick={() => handlePartnerSelect(type.value)}
-                style={{
-                  textAlign: "center",
-                  borderRadius: isMobile ? "12px" : "16px",
-                  border: selectedPartnerType === type.value ? `2px solid ${type.color}` : "1px solid #e0e0e0",
-                  boxShadow: selectedPartnerType === type.value ? `0 8px 20px ${type.color}20` : "0 4px 12px rgba(0,0,0,0.08)",
-                  padding: isMobile ? "16px 12px" : "24px 16px",
-                  height: "100%",
-                  transition: "all 0.3s ease",
-                  cursor: "pointer",
-                  background: selectedPartnerType === type.value ? `${type.color}10` : "#fff",
-                }}
-                bodyStyle={{ 
-                  padding: "12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "12px"
-                }}
-              >
-                <div style={{ 
-                  width: isMobile ? "48px" : "64px", 
-                  height: isMobile ? "48px" : "64px", 
-                  borderRadius: "12px",
-                  background: selectedPartnerType === type.value ? type.color : "#f0f0f0",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: selectedPartnerType === type.value ? "#fff" : type.color,
-                  fontSize: isMobile ? "20px" : "24px",
-                }}>
-                  {type.icon}
-                </div>
-                <div>
-                  <Text 
-                    strong 
-                    style={{ 
-                      color: selectedPartnerType === type.value ? type.color : "#333",
-                      fontSize: isMobile ? "16px" : "18px",
-                      display: "block",
-                      marginBottom: "4px"
-                    }}
-                  >
-                    {type.label}
-                  </Text>
-                  <Text 
-                    type="secondary" 
-                    style={{ 
-                      fontSize: isMobile ? "12px" : "14px",
-                      lineHeight: "1.4",
-                      display: "block"
-                    }}
-                  >
-                    {type.desc}
-                  </Text>
-                </div>
-              </Card>
-            </motion.div>
+              <div style={{ 
+                width: 60, height: 60, borderRadius: '50%', 
+                background: type.color, color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                {type.icon}
+              </div>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 'bold', color: '#333' }}>{type.label}</div>
+                <div style={{ fontSize: 13, color: '#888' }}>{type.desc}</div>
+              </div>
+            </SelectionCard>
           </Col>
         ))}
       </Row>
-
-
     </motion.div>
   );
 
-  const renderLoginForm = () => (
-    <motion.div
-      key="login-form"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div style={{ 
-        display: "flex",
-        justifyContent:"center", 
-        alignItems: "center", 
-        marginBottom: "1.5rem",
-        cursor: "pointer"
-      }}>
-        <Button
-          type="text"
-          onClick={handleBackToSelection}
-          style={{ 
-            color: "#ffffffff", 
-            backgroundColor:"#5C039B",
-            padding: "4px 8px",
-            height: "auto",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px"
-          }}
-        >
-          <ArrowLeftOutlined />
-          Back
-        </Button>
-      </div>
+  const renderLoginForm = () => {
+    const activePartner = getSelectedPartner();
+    return (
+      <motion.div
+        key="form"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 20 }}
+        transition={{ duration: 0.3 }}
+      >
+        {/* Back Button */}
+      
 
-      <div style={{ 
-        textAlign: "center", 
-        marginBottom: "2rem",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: "12px"
-      }}>
-        <div style={{
-          width: "48px",
-          height: "48px",
-          borderRadius: "12px",
-          background: getSelectedPartner()?.color || "#5C039B",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#fff",
-          fontSize: "20px"
-        }}>
-          {getSelectedPartner()?.icon}
+        {/* Form Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
+          <div style={{ 
+            width: 50, height: 50, borderRadius: 12, 
+            background: activePartner.gradient, color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+          }}>
+            {activePartner.icon}
+          </div>
+          <div>
+            <Title level={4} style={{ margin: 0, color: '#333' }}>Login as {activePartner.label}</Title>
+            <Text type="secondary">Enter your credentials to access dashboard</Text>
+          </div>
         </div>
-        <div>
-          <Title 
-            level={isMobile ? 5 : 4} 
-            style={{ 
-              color: "#5C039B",
-              margin: 0,
-              fontSize: isMobile ? "18px" : "22px",
-              textAlign: "left"
-            }}
-          >
-            Login as {getSelectedPartner()?.label}
-          </Title>
-          <Text type="secondary" style={{ fontSize: isMobile ? "12px" : "14px" }}>
-            Enter your credentials to continue
-          </Text>
-        </div>
-      </div>
 
-      {generalError && (
-        <Alert
-          message={generalError}
-          type="error"
-          showIcon
-          closable
-          onClose={() => setGeneralError("")}
-          style={{ 
-            marginBottom: "1.5rem", 
-            borderRadius: "10px",
-            fontSize: "14px",
-            border: "none"
-          }}
-        />
-      )}
+        {generalError && (
+          <Alert message={generalError} type="error" showIcon style={{ marginBottom: 24, borderRadius: 12 }} closable />
+        )}
 
-      <Form form={form} onFinish={onFinish} layout="vertical">
-        <Form.Item 
-          name="email" 
-          label={<span style={{ fontSize: "14px", color: "#5C039B", fontWeight: "600" }}>Email</span>}
-          rules={[{ required: true, type: "email" }]}
-        >
-          <Input 
-            size="large" 
-            placeholder="you@example.com" 
-            style={{ 
-              borderRadius: "10px", 
-              height: "48px",
-              fontSize: "16px",
-              borderColor: "#e0e0e0"
-            }} 
-          />
-        </Form.Item>
-        <Form.Item 
-          name="password" 
-          label={<span style={{ fontSize: "14px", color: "#5C039B", fontWeight: "600" }}>Password</span>}
-          rules={[{ required: true }]}
-        >
-          <Input.Password 
-            size="large" 
-            placeholder="••••••••" 
-            style={{ 
-              borderRadius: "10px", 
-              height: "48px",
-              fontSize: "16px",
-              borderColor: "#e0e0e0"
-            }} 
-          />
-        </Form.Item>
-
-        <div style={{ display: "flex", gap: "12px", marginTop: "1rem" }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            style={{
-              flex: 1,
-              height: "48px",
-              background: getSelectedPartner()?.color || "#5C039B",
-              borderRadius: "10px",
-              fontSize: "16px",
-              fontWeight: "600",
-              border: "none",
-              boxShadow: `0 4px 15px ${getSelectedPartner()?.color || "#5C039B"}30`,
-            }}
-          >
-            {loading ? "Signing In..." : "Login Now"}
-          </Button>
+        <Form form={form} layout="vertical" onFinish={onFinish} size="large">
+          <Form.Item name="email" rules={[{ required: true, type: "email", message: "Valid email required" }]}>
+            <Input 
+              prefix={<MailOutlined style={{ color: '#bfbfbf' }} />} 
+              placeholder="Email Address" 
+              style={{ borderRadius: 12 }} 
+            />
+          </Form.Item>
           
-          <Button
-            type="default"
-            onClick={handleRegister}
-            style={{
-              height: "48px",
-              borderRadius: "10px",
-              fontSize: "16px",
-              fontWeight: "600",
-              border: `1px solid ${getSelectedPartner()?.color || "#5C039B"}`,
-              color: getSelectedPartner()?.color || "#5C039B",
-            }}
-          >
-            Register
-          </Button>
-        </div>
-      </Form>
-    </motion.div>
-  );
+          <Form.Item name="password" rules={[{ required: true, message: "Password required" }]}>
+            <Input.Password 
+              prefix={<LockOutlined style={{ color: '#bfbfbf' }} />} 
+              placeholder="Password" 
+              style={{ borderRadius: 12 }} 
+            />
+          </Form.Item>
+
+          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              block
+              style={{ 
+                height: 48, borderRadius: 12, fontWeight: 'bold',
+                background: activePartner.gradient, border: 'none',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+              }}
+            >
+              {loading ? "Signing In..." : "Login Now"}
+            </Button>
+            
+            <Button
+              onClick={handleRegister}
+              block
+              style={{ 
+                height: 48, borderRadius: 12, fontWeight: 'bold',
+                borderColor: activePartner.color, color: activePartner.color
+              }}
+            >
+              Register
+            </Button>
+          </div>
+            <Button 
+          type="text" 
+          icon={<ArrowLeftOutlined />} 
+          onClick={handleBackToSelection}
+          style={{ marginBottom: 16, paddingLeft: 0, color: '#888' }}
+        >
+          Back to Selection
+        </Button>
+        </Form>
+      </motion.div>
+    );
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: `url(${loginimage}) center/cover no-repeat fixed`,
-        position: "relative",
-        fontFamily: "'Poppins', sans-serif",
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: selectedPartnerType === 'vendor-b2c' ? '#03A4F4' : '#5C039B',
+          borderRadius: 8,
+          fontFamily: 'Poppins, sans-serif',
+        }
       }}
     >
-      {/* Dark Overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "rgba(0, 0, 0, 0.65)",
-          backdropFilter: "blur(5px)",
-        }}
-      />
-
-      {/* Success Welcome Banner */}
-      {showSuccessBanner && welcomeUser && (
-        <motion.div
-          initial={{ y: -100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -100, opacity: 0 }}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-            padding: isMobile ? "0.8rem" : "1rem",
-            background: "#ffffff",
-            color: "#1f1f1f",
-            textAlign: "center",
-            fontWeight: "bold",
-            fontSize: isMobile ? "0.9rem" : "1.3rem",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-            borderBottom: "4px solid #64EF0A",
-          }}
-        >
-          <CheckCircleFilled style={{
-            fontSize: isMobile ? "1.2rem" : "1.8rem",
-            marginRight: isMobile ? "6px" : "12px",
-            color: "#64EF0A",
-          }} />
-          Welcome, {welcomeUser.name}! ({welcomeUser.role})
-          <br />
-          <Text style={{
-            fontSize: isMobile ? "0.75rem" : "1rem",
-            opacity: 0.8,
-            color: "#333333",
-          }}>
-            Redirecting you to your dashboard...
-          </Text>
-        </motion.div>
-      )}
-
-      {/* Mobile Layout */}
-      {isMobile ? (
-        <div style={{ 
-          minHeight: "100vh", 
-          position: "relative", 
-          zIndex: 10,
-          display: "flex",
-          flexDirection: "column"
-        }}>
-          {/* Header Section */}
-          <div style={{
-            padding: "1.5rem 1rem 1rem",
-            color: "white",
-            textAlign: "center",
-            flexShrink: 0,
-          }}>
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "1rem",
-                padding: "1.5rem"
-              }}
-            >
-              <img
-                src={logoNew}
-                alt="Logo"
-                style={{
-                  width: logoSize,
-                  height: "auto",
-                  filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.4))",
-                }}
-              />
-              <Title
-                level={2}
-                style={{
-                  color: "#03A4F4",
-                  fontSize: "1.8rem",
-                  fontWeight: 800,
-                  margin: 0,
-                  lineHeight: 1.2
-                }}
-              >
-                Partner Login
-              </Title>
-              <Text
-                style={{
-                  fontSize: "0.95rem",
-                  opacity: 0.9,
-                  display: "block"
-                }}
-              >
-                {!selectedPartnerType
-                  ? "Select your partner type to continue"
-                  : `Logging in as ${getSelectedPartner()?.label}`}
-              </Text>
-            </motion.div>
-          </div>
-
-          {/* Form Section */}
-          <div style={{
-            flex: 1,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            padding: "0 1rem 1.5rem",
-            overflow: "auto"
-          }}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              style={{ 
-                width: "100%", 
-                maxWidth: "400px"
-              }}
-            >
-              <Card
-                style={{
-                  width: "100%",
-                  borderRadius: "20px",
-                  boxShadow: "0 15px 30px rgba(0,0,0,0.25)",
-                  background: "rgba(255,255,255,0.98)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-                bodyStyle={{ 
-                  padding: cardPadding,
-                }}
-              >
-                {/* Content */}
-                {!selectedPartnerType && renderPartnerSelection()}
-                {selectedPartnerType && renderLoginForm()}
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      ) : (
-        /* Desktop Layout */
-        <Row style={{ 
-          minHeight: "100vh", 
-          position: "relative", 
-          zIndex: 10 
-        }}>
-          {/* Left Side - Logo & Text */}
-          <Col xs={24} lg={12}>
-            <div style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100vh",
-              padding: "2rem",
-              color: "white",
-            }}>
+      <PageWrapper $bgImage={loginimage}>
+        <GradientOverlay />
+        
+        <ContentLayer>
+          <Row style={{ width: '100%', maxWidth: 1200, padding: isMobile ? 16 : 0 }}>
+            {/* Left Side: Logo & Welcome Text (Hidden on small mobile if in form view?) - Let's keep it visible but stacked */}
+            <Col xs={24} lg={12} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: isMobile ? 'center' : 'flex-start', padding: 40 }}>
               <motion.div
-                initial={{ opacity: 0, x: -100 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "1rem",
-                  padding: "1.5rem",
-                  maxWidth: "600px",
-                  textAlign: "center"
-                }}
+                style={{ textAlign: isMobile ? 'center' : 'left' }}
               >
-                <img
-                  src={logoNew}
-                  alt="Logo"
-                  style={{
-                    width: logoSize,
-                    height: "auto",
-                    marginBottom: "2rem",
-                    filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.4))",
-                  }}
+                <img 
+                  src={logoNew} 
+                  alt="Logo" 
+                  style={{ width: isMobile ? 100 : 150, marginBottom: 24, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.3))" }} 
                 />
-                <Title level={titleLevel} style={{ color: "#03A4F4", fontSize: "3.5rem", fontWeight: 800, margin: 0 }}>
-                  Partner Login
-                </Title>
-                <Text style={{ fontSize: "1.5rem", opacity: 0.9, color: "white", marginBottom: "1rem" }}>
-                  {!selectedPartnerType
-                    ? "Welcome to the partner network"
-                    : `Welcome back, ${getSelectedPartner()?.label}!`}
-                </Text>
                 
-              
+                <Title style={{ color: '#fff', fontSize: isMobile ? 32 : 48, fontWeight: 800, margin: 0, lineHeight: 1.1 }}>
+                  Partner <br/>
+                  <span style={{ color: '#03A4F4' }}>Login</span>
+                </Title>
+                
+                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, marginTop: 16, display: 'block', maxWidth: 400 }}>
+                  {!selectedPartnerType 
+                    ? "Connect, Collaborate, and Grow with our extensive ecosystem."
+                    : `Welcome back, ${getSelectedPartner().label}. Let's get to work.`
+                  }
+                </Text>
               </motion.div>
-            </div>
-          </Col>
+            </Col>
 
-          {/* Right Side - Form */}
-          <Col xs={24} lg={12}>
-            <div style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100vh",
-              padding: "2rem",
-            }}>
+            {/* Right Side: Glass Card */}
+            <Col xs={24} lg={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <motion.div
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                style={{ width: "100%", maxWidth: "500px" }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                style={{ width: '100%', maxWidth: 480 }}
               >
-                <Card
-                  style={{
-                    width: "100%",
-                    borderRadius: "24px",
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
-                    background: "rgba(255,255,255,0.98)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                  }}
-                  bodyStyle={{ padding: "2.5rem" }}
-                >
-                  {/* Content */}
-                  {!selectedPartnerType && renderPartnerSelection()}
-                  {selectedPartnerType && renderLoginForm()}
-                </Card>
+                <GlassCard bordered={false} $isMobile={isMobile}>
+                  <AnimatePresence mode="wait">
+                    {!selectedPartnerType ? renderPartnerSelection() : renderLoginForm()}
+                  </AnimatePresence>
+                </GlassCard>
               </motion.div>
-            </div>
-          </Col>
-        </Row>
-      )}
-    </div>
+            </Col>
+          </Row>
+        </ContentLayer>
+      </PageWrapper>
+    </ConfigProvider>
   );
 };
 

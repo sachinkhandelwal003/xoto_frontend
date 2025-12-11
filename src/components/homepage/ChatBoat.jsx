@@ -1,33 +1,20 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const ChatBoat = ({ onClose }) => {
-  const [messages, setMessages] = useState([
-    { from: "bot", text: "Hello! I'm Xoto. How can I help you today?" },
-  ]);
-  const [input, setInput] = useState("");
-  const chatEndRef = useRef(null);
+  const [ready, setReady] = useState(false);
 
-  // Auto scroll to bottom
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    // Check if widget script is loaded
+    const check = setInterval(() => {
+      if (window.customElements?.get("vapi-widget")) {
+        setReady(true);
+        clearInterval(check);
+      }
+    }, 200);
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-
-    const userMessage = { from: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-
-    // Fake bot reply
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { from: "bot", text: "Xoto received your message!" },
-      ]);
-    }, 800);
-  };
+    return () => clearInterval(check);
+  }, []);
 
   return (
     <motion.div
@@ -47,40 +34,21 @@ const ChatBoat = ({ onClose }) => {
         </button>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 px-4 py-4 overflow-y-auto space-y-3 no-scrollbar">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`px-4 py-2 rounded-xl max-w-[75%] text-sm shadow ${
-              msg.from === "user"
-                ? "ml-auto bg-purple-600 text-white"
-                : "mr-auto bg-gray-200 text-gray-800"
-            }`}
-          >
-            {msg.text}
+      {/* Widget Body */}
+      <div className="flex-1 overflow-hidden relative">
+        {!ready ? (
+          <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
+            Loading assistant...
           </div>
-        ))}
-        <div ref={chatEndRef} />
-      </div>
-
-      {/* Input */}
-      <div className="p-3 border-t border-gray-200 flex gap-2">
-        <input
-          type="text"
-          className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
-          placeholder="Type your message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-        />
-
-        <button
-          onClick={sendMessage}
-          className="bg-purple-600 text-white px-4 rounded-lg hover:bg-purple-700 transition"
-        >
-          Send
-        </button>
+        ) : (
+          <vapi-widget
+            public-key="0c5b3eb5-76fc-46ce-a227-889f321291f6"
+            assistant-id="2e5fdf84-bb62-4ea7-a620-ae5cb40d264a"
+            mode="chat"
+            theme="light"
+            style={{ width: "100%", height: "100%" }}
+          ></vapi-widget>
+        )}
       </div>
     </motion.div>
   );

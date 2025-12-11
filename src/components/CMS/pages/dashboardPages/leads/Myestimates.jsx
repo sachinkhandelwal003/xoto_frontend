@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
+// 1. IMPORT LOGO
+import logo from "../../../../../assets/img/logoNew.png";
+
 import { 
   Tabs, Card, Button, Modal, Table, Tag, Input, Spin, Empty, 
-  Row, Col, Divider, Badge, Avatar, Space, Alert
+  Row, Col, Divider, Badge, Avatar, Space, Alert, Typography
 } from 'antd';
 import { 
   CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, 
   ClockCircleOutlined, DollarOutlined, CalendarOutlined,
   UserOutlined, FileTextOutlined, MailOutlined,
-  PhoneOutlined, EnvironmentOutlined, ToolOutlined
+  PhoneOutlined, EnvironmentOutlined, ToolOutlined,
+  PrinterOutlined
 } from '@ant-design/icons';
 import { showSuccessAlert, showErrorAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
 
 const { TextArea } = Input;
+const { Title, Text, Paragraph } = Typography;
 
 // Purple Theme Colors
 const PURPLE_THEME = {
@@ -33,12 +38,15 @@ const MyEstimates = () => {
   const [allEstimates, setAllEstimates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
-  const [selectedQuotation, setSelectedQuotation] = useState(null);
+  
+  // Modal States
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedEstimate, setSelectedEstimate] = useState(null); // Stores full estimate object
+  
+  // Action States
   const [rejectReason, setRejectReason] = useState('');
   const [respondingId, setRespondingId] = useState(null);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
-  const [selectedEstimate, setSelectedEstimate] = useState(null);
 
   // Fetch All Customer Estimates
   const fetchMyEstimates = async () => {
@@ -75,47 +83,27 @@ const MyEstimates = () => {
     rejected: respondedEstimates.filter(e => e.customer_response?.status === 'rejected').length,
   };
 
-  // Format mobile number
-  const formatMobileNumber = (mobileObj) => {
-    if (!mobileObj) return 'N/A';
-    return `${mobileObj.country_code || ''} ${mobileObj.number || ''}`.trim();
-  };
-
-  // Format currency
-  const formatCurrency = (amount, currency = 'AED') => {
-    if (!amount) return `${currency} 0`;
-    return `${currency} ${amount.toLocaleString()}`;
-  };
-
-  // Format date
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  // Helpers
+  const formatCurrency = (amount) => amount ? `AED ${amount.toLocaleString()}` : 'AED 0';
+  const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
+  const formatMobileNumber = (mobileObj) => mobileObj ? `${mobileObj.country_code || ''} ${mobileObj.number || ''}`.trim() : 'N/A';
 
   // View Quotation Modal
-  const openQuotation = (quotation) => {
-    setSelectedQuotation(quotation);
+  const openQuotationModal = (estimate) => {
+    setSelectedEstimate(estimate);
     setModalVisible(true);
   };
 
   // Accept Quotation
   const accept = async (estimate) => {
-    const confirm = await showConfirmDialog(
-      'Accept Quotation', 
-      `Are you sure you want to accept this quotation?`,
-      'Yes, Accept'
-    );
+    const confirm = await showConfirmDialog('Accept Quotation', `Are you sure you want to accept this quotation?`, 'Yes, Accept');
     if (!confirm.isConfirmed) return;
 
     setRespondingId(estimate._id);
     try {
       await apiService.put(`/estimates/${estimate._id}/response`, { status: 'accepted' });
       showSuccessAlert('Success', 'Quotation accepted successfully!');
+      setModalVisible(false); // Close modal if open
       fetchMyEstimates();
     } catch (err) {
       showErrorAlert('Error', 'Failed to accept quotation');
@@ -126,145 +114,110 @@ const MyEstimates = () => {
 
   // Open Reject Modal
   const openRejectModal = (estimate) => {
-    setSelectedEstimate(estimate);
+    // If opening from the main list, set selected estimate first
+    if (!selectedEstimate || selectedEstimate._id !== estimate._id) {
+        setSelectedEstimate(estimate);
+    }
     setRejectReason('');
     setRejectModalVisible(true);
   };
 
   // Reject with Reason
   const reject = async () => {
-    if (!rejectReason.trim()) {
-      showErrorAlert('Reason Required', 'Please provide a reason');
-      return;
-    }
-
-    const confirm = await showConfirmDialog(
-      'Reject Quotation',
-      'Are you sure you want to reject this quotation?',
-      'Confirm Reject'
-    );
-    if (!confirm.isConfirmed) return;
+    if (!rejectReason.trim()) return showErrorAlert('Reason Required', 'Please provide a reason');
 
     setRespondingId(selectedEstimate._id);
     try {
-      await apiService.put(`/estimates/${selectedEstimate._id}/response`, {
-        status: 'rejected',
-        reason: rejectReason
-      });
+      await apiService.put(`/estimates/${selectedEstimate._id}/response`, { status: 'rejected', reason: rejectReason });
       showSuccessAlert('Success', 'Quotation rejected');
       setRejectModalVisible(false);
+      setModalVisible(false); // Close details modal if open
       setRejectReason('');
       fetchMyEstimates();
     } catch (err) {
       showErrorAlert('Error', 'Failed to reject quotation');
     } finally {
       setRespondingId(null);
-      setSelectedEstimate(null);
     }
   };
 
-  // Pending Estimate Card
-  const PendingEstimateCard = ({ est }) => {
+  // --- COMPONENT: CARD VIEW FOR LIST ---
+  const EstimateCard = ({ est, isPending }) => {
     const q = est.final_quotation;
+    const status = est.customer_response?.status;
     
     return (
       <Card 
-        className="mb-4"
+        className="mb-4 shadow-sm hover:shadow-md transition-shadow"
         style={{ 
-          borderLeft: `4px solid ${PURPLE_THEME.primary}`,
+          borderLeft: `4px solid ${isPending ? PURPLE_THEME.warning : (status === 'accepted' ? PURPLE_THEME.success : PURPLE_THEME.error)}`,
           background: 'white'
         }}
+        bodyStyle={{ padding: '20px' }}
       >
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} md={16}>
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-4">
               <Avatar 
-                size={48}
+                size={50}
                 icon={<FileTextOutlined />}
                 style={{ 
-                  background: PURPLE_THEME.primaryBg,
-                  color: PURPLE_THEME.primary
+                  background: isPending ? PURPLE_THEME.warning + '20' : (status === 'accepted' ? PURPLE_THEME.success + '20' : PURPLE_THEME.error + '20'),
+                  color: isPending ? PURPLE_THEME.warning : (status === 'accepted' ? PURPLE_THEME.success : PURPLE_THEME.error)
                 }}
               />
-              
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold text-gray-900 m-0">{est.service_type}</h4>
-                  <Tag color="blue">{est.area_sqft} sq ft</Tag>
-                </div>
-                
-                <div className="text-sm text-gray-600 mb-2">
-                  {est.description || 'No description'}
-                </div>
-                
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <CalendarOutlined />
-                    {formatDate(est.submitted_at)}
-                  </div>
-                  {est.assigned_supervisor && (
-                    <div className="flex items-center gap-1">
-                      <UserOutlined />
-                      {est.assigned_supervisor.name?.first_name}
-                    </div>
+                <div className="flex items-center gap-3 mb-1">
+                  <h4 className="text-lg font-bold text-gray-800 m-0">{est.service_type?.toUpperCase()}</h4>
+                  <Tag color="purple">{est.subcategory?.label}</Tag>
+                  {!isPending && (
+                      <Tag color={status === 'accepted' ? 'success' : 'error'}>
+                          {status === 'accepted' ? 'ACCEPTED' : 'REJECTED'}
+                      </Tag>
                   )}
                 </div>
+                
+                <div className="text-gray-500 mb-2">{est.description || 'No description provided'}</div>
+                
+                <Space split={<Divider type="vertical" />}>
+                    <span className="text-xs text-gray-400"><CalendarOutlined /> {formatDate(est.submitted_at)}</span>
+                    <span className="text-xs text-gray-400"><EnvironmentOutlined /> {est.area_sqft} sq.ft</span>
+                    <span className="text-xs text-gray-400">Ref: {est._id.substring(0,8)}</span>
+                </Space>
               </div>
             </div>
           </Col>
 
           <Col xs={24} md={8}>
-            <div className="text-right">
-              <div className="mb-3">
-                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.success }}>
-                  {formatCurrency(q?.grand_total)}
-                </div>
-                {q?.discount_percent > 0 && (
-                  <div className="text-xs text-green-600">
-                    {q.discount_percent}% discount
-                  </div>
-                )}
+            <div className="flex flex-col items-end justify-center h-full">
+              <div className="text-2xl font-bold mb-1" style={{ color: PURPLE_THEME.primary }}>
+                {formatCurrency(q?.grand_total)}
               </div>
-
-              <Space direction="vertical" style={{ width: '100%' }} size="small">
-                <Button
-                  size="small"
-                  icon={<EyeOutlined />}
-                  onClick={() => openQuotation(q)}
-                  style={{ 
-                    background: PURPLE_THEME.primaryBg,
-                    borderColor: PURPLE_THEME.primaryLighter,
-                    color: PURPLE_THEME.primary
-                  }}
-                >
-                  View Details
-                </Button>
-
-                <div className="flex gap-2">
-                  <Button
-                    type="primary"
-                    size="small"
-                    icon={<CheckCircleOutlined />}
-                    loading={respondingId === est._id}
-                    onClick={() => accept(est)}
-                    style={{ 
-                      background: PURPLE_THEME.success,
-                      borderColor: PURPLE_THEME.success
-                    }}
-                  >
-                    Accept
-                  </Button>
-
-                  <Button
-                    size="small"
-                    danger
-                    icon={<CloseCircleOutlined />}
-                    loading={respondingId === est._id}
-                    onClick={() => openRejectModal(est)}
-                  >
-                    Reject
-                  </Button>
-                </div>
+              
+              <Space className="mt-2">
+                <Button icon={<EyeOutlined />} onClick={() => openQuotationModal(est)}>View Quote</Button>
+                
+                {isPending && (
+                    <>
+                        <Button 
+                            type="primary" 
+                            icon={<CheckCircleOutlined />} 
+                            style={{ background: PURPLE_THEME.success, borderColor: PURPLE_THEME.success }}
+                            loading={respondingId === est._id}
+                            onClick={() => accept(est)}
+                        >
+                            Accept
+                        </Button>
+                        <Button 
+                            danger 
+                            icon={<CloseCircleOutlined />}
+                            loading={respondingId === est._id}
+                            onClick={() => openRejectModal(est)}
+                        >
+                            Reject
+                        </Button>
+                    </>
+                )}
               </Space>
             </div>
           </Col>
@@ -273,329 +226,210 @@ const MyEstimates = () => {
     );
   };
 
-  // Responded Estimate Card
-  const RespondedEstimateCard = ({ est }) => {
-    const q = est.final_quotation;
-    const isAccepted = est.customer_response?.status === 'accepted';
-    
-    return (
-      <Card 
-        className="mb-3"
-        style={{ 
-          borderLeft: `4px solid ${isAccepted ? PURPLE_THEME.success : PURPLE_THEME.error}`,
-          background: 'white'
-        }}
-        size="small"
-      >
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={16}>
-            <div className="flex items-center gap-3">
-              <Avatar 
-                size={36}
-                icon={isAccepted ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
-                style={{ 
-                  background: isAccepted ? '#f6ffed' : '#fff1f0',
-                  color: isAccepted ? PURPLE_THEME.success : PURPLE_THEME.error
-                }}
-              />
-              <div>
-                <div className="font-medium text-gray-900">{est.service_type}</div>
-                <div className="text-sm text-gray-600">
-                  {formatCurrency(q?.grand_total)} • {formatDate(est.updatedAt)}
-                </div>
-              </div>
-            </div>
-          </Col>
-          
-          <Col xs={8} className="text-right">
-            <Tag 
-              color={isAccepted ? "success" : "error"}
-              icon={isAccepted ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
-            >
-              {isAccepted ? 'Accepted' : 'Rejected'}
-            </Tag>
-          </Col>
-        </Row>
-      </Card>
-    );
-  };
-
-  // Tab Items
-  const tabItems = [
-    {
-      key: 'pending',
-      label: (
-        <Badge count={pendingEstimates.length} size="small" style={{ backgroundColor: PURPLE_THEME.primary }}>
-          Pending
-        </Badge>
-      ),
-      children: pendingEstimates.length === 0 ? (
-        <Empty 
-          description="No pending quotations"
-          imageStyle={{ height: 60 }}
-        />
-      ) : (
-        <div>
-          {pendingEstimates.map(est => (
-            <PendingEstimateCard key={est._id} est={est} />
-          ))}
-        </div>
-      ),
-    },
-    {
-      key: 'responded',
-      label: (
-        <Badge count={respondedEstimates.length} size="small" style={{ backgroundColor: PURPLE_THEME.primary }}>
-          Responded
-        </Badge>
-      ),
-      children: respondedEstimates.length === 0 ? (
-        <Empty 
-          description="No responses yet"
-          imageStyle={{ height: 60 }}
-        />
-      ) : (
-        <div>
-          {respondedEstimates.map(est => (
-            <RespondedEstimateCard key={est._id} est={est} />
-          ))}
-        </div>
-      ),
-    },
-  ];
-
+  // --- MAIN RENDER ---
   return (
     <div className="min-h-screen p-6" style={{ background: PURPLE_THEME.light }}>
-      <div className="max-w-screen-2xl mx-auto">
+      <div className="max-w-screen-xl mx-auto">
+        
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-bold" style={{ color: PURPLE_THEME.dark }}>
-                My Estimates
-              </h1>
-              <p className="text-gray-600">Review and respond to your project estimates</p>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <Row gutter={[16, 16]} className="mb-6">
-            <Col xs={12} sm={6}>
-              <Card 
-                className="text-center border-0"
-                style={{ 
-                  background: 'white',
-                  borderLeft: `4px solid ${PURPLE_THEME.primary}`
-                }}
-                bodyStyle={{ padding: '12px' }}
-              >
-                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.primary }}>
-                  {stats.total}
-                </div>
-                <div className="text-sm text-gray-600">Total</div>
-              </Card>
-            </Col>
-            
-            <Col xs={12} sm={6}>
-              <Card 
-                className="text-center border-0"
-                style={{ 
-                  background: 'white',
-                  borderLeft: `4px solid ${PURPLE_THEME.warning}`
-                }}
-                bodyStyle={{ padding: '12px' }}
-              >
-                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.warning }}>
-                  {stats.pending}
-                </div>
-                <div className="text-sm text-gray-600">Pending</div>
-              </Card>
-            </Col>
-            
-            <Col xs={12} sm={6}>
-              <Card 
-                className="text-center border-0"
-                style={{ 
-                  background: 'white',
-                  borderLeft: `4px solid ${PURPLE_THEME.success}`
-                }}
-                bodyStyle={{ padding: '12px' }}
-              >
-                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.success }}>
-                  {stats.accepted}
-                </div>
-                <div className="text-sm text-gray-600">Accepted</div>
-              </Card>
-            </Col>
-            
-            <Col xs={12} sm={6}>
-              <Card 
-                className="text-center border-0"
-                style={{ 
-                  background: 'white',
-                  borderLeft: `4px solid ${PURPLE_THEME.error}`
-                }}
-                bodyStyle={{ padding: '12px' }}
-              >
-                <div className="text-2xl font-bold" style={{ color: PURPLE_THEME.error }}>
-                  {stats.rejected}
-                </div>
-                <div className="text-sm text-gray-600">Rejected</div>
-              </Card>
-            </Col>
-          </Row>
+          <Title level={2} style={{ color: PURPLE_THEME.dark, margin: 0 }}>My Estimates</Title>
+          <Paragraph style={{ color: PURPLE_THEME.gray }}>Review and manage your project quotations</Paragraph>
         </div>
 
-        {/* Main Content */}
-        <Card
-          style={{ 
-            borderRadius: '12px',
-            border: '1px solid #f0f0f0',
-            background: 'white'
-          }}
-          bodyStyle={{ padding: 0 }}
-        >
+        {/* Stats Row */}
+        <Row gutter={16} className="mb-6">
+            <Col span={6}>
+                <Card bordered={false} className="text-center">
+                    <h2 className="text-3xl font-bold m-0" style={{ color: PURPLE_THEME.primary }}>{stats.total}</h2>
+                    <div className="text-gray-500">Total</div>
+                </Card>
+            </Col>
+            <Col span={6}>
+                <Card bordered={false} className="text-center">
+                    <h2 className="text-3xl font-bold m-0" style={{ color: PURPLE_THEME.warning }}>{stats.pending}</h2>
+                    <div className="text-gray-500">Pending Action</div>
+                </Card>
+            </Col>
+            <Col span={6}>
+                <Card bordered={false} className="text-center">
+                    <h2 className="text-3xl font-bold m-0" style={{ color: PURPLE_THEME.success }}>{stats.accepted}</h2>
+                    <div className="text-gray-500">Accepted</div>
+                </Card>
+            </Col>
+            <Col span={6}>
+                <Card bordered={false} className="text-center">
+                    <h2 className="text-3xl font-bold m-0" style={{ color: PURPLE_THEME.error }}>{stats.rejected}</h2>
+                    <div className="text-gray-500">Rejected</div>
+                </Card>
+            </Col>
+        </Row>
+
+        {/* Content Tabs */}
+        <Card bodyStyle={{ padding: 0 }} className="shadow-sm rounded-lg overflow-hidden">
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
-            items={tabItems}
-            style={{ padding: '0 16px' }}
+            size="large"
+            tabBarStyle={{ margin: 0, padding: '0 20px', background: 'white' }}
+            items={[
+                {
+                    key: 'pending',
+                    label: <Badge count={pendingEstimates.length} offset={[10, 0]} color={PURPLE_THEME.warning}>Pending Approval</Badge>,
+                    children: (
+                        <div className="p-6 bg-gray-50 min-h-[300px]">
+                            {loading ? <Spin className="w-full py-10" /> : 
+                             pendingEstimates.length === 0 ? <Empty description="No pending estimates" /> :
+                             pendingEstimates.map(est => <EstimateCard key={est._id} est={est} isPending={true} />)
+                            }
+                        </div>
+                    )
+                },
+                {
+                    key: 'responded',
+                    label: 'History',
+                    children: (
+                        <div className="p-6 bg-gray-50 min-h-[300px]">
+                            {loading ? <Spin className="w-full py-10" /> : 
+                             respondedEstimates.length === 0 ? <Empty description="No history available" /> :
+                             respondedEstimates.map(est => <EstimateCard key={est._id} est={est} isPending={false} />)
+                            }
+                        </div>
+                    )
+                }
+            ]}
           />
-
-          <div className="p-4">
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <Spin />
-              </div>
-            ) : activeTab === 'pending' && pendingEstimates.length === 0 ? (
-              <Empty description="No pending quotations to review" />
-            ) : activeTab === 'responded' && respondedEstimates.length === 0 ? (
-              <Empty description="No responses yet" />
-            ) : null}
-          </div>
         </Card>
 
-        {/* Quotation Details Modal */}
+        {/* --- INVOICE STYLE MODAL (Customer View) --- */}
         <Modal
-          title={
-            <div className="flex items-center gap-3">
-              <Avatar 
-                size={40}
-                style={{ 
-                  background: PURPLE_THEME.primary,
-                  color: 'white'
-                }}
-                icon={<FileTextOutlined />}
-              />
-              <div>
-                <h3 className="text-xl font-bold m-0" style={{ color: PURPLE_THEME.dark }}>
-                  Quotation Details
-                </h3>
-                <p className="text-gray-500 text-sm m-0">Full project breakdown</p>
-              </div>
-            </div>
-          }
+          title={null}
           open={modalVisible}
           onCancel={() => setModalVisible(false)}
           footer={null}
-          width={800}
+          width={900}
+          style={{ top: 20 }}
+          bodyStyle={{ padding: 0 }}
         >
-          {selectedQuotation && (
-            <div className="space-y-6 mt-4">
-              {/* Amount Summary */}
-              <Card 
-                style={{ 
-                  background: PURPLE_THEME.primaryBg,
-                  border: `1px solid ${PURPLE_THEME.primaryLighter}`
-                }}
-              >
-                <div className="text-center">
-                  <div className="text-sm text-gray-600">Grand Total</div>
-                  <div className="text-3xl font-bold mt-2" style={{ color: PURPLE_THEME.success }}>
-                    {formatCurrency(selectedQuotation.grand_total)}
-                  </div>
-                  {selectedQuotation.discount_percent > 0 && (
-                    <div className="text-sm text-green-600 mt-2">
-                      {selectedQuotation.discount_percent}% discount applied
+          {selectedEstimate && selectedEstimate.final_quotation && (
+            <div className="bg-white rounded-lg overflow-hidden">
+                
+                {/* 1. Invoice Header with Logo */}
+                <div className="p-8 border-b">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <img src={logo} alt="Company Logo" style={{ height: 60, marginBottom: 15 }} />
+                            <div className="text-gray-500 text-sm leading-relaxed">
+                                <strong>Clean & Green Services</strong><br/>
+                                123 Landscape Avenue<br/>
+                                Dubai, UAE<br/>
+                                support@company.com
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <h1 className="text-3xl font-bold text-gray-800 m-0" style={{ letterSpacing: '2px' }}>QUOTATION</h1>
+                            <div className="mt-4 text-sm text-gray-600 space-y-1">
+                                <div><strong>Date:</strong> {formatDate(selectedEstimate.final_quotation.createdAt)}</div>
+                                <div><strong>Ref #:</strong> {selectedEstimate._id.substring(0,8).toUpperCase()}</div>
+                                <div><strong>Valid Until:</strong> {formatDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))}</div>
+                            </div>
+                        </div>
                     </div>
-                  )}
                 </div>
-              </Card>
 
-              {/* Scope of Work */}
-              <Card title="Scope of Work" size="small">
-                <div className="p-3 bg-gray-50 rounded">
-                  <p>{selectedQuotation.scope_of_work}</p>
+                {/* 2. Bill To & Project Info */}
+                <div className="p-8 bg-gray-50 border-b">
+                    <Row gutter={24}>
+                        <Col span={12}>
+                            <h4 className="font-bold text-gray-700 uppercase text-xs mb-2">Bill To:</h4>
+                            <div className="text-sm text-gray-800 font-medium">{selectedEstimate.customer_name}</div>
+                            <div className="text-sm text-gray-500">{selectedEstimate.customer_email}</div>
+                            <div className="text-sm text-gray-500">{formatMobileNumber(selectedEstimate.customer_mobile)}</div>
+                        </Col>
+                        <Col span={12} className="text-right">
+                            <h4 className="font-bold text-gray-700 uppercase text-xs mb-2">Project Details:</h4>
+                            <div className="text-sm text-gray-800 font-medium">{selectedEstimate.service_type} - {selectedEstimate.subcategory?.label}</div>
+                            <div className="text-sm text-gray-500">Package: {selectedEstimate.package?.name}</div>
+                            <div className="text-sm text-gray-500">Area: {selectedEstimate.area_sqft} sq.ft</div>
+                        </Col>
+                    </Row>
                 </div>
-              </Card>
 
-              {/* Items Table */}
-              <Card title="Items Breakdown" size="small">
-                <Table
-                  dataSource={selectedQuotation.items || []}
-                  pagination={false}
-                  bordered
-                  size="small"
-                  scroll={{ x: 600 }}
-                >
-                  <Table.Column 
-                    title="Item" 
-                    dataIndex="item" 
-                    width={200}
-                  />
-                  <Table.Column 
-                    title="Description" 
-                    dataIndex="description" 
-                    ellipsis
-                  />
-                  <Table.Column 
-                    title="Qty" 
-                    dataIndex="quantity" 
-                    width={80}
-                    align="center"
-                  />
-                  <Table.Column 
-                    title="Rate" 
-                    render={(_, r) => (
-                      <div>{formatCurrency(r.unit_price)}</div>
-                    )}
-                    width={100}
-                  />
-                  <Table.Column 
-                    title="Total" 
-                    render={(_, r) => (
-                      <div className="font-semibold" style={{ color: PURPLE_THEME.success }}>
-                        {formatCurrency(r.total)}
-                      </div>
-                    )}
-                    width={120}
-                  />
-                </Table>
-              </Card>
+                {/* 3. Items Table */}
+                <div className="p-8">
+                    <Table
+                        dataSource={selectedEstimate.final_quotation.items}
+                        pagination={false}
+                        size="small"
+                        bordered
+                        rowKey="sno"
+                        columns={[
+                            { title: '#', dataIndex: 'sno', width: 50, align: 'center', className: 'bg-gray-50' },
+                            { title: 'Description', dataIndex: 'item', render: (t,r) => <div><strong>{t}</strong><div className="text-gray-500 text-xs">{r.description}</div></div> },
+                            { title: 'Unit', dataIndex: 'unit', width: 80, align: 'center' },
+                            { title: 'Qty', dataIndex: 'quantity', width: 80, align: 'center' },
+                            { title: 'Rate', dataIndex: 'unit_price', width: 100, align: 'right', render: v => formatCurrency(v) },
+                            { title: 'Total', dataIndex: 'total', width: 120, align: 'right', render: v => <strong>{formatCurrency(v)}</strong> }
+                        ]}
+                    />
 
-              {/* Totals */}
-              <Card size="small">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span className="font-semibold">{formatCurrency(selectedQuotation.subtotal)}</span>
-                  </div>
-                  
-                  {selectedQuotation.discount_percent > 0 && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Discount ({selectedQuotation.discount_percent}%):</span>
-                      <span className="font-semibold">-{formatCurrency(selectedQuotation.discount_amount)}</span>
-                    </div>
-                  )}
-
-                  <Divider />
-
-                  <div className="flex justify-between text-lg font-bold" style={{ color: PURPLE_THEME.success }}>
-                    <span>Grand Total:</span>
-                    <span>{formatCurrency(selectedQuotation.grand_total)}</span>
-                  </div>
+                    <Row gutter={24} className="mt-8">
+                        <Col span={14}>
+                            <h4 className="font-bold text-gray-700 text-sm mb-2">Scope of Work & Notes:</h4>
+                            <div className="p-4 bg-gray-50 rounded text-sm text-gray-600 whitespace-pre-wrap border border-gray-100">
+                                {selectedEstimate.final_quotation.scope_of_work}
+                            </div>
+                        </Col>
+                        <Col span={10}>
+                            <div className="bg-purple-50 p-6 rounded-lg">
+                                <div className="flex justify-between mb-2 text-gray-600">
+                                    <span>Subtotal:</span>
+                                    <span>{formatCurrency(selectedEstimate.final_quotation.subtotal)}</span>
+                                </div>
+                                {selectedEstimate.final_quotation.discount_amount > 0 && (
+                                    <div className="flex justify-between mb-2 text-red-500">
+                                        <span>Discount ({selectedEstimate.final_quotation.discount_percent}%):</span>
+                                        <span>- {formatCurrency(selectedEstimate.final_quotation.discount_amount)}</span>
+                                    </div>
+                                )}
+                                <Divider className="my-3 border-purple-200" />
+                                <div className="flex justify-between text-2xl font-bold text-purple-800">
+                                    <span>Total:</span>
+                                    <span>{formatCurrency(selectedEstimate.final_quotation.grand_total)}</span>
+                                </div>
+                            </div>
+                        </Col>
+                    </Row>
                 </div>
-              </Card>
+
+                {/* 4. Footer Actions */}
+                <div className="p-6 bg-gray-100 border-t flex justify-between items-center">
+                    <Button icon={<PrinterOutlined />} onClick={() => window.print()}>Print / Save PDF</Button>
+                    
+                    <Space>
+                        <Button onClick={() => setModalVisible(false)}>Close</Button>
+                        {!selectedEstimate.customer_response?.status && (
+                            <>
+                                <Button 
+                                    danger 
+                                    size="large"
+                                    onClick={() => openRejectModal(selectedEstimate)}
+                                >
+                                    Reject
+                                </Button>
+                                <Button 
+                                    type="primary" 
+                                    size="large"
+                                    icon={<CheckCircleOutlined />}
+                                    style={{ background: PURPLE_THEME.success, borderColor: PURPLE_THEME.success }}
+                                    onClick={() => accept(selectedEstimate)}
+                                >
+                                    Accept Quotation
+                                </Button>
+                            </>
+                        )}
+                    </Space>
+                </div>
             </div>
           )}
         </Modal>
@@ -606,52 +440,15 @@ const MyEstimates = () => {
           open={rejectModalVisible}
           onCancel={() => setRejectModalVisible(false)}
           footer={[
-            <Button key="cancel" onClick={() => setRejectModalVisible(false)}>
-              Cancel
-            </Button>,
-            <Button 
-              key="reject"
-              type="primary"
-              danger
-              loading={respondingId === selectedEstimate?._id}
-              onClick={reject}
-              icon={<CloseCircleOutlined />}
-            >
-              Reject
-            </Button>,
+            <Button key="cancel" onClick={() => setRejectModalVisible(false)}>Cancel</Button>,
+            <Button key="reject" type="primary" danger loading={respondingId === selectedEstimate?._id} onClick={reject} icon={<CloseCircleOutlined />}>Reject Quotation</Button>,
           ]}
           width={500}
         >
-          {selectedEstimate && (
-            <div className="space-y-4">
-              <Alert
-                message="Help us improve"
-                description="Your feedback helps us understand your needs better"
-                type="info"
-                showIcon
-              />
-              
-              <div className="bg-gray-50 p-3 rounded">
-                <div className="font-semibold text-gray-900">
-                  {selectedEstimate.service_type} • {formatCurrency(selectedEstimate.final_quotation?.grand_total)}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-medium text-gray-900 mb-2">
-                  Please share your reason:
-                </div>
-                <TextArea
-                  rows={4}
-                  placeholder="For example: The price is too high, timeline doesn't work, etc."
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  maxLength={500}
-                />
-              </div>
-            </div>
-          )}
+          <Alert message="We value your feedback" description="Please let us know why you are rejecting this quotation so we can improve." type="info" showIcon className="mb-4" />
+          <TextArea rows={4} placeholder="E.g. Price is too high, timeline doesn't work..." value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} />
         </Modal>
+
       </div>
     </div>
   );

@@ -11,28 +11,44 @@ import {
   Modal,
   Input,
   Tabs,
-  Statistic,
   Popconfirm,
   Alert,
   message,
   Badge,
+  Typography,
+  Avatar,
+  Divider
 } from "antd";
 import {
-  FiPlus,
-  FiRefreshCw,
-  FiEye,
-  FiCheck,
-  FiX,
-  FiUser,
-  FiClock,
-} from "react-icons/fi";
+  UserOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  EyeOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  GlobalOutlined,
+  SafetyCertificateOutlined
+} from "@ant-design/icons";
 import moment from "moment";
 import { apiService } from "../../../../../../manageApi/utils/custom.apiservice";
 import CustomTable from "../../../custom/CustomTable";
-import { showConfirmDialog } from "../../../../../../manageApi/utils/sweetAlert";
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
+const { Title, Text } = Typography;
+
+// --- THEME CONFIGURATION ---
+const PURPLE_THEME = {
+  primary: '#722ed1',
+  primaryLight: '#9254de',
+  primaryBg: '#f9f0ff',
+  success: '#52c41a',
+  warning: '#faad14',
+  error: '#ff4d4f',
+};
 
 // Role map
 const roleSlugMap = {
@@ -42,13 +58,6 @@ const roleSlugMap = {
   6: "vendor-b2b",
   7: "freelancer",
   11: "accountant",
-};
-
-// Status configuration
-const STATUS_CONFIG = {
-  0: { label: "Pending", color: "orange", badge: "processing" },
-  1: { label: "Approved", color: "green", badge: "success" },
-  2: { label: "Rejected", color: "red", badge: "error" },
 };
 
 // Permission Hook
@@ -73,9 +82,12 @@ const Freelancers = () => {
 
   const roleSlug = roleSlugMap[user?.role?.code] ?? "dashboard";
 
+  // DEFAULT TAB SET TO 'approved'
+  const [activeTab, setActiveTab] = useState("approved"); 
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("pending");
   const [freelancers, setFreelancers] = useState([]);
+  
+  // Kept stats only for Tab Badges (not for top cards)
   const [stats, setStats] = useState({ 
     total: 0, 
     pending: 0, 
@@ -102,6 +114,13 @@ const Freelancers = () => {
     rejected: 2 
   };
 
+  // Status UI Config
+  const statusConfig = {
+    0: { label: "Pending", color: "warning", icon: <ClockCircleOutlined />, bgColor: '#fff7e6', textColor: '#fa8c16' },
+    1: { label: "Approved", color: "success", icon: <CheckCircleOutlined />, bgColor: '#f6ffed', textColor: '#52c41a' },
+    2: { label: "Rejected", color: "error", icon: <CloseCircleOutlined />, bgColor: '#fff1f0', textColor: '#ff4d4f' },
+  };
+
   // Fetch Freelancers
   const fetchFreelancers = useCallback(
     async (page = 1, limit = 10) => {
@@ -115,15 +134,11 @@ const Freelancers = () => {
           status: statusMap[activeTab],
         };
 
-        console.log("Fetching freelancers with params:", params);
-
         const res = await apiService.get("/freelancer", params);
-        console.log("API Response:", res);
 
         if (res.success) {
           setFreelancers(res.freelancers || []);
           
-          // Handle pagination
           const paginationData = res.pagination || {};
           setPagination({
             currentPage: paginationData.page || 1,
@@ -132,18 +147,13 @@ const Freelancers = () => {
             itemsPerPage: paginationData.limit || limit,
           });
 
-          // Calculate stats from data if not provided by API
+          // Calculate stats for badges
           if (res.stats) {
             setStats(res.stats);
           } else {
-            // Fallback: Calculate from current data
-            const allFreelancers = res.freelancers || [];
-            setStats({
-              total: paginationData.total || allFreelancers.length,
-              pending: allFreelancers.filter(f => f.status_info?.status === 0).length,
-              approved: allFreelancers.filter(f => f.status_info?.status === 1).length,
-              rejected: allFreelancers.filter(f => f.status_info?.status === 2).length,
-            });
+             // Basic fallback (optional)
+             const all = res.freelancers || [];
+             setStats(prev => ({...prev, [activeTab]: all.length})); 
           }
         } else {
           message.error(res.message || "Failed to fetch freelancers");
@@ -152,7 +162,6 @@ const Freelancers = () => {
       } catch (err) {
         console.error("Error fetching freelancers:", err);
         message.error("Failed to load freelancers");
-        setFreelancers([]);
       } finally {
         setLoading(false);
       }
@@ -160,18 +169,12 @@ const Freelancers = () => {
     [activeTab, token, perm.canView]
   );
 
-  // Fetch stats separately
+  // Initial Fetch of Stats (for badges)
   const fetchStats = useCallback(async () => {
     try {
-      const allRes = await apiService.get("/freelancer", { limit: 1000 });
-      if (allRes.success) {
-        const allFreelancers = allRes.freelancers || [];
-        setStats({
-          total: allRes.pagination?.total || allFreelancers.length,
-          pending: allFreelancers.filter(f => f.status_info?.status === 0).length,
-          approved: allFreelancers.filter(f => f.status_info?.status === 1).length,
-          rejected: allFreelancers.filter(f => f.status_info?.status === 2).length,
-        });
+      const allRes = await apiService.get("/freelancer", { limit: 1 }); // Just to get stats object
+      if (allRes.success && allRes.stats) {
+        setStats(allRes.stats);
       }
     } catch (err) {
       console.error("Error fetching stats:", err);
@@ -180,7 +183,7 @@ const Freelancers = () => {
 
   useEffect(() => {
     fetchFreelancers(pagination.currentPage, pagination.itemsPerPage);
-    // fetchStats();
+    fetchStats();
   }, [activeTab, fetchFreelancers, fetchStats]);
 
   const handleTabChange = (key) => {
@@ -194,15 +197,13 @@ const Freelancers = () => {
 
   const handleRefresh = () => {
     fetchFreelancers(pagination.currentPage, pagination.itemsPerPage);
+    fetchStats();
   };
 
   const handleApprove = async (id) => {
     setActionLoading(id);
     try {
-      const response = await apiService.put(`/freelancer/${id}/status`, { 
-        status: 1 
-      });
-
+      const response = await apiService.put(`/freelancer/${id}/status`, { status: 1 });
       if (response.success) {
         message.success("Freelancer approved successfully!");
         handleRefresh();
@@ -210,7 +211,6 @@ const Freelancers = () => {
         message.error(response.message || "Failed to approve freelancer");
       }
     } catch (err) {
-      console.error("Error approving freelancer:", err);
       message.error("Failed to approve freelancer");
     } finally {
       setActionLoading(null);
@@ -247,22 +247,16 @@ const Freelancers = () => {
         message.error(response.message || "Failed to reject freelancer");
       }
     } catch (err) {
-      console.error("Error rejecting freelancer:", err);
       message.error("Failed to reject freelancer");
     } finally {
       setActionLoading(null);
     }
   };
 
-  // Navigate to freelancer detail page
   const handleViewDetails = (freelancer) => {
-    // navigate(`/dashboard/${roleSlug}/freelancer/${freelancer._id}`);
-          navigate(`/dashboard/${roleSlug}/freelancer?freelancerId=${freelancer._id}`)
-
+      navigate(`/dashboard/${roleSlug}/freelancer?freelancerId=${freelancer._id}`)
   };
 
-
-  // Format mobile number
   const formatMobile = (freelancer) => {
     if (freelancer.mobile) {
       if (typeof freelancer.mobile === 'object') {
@@ -273,25 +267,27 @@ const Freelancers = () => {
     return "—";
   };
 
-  // Table Columns
+  // --- COLUMNS ---
   const columns = useMemo(
     () => [
       {
-        title: "Freelancer",
+        title: "Freelancer Profile",
         width: 280,
         render: (_, record) => (
           <div className="flex items-center gap-3">
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"
-              style={{ backgroundColor: "#5C039B" }}
+            <Avatar 
+                size={45} 
+                style={{ background: PURPLE_THEME.primaryBg, color: PURPLE_THEME.primary, border: `1px solid ${PURPLE_THEME.primaryLighter}` }}
             >
-              {record.name?.first_name?.[0]?.toUpperCase() || "F"}
-            </div>
+                {record.name?.first_name?.[0]?.toUpperCase() || "F"}
+            </Avatar>
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-gray-800 truncate">
                 {record.name?.first_name} {record.name?.last_name}
               </div>
-              <div className="text-xs text-gray-500 truncate">{record.email}</div>
+              <div className="text-xs text-gray-500 flex items-center gap-1">
+                 <MailOutlined /> {record.email}
+              </div>
               <div className="text-xs text-gray-400 mt-1">
                 Joined: {moment(record.createdAt).format("DD MMM YYYY")}
               </div>
@@ -300,102 +296,73 @@ const Freelancers = () => {
         ),
       },
       {
-        title: "Contact",
-        width: 160,
-        render: (_, record) => (
-          <Space direction="vertical" size={2}>
-            <div className="flex items-center gap-1 text-sm">
-              <span>{formatMobile(record)}</span>
-            </div>
-            {record.is_mobile_verified && (
-              <Tag color="green" icon={<FiCheck />} size="small">
-                Verified
-              </Tag>
-            )}
-          </Space>
-        ),
-      },
-      {
-        title: "Location",
-        width: 150,
+        title: "Contact & Location",
+        width: 200,
         render: (_, record) => {
-          const location = [
-            record.location?.city,
-            record.location?.state,
-            record.location?.country,
-          ]
-            .filter(Boolean)
-            .join(", ");
-          return (
-            <Tooltip title={location}>
-              <div className="text-sm">
-                <span className="truncate">{location || "—"}</span>
-              </div>
-            </Tooltip>
-          );
+             const location = [
+                record.location?.city,
+                record.location?.state
+              ].filter(Boolean).join(", ");
+
+            return (
+              <Space direction="vertical" size={0}>
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <PhoneOutlined className="text-gray-400"/>
+                  <span>{formatMobile(record)}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                    <GlobalOutlined className="text-gray-400"/>
+                    <Tooltip title={`${location}, ${record.location?.country || ''}`}>
+                        <span className="truncate max-w-[150px]">{location || "—"}</span>
+                    </Tooltip>
+                </div>
+              </Space>
+            )
         },
       },
       {
-        title: "Experience",
-        width: 120,
+        title: "Professional Info",
+        width: 150,
         render: (_, record) => (
-          <div className="text-center">
-            <Tag color="blue">
-              {record.professional?.experience_years || 0} years
-            </Tag>
-          </div>
-        ),
-      },
-      {
-        title: "Services",
-        width: 100,
-        render: (_, record) => (
-          <Badge 
-            count={record.services_offered?.length || 0} 
-            showZero 
-            color="#5C039B"
-          >
-            <div className="text-center">
-              <Tag color="purple">{record.services_offered?.length || 0}</Tag>
-            </div>
-          </Badge>
+            <Space direction="vertical" size={2}>
+                <Tag color="purple">
+                     <SafetyCertificateOutlined className="mr-1"/>
+                     {record.professional?.experience_years || 0} Years Exp.
+                </Tag>
+                <div className="text-xs text-gray-500 pl-1">
+                    {record.services_offered?.length || 0} Services Offered
+                </div>
+            </Space>
         ),
       },
       {
         title: "Status",
-        width: 120,
+        width: 130,
         render: (_, record) => {
           const status = record.status_info?.status ?? 0;
-          const config = STATUS_CONFIG[status];
+          const config = statusConfig[status];
           return (
-            <Badge 
-              status={config.badge} 
-              text={config.label}
-              className="font-medium"
-            />
+            <Tag color={config.color} style={{ borderRadius: 10, padding: '2px 10px', display: 'flex', width: 'fit-content', alignItems: 'center', gap: '4px' }}>
+                {config.icon} {config.label}
+            </Tag>
           );
         },
       },
       {
-        title: "Registered",
-        width: 130,
-        render: (_, record) => moment(record.createdAt).format("DD/MM/YYYY"),
-      },
-      {
         title: "Actions",
         fixed: "right",
-        width: 180,
+        width: 140,
         render: (_, record) => (
           <Space>
-            <Tooltip title="View Full Details">
+            <Tooltip title="View Details">
               <Button
-                type="link"
-                icon={<FiEye />}
+                icon={<EyeOutlined />}
+                size="small"
                 onClick={() => handleViewDetails(record)}
-                className="text-blue-600"
               />
             </Tooltip>
 
+            {/* Actions for Pending Tab */}
             {activeTab === "pending" && perm.canApprove && (
               <Tooltip title="Approve">
                 <Popconfirm
@@ -404,12 +371,13 @@ const Freelancers = () => {
                   onConfirm={() => handleApprove(record._id)}
                   okText="Yes"
                   cancelText="No"
-                  okType="primary"
+                  okButtonProps={{ style: { background: '#52c41a' }}}
                 >
                   <Button
-                    type="link"
-                    icon={<FiCheck />}
-                    className="text-green-600"
+                    type="primary"
+                    size="small"
+                    icon={<CheckOutlined />}
+                    className="bg-green-600 hover:bg-green-500"
                     loading={actionLoading === record._id}
                   />
                 </Popconfirm>
@@ -419,9 +387,10 @@ const Freelancers = () => {
             {activeTab === "pending" && perm.canReject && (
               <Tooltip title="Reject">
                 <Button
-                  type="link"
+                  type="primary"
                   danger
-                  icon={<FiX />}
+                  size="small"
+                  icon={<CloseOutlined />}
                   onClick={() => openRejectModal(record)}
                   loading={actionLoading === record._id}
                 />
@@ -431,7 +400,7 @@ const Freelancers = () => {
         ),
       },
     ],
-    [activeTab, perm.canApprove, perm.canReject, actionLoading, roleSlug, navigate]
+    [activeTab, perm, actionLoading, navigate, roleSlug]
   );
 
   if (!perm.canView) {
@@ -447,106 +416,72 @@ const Freelancers = () => {
     );
   }
 
+  // --- TAB CONFIGURATION ---
+  // Re-ordering so Approved is first conceptually, but using keys to control content
+  const tabItems = [
+    {
+        key: 'approved',
+        label: 'Approved',
+        icon: <CheckCircleOutlined />,
+        count: stats.approved,
+        color: '#52c41a'
+    },
+    {
+        key: 'pending',
+        label: 'Pending',
+        icon: <ClockCircleOutlined />,
+        count: stats.pending,
+        color: '#fa8c16'
+    },
+    {
+        key: 'rejected',
+        label: 'Rejected',
+        icon: <CloseCircleOutlined />,
+        count: stats.rejected,
+        color: '#ff4d4f'
+    }
+  ];
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      
       {/* Header */}
-      <Card className="mb-6 shadow-sm" bodyStyle={{ padding: "20px 24px" }}>
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-1">
-              Freelancer Management
-            </h1>
-            <p className="text-gray-600">
-              Review and manage freelancer applications and profiles
-            </p>
-          </div>
-        
-        </div>
-      </Card>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        {[
-          { 
-            title: "Total Freelancers", 
-            value: stats.total, 
-            icon: <FiUser style={{ color: "#5C039B" }} />, 
-            color: "#5C039B" 
-          },
-          { 
-            title: "Pending Review", 
-            value: stats.pending, 
-            icon: <FiClock style={{ color: "#fa8c16" }} />, 
-            color: "#fa8c16" 
-          },
-          { 
-            title: "Approved", 
-            value: stats.approved, 
-            icon: <FiCheck style={{ color: "#52c41a" }} />, 
-            color: "#52c41a" 
-          },
-          { 
-            title: "Rejected", 
-            value: stats.rejected, 
-            icon: <FiX style={{ color: "#ff4d4f" }} />, 
-            color: "#ff4d4f" 
-          },
-        ].map((stat, index) => (
-          <Card key={stat.title} className="shadow-sm hover:shadow-md transition-shadow">
-            <Statistic
-              title={stat.title}
-              value={stat.value}
-              prefix={stat.icon}
-              valueStyle={{ color: stat.color, fontWeight: 600 }}
-            />
-          </Card>
-        ))}
+      <div className="mb-6">
+        <Title level={3}>Freelancer Management</Title>
+        <Text type="secondary">Manage partners, view profiles, and handle approvals</Text>
       </div>
 
-      {/* Tabs */}
-      <Card className="shadow-sm">
+      {/* Filter Tabs */}
+      <Card bodyStyle={{ padding: 0 }} className="mb-6 overflow-hidden rounded-lg shadow-sm border-none">
         <Tabs 
-          activeKey={activeTab} 
-          onChange={handleTabChange}
-          type="card"
+            activeKey={activeTab} 
+            onChange={handleTabChange} 
+            type="card" 
+            size="large"
+            tabBarStyle={{ margin: 0, background: '#fff' }}
         >
-          <TabPane 
-            tab={
-              <span>
-                Pending
-                {stats.pending > 0 && (
-                  <Badge count={stats.pending} offset={[10, -5]} />
-                )}
-              </span>
-            } 
-            key="pending" 
-          />
-          <TabPane 
-            tab={
-              <span>
-                Approved
-                {stats.approved > 0 && (
-                  <Badge count={stats.approved} offset={[10, -5]} />
-                )}
-              </span>
-            } 
-            key="approved" 
-          />
-          <TabPane 
-            tab={
-              <span>
-                Rejected
-                {stats.rejected > 0 && (
-                  <Badge count={stats.rejected} offset={[10, -5]} />
-                )}
-              </span>
-            } 
-            key="rejected" 
-          />
+            {tabItems.map(item => (
+                <TabPane 
+                    tab={
+                        <span className="flex items-center gap-2 px-4">
+                            {item.icon}
+                            {item.label}
+                            {item.count > 0 && (
+                                <Badge 
+                                    count={item.count} 
+                                    style={{ backgroundColor: item.color, marginLeft: 4 }} 
+                                />
+                            )}
+                        </span>
+                    }
+                    key={item.key}
+                />
+            ))}
         </Tabs>
+      </Card>
 
-        {/* Table */}
-        <div className="mt-4">
+      {/* Data Table */}
+      <Card bodyStyle={{ padding: '0px' }} className="shadow-sm border-none">
           <CustomTable
             columns={columns}
             data={freelancers}
@@ -555,16 +490,15 @@ const Freelancers = () => {
             currentPage={pagination.currentPage}
             itemsPerPage={pagination.itemsPerPage}
             onPageChange={handlePageChange}
-            scroll={{ x: 1200 }}
+            scroll={{ x: 1000 }}
             rowKey="_id"
           />
-        </div>
       </Card>
 
       {/* Reject Modal */}
       <Modal
         open={showRejectModal}
-        title="Reject Freelancer Application"
+        title={<span className="text-red-600"><CloseCircleOutlined /> Reject Application</span>}
         onCancel={() => setShowRejectModal(false)}
         footer={[
           <Button key="cancel" onClick={() => setShowRejectModal(false)}>
@@ -578,37 +512,44 @@ const Freelancers = () => {
             disabled={!rejectionReason.trim()}
             onClick={handleReject}
           >
-            Reject Application
+            Confirm Rejection
           </Button>,
         ]}
         width={500}
       >
         {selectedFreelancer && (
-          <>
+          <div className="pt-2">
             <Alert
-              message="Rejection Reason Required"
-              description="Please provide a clear reason for rejecting this freelancer's application. This will be visible to the freelancer."
+              message="Action Required"
+              description="Please provide a valid reason for rejection. This will be sent to the freelancer."
               type="warning"
               showIcon
               className="mb-4"
             />
             
-            <div className="mb-4 p-3 bg-gray-50 rounded">
-              <div className="font-semibold">
-                {selectedFreelancer.name?.first_name} {selectedFreelancer.name?.last_name}
+            <div className="mb-4 p-3 bg-gray-50 rounded border border-gray-200">
+              <div className="flex items-center gap-2">
+                <Avatar size="small" src={selectedFreelancer.avatar}>{selectedFreelancer.name?.first_name?.[0]}</Avatar>
+                <div>
+                    <div className="font-semibold text-sm">
+                        {selectedFreelancer.name?.first_name} {selectedFreelancer.name?.last_name}
+                    </div>
+                    <div className="text-xs text-gray-500">{selectedFreelancer.email}</div>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">{selectedFreelancer.email}</div>
             </div>
 
+            <Text strong>Rejection Reason:</Text>
             <TextArea
+              className="mt-2"
               rows={4}
-              placeholder="Enter detailed reason for rejection..."
+              placeholder="E.g., Incomplete profile information, credentials not verified..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               maxLength={500}
               showCount
             />
-          </>
+          </div>
         )}
       </Modal>
     </div>

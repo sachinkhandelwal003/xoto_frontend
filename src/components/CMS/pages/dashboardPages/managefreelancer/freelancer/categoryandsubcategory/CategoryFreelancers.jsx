@@ -1,6 +1,6 @@
+// src/pages/admin/CategoryFreelancers.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-
 import {
   Card,
   Button,
@@ -9,7 +9,6 @@ import {
   Space,
   Tag,
   Tooltip,
-  Spin,
   Typography,
   Divider,
   Row,
@@ -17,37 +16,37 @@ import {
   Alert,
   Avatar,
   Popconfirm,
-  Empty,
   Input,
   Form,
   Modal,
   Select,
   Tabs,
   Descriptions,
+  Statistic,
+  Radio
 } from 'antd';
 
 import {
   PlusOutlined,
   EyeOutlined,
   EditOutlined,
-  RestOutlined,
-  SearchOutlined,
-  InfoCircleOutlined,
-  CloseOutlined,
-  DeleteOutlined,
+  ReloadOutlined,DeleteOutlined
 } from '@ant-design/icons';
 
 import {
   FiTrash2,
-  FiArrowLeft,
+  FiLayers,
+  FiTag,
+  FiArchive,
   FiRefreshCw
 } from 'react-icons/fi';
 
+// Icons Import
 import {
   FaLaptopCode, FaMobileAlt, FaPaintBrush, FaBullhorn, FaCamera, FaPenFancy,
   FaVideo, FaChartLine, FaCogs, FaHeadset, FaShieldAlt, FaWordpress, FaReact,
   FaNodeJs, FaPython, FaDatabase, FaCloud, FaShoppingCart, FaUsers, FaBriefcase,
-  FaLightbulb, FaRocket, FaStar, FaHeart, FaCertificate, FaLayerGroup, FaTag
+  FaLightbulb, FaRocket, FaStar, FaHeart, FaCertificate
 } from 'react-icons/fa';
 
 import CustomTable from '../../../../../../../components/CMS/pages/custom/CustomTable';
@@ -58,18 +57,13 @@ import { showConfirmDialog, showSuccessAlert, showErrorAlert } from '../../../..
 const { TextArea } = Input;
 const { Option } = Select;
 const { TabPane } = Tabs;
+const { Title, Text } = Typography;
 
-// Theme colors - PURPLE
+// --- THEME ---
 const PURPLE_THEME = {
   primary: '#722ed1',
   primaryLight: '#9254de',
-  primaryLighter: '#d3adf7',
   primaryBg: '#f9f0ff',
-  success: '#52c41a',
-  warning: '#faad14',
-  error: '#ff4d4f',
-  info: '#1890ff',
-  gray: '#8c8c8c',
   dark: '#1f2937'
 };
 
@@ -101,41 +95,38 @@ const iconOptions = [
   { value: 'FaCertificate', label: 'Certified Expert', icon: <FaCertificate /> },
 ];
 
-// Category Creation Modal
+// Helper to render icon
+const getIconComponent = (iconName) => {
+  const map = {
+    FaLaptopCode, FaMobileAlt, FaPaintBrush, FaBullhorn, FaCamera, FaPenFancy,
+    FaVideo, FaChartLine, FaCogs, FaHeadset, FaShieldAlt, FaWordpress, FaReact,
+    FaNodeJs, FaPython, FaDatabase, FaCloud, FaShoppingCart, FaUsers, FaBriefcase,
+    FaLightbulb, FaRocket, FaStar, FaHeart, FaCertificate,
+  };
+  const Icon = map[iconName];
+  return Icon ? <Icon /> : <FaLaptopCode />;
+};
+
+// --- MODAL: CREATE CATEGORY ---
 const CreateCategoryModal = ({ open, onCancel, onSuccess, isSubcategory = false, parentCategory = null }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [activeCategories, setActiveCategories] = useState([]);
 
   useEffect(() => {
-    if (isSubcategory) {
+    if (isSubcategory && open) {
       fetchActiveCategories();
     }
-  }, [isSubcategory]);
+  }, [isSubcategory, open]);
 
   const fetchActiveCategories = async () => {
     try {
-      const params = {
-        active: true,
-        is_deleted: false,
-        limit: 100
-      };
-      const res = await apiService.get('/freelancer/category', params);
+      // Fetch only active categories for the parent dropdown
+      const res = await apiService.get('/freelancer/category', { active: true, is_deleted: false, limit: 100 });
       setActiveCategories(res.data || []);
     } catch (err) {
       console.error('Error fetching active categories:', err);
     }
-  };
-
-  const getIconComponent = (iconName) => {
-    const map = {
-      FaLaptopCode, FaMobileAlt, FaPaintBrush, FaBullhorn, FaCamera, FaPenFancy,
-      FaVideo, FaChartLine, FaCogs, FaHeadset, FaShieldAlt, FaWordpress, FaReact,
-      FaNodeJs, FaPython, FaDatabase, FaCloud, FaShoppingCart, FaUsers, FaBriefcase,
-      FaLightbulb, FaRocket, FaStar, FaHeart, FaCertificate,
-    };
-    const Icon = map[iconName];
-    return Icon ? <Icon /> : <FaLaptopCode />;
   };
 
   const handleSubmit = async (values) => {
@@ -169,8 +160,8 @@ const CreateCategoryModal = ({ open, onCancel, onSuccess, isSubcategory = false,
   return (
     <Modal
       title={
-        <div className="flex items-center gap-2">
-          <PlusOutlined style={{ color: PURPLE_THEME.primary }} />
+        <div className="flex items-center gap-2 text-purple-700">
+          <PlusOutlined />
           <span>Create New {isSubcategory ? 'Subcategory' : 'Category'}</span>
         </div>
       }
@@ -197,14 +188,11 @@ const CreateCategoryModal = ({ open, onCancel, onSuccess, isSubcategory = false,
               placeholder="Select parent category"
               showSearch
               optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
             >
               {activeCategories.map(cat => (
                 <Option key={cat._id} value={cat._id}>
                   <div className="flex items-center gap-3">
-                    {getIconComponent(cat.icon || 'FaLaptopCode')}
+                    <span className="text-purple-600">{getIconComponent(cat.icon)}</span>
                     <span className="font-medium">{cat.name}</span>
                   </div>
                 </Option>
@@ -218,21 +206,11 @@ const CreateCategoryModal = ({ open, onCancel, onSuccess, isSubcategory = false,
           label="Name"
           rules={[{ required: true, message: 'Please enter name' }]}
         >
-          <Input 
-            placeholder={`e.g., ${isSubcategory ? 'React.js Development' : 'Web Development'}`} 
-          />
+          <Input placeholder={`e.g., ${isSubcategory ? 'React.js Development' : 'Web Development'}`} />
         </Form.Item>
 
-        <Form.Item
-          name="description"
-          label="Description"
-        >
-          <TextArea 
-            rows={3} 
-            placeholder="Describe this service category..." 
-            showCount 
-            maxLength={200} 
-          />
+        <Form.Item name="description" label="Description">
+          <TextArea rows={3} placeholder="Describe this service category..." showCount maxLength={200} />
         </Form.Item>
 
         <Form.Item
@@ -244,15 +222,12 @@ const CreateCategoryModal = ({ open, onCancel, onSuccess, isSubcategory = false,
             showSearch
             optionLabelProp="label"
             placeholder="Select an icon"
-            filterOption={(input, option) =>
-              option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
           >
             {iconOptions.map(opt => (
               <Option key={opt.value} value={opt.value} label={opt.label}>
-                <div className="flex items-center gap-4 py-2">
-                  <span className="text-purple-600 text-xl">{opt.icon}</span>
-                  <span className="font-medium">{opt.label}</span>
+                <div className="flex items-center gap-3 py-1">
+                  <span className="text-purple-600 text-lg">{opt.icon}</span>
+                  <span>{opt.label}</span>
                 </div>
               </Option>
             ))}
@@ -262,16 +237,14 @@ const CreateCategoryModal = ({ open, onCancel, onSuccess, isSubcategory = false,
         <Divider />
 
         <div className="flex justify-end gap-2">
-          <Button onClick={onCancel} disabled={loading}>
-            Cancel
-          </Button>
+          <Button onClick={onCancel} disabled={loading}>Cancel</Button>
           <Button
             type="primary"
             htmlType="submit"
             loading={loading}
             style={{ background: PURPLE_THEME.primary, borderColor: PURPLE_THEME.primary }}
           >
-            Create {isSubcategory ? 'Subcategory' : 'Category'}
+            Create
           </Button>
         </div>
       </Form>
@@ -279,8 +252,8 @@ const CreateCategoryModal = ({ open, onCancel, onSuccess, isSubcategory = false,
   );
 };
 
-// Category Details Drawer
-const CategoryDetailsDrawer = ({ open, category, onClose, onEdit, onDelete, onRestore, isSubcategory = false }) => {
+// --- DRAWER: CATEGORY DETAILS (Handles Edit, Delete, Restore) ---
+const CategoryDetailsDrawer = ({ open, category, onClose, onEdit, onSuccess, isSubcategory = false }) => {
   const [editMode, setEditMode] = useState(false);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -294,19 +267,10 @@ const CategoryDetailsDrawer = ({ open, category, onClose, onEdit, onDelete, onRe
         is_active: category.is_active !== undefined ? category.is_active : true
       });
     }
-  }, [category, form]);
+    setEditMode(false); // Reset edit mode when opening new category
+  }, [category, form, open]);
 
-  const getIconComponent = (iconName) => {
-    const map = {
-      FaLaptopCode, FaMobileAlt, FaPaintBrush, FaBullhorn, FaCamera, FaPenFancy,
-      FaVideo, FaChartLine, FaCogs, FaHeadset, FaShieldAlt, FaWordpress, FaReact,
-      FaNodeJs, FaPython, FaDatabase, FaCloud, FaShoppingCart, FaUsers, FaBriefcase,
-      FaLightbulb, FaRocket, FaStar, FaHeart, FaCertificate,
-    };
-    const Icon = map[iconName];
-    return Icon ? <Icon /> : <FaLaptopCode />;
-  };
-
+  // Handle Update
   const handleSave = async (values) => {
     setLoading(true);
     try {
@@ -314,47 +278,64 @@ const CategoryDetailsDrawer = ({ open, category, onClose, onEdit, onDelete, onRe
       await apiService.put(`${endpoint}/${category._id}`, values);
       showToast(`${isSubcategory ? 'Subcategory' : 'Category'} updated successfully`, 'success');
       setEditMode(false);
-      onEdit();
+      onSuccess(); // Refresh table
     } catch (err) {
-      const msg = err.response?.data?.message || `Failed to update ${isSubcategory ? 'subcategory' : 'category'}`;
+      const msg = err.response?.data?.message || `Failed to update`;
       showErrorAlert('Error', msg);
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle Soft Delete
   const handleDelete = async () => {
     try {
-      await showSuccessAlert(
+      const result = await showConfirmDialog(
         'Confirm Delete',
-        `Are you sure you want to delete this ${isSubcategory ? 'subcategory' : 'category'}?`,
-        'warning',
-        true
-      ).then(async (result) => {
-        if (result.isConfirmed) {
-          const endpoint = isSubcategory ? '/freelancer/subcategory' : '/freelancer/category';
-          await apiService.delete(`${endpoint}/${category._id}`);
-          showToast(`${isSubcategory ? 'Subcategory' : 'Category'} deleted successfully`, 'success');
-          onDelete();
-          onClose();
-        }
-      });
+        `Are you sure you want to delete this ${isSubcategory ? 'subcategory' : 'category'}? It will be moved to trash.`,
+        'Delete'
+      );
+      if (result) {
+        setLoading(true);
+        const endpoint = isSubcategory ? '/freelancer/subcategory' : '/freelancer/category';
+        // Backend expects DELETE request for soft delete
+        await apiService.delete(`${endpoint}/${category._id}`);
+        
+        showToast(`Deleted successfully`, 'success');
+        onSuccess();
+        onClose();
+      }
     } catch (err) {
-      const msg = err.response?.data?.message || `Failed to delete ${isSubcategory ? 'subcategory' : 'category'}`;
-      showErrorAlert('Error', msg);
+      const msg = err.response?.data?.message || 'Failed to delete';
+      showErrorAlert('Operation Failed', msg);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Handle Restore
   const handleRestore = async () => {
     try {
-      const endpoint = isSubcategory ? '/freelancer/subcategory' : '/freelancer/category';
-      await apiService.put(`${endpoint}/${category._id}/restore`);
-      showToast(`${isSubcategory ? 'Subcategory' : 'Category'} restored successfully`, 'success');
-      onRestore();
-      onClose();
+      const result = await showConfirmDialog(
+        'Confirm Restore',
+        `Do you want to restore this ${isSubcategory ? 'subcategory' : 'category'} from trash?`,
+        'Restore'
+      );
+      if (result) {
+        setLoading(true);
+        const endpoint = isSubcategory ? '/freelancer/subcategory' : '/freelancer/category';
+        // Backend expects PUT request to /restore endpoint
+        await apiService.put(`${endpoint}/${category._id}/restore`);
+        
+        showToast(`Restored successfully`, 'success');
+        onSuccess();
+        onClose();
+      }
     } catch (err) {
-      const msg = err.response?.data?.message || `Failed to restore ${isSubcategory ? 'subcategory' : 'category'}`;
-      showErrorAlert('Error', msg);
+      const msg = err.response?.data?.message || 'Failed to restore';
+      showErrorAlert('Operation Failed', msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -367,46 +348,38 @@ const CategoryDetailsDrawer = ({ open, category, onClose, onEdit, onDelete, onRe
           <Avatar 
             size={40}
             style={{ background: PURPLE_THEME.primaryBg, color: PURPLE_THEME.primary }}
-            icon={getIconComponent(category.icon || 'FaLaptopCode')}
+            icon={getIconComponent(category.icon)}
           />
           <div>
-            <Typography.Title level={4} style={{ margin: 0 }}>
-              {category.name}
-            </Typography.Title>
-            <Typography.Text type="secondary">
-              {isSubcategory ? 'Subcategory' : 'Category'}
-            </Typography.Text>
+            <div className="font-bold text-gray-800">{category.name}</div>
+            <div className="text-xs text-gray-500">{isSubcategory ? 'Subcategory' : 'Category'} Details</div>
           </div>
         </div>
       }
-      placement="right"
       onClose={onClose}
       open={open}
       width={600}
-      destroyOnClose
       extra={
         <Space>
           {!editMode && !category.is_deleted && (
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => setEditMode(true)}
-            >
-              Edit
-            </Button>
+            <Button icon={<EditOutlined />} onClick={() => setEditMode(true)}>Edit</Button>
           )}
-          <Button icon={<CloseOutlined />} onClick={onClose} />
         </Space>
       }
     >
       <div className="space-y-6">
-        {/* Status */}
-        <div>
-          <Tag color={category.is_deleted ? 'red' : category.is_active ? 'green' : 'orange'}>
-            {category.is_deleted ? 'Deleted' : category.is_active ? 'Active' : 'Inactive'}
-          </Tag>
-          <Typography.Text type="secondary" className="ml-4">
-            Created: {new Date(category.created_at).toLocaleDateString()}
-          </Typography.Text>
+        {/* Status Badge */}
+        <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border">
+            <div>
+                <span className="text-gray-500 text-sm">Current Status</span>
+                <div className="font-medium mt-1">
+                    {category.is_deleted ? <Tag color="red">TRASHED</Tag> : category.is_active ? <Tag color="green">ACTIVE</Tag> : <Tag color="orange">INACTIVE</Tag>}
+                </div>
+            </div>
+            <div className="text-right">
+                 <span className="text-gray-500 text-sm">Created Date</span>
+                 <div className="font-medium mt-1">{new Date(category.created_at || category.createdAt).toLocaleDateString()}</div>
+            </div>
         </div>
 
         {/* Edit Form */}
@@ -416,641 +389,365 @@ const CategoryDetailsDrawer = ({ open, category, onClose, onEdit, onDelete, onRe
           onFinish={handleSave}
           disabled={!editMode || loading}
         >
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                label="Name"
-                name="name"
-                rules={[{ required: true, message: 'Required' }]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
 
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                label="Description"
-                name="description"
-              >
-                <TextArea rows={3} />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item label="Description" name="description">
+            <TextArea rows={3} />
+          </Form.Item>
 
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                label="Icon"
-                name="icon"
-              >
-                <Select
-                  showSearch
-                  optionLabelProp="label"
-                  placeholder="Select an icon"
-                >
-                  {iconOptions.map(opt => (
-                    <Option key={opt.value} value={opt.value} label={opt.label}>
-                      <div className="flex items-center gap-4 py-2">
-                        <span className="text-purple-600 text-xl">{opt.icon}</span>
-                        <span className="font-medium">{opt.label}</span>
-                      </div>
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item label="Icon" name="icon">
+            <Select showSearch optionLabelProp="label">
+              {iconOptions.map(opt => (
+                <Option key={opt.value} value={opt.value} label={opt.label}>
+                   <div className="flex items-center gap-2"><span className="text-purple-600">{opt.icon}</span> {opt.label}</div>
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                label="Status"
-                name="is_active"
-                valuePropName="checked"
-              >
-                <Switch
-                  checkedChildren="Active"
-                  unCheckedChildren="Inactive"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+          {/* Status Switch (Only show if not deleted) */}
+          {!category.is_deleted && (
+            <Form.Item label="Active Status" name="is_active" valuePropName="checked">
+              <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+            </Form.Item>
+          )}
 
           {editMode && (
-            <div className="flex justify-end gap-2 mt-4">
-              <Button onClick={() => setEditMode(false)} disabled={loading}>
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                style={{ background: PURPLE_THEME.primary, borderColor: PURPLE_THEME.primary }}
-              >
-                Save Changes
-              </Button>
+            <div className="flex justify-end gap-2">
+              <Button onClick={() => setEditMode(false)}>Cancel</Button>
+              <Button type="primary" htmlType="submit" loading={loading} style={{ background: PURPLE_THEME.primary }}>Save Changes</Button>
             </div>
           )}
         </Form>
 
-        {/* Additional Info */}
-        <Divider orientation="left">
-          <Tag color="purple" icon={<InfoCircleOutlined />}>
-            Additional Information
-          </Tag>
-        </Divider>
-
-        <Descriptions column={1} size="small">
-          <Descriptions.Item label="ID">
-            <Typography.Text copyable>{category._id}</Typography.Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="Created At">
-            {new Date(category.created_at).toLocaleString()}
-          </Descriptions.Item>
-          {category.updated_at && (
-            <Descriptions.Item label="Last Updated">
-              {new Date(category.updated_at).toLocaleString()}
-            </Descriptions.Item>
-          )}
+        {/* Info */}
+        <Divider orientation="left"><span className="text-gray-400 text-sm">System Information</span></Divider>
+        <Descriptions column={1} size="small" bordered>
+          <Descriptions.Item label="ID">{category._id}</Descriptions.Item>
           {isSubcategory && category.category && (
             <Descriptions.Item label="Parent Category">
-              <Tag color="purple">{category.category?.name || category.category}</Tag>
+                <Tag color="purple">{category.category?.name || 'Unknown'}</Tag>
             </Descriptions.Item>
           )}
         </Descriptions>
 
-        {/* Actions */}
-        {!category.is_deleted && (
-          <Divider>
-            <Typography.Text type="danger">Danger Zone</Typography.Text>
-          </Divider>
-        )}
-
-        <div className="space-y-3">
-          {category.is_deleted ? (
-            <Popconfirm
-              title={`Restore this ${isSubcategory ? 'subcategory' : 'category'}?`}
-              description={`This will make the ${isSubcategory ? 'subcategory' : 'category'} active again`}
-              onConfirm={handleRestore}
-            >
-              <Button
-                block
-                icon={<RestOutlined />}
-                style={{ background: PURPLE_THEME.success, borderColor: PURPLE_THEME.success, color: 'white' }}
-              >
-                Restore {isSubcategory ? 'Subcategory' : 'Category'}
-              </Button>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
-              title={`Delete this ${isSubcategory ? 'subcategory' : 'category'}?`}
-              description="This will soft delete. You can restore it later."
-              onConfirm={handleDelete}
-            >
-              <Button
-                block
-                danger
-                icon={<DeleteOutlined />}
-              >
-                Delete {isSubcategory ? 'Subcategory' : 'Category'}
-              </Button>
-            </Popconfirm>
-          )}
+        {/* Danger Zone: Delete or Restore */}
+        <div className={`mt-8 p-4 border rounded-lg ${category.is_deleted ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+             <div className={`font-bold mb-2 ${category.is_deleted ? 'text-green-700' : 'text-red-700'}`}>
+                {category.is_deleted ? 'Recovery Zone' : 'Danger Zone'}
+             </div>
+             <div className="flex gap-3">
+                {category.is_deleted ? (
+                     <Popconfirm title="Restore item?" description="It will become active again." onConfirm={handleRestore}>
+                        <Button type="primary" className="bg-green-600 hover:bg-green-500 border-none" icon={<FiRefreshCw />}>Restore Item</Button>
+                     </Popconfirm>
+                ) : (
+                    <Popconfirm title="Delete item?" description="Item will be moved to trash" onConfirm={handleDelete}>
+                        <Button danger icon={<DeleteOutlined />}>Delete Item</Button>
+                    </Popconfirm>
+                )}
+             </div>
         </div>
       </div>
     </Drawer>
   );
 };
 
-// Main Component
+// --- MAIN COMPONENT ---
 const CategoryFreelancers = () => {
   const { token } = useSelector(s => s.auth);
 
+  // Data State
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-  const [activeCategories, setActiveCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('categories');
-  const [showTrash, setShowTrash] = useState(false);
   
+  // UI State
+  const [activeTab, setActiveTab] = useState('categories'); // 'categories', 'subcategories', 'trash'
+  const [trashViewType, setTrashViewType] = useState('categories'); // 'categories' or 'subcategories' (only inside trash tab)
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  
+
+  // Filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [activeCategoriesFilter, setActiveCategoriesFilter] = useState([]); // For dropdown filter
   const [categoryFilter, setCategoryFilter] = useState(null);
 
-  const [catPagination, setCatPagination] = useState({
-    currentPage: 1,
-    itemsPerPage: 10,
-    totalItems: 0,
-  });
+  // Pagination
+  const [pagination, setPagination] = useState({ currentPage: 1, itemsPerPage: 10, totalItems: 0 });
 
-  const [subPagination, setSubPagination] = useState({
-    currentPage: 1,
-    itemsPerPage: 10,
-    totalItems: 0,
-  });
+  // --- API CALLS ---
 
-  // Fetch active categories for filter dropdown
-  const fetchActiveCategories = useCallback(async () => {
+  // Used for the "Filter by Parent Category" dropdown
+  const fetchFilterCategories = useCallback(async () => {
     try {
-      const params = {
-        active: true,
-        is_deleted: false,
-        limit: 100
-      };
-      const res = await apiService.get('/freelancer/category', params);
-      setActiveCategories(res.data || []);
-    } catch (err) {
-      console.error('Error fetching active categories:', err);
-    }
+      const res = await apiService.get('/freelancer/category', { active: true, is_deleted: false, limit: 100 });
+      setActiveCategoriesFilter(res.data || []);
+    } catch (e) { console.error(e); }
   }, []);
 
-  // Fetch Categories
-  const fetchCategories = useCallback(async (page = 1, limit = 10, filters = {}) => {
+  const fetchData = useCallback(async (page = 1, limit = 10) => {
     setLoading(true);
     try {
+      // Determine what we are fetching
+      let type = activeTab;
+      let isDeleted = false;
+
+      if (activeTab === 'trash') {
+        type = trashViewType; // 'categories' or 'subcategories' based on toggle
+        isDeleted = true;
+      } else {
+        isDeleted = false; // Regular tabs show active/inactive but NOT deleted
+      }
+
+      const endpoint = type === 'categories' ? '/freelancer/category' : '/freelancer/subcategory';
+      
       const params = {
         page,
         limit,
-        ...filters,
-        is_deleted: showTrash,
+        search: searchQuery || undefined,
+        is_deleted: isDeleted, // Pass boolean or string depending on backend (controller handles string 'true')
+        category: (type === 'subcategories' && categoryFilter) ? categoryFilter : undefined
       };
 
-      if (statusFilter !== 'all') {
-        params.is_active = statusFilter === 'active';
+      const res = await apiService.get(endpoint, params);
+      
+      const dataList = res.data || [];
+      const pgn = res.pagination || { page: 1, limit: 10, total: 0 };
+
+      if (type === 'categories') {
+        setCategories(dataList);
+      } else {
+        setSubcategories(dataList);
       }
 
-      if (searchQuery) {
-        params.search = searchQuery;
-      }
-
-      const res = await apiService.get('/freelancer/category', params);
-      setCategories(res.data || []);
-      setCatPagination({
-        currentPage: res.pagination?.page || page,
-        itemsPerPage: res.pagination?.limit || limit,
-        totalItems: res.pagination?.total || 0,
+      setPagination({
+        currentPage: pgn.page,
+        itemsPerPage: pgn.limit,
+        totalItems: pgn.total
       });
+
     } catch (err) {
-      console.error('Error fetching categories:', err);
-      showErrorAlert('Error', 'Failed to fetch categories');
+      showErrorAlert('Error', 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
-  }, [showTrash, statusFilter, searchQuery]);
+  }, [activeTab, trashViewType, searchQuery, categoryFilter]);
 
-  // Fetch Subcategories
-  const fetchSubcategories = useCallback(async (page = 1, limit = 10, filters = {}) => {
-    setLoading(true);
-    try {
-      const params = {
-        page,
-        limit,
-        ...filters,
-        is_deleted: showTrash,
-      };
+  // --- EFFECTS ---
 
-      if (categoryFilter) {
-        params.category = categoryFilter;
-      }
-
-      if (statusFilter !== 'all') {
-        params.is_active = statusFilter === 'active';
-      }
-
-      if (searchQuery) {
-        params.search = searchQuery;
-      }
-
-      const res = await apiService.get('/freelancer/subcategory', params);
-      setSubcategories(res.data || []);
-      setSubPagination({
-        currentPage: res.pagination?.page || page,
-        itemsPerPage: res.pagination?.limit || limit,
-        totalItems: res.pagination?.total || 0,
-      });
-    } catch (err) {
-      console.error('Error fetching subcategories:', err);
-      showErrorAlert('Error', 'Failed to fetch subcategories');
-    } finally {
-      setLoading(false);
-    }
-  }, [showTrash, categoryFilter, statusFilter, searchQuery]);
-
-  // Initial load
   useEffect(() => {
     if (token) {
-      localStorage.setItem('token', token);
-      fetchActiveCategories();
-      fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
+      fetchFilterCategories();
+      fetchData(1, 10);
     }
-  }, [token]);
+  }, [token, activeTab, trashViewType, searchQuery, categoryFilter]); // Reload on any filter change
 
-  // Handle tab change
-  useEffect(() => {
-    if (activeTab === 'subcategories') {
-      fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage);
-    }
-  }, [activeTab]);
-
+  // --- HANDLERS ---
+  
   const handleTabChange = (key) => {
     setActiveTab(key);
-    setShowTrash(false);
     setSearchQuery('');
-    setStatusFilter('all');
     setCategoryFilter(null);
-  };
-
-  const handleFilterChange = () => {
-    if (activeTab === 'categories') {
-      fetchCategories(1, catPagination.itemsPerPage);
-    } else {
-      fetchSubcategories(1, subPagination.itemsPerPage);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+    
+    // If switching to trash, default to categories view inside trash
+    if (key === 'trash') {
+        setTrashViewType('categories');
     }
   };
 
-  const handleClearFilters = () => {
+  const handleTrashTypeChange = (e) => {
+    setTrashViewType(e.target.value);
     setSearchQuery('');
-    setStatusFilter('all');
-    setCategoryFilter(null);
-    if (activeTab === 'categories') {
-      fetchCategories(1, catPagination.itemsPerPage);
-    } else {
-      fetchSubcategories(1, subPagination.itemsPerPage);
-    }
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
 
-  const handleDelete = async (item) => {
-    const confirmed = await showConfirmDialog(
-      `Delete ${activeTab === 'categories' ? 'Category' : 'Subcategory'}`,
-      `Move "${item.name}" to trash?`,
-      'Delete'
-    );
-    if (!confirmed) return;
-
-    try {
-      const endpoint = activeTab === 'subcategories' ? '/freelancer/subcategory' : '/freelancer/category';
-      await apiService.delete(`${endpoint}/${item._id}`);
-      showSuccessAlert('Success', 'Moved to trash');
-      if (activeTab === 'categories') {
-        fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
-      } else {
-        fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage);
-      }
-    } catch (err) {
-      showErrorAlert('Error', err.response?.data?.message || 'Delete failed');
-    }
+  const handlePageChange = (page, pageSize) => {
+    fetchData(page, pageSize);
   };
 
-  const handleRestore = async (item) => {
-    const confirmed = await showConfirmDialog(
-      `Restore ${activeTab === 'categories' ? 'Category' : 'Subcategory'}`,
-      `Restore "${item.name}"?`,
-      'Restore'
-    );
-    if (!confirmed) return;
-
-    try {
-      const endpoint = activeTab === 'subcategories' ? '/freelancer/subcategory' : '/freelancer/category';
-      await apiService.put(`${endpoint}/${item._id}/restore`);
-      showSuccessAlert('Success', 'Restored successfully');
-      if (activeTab === 'categories') {
-        fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
-      } else {
-        fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage);
-      }
-    } catch (err) {
-      showErrorAlert('Error', err.response?.data?.message || 'Restore failed');
-    }
+  const refreshData = () => {
+    fetchData(pagination.currentPage, pagination.itemsPerPage);
   };
 
-  const getIconComponent = (iconName) => {
-    const map = {
-      FaLaptopCode, FaMobileAlt, FaPaintBrush, FaBullhorn, FaCamera, FaPenFancy,
-      FaVideo, FaChartLine, FaCogs, FaHeadset, FaShieldAlt, FaWordpress, FaReact,
-      FaNodeJs, FaPython, FaDatabase, FaCloud, FaShoppingCart, FaUsers, FaBriefcase,
-      FaLightbulb, FaRocket, FaStar, FaHeart, FaCertificate,
-    };
-    const Icon = map[iconName];
-    return Icon ? <Icon /> : <FaLaptopCode />;
-  };
-
-  // Get columns based on active tab
-  const getColumns = useMemo(() => {
-    const baseColumns = [
+  // --- COLUMNS ---
+  const getColumns = () => {
+    const isSub = (activeTab === 'subcategories') || (activeTab === 'trash' && trashViewType === 'subcategories');
+    
+    return [
       {
         key: 'icon',
         title: 'Icon',
-        sortable: false,
-        filterable: false,
+        width: 80,
         render: (_, item) => (
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center text-purple-600">
-            {getIconComponent(item.icon || 'FaLaptopCode')}
+          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg border ${item.is_deleted ? 'bg-red-50 text-red-400 border-red-100' : 'bg-purple-50 text-purple-600 border-purple-100'}`}>
+            {getIconComponent(item.icon)}
           </div>
         ),
       },
       {
         key: 'name',
-        title: 'Name',
-        sortable: true,
-        filterKey: 'name',
+        title: 'Name & Details',
         render: (_, item) => (
           <div>
-            <div className="font-semibold text-gray-900">{item.name}</div>
-            {activeTab === 'subcategories' && item.category && (
-              <div className="text-xs text-purple-600 mt-1">
-                {item.category?.name || item.category}
-              </div>
+            <div className={`font-semibold ${item.is_deleted ? 'text-gray-500' : 'text-gray-800'}`}>
+                {item.name} {item.is_deleted && <span className="text-red-500 text-xs ml-2">(Deleted)</span>}
+            </div>
+            <div className="text-xs text-gray-500 line-clamp-1">{item.description || "No description"}</div>
+            
+            {/* Show Parent Category Tag for Subcategories */}
+            {isSub && item.category && (
+              <Tag color="purple" className="mt-1 text-[10px] border-0 bg-purple-50 text-purple-700">
+                 In: {item.category?.name || "Unknown"}
+              </Tag>
             )}
           </div>
         ),
       },
       {
-        key: 'description',
-        title: 'Description',
-        sortable: false,
-        filterKey: 'description',
-        render: (d) => (
-          <span className="text-sm text-gray-600 line-clamp-2">{d || 'No description'}</span>
-        ),
-      },
-      {
-        key: 'is_active',
+        key: 'status',
         title: 'Status',
-        sortable: true,
-        filterable: true,
-        filterKey: 'is_active',
-        filterOptions: [
-          { value: true, label: 'Active' },
-          { value: false, label: 'Inactive' },
-        ],
-        render: (_, item) => {
-          let status = 'active';
-          if (item.is_deleted) status = 'deleted';
-          else if (!item.is_active) status = 'inactive';
-          
-          return (
-            <Tag color={status === 'deleted' ? 'red' : status === 'active' ? 'green' : 'orange'}>
-              {status === 'deleted' ? 'Deleted' : status === 'active' ? 'Active' : 'Inactive'}
-            </Tag>
-          );
-        }
+        width: 120,
+        render: (_, item) => (
+          <Tag color={item.is_deleted ? 'red' : item.is_active ? 'green' : 'orange'}>
+            {item.is_deleted ? 'TRASHED' : item.is_active ? 'ACTIVE' : 'INACTIVE'}
+          </Tag>
+        )
       },
-     
       {
         key: 'actions',
-        title: 'Actions',
+        title: '',
+        width: 100,
         render: (_, item) => (
           <Space>
-            <Tooltip title="View Details">
-              <Button
-                type="link"
-                icon={<EyeOutlined />}
-                onClick={() => {
-                  setSelectedCategory(item);
-                  setDetailsOpen(true);
-                }}
-              />
-            </Tooltip>
-            
-            {!showTrash && (
-              <Tooltip title="Edit">
-                <Button
-                  type="link"
-                  icon={<EditOutlined />}
-                  onClick={() => {
-                    setSelectedCategory(item);
-                    setDetailsOpen(true);
-                  }}
+            <Tooltip title={item.is_deleted ? "View & Restore" : "View & Edit"}>
+                <Button 
+                    type="text" 
+                    icon={<EyeOutlined style={{ color: PURPLE_THEME.primary }} />} 
+                    onClick={() => { setSelectedCategory(item); setDetailsOpen(true); }}
                 />
-              </Tooltip>
-            )}
-            
-            {showTrash ? (
-              <Popconfirm
-                title="Restore?"
-                onConfirm={() => handleRestore(item)}
-              >
-                <Tooltip title="Restore">
-                  <Button
-                    type="link"
-                    icon={<FiArrowLeft className="text-green-600" />}
-                  />
-                </Tooltip>
-              </Popconfirm>
-            ) : (
-              <Popconfirm
-                title="Move to trash?"
-                onConfirm={() => handleDelete(item)}
-              >
-                <Tooltip title="Delete">
-                  <Button
-                    type="link"
-                    icon={<DeleteOutlined />}
-                    danger
-                  />
-                </Tooltip>
-              </Popconfirm>
-            )}
+            </Tooltip>
           </Space>
         ),
       },
     ];
-
-    return baseColumns;
-  }, [activeTab, showTrash]);
-
-  // Get trash count
-  const getTrashCount = () => {
-    const data = activeTab === 'categories' ? categories : subcategories;
-    return data.filter(item => item.is_deleted).length;
   };
 
-  if (loading && categories.length === 0 && subcategories.length === 0) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Spin size="large" />
-      </div>
-    );
-  }
+  const currentData = activeTab === 'categories' || (activeTab === 'trash' && trashViewType === 'categories') 
+    ? categories 
+    : subcategories;
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <Typography.Title level={3} style={{ margin: 0, color: PURPLE_THEME.dark }}>
-              Freelancer Categories
-            </Typography.Title>
-            <Typography.Text type="secondary">
-              Manage service categories and subcategories for freelancers
-            </Typography.Text>
-          </div>
-          
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setCreateModalOpen(true)}
-            style={{ background: PURPLE_THEME.primary, borderColor: PURPLE_THEME.primary }}
-          >
-            Add {activeTab === 'categories' ? 'Category' : 'Subcategory'}
-          </Button>
-        </div>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      
+      {/* HEADER */}
+      <div className="mb-6 flex justify-between items-center">
+         <div>
+            <Title level={3} style={{ margin: 0, color: PURPLE_THEME.dark }}>Service Categories</Title>
+            <Text type="secondary">Manage freelancer services structure</Text>
+         </div>
+         <Space>
+            {activeTab !== 'trash' && (
+                <Button 
+                    type="primary" 
+                    size="large" 
+                    icon={<PlusOutlined />} 
+                    style={{ background: PURPLE_THEME.primary }}
+                    onClick={() => setCreateModalOpen(true)}
+                >
+                    Add {activeTab === 'subcategories' ? 'Subcategory' : 'Category'}
+                </Button>
+            )}
+         </Space>
       </div>
 
-    
-
-      {/* Main Content */}
-      <Card className="shadow-sm" title={
-        <div className="flex justify-between items-center">
-          <Tabs
-            activeKey={activeTab}
-            onChange={handleTabChange}
-            size="large"
-          >
-            <TabPane
-              tab={
-                <span className="flex items-center gap-2">
-                  <FaLayerGroup />
-                  Categories
-                </span>
-              }
-              key="categories"
-            />
-            <TabPane
-              tab={
-                <span className="flex items-center gap-2">
-                  <FaTag />
-                  Subcategories
-                </span>
-              }
-              key="subcategories"
-            />
-          </Tabs>
-        </div>
-      }>
-        {activeTab === 'categories' ? (
-          <CustomTable
-            columns={getColumns}
-            data={categories}
-            loading={loading}
-            totalItems={catPagination.totalItems}
-            currentPage={catPagination.currentPage}
-            itemsPerPage={catPagination.itemsPerPage}
-            onPageChange={(page, pageSize) => {
-              fetchCategories(page, pageSize);
-              setCatPagination(prev => ({ ...prev, currentPage: page, itemsPerPage: pageSize }));
-            }}
-            onFilter={handleFilterChange}
-          />
-        ) : (
-          <CustomTable
-            columns={getColumns}
-            data={subcategories}
-            loading={loading}
-            totalItems={subPagination.totalItems}
-            currentPage={subPagination.currentPage}
-            itemsPerPage={subPagination.itemsPerPage}
-            onPageChange={(page, pageSize) => {
-              fetchSubcategories(page, pageSize);
-              setSubPagination(prev => ({ ...prev, currentPage: page, itemsPerPage: pageSize }));
-            }}
-            onFilter={handleFilterChange}
-          />
-        )}
+      {/* TABS (Main Navigation) */}
+      <Card bodyStyle={{ padding: 0 }} className="overflow-hidden shadow-sm mb-4">
+         <Tabs 
+           activeKey={activeTab} 
+           onChange={handleTabChange} 
+           type="card" 
+           size="large"
+           tabBarStyle={{ margin: 0, background: '#fff', borderBottom: '1px solid #f0f0f0' }}
+         >
+            <TabPane tab={<span className="px-4"><FiLayers className="inline mr-2"/>Categories</span>} key="categories" />
+            <TabPane tab={<span className="px-4"><FiTag className="inline mr-2"/>Subcategories</span>} key="subcategories" />
+            <TabPane tab={<span className="px-4 text-red-500"><FiTrash2 className="inline mr-2"/>Trash Bin</span>} key="trash" />
+         </Tabs>
       </Card>
 
-      {/* Modals and Drawers */}
+      {/* FILTER BAR / TRASH TOGGLE */}
+      <Card bodyStyle={{ padding: '16px' }} className="mb-4 shadow-sm border-t-0">
+         <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex gap-4 items-center flex-1">
+               
+               {/* Trash View Switcher */}
+               {activeTab === 'trash' && (
+                   <Radio.Group value={trashViewType} onChange={handleTrashTypeChange} buttonStyle="solid">
+                      <Radio.Button value="categories">Deleted Categories</Radio.Button>
+                      <Radio.Button value="subcategories">Deleted Subcategories</Radio.Button>
+                   </Radio.Group>
+               )}
+
+               {/* Parent Category Filter (Only for subcategories view) */}
+               {((activeTab === 'subcategories') || (activeTab === 'trash' && trashViewType === 'subcategories')) && (
+                   <Select 
+                       placeholder="Filter by Parent Category" 
+                       style={{ width: 220 }}
+                       allowClear
+                       value={categoryFilter}
+                       onChange={setCategoryFilter}
+                   >
+                       {activeCategoriesFilter.map(c => (
+                           <Option key={c._id} value={c._id}>{c.name}</Option>
+                       ))}
+                   </Select>
+               )}
+            </div>
+
+            {activeTab === 'trash' && (
+                 <Alert type="warning" message="Items in trash can be restored or will be permanently deleted eventually." showIcon className="py-1" />
+            )}
+         </div>
+      </Card>
+
+      {/* TABLE */}
+      <Card bodyStyle={{ padding: 0 }} className="shadow-sm">
+         <CustomTable 
+           columns={getColumns()}
+           data={currentData}
+           loading={loading}
+           totalItems={pagination.totalItems}
+           currentPage={pagination.currentPage}
+           itemsPerPage={pagination.itemsPerPage}
+           onPageChange={handlePageChange}
+         />
+      </Card>
+
+      {/* CREATE MODAL */}
       <CreateCategoryModal
         open={createModalOpen}
         onCancel={() => setCreateModalOpen(false)}
-        onSuccess={() => {
-          if (activeTab === 'categories') {
-            fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
-          } else {
-            fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage);
-          }
-        }}
+        onSuccess={refreshData}
         isSubcategory={activeTab === 'subcategories'}
-        parentCategory={categoryFilter}
       />
       
+      {/* DETAILS DRAWER (Edit/Delete/Restore) */}
       <CategoryDetailsDrawer
         open={detailsOpen}
         category={selectedCategory}
-        onClose={() => {
-          setDetailsOpen(false);
-          setSelectedCategory(null);
-        }}
-        onEdit={() => {
-          if (activeTab === 'categories') {
-            fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
-          } else {
-            fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage);
-          }
-        }}
-        onDelete={() => {
-          if (activeTab === 'categories') {
-            fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
-          } else {
-            fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage);
-          }
-        }}
-        onRestore={() => {
-          if (activeTab === 'categories') {
-            fetchCategories(catPagination.currentPage, catPagination.itemsPerPage);
-          } else {
-            fetchSubcategories(subPagination.currentPage, subPagination.itemsPerPage);
-          }
-        }}
-        isSubcategory={activeTab === 'subcategories'}
+        onClose={() => { setDetailsOpen(false); setSelectedCategory(null); }}
+        onSuccess={refreshData}
+        isSubcategory={
+            activeTab === 'subcategories' || 
+            (activeTab === 'trash' && trashViewType === 'subcategories')
+        }
       />
+
     </div>
   );
 };

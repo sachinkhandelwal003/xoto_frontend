@@ -1,7 +1,14 @@
 // src/components/login/AdminLogin.jsx
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Form, Input, Button, Card, Alert, Typography, Spin } from 'antd';
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import { Form, Input, Button, Card, Alert, Typography, Spin, ConfigProvider } from 'antd';
+import { 
+  EyeInvisibleOutlined, 
+  EyeTwoTone, 
+  MailOutlined, 
+  LockOutlined,
+  CrownFilled,
+  SafetyCertificateFilled
+} from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../manageApi/context/AuthContext.jsx';
@@ -10,14 +17,64 @@ import styled from 'styled-components';
 
 const { Title, Text } = Typography;
 
-const StyledContainer = styled.div`
+// --- Styled Components ---
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #5C039B 0%, #03A4F4 100%);
-  padding: 27px 10px;
+  padding: 20px;
+  background: linear-gradient(-45deg, #240046, #5C039B, #03A4F4, #001f3f);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   font-family: 'Poppins', sans-serif;
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 `;
+
+const GlassCard = styled(Card)`
+  width: 100%;
+  max-width: 480px;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.95) !important; // Slightly opaque for readability
+  backdrop-filter: blur(20px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+
+  .ant-card-body {
+    padding: 40px 32px !important;
+    
+    @media (max-width: 480px) {
+      padding: 30px 20px !important;
+    }
+  }
+`;
+
+const GradientText = styled.span`
+  background: linear-gradient(135deg, #5C039B 0%, #03A4F4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+`;
+
+const TestCredBox = styled.div`
+  background: #f0f2f5;
+  border-left: 4px solid #5C039B;
+  padding: 12px;
+  border-radius: 0 8px 8px 0;
+  margin-top: 24px;
+  font-size: 13px;
+  color: #555;
+`;
+
+// --- Logic ---
 
 const getDashboardPath = (roleCode) => {
   const map = { '0': '/superadmin', '1': '/admin' };
@@ -46,31 +103,56 @@ const AdminLogin = () => {
     return () => clearInterval(timer);
   }, [lockUntil]);
 
-  // Auto redirect after successful login
+  // Auto redirect logic
   useEffect(() => {
     if (isAuthenticated && user && token && !hasRedirected.current) {
       hasRedirected.current = true;
       const roleCode = user?.role?.code?.toString() || user?.role;
       const roleName = roleCode === '0' ? 'SuperAdmin' : 'Admin';
-      const userName = user?.name || user?.email?.split('@')[0] || 'Admin';
+      const userName = user?.name || user?.email?.split('@')[0] || 'User';
 
-      // Epic Role-Based Toast
-      toast.success(`Welcome back, ${roleName} ${userName}!`, {
-        position: "top-center",
-        autoClose: 4000,
-        style: {
-          background: roleCode === '0' 
-            ? "linear-gradient(135deg, #5C039B, #8E44AD)" 
-            : "#03A4F4",
-          color: roleCode === '0' ? "#FFD700" : "#FFFFFF",
-          fontSize: "18px",
-          fontWeight: "bold",
-          borderRadius: "16px",
-          padding: "16px",
-          boxShadow: `0 10px 30px rgba(${roleCode === '0' ? '92, 3, 155' : '3, 164, 244'}, 0.5)`,
-        },
-        icon: roleCode === '0' ? "Crown" : "Key",
-      });
+      // --- THE "PERFECT" ALERT DESIGN ---
+      const isSuper = roleCode === '0';
+      
+      toast.success(
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ 
+            background: isSuper ? '#FFD700' : 'rgba(255,255,255,0.2)', 
+            borderRadius: '50%', 
+            width: 40, height: 40, 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}>
+            {isSuper ? <CrownFilled style={{ color: '#5C039B', fontSize: 20 }} /> : <SafetyCertificateFilled style={{ color: '#fff', fontSize: 20 }} />}
+          </div>
+          <div>
+            <div style={{ fontWeight: 'bold', fontSize: '16px' }}>Welcome, {roleName}</div>
+            <div style={{ fontSize: '13px', opacity: 0.9 }}>Dashboard Access Granted</div>
+          </div>
+        </div>, 
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          style: {
+            background: isSuper 
+              ? "linear-gradient(135deg, #4b0082 0%, #240046 100%)" // Deep Royal Purple for Super
+              : "linear-gradient(135deg, #03A4F4 0%, #0077b6 100%)", // Professional Blue for Admin
+            color: "#fff",
+            borderRadius: "16px",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.45)",
+            border: isSuper ? "1px solid #FFD700" : "1px solid rgba(255,255,255,0.2)",
+            minWidth: "350px",
+            padding: "16px"
+          },
+          progressStyle: {
+            background: isSuper ? "#FFD700" : "#ffffff"
+          }
+        }
+      );
 
       setTimeout(() => {
         navigate(getDashboardPath(roleCode), { replace: true });
@@ -81,109 +163,102 @@ const AdminLogin = () => {
   const onFinish = async (values) => {
     setGeneralError('');
 
-    // Check lock
     if (lockUntil && Date.now() < lockUntil) {
       const seconds = Math.ceil((lockUntil - Date.now()) / 1000);
-      toast.warn(`Too many attempts. Wait ${seconds}s`, {
-        style: { background: "#ff4d4f", color: "white" },
-      });
+      toast.warn(`Please wait ${seconds}s before retrying.`, { position: "top-center" });
       return;
     }
 
     try {
-      // Use the NEW flexible login with endpoint + payload
       await login("/auth/login", {
         email: values.email.trim(),
         password: values.password,
       });
 
-      // Success → reset attempts
       setAttemptCount(0);
       setLockUntil(null);
-
     } catch (err) {
       const errorMsg = typeof err === 'string' ? err : err?.message || "Login failed";
       const newCount = attemptCount + 1;
       setAttemptCount(newCount);
 
-      // Lock after 5 failed attempts
       if (newCount >= 5) {
-        const lockTime = Date.now() + 5 * 60 * 1000; // 5 minutes
+        const lockTime = Date.now() + 5 * 60 * 1000; 
         setLockUntil(lockTime);
-        toast.error('Account locked for 5 minutes due to too many attempts', {
-          autoClose: 10000,
-          style: { background: "#ff4d4f", color: "white", fontWeight: "bold" },
-        });
-        setGeneralError("Too many failed attempts. Account locked for 5 minutes.");
+        setGeneralError("Security Lock: Too many failed attempts. Try again in 5 minutes.");
         return;
       }
 
-      // Friendly error messages
       let displayError = "Invalid email or password";
-      if (errorMsg.toLowerCase().includes("inactive") || errorMsg.toLowerCase().includes("deactivated")) {
-        displayError = "Your account is deactivated. Contact support.";
-      } else if (errorMsg.toLowerCase().includes("verify")) {
-        displayError = "Please verify your email first.";
-      } else if (errorMsg.toLowerCase().includes("not found") || errorMsg.toLowerCase().includes("credentials")) {
-        displayError = "Incorrect email or password";
-      } else if (errorMsg.includes("Network") || errorMsg.includes("failed to fetch")) {
-        displayError = "No internet connection";
-      }
+      if (errorMsg.toLowerCase().includes("verify")) displayError = "Please verify your email first.";
+      else if (errorMsg.includes("Network")) displayError = "Network error. Check your connection.";
 
       setGeneralError(displayError);
-      toast.error(displayError);
+      toast.error(displayError, { position: "top-center" });
     }
   };
 
   const getLockMessage = () => {
     if (!lockUntil) return null;
     const seconds = Math.ceil((lockUntil - Date.now()) / 1000);
-    return `Too many attempts. Try again in ${seconds} seconds`;
+    return `Security Lockout: Try again in ${seconds} seconds`;
   };
 
   return (
-    <StyledContainer>
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6, type: "spring", stiffness: 120 }}
-        style={{ width: '100%', maxWidth: 460 }}
-      >
-        <Card
-          style={{
-            borderRadius: 24,
-            overflow: 'hidden',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
-            border: '2px solid #5C039B',
-          }}
+    // Override Ant Design Theme to match Purple/Blue
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#5C039B',
+          borderRadius: 8,
+          fontFamily: 'Poppins, sans-serif',
+        },
+        components: {
+          Button: {
+            colorPrimary: '#5C039B',
+            algorithm: true, // Enable hover algorithms
+          },
+          Input: {
+            activeBorderColor: '#5C039B',
+            hoverBorderColor: '#03A4F4',
+          }
+        }
+      }}
+    >
+      <PageWrapper>
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, type: "spring", stiffness: 50 }}
+          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
         >
-          {/* Header */}
-          <div style={{
-            background: 'linear-gradient(135deg, #5C039B, #03A4F4)',
-            padding: '20px 16px',
-            textAlign: 'center',
-            color: 'white',
-          }}>
-            <Title level={2} style={{ color: '#fff', margin: 0, fontWeight: 800 }}>
-              Admin Portal
-            </Title>
-            <Text style={{ color: '#e0f7ff', fontSize: 16 }}>
-              Secure Access Only
-            </Text>
-          </div>
+          <GlassCard bordered={false}>
+            {/* Header Section */}
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <div style={{ 
+                width: 64, height: 64, margin: '0 auto 16px', 
+                background: 'linear-gradient(135deg, #5C039B, #03A4F4)',
+                borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 10px 20px rgba(92, 3, 155, 0.3)'
+              }}>
+                <LockOutlined style={{ fontSize: 30, color: '#fff' }} />
+              </div>
+              <Title level={2} style={{ margin: 0, fontWeight: 700 }}>
+                Admin <GradientText>Portal</GradientText>
+              </Title>
+              <Text type="secondary">Secure Gateway for Management</Text>
+            </div>
 
-          <div style={{ padding: '32px 25px' }}>
-            {/* Lock Alert */}
+            {/* Alerts */}
             {lockUntil && (
               <Alert
                 message={getLockMessage()}
-                type="warning"
+                type="error"
                 showIcon
-                style={{ marginBottom: 20, borderRadius: 12, fontWeight: "bold" }}
+                style={{ marginBottom: 24, borderRadius: 12, border: '1px solid #ffccc7' }}
               />
             )}
 
-            {/* General Error */}
             {generalError && !lockUntil && (
               <Alert
                 message={generalError}
@@ -191,107 +266,105 @@ const AdminLogin = () => {
                 showIcon
                 closable
                 onClose={() => setGeneralError('')}
-                style={{ marginBottom: 20, borderRadius: 12 }}
+                style={{ marginBottom: 24, borderRadius: 12 }}
               />
             )}
 
-            {/* Loading */}
             {loading && (
-              <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <Spin size="large" tip="Signing you in..." />
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <Spin size="large" />
+                <div style={{ marginTop: 10, color: '#5C039B', fontWeight: 500 }}>Authenticating...</div>
               </div>
             )}
 
+            {/* Login Form */}
             <Form
               form={form}
               layout="vertical"
               onFinish={onFinish}
               disabled={loading || !!lockUntil}
+              size="large"
             >
               <Form.Item
-                label={<span style={{ color: "#5C039B", fontWeight: 600 }}>Email Address</span>}
                 name="email"
                 rules={[
-                  { required: true, message: 'Email is required' },
-                  { type: 'email', message: 'Invalid email format' },
+                  { required: true, message: 'Please enter your email' },
+                  { type: 'email', message: 'Invalid email address' }
                 ]}
               >
-                <Input
-                  size="large"
-                  placeholder="admin@xoto.com"
-                  style={{ borderRadius: 12, height: 50 }}
+                <Input 
+                  prefix={<MailOutlined style={{ color: '#bfbfbf' }} />} 
+                  placeholder="Email Address" 
+                  style={{ borderRadius: 12 }}
                 />
               </Form.Item>
 
               <Form.Item
-                label={<span style={{ color: "#5C039B", fontWeight: 600 }}>Password</span>}
                 name="password"
-                rules={[
-                  { required: true, message: 'Password is required' },
-                  { min: 6, message: 'Minimum 6 characters' },
-                ]}
+                rules={[{ required: true, message: 'Please enter your password' }]}
               >
-                <Input.Password
-                  size="large"
-                  placeholder="Enter secure password"
-                  style={{ borderRadius: 12, height: 50 }}
-                  iconRender={(visible) =>
-                    visible ? <EyeTwoTone twoToneColor="#5C039B" /> : <EyeInvisibleOutlined />
-                  }
+                <Input.Password 
+                  prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
+                  placeholder="Password"
+                  style={{ borderRadius: 12 }}
+                  iconRender={(visible) => (visible ? <EyeTwoTone twoToneColor="#5C039B" /> : <EyeInvisibleOutlined />)}
                 />
               </Form.Item>
 
-              <Form.Item style={{ marginBottom: 12 }}>
-                <a href="/forgot-password" style={{ float: 'right', color: "#03A4F4", fontWeight: 600 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24, marginTop: -10 }}>
+                <a href="/forgot-password" style={{ color: '#03A4F4', fontWeight: 600, fontSize: 13 }}>
                   Forgot Password?
                 </a>
-              </Form.Item>
+              </div>
 
               <Form.Item>
                 <Button
                   type="primary"
                   htmlType="submit"
-                  size="large"
                   block
                   loading={loading}
-                  disabled={!!lockUntil}
                   style={{
-                    height: 56,
-                    fontSize: 18,
+                    height: 52,
+                    fontSize: 16,
                     fontWeight: 'bold',
-                    background: "#5C039B",
-                    border: "none",
-                    borderRadius: 16,
-                    boxShadow: "0 8px 20px rgba(92, 3, 155, 0.4)",
+                    background: 'linear-gradient(135deg, #5C039B 0%, #7B1FA2 100%)',
+                    border: 'none',
+                    borderRadius: 14,
+                    boxShadow: '0 8px 20px rgba(92, 3, 155, 0.3)',
+                    transition: 'all 0.3s'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
-                  {loading ? 'Signing In...' : 'Login as Admin'}
+                  {loading ? 'Accessing...' : 'Secure Login'}
                 </Button>
               </Form.Item>
             </Form>
 
-            {/* Test Credentials - FIXED */}
-            <Alert
-              message={
-                <div style={{ fontSize: 13, lineHeight: 1.8 }}>
-                  <strong>Test Accounts:</strong><br />
-                  SuperAdmin: <Text code>Super1@gmail.com</Text> <br/>Password: <Text code>Super1@gmail.com</Text><br />
-                </div>
-              }
-              type="info"
-              showIcon
-              style={{ marginTop: 20, borderRadius: 12, fontSize: 13 }}
-            />
-
-            <div style={{ textAlign: 'center', marginTop: 24 }}>
-              <a href="/login" style={{ color: "#03A4F4", fontWeight: 600 }}>
-                ← Back to User Login
+            {/* Back Link */}
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <a href="/login" style={{ color: '#888', fontSize: 13, transition: '0.3s' }}>
+                <span style={{ marginRight: 4 }}>←</span> Back to User Login
               </a>
             </div>
-          </div>
-        </Card>
-      </motion.div>
-    </StyledContainer>
+
+            {/* Test Credentials Box */}
+            <TestCredBox>
+               <div style={{ marginBottom: 4, fontWeight: 'bold', color: '#333' }}>Developer Test Mode:</div>
+               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                 <span>SuperAdmin:</span>
+                 <Text copyable={{ text: 'Super1@gmail.com' }} style={{ color: '#5C039B', fontWeight: 600 }}>Super1@gmail.com</Text>
+               </div>
+               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                 <span>Password:</span>
+                 <Text copyable={{ text: 'Super1@gmail.com' }} style={{ color: '#5C039B', fontWeight: 600 }}>Super1@gmail.com</Text>
+               </div>
+            </TestCredBox>
+
+          </GlassCard>
+        </motion.div>
+      </PageWrapper>
+    </ConfigProvider>
   );
 };
 

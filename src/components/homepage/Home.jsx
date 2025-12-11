@@ -75,33 +75,25 @@ const Home = () => {
       <TestimonialSlider />
       <Trust />
 
-      <motion.button
-        onClick={toggleChat}
-        className="fixed bottom-6 right-6 w-46 h-16 rounded-full  flex items-center justify-center text-black font-medium text-lg bg-gradient-to-br bg-white  transition-all z-50"
-        // style={{ boxShadow: "0 0 20px rgba(128,0,255,0.6)" }}
-        // whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        // animate={{
-        //   rotate: isChatOpen ? 0 : [0, 10, -10, 0],
-        // }}
-        // transition={{
-        //   rotate: { repeat: isChatOpen ? 0 : Infinity, duration: 2 },
-        // }}
-      >
-        {isChatOpen ? "×" : "TALK WITH Xobir"}
-      </motion.button>
+     <motion.button
+  onClick={toggleChat}
+  className="fixed bottom-6 right-6 w-46 h-16 rounded-full flex items-center justify-center text-black font-medium text-lg bg-gradient-to-br bg-white transition-all z-50"
+  whileTap={{ scale: 0.9 }}
+>
+  {isChatOpen ? "×" : "TALK WITH Xobir"}
+</motion.button>
 
-      {/* Slide-up Chatbot Panel */}
-      {isChatOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: 100, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: "spring", damping: 25 }}
-          className="fixed bottom-24 right-6 w-[350px] h-[500px] bg-white rounded-3xl shadow-2xl border border-purple-300 z-50 overflow-hidden"
-        >
-          <ChatBoat onClose={closeChat} />
-        </motion.div>
-      )}
+{isChatOpen && (
+  <motion.div
+    initial={{ opacity: 0, y: 100, scale: 0.8 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    transition={{ type: "spring", damping: 25 }}
+    className="fixed bottom-24 right-6 w-[350px] h-[500px] bg-white rounded-3xl shadow-2xl border border-purple-300 z-50 overflow-hidden"
+  >
+    <ChatBoat onClose={closeChat} />
+  </motion.div>
+)}
+
 
       {/* <motion.button
         onClick={toggleModule}

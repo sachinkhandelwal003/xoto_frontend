@@ -1,305 +1,272 @@
 // src/pages/auth/CustomerLogin.jsx
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import {
   Form,
-  InputNumber,
+  Input,
   Button,
   Card,
   Typography,
-  Alert,
-  message,
   Row,
   Col,
   Grid,
+  ConfigProvider,
+  Spin
 } from 'antd';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../manageApi/context/AuthContext.jsx';
+import { toast } from 'react-toastify';
+import styled from 'styled-components';
+
+// Assets
 import loginimage from '../../assets/img/one.png';
 import logoNew from '../../assets/img/logoNew.png';
-import { UserOutlined, CheckCircleFilled, ArrowLeftOutlined } from '@ant-design/icons';
+import { 
+  UserOutlined, 
+  MobileOutlined, 
+  SmileFilled,
+  ArrowLeftOutlined 
+} from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
+// --- Styled Components ---
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+  background: url(${props => props.$bgImage}) center/cover no-repeat fixed;
+  overflow: hidden;
+`;
+
+// Blue-tinted overlay for Customer Theme
+const GradientOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(3, 164, 244, 0.8), rgba(0, 31, 63, 0.85));
+  backdrop-filter: blur(3px);
+  z-index: 1;
+`;
+
+const ContentLayer = styled.div`
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const GlassCard = styled(Card)`
+  width: 100%;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+  .ant-card-body {
+    padding: ${props => props.$isMobile ? "30px 20px" : "40px"} !important;
+  }
+`;
+
 const CustomerLogin = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [generalError, setGeneralError] = useState('');
-  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
-  const [welcomeUser, setWelcomeUser] = useState(null);
+  const hasRedirected = useRef(false);
 
   const { login, isAuthenticated, user, token } = useContext(AuthContext);
   const navigate = useNavigate();
   const screens = useBreakpoint();
   const isMobile = !screens.md;
 
-  // Auto redirect after successful login (same logic as Partner Login)
+  // --- Auth Effect (Success Toast) ---
   useEffect(() => {
-    if (isAuthenticated && user && token) {
-      const userName = user?.name || user?.firstName || user?.mobile || 'Customer';
-      const roleName = user?.role?.name || 'Customer';
+    if (isAuthenticated && user && token && !hasRedirected.current) {
+      hasRedirected.current = true;
+      const userName = user?.name || user?.firstName || 'Customer';
 
-      setWelcomeUser({ name: userName, role: roleName });
-      setShowSuccessBanner(true);
+      toast.success(
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ 
+            background: 'rgba(255,255,255,0.2)', 
+            borderRadius: '50%', 
+            width: 40, height: 40, 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}>
+            <SmileFilled style={{ color: '#fff', fontSize: 20 }} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 'bold', fontSize: '16px' }}>Welcome, {userName}!</div>
+          </div>
+        </div>, 
+        {
+          position: "top-center",
+          autoClose: 2000,
+          style: {
+            background: "linear-gradient(135deg, #03A4F4, #0077b6)",
+            color: "#fff",
+            borderRadius: "16px",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.45)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            padding: "16px"
+          }
+        }
+      );
 
-      const timer = setTimeout(() => {
-        const roleCode = user?.role?.code?.toString() || user?.role;
-        const rolePathMap = {
-          "2": "/dashboard/customer",     // Customer role
-          // Add more if you have sub-roles under customer
-        };
-        const path = rolePathMap[roleCode] || "/dashboard/customer";
-        navigate(path, { replace: true });
+      setTimeout(() => {
+        navigate("/dashboard/customer", { replace: true });
       }, 2000);
-
-      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, user, token, navigate]);
 
   const onFinish = async (values) => {
     setLoading(true);
-    setGeneralError('');
-
     try {
       const mobile = values.mobile.toString();
       await login('/users/login/customer', { mobile });
-      message.success('Login successful!');
+      // Toast handled in useEffect
     } catch (err) {
-      const errorMessage = typeof err === 'object'
-        ? err.message || err.status || 'Login failed'
-        : err || 'Login failed';
-
-      const msg = errorMessage.includes('not found')
-        ? 'Customer not found. Please register first.'
+      const errorMessage = err?.message || err?.status || 'Login failed';
+      const displayMsg = errorMessage.includes('not found') 
+        ? 'Account not found. Please register.' 
         : errorMessage;
-
-      setGeneralError(msg);
-      message.error(msg);
+      
+      toast.error(displayMsg, { position: "top-center" });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: `url(${loginimage}) center/cover no-repeat fixed`,
-        position: 'relative',
-        fontFamily: "'Poppins', sans-serif",
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#03A4F4', // Customer Blue Theme
+          borderRadius: 8,
+          fontFamily: 'Poppins, sans-serif',
+        }
       }}
     >
-      {/* Dark Overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'rgba(0, 0, 0, 0.65)',
-          backdropFilter: 'blur(5px)',
-        }}
-      />
-
-      {/* Success Banner */}
-      {showSuccessBanner && welcomeUser && (
-        <motion.div
-          initial={{ y: -100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-            padding: isMobile ? '0.8rem' : '1rem',
-            background: '#ffffff',
-            color: '#1f1f1f',
-            textAlign: 'center',
-            fontWeight: 'bold',
-            fontSize: isMobile ? '0.9rem' : '1.3rem',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            borderBottom: '4px solid #64EF0A',
-          }}
-        >
-          <CheckCircleFilled
-            style={{
-              fontSize: isMobile ? '1.2rem' : '1.8rem',
-              marginRight: isMobile ? '6px' : '12px',
-              color: '#64EF0A',
-            }}
-          />
-          Welcome back, {welcomeUser.name}! ({welcomeUser.role})
-          <br />
-          <Text style={{ fontSize: isMobile ? '0.75rem' : '1rem', opacity: 0.8, color: '#333' }}>
-            Redirecting you to your dashboard...
-          </Text>
-        </motion.div>
-      )}
-
-      <Row style={{ minHeight: '100vh', position: 'relative', zIndex: 10 }}>
-        {/* Left Side - Branding (Desktop) */}
-        {!isMobile && (
-          <Col xs={0} lg={12}>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-                padding: '3rem',
-                color: 'white',
-              }}
-            >
+      <PageWrapper $bgImage={loginimage}>
+        <GradientOverlay />
+        
+        <ContentLayer>
+          <Row style={{ width: '100%', maxWidth: 1200, padding: isMobile ? 16 : 0 }}>
+            
+            {/* Left Side: Branding */}
+            <Col xs={24} lg={12} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: isMobile ? 'center' : 'flex-start', padding: 40 }}>
               <motion.div
-                initial={{ opacity: 0, x: -100 }}
+                initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
-                style={{ maxWidth: '600px', textAlign: 'center' }}
+                style={{ textAlign: isMobile ? 'center' : 'left' }}
               >
-                <img
-                  src={logoNew}
-                  alt="Logo"
-                  style={{
-                    width: '140px',
-                    marginBottom: '2rem',
-                    filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))',
-                  }}
+                <img 
+                  src={logoNew} 
+                  alt="Logo" 
+                  style={{ width: isMobile ? 100 : 150, marginBottom: 24, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.3))" }} 
                 />
-                <Title level={1} style={{ color: '#03A4F4', fontSize: '3.5rem', fontWeight: 800 }}>
-                  Customer Login
+                
+                <Title style={{ color: '#fff', fontSize: isMobile ? 32 : 48, fontWeight: 800, margin: 0, lineHeight: 1.1 }}>
+                  Customer <br/>
+                  <span style={{ color: '#03A4F4' }}>Login</span>
                 </Title>
-                <Text style={{ fontSize: '1.4rem', opacity: 0.9 }}>
-                  Enter your mobile number to access your account
+                
+                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, marginTop: 16, display: 'block', maxWidth: 400 }}>
+                  Access your orders, wishlist, and profile with just your mobile number.
                 </Text>
               </motion.div>
-            </div>
-          </Col>
-        )}
+            </Col>
 
-        {/* Right Side - Form */}
-        <Col xs={24} lg={isMobile ? 24 : 12}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100vh',
-              padding: '2rem',
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              style={{ width: '100%', maxWidth: '450px' }}
-            >
-              <Card
-                style={{
-                  borderRadius: '20px',
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                  background: 'rgba(255,255,255,0.98)',
-                }}
-                bodyStyle={{ padding: '2.5rem' }}
+            {/* Right Side: Glass Card Form */}
+            <Col xs={24} lg={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                style={{ width: '100%', maxWidth: 450 }}
               >
-                {/* Back Button */}
-             
+                <GlassCard bordered={false} $isMobile={isMobile}>
+                  
+                  {/* Back Link */}
+                 
 
-                {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                  <div
-                    style={{
-                      width: '64px',
-                      height: '64px',
-                      borderRadius: '16px',
-                      background: '#1890ff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#fff',
-                      fontSize: '28px',
-                      margin: '0 auto 1rem',
-                    }}
-                  >
-                    <UserOutlined />
+                  {/* Icon Header */}
+                  <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                    <div style={{ 
+                      width: 64, height: 64, margin: '0 auto 16px',
+                      background: 'linear-gradient(135deg, #03A4F4, #0077b6)',
+                      borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: '0 10px 20px rgba(3, 164, 244, 0.3)',
+                      color: '#fff', fontSize: 28
+                    }}>
+                      <UserOutlined />
+                    </div>
+                    <Title level={3} style={{ margin: 0, color: '#333' }}>Welcome Back</Title>
+                    <Text type="secondary">Login using your mobile number</Text>
                   </div>
-                  <Title level={3} style={{ color: '#5C039B', margin: 0 }}>
-                    Customer Login
-                  </Title>
-                  <Text type="secondary">
-                    Enter your registered mobile number
-                  </Text>
-                </div>
 
-                {/* Error */}
-                {generalError && (
-                  <Alert
-                    message={generalError}
-                    type="error"
-                    showIcon
-                    closable
-                    onClose={() => setGeneralError('')}
-                    style={{ marginBottom: '1.5rem', borderRadius: '10px' }}
-                  />
-                )}
+                  {/* Form */}
+                  <Form form={form} layout="vertical" onFinish={onFinish} size="large">
+                    <Form.Item
+                      name="mobile"
+                      rules={[
+                        { required: true, message: 'Please enter your mobile number' },
+                        { pattern: /^\d{10}$/, message: 'Enter a valid 10-digit number' },
+                      ]}
+                    >
+                      <Input 
+                        prefix={<MobileOutlined style={{ color: '#bfbfbf' }} />} 
+                        placeholder="Mobile Number (e.g. 9876543210)"
+                        maxLength={10}
+                        style={{ borderRadius: 12, height: 50 }}
+                      />
+                    </Form.Item>
 
-                {/* Form */}
-                <Form form={form} onFinish={onFinish} layout="vertical">
-                  <Form.Item
-                    name="mobile"
-                    label={<span style={{ color: '#5C039B', fontWeight: 600 }}>Mobile Number</span>}
-                    rules={[
-                      { required: true, message: 'Please enter your mobile number' },
-                      { pattern: /^\d{10}$/, message: 'Enter a valid 10-digit number' },
-                    ]}
-                  >
-                    <InputNumber
-                      controls={false}
-                      placeholder="9876543210"
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loading}
+                      block
                       style={{
-                        width: '100%',
-                        height: '48px',
-                        borderRadius: '10px',
-                        fontSize: '16px',
+                        height: 50,
+                        borderRadius: 12,
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        background: 'linear-gradient(135deg, #03A4F4 0%, #0077b6 100%)',
+                        border: 'none',
+                        boxShadow: '0 8px 20px rgba(3, 164, 244, 0.3)',
+                        marginTop: 8
                       }}
-                    />
-                  </Form.Item>
+                    >
+                      {loading ? 'Verifying...' : 'Secure Login'}
+                    </Button>
+                  </Form>
 
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={loading}
-                    block
-                    style={{
-                      height: '48px',
-                      background: '#1890ff',
-                      borderRadius: '10px',
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      boxShadow: '0 4px 15px rgba(24,144,255,0.3)',
-                    }}
-                  >
-                    {loading ? 'Signing In...' : 'Login Now'}
-                  </Button>
-                </Form>
-
-                <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-                  <Text type="secondary">
-                    New here?{' '}
+                  <div style={{ textAlign: 'center', marginTop: 24 }}>
+                    <Text type="secondary">Don't have an account? </Text>
                     <span
                       onClick={() => navigate('/customer/registration')}
-                      style={{ color: '#1890ff', fontWeight: 'bold', cursor: 'pointer' }}
+                      style={{ 
+                        color: '#03A4F4', fontWeight: 'bold', cursor: 'pointer',
+                        textDecoration: 'underline', textUnderlineOffset: 4
+                      }}
                     >
                       Register Now
                     </span>
-                  </Text>
-                </div>
-              </Card>
-            </motion.div>
-          </div>
-        </Col>
-      </Row>
-    </div>
+                  </div>
+
+                </GlassCard>
+              </motion.div>
+            </Col>
+          </Row>
+        </ContentLayer>
+      </PageWrapper>
+    </ConfigProvider>
   );
 };
 
