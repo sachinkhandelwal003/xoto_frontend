@@ -1,67 +1,59 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next"; // ✅ Added i18n hook
+
 import Pool from "./../assets/img/home/Pool.png";
 import wavemap from "./../assets/img/home/wavemap1.png";
 
 export default function HomeJourneySection() {
-  // small-screen toggle: 'both' | 'text' | 'image'
-  const [mobileView, setMobileView] = useState('both');
+  const [mobileView, setMobileView] = useState("both");
+
+  const { t } = useTranslation("home2"); // ✅ Using home2 namespace
 
   return (
     <section className="relative w-full min-h-screen overflow-hidden">
-      {/* Background Image (full-bleed, dimmed) */}
+      {/* Background Image */}
       <div className="absolute inset-0 pointer-events-none">
         <img
           src={Pool}
-          alt="Luxury modern villa at night"
-          className="w-full h-full object-cover "
+          alt={t("homeJourney.imageAlt.background")} // ✅ i18n ALT text
+          className="w-full h-full object-cover"
         />
-        {/* gradient overlay for contrast */}
-        {/* <div className="absolute " /> */}
       </div>
-
-
 
       {/* Main Content */}
       <div className="relative z-10 flex items-center min-h-screen px-6 py-20">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full">
-
-          {/* LEFT: Text Content */}
-          {/* On small screens we hide/show based on mobileView */}
+          {/* LEFT TEXT */}
           <div
-  className={`text-white max-w-2xl transition-all duration-300
-    ${mobileView === 'image' ? 'hidden' : 'block'}
-    text-center lg:text-left mx-auto lg:mx-0
-  `}
->
-  <h1 className="heading-light" style={{ color: "var(--color-black)" }}>
-    Your AI-Powered <br/> Home Journey
-  </h1>
+            className={`text-white max-w-2xl transition-all duration-300
+              ${mobileView === "image" ? "hidden" : "block"}
+              text-center lg:text-left mx-auto lg:mx-0
+            `}
+          >
+            <h1
+              className="heading-light"
+              style={{ color: "var(--color-black)" }}
+            >
+              {t("homeJourney.title")} {/* ✅ i18n Title */}
+            </h1>
 
-  <p className="button-text text-black mt-6 max-w-lg mx-auto lg:mx-0">
-    From landscaping to purchase and financing — XOTO personalizes every step
-    to help you discover, design, and maintain your dream home on one
-    seamless platform.
-  </p>
-</div>
+            <p className="button-text text-black mt-6 max-w-lg mx-auto lg:mx-0">
+              {t("homeJourney.description")} {/* ✅ i18n Description */}
+            </p>
+          </div>
 
-
-          {/* RIGHT: Wavemap Image */}
-        
-            <div className="relative w-full max-w-xl lg:max-w-3xl p-4 rounded-2xl">
-              {/* Decorative border + shadow */}
-              <div className="rounded-xl overflow-hidden flex justify-center ">
-                <img
-                  src={wavemap}
-                  alt="Journey Map"
-                  className="w-100 object-cover block"
-                />
-              </div>
-
+          {/* RIGHT IMAGE */}
+          <div className="relative w-full max-w-xl lg:max-w-3xl p-4 rounded-2xl">
+            <div className="rounded-xl overflow-hidden flex justify-center">
+              <img
+                src={wavemap}
+                alt={t("homeJourney.imageAlt.map")} // ✅ i18n ALT text
+                className="w-100 object-cover block"
+              />
             </div>
-      
-
+          </div>
         </div>
       </div>
     </section>

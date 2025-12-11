@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "एकीकृत इकोसिस्टम <br/> जीवनभर की <br/> प्रॉपर्टी वैल्यू बनाता है।",
+    "description": "स्केलेबल। एआई-संचालित। एसेट-लाइट।"
+  },
+
+  "titles": {
+    "offerings": "हमारी सेवाएँ",
+    "resources": "पार्टनर इकोसिस्टम",
+    "knowledge": "हमारे बारे में",
+    "location": "स्थान",
+    "email": "ईमेल",
+    "contact": "संपर्क"
+  },
+
+  "offerings": [
+    { "label": "लैंडस्केपिंग", "path": "/landscaping" },
+    { "label": "इंटीरियर्स", "path": "/interiors" },
+    { "label": "किराया", "path": "/rentals" },
+    { "label": "खरीदें", "path": "/buy" },
+    { "label": "बेचें", "path": "/sell" },
+    { "label": "बंधक", "path": "/mortgage/services" }
+  ],
+
+  "resources": [
+    { "label": "Xoto प्रॉपर्टीज़", "path": "/properties" },
+    { "label": "Xoto एक्सप्लोर करें", "path": "/explore" },
+    { "label": "AI संचालित", "path": "/ai" },
+    { "label": "नि:शुल्क परामर्श", "path": "/consultation" },
+    { "label": "फ्रीलांसर हायर करें", "path": "/freelancers" }
+  ],
+
+  "knowledge": [
+    { "label": "हमारे बारे में", "path": "/about" },
+    { "label": "नॉलेज सेंटर", "path": "/knowledge-centre" },
+    { "label": "सस्टेनेबिलिटी फोकस", "path": "/sustainability" },
+    { "label": "अपना फीडबैक दें", "path": "/feedback" },
+    { "label": "संपर्क करें", "path": "/contact" },
+    { "label": "गोपनीयता नीति", "path": "/privacy" },
+    { "label": "उपयोग की शर्तें", "path": "/terms" }
+  ],
+
+  "location": "यूएई",
+
+  "email": {
+    "partners": "साझेदारों के लिए:",
+    "customers": "ग्राहकों के लिए:"
+  },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "Linkedin", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "©2025 Xoto. सर्वाधिकार सुरक्षित"
+  }
+}

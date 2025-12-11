@@ -1,0 +1,15 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "landscaping": "Aménagement paysager",
+    "interiors": "Intérieurs",
+    "mortgages": "Crédits immobiliers",
+    "ecosystem": "Écosystème partenaire",
+    "store": "Boutique Xoto",
+    "properties": "Propriétés",
+    "blogs": "Blogs",
+    "contact": "Nous contacter",
+    "login": "Connexion",
+    "tagline": "Propulsé par l’IA. Inspiré par vous."
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "Birleşik bir ekosistem <br/> Ömür boyu <br/> mülk değeri yaratıyor.",
+    "description": "Ölçeklenebilir. Yapay zekâ destekli. Hafif yapı."
+  },
+
+  "titles": {
+    "offerings": "Hizmetlerimiz",
+    "resources": "Partner Ekosistemi",
+    "knowledge": "Hakkımızda",
+    "location": "Konum",
+    "email": "E-posta",
+    "contact": "İletişim"
+  },
+
+  "offerings": [
+    { "label": "Peyzaj", "path": "/landscaping" },
+    { "label": "İç Mekan", "path": "/interiors" },
+    { "label": "Kiralık", "path": "/rentals" },
+    { "label": "Satın Al", "path": "/buy" },
+    { "label": "Sat", "path": "/sell" },
+    { "label": "Konut Kredileri", "path": "/mortgage/services" }
+  ],
+
+  "resources": [
+    { "label": "Xoto İlanları", "path": "/properties" },
+    { "label": "Xoto’yu Keşfet", "path": "/explore" },
+    { "label": "AI Destekli", "path": "/ai" },
+    { "label": "Ücretsiz Danışmanlık", "path": "/consultation" },
+    { "label": "Freelancer Kirala", "path": "/freelancers" }
+  ],
+
+  "knowledge": [
+    { "label": "Hakkımızda", "path": "/about" },
+    { "label": "Bilgi Merkezi", "path": "/knowledge-centre" },
+    { "label": "Sürdürülebilirlik Odağımız", "path": "/sustainability" },
+    { "label": "Geri Bildirim Gönder", "path": "/feedback" },
+    { "label": "Bize Ulaşın", "path": "/contact" },
+    { "label": "Gizlilik Politikası", "path": "/privacy" },
+    { "label": "Kullanım Şartları", "path": "/terms" }
+  ],
+
+  "location": "BAE",
+
+  "email": {
+    "partners": "Partnerler için:",
+    "customers": "Müşteriler için:"
+  },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "Linkedin", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "©2025 Xoto. Tüm hakları saklıdır."
+  }
+}

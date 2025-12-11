@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "A Unified Ecosystem <br/> Creating life time <br/> property Value.",
+    "description": "Scalable. AI–powered. Asset–light."
+  },
+
+  "titles": {
+    "offerings": "Our Offerings",
+    "resources": "Partner Ecosystem",
+    "knowledge": "About Us",
+    "location": "Location",
+    "email": "Email",
+    "contact": "Contact"
+  },
+
+  "offerings": [
+    { "label": "Landscaping", "path": "/landscaping" },
+    { "label": "Interiors", "path": "/interiors" },
+    { "label": "Rentals", "path": "/rentals" },
+    { "label": "Buy", "path": "/buy" },
+    { "label": "Sell", "path": "/sell" },
+    { "label": "Mortgages", "path": "/mortgage/services" }
+  ],
+
+  "resources": [
+    { "label": "Xoto Properties", "path": "/properties" },
+    { "label": "Explore Xoto", "path": "/explore" },
+    { "label": "AI Driven", "path": "/ai" },
+    { "label": "Free Consultation", "path": "/consultation" },
+    { "label": "Hire Freelancers", "path": "/freelancers" }
+  ],
+
+  "knowledge": [
+    { "label": "About Us", "path": "/about" },
+    { "label": "Knowledge Centre", "path": "/knowledge-centre" },
+    { "label": "Our Sustainability Focus", "path": "/sustainability" },
+    { "label": "Submit Your Feedback", "path": "/feedback" },
+    { "label": "Contact Us", "path": "/contact" },
+    { "label": "Privacy Policy", "path": "/privacy" },
+    { "label": "Terms Of Use", "path": "/terms" }
+  ],
+
+  "location": "UAE",
+
+  "email": {
+    "partners": "For Partners:",
+    "customers": "For Customers:"
+  },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "Linkedin", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "©2025 Xoto. All rights reserved"
+  }
+}

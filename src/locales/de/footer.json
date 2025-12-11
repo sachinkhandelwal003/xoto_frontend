@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "Ein vereintes Ökosystem <br/> schafft lebenslangen <br/> Immobilienwert.",
+    "description": "Skalierbar. KI-gestützt. Ressourcenleicht."
+  },
+
+  "titles": {
+    "offerings": "Unsere Angebote",
+    "resources": "Partner-Ökosystem",
+    "knowledge": "Über uns",
+    "location": "Standort",
+    "email": "E-Mail",
+    "contact": "Kontakt"
+  },
+
+  "offerings": [
+    { "label": "Landschaftsgestaltung", "path": "/landscaping" },
+    { "label": "Innenräume", "path": "/interiors" },
+    { "label": "Vermietung", "path": "/rentals" },
+    { "label": "Kaufen", "path": "/buy" },
+    { "label": "Verkaufen", "path": "/sell" },
+    { "label": "Hypotheken", "path": "/mortgage/services" }
+  ],
+
+  "resources": [
+    { "label": "Xoto Immobilien", "path": "/properties" },
+    { "label": "Xoto entdecken", "path": "/explore" },
+    { "label": "KI-gestützt", "path": "/ai" },
+    { "label": "Kostenlose Beratung", "path": "/consultation" },
+    { "label": "Freelancer beauftragen", "path": "/freelancers" }
+  ],
+
+  "knowledge": [
+    { "label": "Über uns", "path": "/about" },
+    { "label": "Wissenszentrum", "path": "/knowledge-centre" },
+    { "label": "Unser Nachhaltigkeitsfokus", "path": "/sustainability" },
+    { "label": "Feedback einreichen", "path": "/feedback" },
+    { "label": "Kontakt", "path": "/contact" },
+    { "label": "Datenschutzrichtlinie", "path": "/privacy" },
+    { "label": "Nutzungsbedingungen", "path": "/terms" }
+  ],
+
+  "location": "VAE",
+
+  "email": {
+    "partners": "Für Partner:",
+    "customers": "Für Kunden:"
+  },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "LinkedIn", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "©2025 Xoto. Alle Rechte vorbehalten"
+  }
+}

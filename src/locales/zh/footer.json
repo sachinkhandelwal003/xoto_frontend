@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "统一生态系统 <br/> 创造终身 <br/> 物业价值。",
+    "description": "可扩展 · AI 驱动 · 轻资产模式"
+  },
+
+  "titles": {
+    "offerings": "我们的服务",
+    "resources": "合作生态系统",
+    "knowledge": "关于我们",
+    "location": "位置",
+    "email": "电子邮箱",
+    "contact": "联系方式"
+  },
+
+  "offerings": [
+    { "label": "景观设计", "path": "/landscaping" },
+    { "label": "室内设计", "path": "/interiors" },
+    { "label": "租赁", "path": "/rentals" },
+    { "label": "购买", "path": "/buy" },
+    { "label": "出售", "path": "/sell" },
+    { "label": "贷款服务", "path": "/mortgage/services" }
+  ],
+
+  "resources": [
+    { "label": "Xoto 物业", "path": "/properties" },
+    { "label": "探索 Xoto", "path": "/explore" },
+    { "label": "AI 驱动", "path": "/ai" },
+    { "label": "免费咨询", "path": "/consultation" },
+    { "label": "聘请自由职业者", "path": "/freelancers" }
+  ],
+
+  "knowledge": [
+    { "label": "关于我们", "path": "/about" },
+    { "label": "知识中心", "path": "/knowledge-centre" },
+    { "label": "可持续发展", "path": "/sustainability" },
+    { "label": "提交反馈", "path": "/feedback" },
+    { "label": "联系我们", "path": "/contact" },
+    { "label": "隐私政策", "path": "/privacy" },
+    { "label": "使用条款", "path": "/terms" }
+  ],
+
+  "location": "阿联酋",
+
+  "email": {
+    "partners": "合作伙伴：",
+    "customers": "客户："
+  },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "Linkedin", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "©2025 Xoto. 版权所有"
+  }
+}

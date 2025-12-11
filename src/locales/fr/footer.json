@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "Un écosystème unifié <br/> créant une valeur <br/> immobilière durable.",
+    "description": "Évolutif. Alimenté par l’IA. Léger en actifs."
+  },
+
+  "titles": {
+    "offerings": "Nos Services",
+    "resources": "Écosystème Partenaire",
+    "knowledge": "À propos de nous",
+    "location": "Localisation",
+    "email": "Email",
+    "contact": "Contact"
+  },
+
+  "offerings": [
+    { "label": "Aménagement paysager", "path": "/landscaping" },
+    { "label": "Intérieurs", "path": "/interiors" },
+    { "label": "Locations", "path": "/rentals" },
+    { "label": "Acheter", "path": "/buy" },
+    { "label": "Vendre", "path": "/sell" },
+    { "label": "Prêts hypothécaires", "path": "/mortgage/services" }
+  ],
+
+  "resources": [
+    { "label": "Xoto Propriétés", "path": "/properties" },
+    { "label": "Explorer Xoto", "path": "/explore" },
+    { "label": "IA", "path": "/ai" },
+    { "label": "Consultation Gratuite", "path": "/consultation" },
+    { "label": "Engager des Freelancers", "path": "/freelancers" }
+  ],
+
+  "knowledge": [
+    { "label": "À propos", "path": "/about" },
+    { "label": "Centre de Connaissances", "path": "/knowledge-centre" },
+    { "label": "Focus Durabilité", "path": "/sustainability" },
+    { "label": "Envoyer un Avis", "path": "/feedback" },
+    { "label": "Nous Contacter", "path": "/contact" },
+    { "label": "Politique de Confidentialité", "path": "/privacy" },
+    { "label": "Conditions d’Utilisation", "path": "/terms" }
+  ],
+
+  "location": "EAU",
+
+  "email": {
+    "partners": "Pour les partenaires:",
+    "customers": "Pour les clients:"
+  },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "Linkedin", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "©2025 Xoto. Tous droits réservés."
+  }
+}
