@@ -1,24 +1,61 @@
 // src/pages/admin/VendorB2C.jsx
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
-  FiPlus,
   FiRefreshCw,
   FiEye,
   FiCheck,
   FiX,
-  FiUser,
-  FiClock,
   FiShoppingBag,
 } from "react-icons/fi";
-import { Button, Card, Modal, Input, Tabs, Statistic, Tag, Space } from "antd";
+import { 
+  Button, 
+  Card, 
+  Modal, 
+  Input, 
+  Tabs, 
+  Tag, 
+  Space, 
+  Typography, 
+  Badge, 
+  Avatar, 
+  Tooltip, 
+  Alert,
+  Popconfirm,
+  Row,
+  Col,
+  Statistic 
+} from "antd";
+import {
+  UserOutlined,
+  ShopOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ReloadOutlined,
+  ShoppingOutlined,
+  TeamOutlined,
+  ShopTwoTone
+} from "@ant-design/icons";
 import CustomTable from "../../custom/CustomTable";
 import { apiService } from "../../../../../manageApi/utils/custom.apiservice";
 import { showToast } from "../../../../../manageApi/utils/toast";
 
 const { TextArea } = Input;
-const { TabPane } = Tabs;
+const { Title, Text } = Typography;
+
+// --- THEME CONFIGURATION ---
+const THEME = {
+  primary: "#722ed1", // Purple
+  secondary: "#1890ff", // Blue
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
+};
 
 const roleSlugMap = {
   0: "superadmin",
@@ -51,7 +88,10 @@ const VendorB2C = () => {
   const roleSlug = roleSlugMap[user?.role?.code] ?? "dashboard";
 
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("pending");
+  
+  // ✅ CHANGED DEFAULT TO 'approved'
+  const [activeTab, setActiveTab] = useState("approved");
+  
   const [vendors, setVendors] = useState([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
 
@@ -72,16 +112,19 @@ const VendorB2C = () => {
       setLoading(true);
 
       try {
+        // Map tab strings to Backend numeric status (0=Pending, 1=Approved, 2=Rejected)
         const statusMap = { pending: 0, approved: 1, rejected: 2 };
+
         const res = await apiService.get("/vendor/b2c", {
           page,
           limit,
-          status: statusMap[activeTab],
+          status: statusMap[activeTab], 
         });
 
+        // 1. Process List Data
         const data = (res.vendors || []).map((v, i) => {
           const fullName = `${v.name?.first_name || ""} ${v.name?.last_name || ""}`.trim() || "—";
-          const mobile = v.mobile ? `${v.mobile.country_code}${v.mobile.number}` : "—";
+          const mobile = v.mobile ? `${v.mobile.country_code} ${v.mobile.number}` : "—";
           const categories = v.store_details?.categories
             ? v.store_details.categories.map(c => c.name).join(", ")
             : "—";
@@ -104,6 +147,7 @@ const VendorB2C = () => {
 
         setVendors(data);
 
+        // 2. Update Pagination from Backend Response
         setPagination({
           currentPage: res.pagination?.page || 1,
           totalPages: res.pagination?.totalPages || 1,
@@ -111,12 +155,15 @@ const VendorB2C = () => {
           itemsPerPage: res.pagination?.limit || 10,
         });
 
-        setStats({
-          total: res.stats?.total || 0,
-          pending: res.stats?.pending || 0,
-          approved: res.stats?.approved || 0,
-          rejected: res.stats?.rejected || 0,
-        });
+        // 3. Update Stats (Badges)
+        if (res.stats) {
+            setStats({
+                total: res.stats?.total || 0,
+                pending: res.stats?.pending || 0,
+                approved: res.stats?.approved || 0,
+                rejected: res.stats?.rejected || 0,
+            });
+        }
       } catch (err) {
         showToast(err.response?.data?.message || "Failed to load vendors", "error");
         setVendors([]);
@@ -178,60 +225,73 @@ const VendorB2C = () => {
     }
   };
 
+  // --- COLUMNS ---
   const columns = useMemo(
     () => [
-    
       {
-        title: "Vendor",
-        width: 280,
+        title: "Vendor Profile",
+        width: 300,
         render: (_, r) => (
-          <div>
-            <div className="font-semibold text-gray-900">{r.full_name}</div>
-            <div className="text-sm text-gray-500">{r.email}</div>
-            <div className="text-xs text-purple-600 font-medium mt-1">
-              {r.store_name}
+          <div className="flex items-center gap-3">
+            <Avatar 
+                size={48} 
+                icon={<ShopOutlined />} 
+                style={{ backgroundColor: THEME.bgLight, color: THEME.primary, border: '1px solid #eee' }}
+            />
+            <div>
+              <div className="font-semibold text-gray-900 text-base">{r.store_name}</div>
+              <div className="text-xs text-gray-500 flex items-center gap-1">
+                 <UserOutlined /> {r.full_name}
+              </div>
+              <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                 <MailOutlined /> {r.email}
+              </div>
             </div>
           </div>
         ),
       },
       {
-        title: "Mobile",
-        width: 140,
+        title: "Contact Info",
+        width: 160,
         render: (_, r) => (
           <Space direction="vertical" size={0}>
-            <span>{r.mobile}</span>
-            {r.is_mobile_verified && <Tag color="green" className="text-xs">Verified</Tag>}
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+                <PhoneOutlined style={{ color: THEME.secondary }} /> {r.mobile}
+            </div>
+            {r.is_mobile_verified && <Tag color="success" style={{ marginTop: 4, fontSize: '10px' }}>Verified</Tag>}
           </Space>
         ),
       },
       {
-        title: "Categories",
+        title: "Store Details",
         width: 200,
         render: (_, r) => (
-          <div className="text-sm">
-            {r.categories}
-          </div>
+          <Space direction="vertical" size={2}>
+             <Tag color="geekblue">{r.store_type}</Tag>
+             <div className="text-xs text-gray-500 line-clamp-1" title={r.categories}>
+                {r.categories}
+             </div>
+          </Space>
         ),
       },
       {
-        title: "Store Type",
-        width: 160,
-        render: (_, r) => r.store_type,
-      },
-      {
         title: "Status",
-        width: 130,
+        width: 140,
         render: (_, r) => {
           const status = r.status;
-          const map = { 0: "warning", 1: "success", 2: "error" };
-          const label = { 0: "Pending", 1: "Approved", 2: "Rejected" };
+          const config = {
+             0: { color: 'warning', icon: <ClockCircleOutlined />, label: 'Pending' },
+             1: { color: 'success', icon: <CheckCircleOutlined />, label: 'Approved' },
+             2: { color: 'error', icon: <CloseCircleOutlined />, label: 'Rejected' }
+          }[status];
+
           return (
             <div>
-              <Tag color={map[status]}>{label[status]}</Tag>
+              <Tag color={config.color} icon={config.icon} style={{ borderRadius: 12 }}>{config.label}</Tag>
               {status === 2 && r.rejection_reason && (
-                <div className="text-xs text-red-600 mt-1 max-w-xs truncate">
-                  {r.rejection_reason}
-                </div>
+                <Tooltip title={r.rejection_reason}>
+                    <div className="text-xs text-red-500 mt-1 cursor-help underline">Reason</div>
+                </Tooltip>
               )}
             </div>
           );
@@ -240,10 +300,11 @@ const VendorB2C = () => {
       {
         title: "Registered",
         width: 120,
-        render: (_, r) =>
-          r.created_at
-            ? new Date(r.created_at).toLocaleDateString("en-GB")
-            : "—",
+        render: (_, r) => (
+            <span className="text-gray-500 text-xs">
+                {r.created_at ? new Date(r.created_at).toLocaleDateString("en-GB") : "—"}
+            </span>
+        )
       },
       {
         title: "Actions",
@@ -251,44 +312,53 @@ const VendorB2C = () => {
         width: 180,
         render: (_, r) => (
           <Space>
-            <Button
-              type="link"
-              size="small"
-              icon={<FiEye />}
-              onClick={() => navigate(`/dashboard/${roleSlug}/seller/${r._id}`)}
-            />
+            <Tooltip title="View Profile">
+                <Button
+                type="text"
+                shape="circle"
+                icon={<FiEye style={{ color: THEME.primary }} />}
+                onClick={() => navigate(`/dashboard/${roleSlug}/seller/${r._id}`)}
+                />
+            </Tooltip>
+
+            <Tooltip title="View Products">
+                <Button
+                type="text"
+                shape="circle"
+                icon={<ShoppingOutlined style={{ color: THEME.secondary }} />}
+                onClick={() => navigate(`/dashboard/${roleSlug}/seller/product/${r._id}`)}
+                />
+            </Tooltip>
 
             {activeTab === "pending" && perm.canApprove && (
-              <Button
-                type="link"
-                size="small"
-                icon={<FiCheck />}
-                className="text-green-600"
-                onClick={() => handleApprove(r._id)}
-              />
+              <Tooltip title="Approve">
+                  <Popconfirm
+                    title="Approve Vendor"
+                    description="Are you sure you want to approve this vendor?"
+                    onConfirm={() => handleApprove(r._id)}
+                    okText="Approve"
+                    cancelText="No"
+                    okButtonProps={{ type: 'primary', style: { background: THEME.success } }}
+                  >
+                    <Button
+                        type="text"
+                        shape="circle"
+                        icon={<FiCheck style={{ color: THEME.success }} />}
+                    />
+                  </Popconfirm>
+              </Tooltip>
             )}
 
             {activeTab === "pending" && perm.canReject && (
-              <Button
-                type="link"
-                size="small"
-                danger
-                icon={<FiX />}
-                onClick={() => openRejectModal(r)}
-              />
+              <Tooltip title="Reject">
+                <Button
+                  type="text"
+                  shape="circle"
+                  icon={<FiX style={{ color: THEME.error }} />}
+                  onClick={() => openRejectModal(r)}
+                />
+              </Tooltip>
             )}
-
-            <Button
-              type="link"
-              size="small"
-              icon={<FiShoppingBag />}
-              className="text-purple-600"
-              onClick={() =>
-                navigate(`/dashboard/${roleSlug}/seller/product/${r._id}`)
-              }
-            >
-              Products
-            </Button>
           </Space>
         ),
       },
@@ -299,93 +369,121 @@ const VendorB2C = () => {
   if (!perm.canView) {
     return (
       <div className="p-10 text-center">
-        <h2 className="text-2xl font-bold text-red-600">Access Denied</h2>
-        <p className="text-gray-600 mt-2">You don't have permission to view B2C vendors.</p>
+        <Alert
+          message="Access Denied"
+          description="You don't have permission to view B2C vendors."
+          type="error"
+          showIcon
+        />
       </div>
     );
   }
 
+  // --- TAB CONFIGURATION ---
+  const tabItems = [
+    {
+      key: 'approved',
+      label: (
+        <span>
+          <CheckCircleOutlined /> Approved
+          <Badge count={stats.approved} style={{ marginLeft: 8, backgroundColor: THEME.success }} />
+        </span>
+      )
+    },
+    {
+      key: 'pending',
+      label: (
+        <span>
+          <ClockCircleOutlined /> Pending
+          <Badge count={stats.pending} style={{ marginLeft: 8, backgroundColor: THEME.warning }} />
+        </span>
+      )
+    },
+    {
+      key: 'rejected',
+      label: (
+        <span>
+          <CloseCircleOutlined /> Rejected
+          <Badge count={stats.rejected} style={{ marginLeft: 8, backgroundColor: THEME.error }} />
+        </span>
+      )
+    }
+  ];
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      
       {/* Header */}
-      <Card className="mb-6 shadow-sm">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">B2C Vendor Requests</h1>
-            <p className="text-gray-500">Manage and approve B2C seller applications</p>
-          </div>
-          <Button
-            type="primary"
-            icon={<FiRefreshCw />}
-            onClick={handleRefresh}
-            loading={loading}
-          >
-            Refresh
-          </Button>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+            <Title level={3} style={{ margin: 0 }}>Vendor Management (B2C)</Title>
+            <Text type="secondary">Manage approvals and view vendor details.</Text>
         </div>
-      </Card>
-
-      {/* Tabs */}
-      <Tabs activeKey={activeTab} onChange={handleTabChange} className="mb-6">
-        <TabPane tab={`Pending (${stats.pending})`} key="pending" />
-        <TabPane tab={`Approved (${stats.approved})`} key="approved" />
-        <TabPane tab={`Rejected (${stats.rejected})`} key="rejected" />
-      </Tabs>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {[
-          { title: "Total Vendors", value: stats.total, icon: FiUser, color: "#5C039B" },
-          { title: "Pending", value: stats.pending, icon: FiClock, color: "#ff9800" },
-          { title: "Approved", value: stats.approved, icon: FiCheck, color: "#4caf50" },
-          { title: "Rejected", value: stats.rejected, icon: FiX, color: "#f44336" },
-        ].map((s) => (
-          <Card key={s.title} className="shadow-md hover:shadow-lg transition-shadow">
-            <Statistic
-              title={s.title}
-              value={s.value}
-              prefix={<s.icon className="text-xl" style={{ color: s.color }} />}
-              valueStyle={{ color: s.color, fontWeight: "bold" }}
-            />
-          </Card>
-        ))}
+        
       </div>
 
-      {/* Table */}
-      <Card bodyStyle={{ padding: 0 }}>
-        <CustomTable
-          columns={columns}
-          data={vendors}
-          loading={loading}
-          totalItems={pagination.totalResults}
-          currentPage={pagination.currentPage}
-          itemsPerPage={pagination.itemsPerPage}
-          onPageChange={handlePageChange}
-          scroll={{ x: 1500 }}
+      {/* Main Content Card */}
+      <Card 
+        bordered={false} 
+        className="shadow-md rounded-lg" 
+        bodyStyle={{ padding: 0 }}
+      >
+        <Tabs 
+            activeKey={activeTab} 
+            onChange={handleTabChange} 
+            size="large"
+            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
+            items={tabItems}
+            type="card"
         />
+
+        <div className="p-0">
+            <CustomTable
+                columns={columns}
+                data={vendors}
+                loading={loading}
+                totalItems={pagination.totalResults}
+                currentPage={pagination.currentPage}
+                itemsPerPage={pagination.itemsPerPage}
+                onPageChange={handlePageChange}
+                scroll={{ x: 1200 }}
+            />
+        </div>
       </Card>
 
       {/* Reject Modal */}
       <Modal
-        title="Reject Vendor Application"
+        title={
+            <div className="flex items-center gap-2 text-red-600 font-bold">
+                <CloseCircleOutlined /> Reject Vendor Application
+            </div>
+        }
         open={showRejectModal}
         onCancel={() => setShowRejectModal(false)}
         footer={null}
         width={500}
+        destroyOnClose
+        centered
       >
         {selectedVendor && (
-          <div>
-            <p className="mb-4">
-              <strong>Vendor:</strong> {selectedVendor.full_name}<br />
-              <strong>Store:</strong> {selectedVendor.store_name}
-            </p>
+          <div className="pt-2">
+            <Alert
+                message="Action Required"
+                description={`You are about to reject ${selectedVendor.store_name}. Please provide a reason.`}
+                type="warning"
+                showIcon
+                className="mb-4"
+            />
+            
+            <p className="mb-2 font-medium">Rejection Reason:</p>
             <TextArea
               rows={4}
-              placeholder="Please provide a reason for rejection (required)"
+              placeholder="e.g. Incomplete documentation, policy violation..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="mb-4"
+              className="mb-6"
             />
+            
             <div className="flex justify-end gap-3">
               <Button onClick={() => setShowRejectModal(false)}>Cancel</Button>
               <Button
@@ -394,7 +492,7 @@ const VendorB2C = () => {
                 onClick={handleReject}
                 disabled={!rejectionReason.trim()}
               >
-                Reject Vendor
+                Confirm Rejection
               </Button>
             </div>
           </div>

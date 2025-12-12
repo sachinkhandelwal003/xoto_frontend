@@ -1,8 +1,25 @@
 import { useState } from 'react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
+import { 
+  DollarOutlined, 
+  TeamOutlined, 
+  ShoppingCartOutlined, 
+  EnvironmentOutlined, 
+  RiseOutlined,
+  ArrowUpOutlined,
+  PlusOutlined,
+  FileTextOutlined,
+  UserAddOutlined,
+  BellOutlined,
+  SettingOutlined
+} from '@ant-design/icons';
+import { Card, Row, Col, Select, Button, Typography, Tag, Avatar, List, Statistic } from 'antd';
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 const Dashboard = () => {
   const [timeRange, setTimeRange] = useState('7d');
@@ -37,198 +54,202 @@ const Dashboard = () => {
 
   // === QUICK STATS ===
   const stats = [
-    { label: 'Total Revenue', value: '$48,921', change: '+18.2%', trend: 'up', icon: 'fas fa-dollar-sign' },
-    { label: 'Active Freelancers', value: '68', change: '+12%', trend: 'up', icon: 'fas fa-user-hard-hat' },
-    { label: 'E-Commerce Orders', value: '1,234', change: '+22%', trend: 'up', icon: 'fas fa-shopping-cart' },
-    { label: 'Landscaping Projects', value: '342', change: '+28%', trend: 'up', icon: 'fas fa-tree' },
-    { label: 'Avg. Project Value', value: '$1,280', change: '+9%', trend: 'up', icon: 'fas fa-chart-line' },
+    { label: 'Total Revenue', value: '$48,921', change: 18.2, icon: <DollarOutlined />, color: '#722ed1', bg: '#f9f0ff' },
+    { label: 'Active Freelancers', value: '68', change: 12, icon: <TeamOutlined />, color: '#1890ff', bg: '#e6f7ff' },
+    { label: 'Orders', value: '1,234', change: 22, icon: <ShoppingCartOutlined />, color: '#52c41a', bg: '#f6ffed' },
+    { label: 'Projects', value: '342', change: 28, icon: <EnvironmentOutlined />, color: '#faad14', bg: '#fff7e6' },
   ];
 
   const recentActivity = [
-    { action: 'New landscaping project in Mumbai', user: 'Rajesh Kumar', time: '10 mins ago', icon: 'fas fa-seedling', color: 'text-green-600' },
-    { action: 'Order #7892 - Garden Kit Delivered', user: 'Priya Sharma', time: '25 mins ago', icon: 'fas fa-truck', color: 'text-blue-600' },
-    { action: 'Freelancer completed lawn design', user: 'Amit Patel', time: '1 hr ago', icon: 'fas fa-check-circle', color: 'text-purple-600' },
-    { action: 'New review: 5★ for irrigation setup', user: 'Neha Gupta', time: '2 hrs ago', icon: 'fas fa-star', color: 'text-yellow-600' },
-    { action: 'Bulk plant order #4451 processed', user: 'System', time: '3 hrs ago', icon: 'fas fa-box-open', color: 'text-indigo-600' },
+    { title: 'New landscaping project', user: 'Rajesh Kumar', time: '10 mins ago', type: 'project' },
+    { title: 'Order #7892 Delivered', user: 'Priya Sharma', time: '25 mins ago', type: 'order' },
+    { title: 'Lawn design completed', user: 'Amit Patel', time: '1 hr ago', type: 'freelancer' },
+    { title: '5★ Review received', user: 'Neha Gupta', time: '2 hrs ago', type: 'review' },
   ];
-
-  const quickActions = [
-    { title: 'Add Product', icon: 'fas fa-plus-circle', path: '/ecommerce/products/new', bg: 'bg-green-100', iconColor: 'text-green-600' },
-    { title: 'Post Job', icon: 'fas fa-bullhorn', path: '/freelance/jobs/new', bg: 'bg-purple-100', iconColor: 'text-purple-600' },
-    { title: 'View Orders', icon: 'fas fa-clipboard-list', path: '/ecommerce/orders', bg: 'bg-blue-100', iconColor: 'text-blue-600' },
-    { title: 'Manage Team', icon: 'fas fa-users-cog', path: '/admin/team', bg: 'bg-yellow-100', iconColor: 'text-yellow-600' },
-  ];
-
-  const COLORS = ['#10b981', '#8b5cf6', '#f59e0b', '#3b82f6', '#6b7280'];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* === PURPLE HEADER === */}
-      <header className="bg-gradient-to-r from-purple-700 to-purple-900 text-white shadow-lg">
-        <div className="px-6 py-5 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">Super Admin Dashboard</h1>
-            <p className="text-purple-200 text-sm mt-1">Landscaping Freelance & E-Commerce Platform</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="bg-purple-800 text-white px-4 py-2 rounded-lg text-sm border border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            >
-              <option value="7d">Last 7 Days</option>
-              <option value="30d">Last 30 Days</option>
-              <option value="90d">Last Quarter</option>
-            </select>
-            <button className="bg-white text-purple-700 px-4 py-2 rounded-lg font-medium text-sm hover:bg-purple-50 transition">
-              <i className="fas fa-download mr-2"></i> Export
-            </button>
-            <button className="bg-purple-600 px-4 py-2 rounded-lg font-medium text-sm hover:bg-purple-500 transition flex items-center">
-              <i className="fas fa-sync-alt mr-2"></i> Refresh
-            </button>
-          </div>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+        <div>
+          <Title level={2} style={{ margin: 0, color: '#1f2937' }}>Dashboard Overview</Title>
+          <Text type="secondary">Welcome back, here's what's happening with your store today.</Text>
         </div>
-      </header>
-
-      <div className="p-6 space-y-6 max-w-7xl mx-auto">
-        {/* === QUICK ACTIONS === */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {quickActions.map((action, i) => (
-            <a
-              key={i}
-              href={action.path}
-              className="bg-white p-5 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col items-center text-center group"
-            >
-              <div className={`w-12 h-12 rounded-full ${action.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                <i className={`${action.icon} ${action.iconColor} text-xl`}></i>
-              </div>
-              <span className="text-sm font-semibold text-gray-800">{action.title}</span>
-            </a>
-          ))}
+        <div className="flex gap-3 mt-4 md:mt-0">
+           <Select defaultValue="7d" style={{ width: 120 }} onChange={setTimeRange} size="large">
+              <Option value="7d">Last 7 Days</Option>
+              <Option value="30d">Last 30 Days</Option>
+              <Option value="90d">Last Quarter</Option>
+           </Select>
+           <Button type="primary" size="large" icon={<BellOutlined />} style={{ background: '#722ed1', borderColor: '#722ed1' }}>
+              Notifications
+           </Button>
         </div>
+      </div>
 
-        {/* === STATS CARDS === */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          {stats.map((stat, i) => (
-            <div
-              key={i}
-              className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
-            >
+      {/* STATS CARDS */}
+      <Row gutter={[16, 16]} className="mb-8">
+        {stats.map((stat, i) => (
+          <Col xs={24} sm={12} lg={6} key={i}>
+            <Card bordered={false} className="shadow-sm hover:shadow-md transition-shadow rounded-xl h-full">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-800 mt-1">{stat.value}</p>
+                  <Text type="secondary" className="block mb-1">{stat.label}</Text>
+                  <Title level={3} style={{ margin: 0 }}>{stat.value}</Title>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center">
-                  <i className={`${stat.icon} text-green-600 text-lg`}></i>
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl" style={{ backgroundColor: stat.bg, color: stat.color }}>
+                  {stat.icon}
                 </div>
               </div>
-              <div className="mt-3 flex items-center">
-                <span className="text-sm font-semibold text-green-600">{stat.change}</span>
-                <span className="text-xs text-gray-500 ml-2">vs last period</span>
+              <div className="mt-4 flex items-center">
+                <Tag color={stat.change > 0 ? 'success' : 'error'} icon={stat.change > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}>
+                  {Math.abs(stat.change)}%
+                </Tag>
+                <Text type="secondary" style={{ fontSize: '12px' }}>vs last period</Text>
+              </div>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+
+      {/* MAIN CHARTS SECTION */}
+      <Row gutter={[16, 16]} className="mb-8">
+        <Col xs={24} lg={16}>
+          <Card bordered={false} className="shadow-sm rounded-xl h-full" title="Revenue & Orders Trend">
+            <ResponsiveContainer width="100%" height={350}>
+              <AreaChart data={salesData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Legend verticalAlign="top" height={36} iconType="circle" />
+                <Area type="monotone" dataKey="sales" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" name="Revenue ($)" />
+                <Area type="monotone" dataKey="orders" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorOrders)" name="Orders" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+        
+        <Col xs={24} lg={8}>
+          <Card bordered={false} className="shadow-sm rounded-xl h-full" title="Sales by Category">
+            <div className="relative h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              {/* Center Text */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                <Text type="secondary" className="block text-xs">Total</Text>
+                <Title level={4} style={{ margin: 0 }}>100%</Title>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* === CHARTS ROW === */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Sales & Orders Line Chart */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Revenue & Orders Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={salesData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="sales" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6' }} name="Revenue ($)" />
-                <Line type="monotone" dataKey="orders" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981' }} name="Orders" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Category Pie Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Sales by Category</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {categoryData.map((entry, i) => (
-                    <Cell key={`cell-${i}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-4 space-y-2">
-              {categoryData.map((item, i) => (
-                <div key={i} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></div>
-                    <span className="text-gray-600">{item.name}</span>
+            
+            <div className="mt-4 space-y-3">
+              {categoryData.slice(0, 3).map((item, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                    <Text className="text-gray-600">{item.name}</Text>
                   </div>
-                  <span className="font-medium text-gray-800">{item.value}%</span>
+                  <Text strong>{item.value}%</Text>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+          </Card>
+        </Col>
+      </Row>
 
-        {/* === FREELANCER GROWTH BAR CHART === */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Freelancer Growth (Last 6 Months)</h3>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={freelancerStats}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="active" fill="#8b5cf6" name="Active Freelancers" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="completed" fill="#10b981" name="Projects Completed" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* === RECENT ACTIVITY === */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-5">
-            <h3 className="text-lg font-semibold text-gray-800">Recent Activity</h3>
-            <a href="/activity" className="text-purple-600 hover:text-purple-700 text-sm font-medium">
-              View All <i className="fas fa-arrow-right ml-1"></i>
-            </a>
-          </div>
-          <div className="space-y-4">
-            {recentActivity.map((act, i) => (
-              <div key={i} className="flex items-start space-x-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0">
-                <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-50 ${act.color}`}>
-                  <i className={`${act.icon} text-sm`}></i>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-800 font-medium truncate">
-                    <span className="font-semibold">{act.user}</span>{' '}
-                    <span className="font-normal text-gray-600">{act.action}</span>
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">{act.time}</p>
-                </div>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <i className="fas fa-ellipsis-h text-xs"></i>
-                </button>
+      {/* BOTTOM SECTION */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12} lg={8}>
+           <Card bordered={false} className="shadow-sm rounded-xl h-full" title="Quick Actions">
+              <div className="grid grid-cols-2 gap-4">
+                 {[
+                    { label: 'Add Product', icon: <PlusOutlined />, color: '#52c41a', bg: '#f6ffed' },
+                    { label: 'Post Job', icon: <FileTextOutlined />, color: '#722ed1', bg: '#f9f0ff' },
+                    { label: 'Add User', icon: <UserAddOutlined />, color: '#1890ff', bg: '#e6f7ff' },
+                    { label: 'Settings', icon: <SettingOutlined />, color: '#faad14', bg: '#fff7e6' },
+                 ].map((action, i) => (
+                    <div key={i} className="flex flex-col items-center justify-center p-4 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors border border-dashed border-gray-200">
+                       <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl mb-2" style={{ backgroundColor: action.bg, color: action.color }}>
+                          {action.icon}
+                       </div>
+                       <Text strong>{action.label}</Text>
+                    </div>
+                 ))}
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+           </Card>
+        </Col>
+
+        <Col xs={24} md={12} lg={8}>
+           <Card bordered={false} className="shadow-sm rounded-xl h-full" title="Freelancer Activity">
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={freelancerStats}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                  <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px' }} />
+                  <Bar dataKey="active" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="completed" fill="#e5e7eb" radius={[4, 4, 0, 0]} barSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
+           </Card>
+        </Col>
+
+        <Col xs={24} lg={8}>
+           <Card bordered={false} className="shadow-sm rounded-xl h-full" title="Recent Activity">
+              <List
+                itemLayout="horizontal"
+                dataSource={recentActivity}
+                renderItem={(item) => (
+                  <List.Item className="border-b-0 py-3">
+                    <List.Item.Meta
+                      avatar={
+                        <Avatar style={{ backgroundColor: '#f0f2f5', color: '#1f2937' }}>
+                          {item.user.charAt(0)}
+                        </Avatar>
+                      }
+                      title={<Text strong>{item.title}</Text>}
+                      description={
+                        <div className="flex justify-between items-center text-xs">
+                           <Text type="secondary">{item.user}</Text>
+                           <Text type="secondary">{item.time}</Text>
+                        </div>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+           </Card>
+        </Col>
+      </Row>
+
     </div>
   );
 };

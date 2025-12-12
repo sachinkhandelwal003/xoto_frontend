@@ -57,6 +57,7 @@ import {
   ShareAltOutlined,
   SettingOutlined
 } from "@ant-design/icons";
+import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;

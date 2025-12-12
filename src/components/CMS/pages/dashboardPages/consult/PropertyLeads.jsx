@@ -1,25 +1,36 @@
 // src/components/property/PropertyLeads.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Card, Drawer, Descriptions, Tag, Button, Space, Badge,
-  Alert, message, Avatar, Row, Col, Input, Tabs, Select
+  Alert, message, Avatar, Row, Col, Input, Tabs, Select, Statistic, Tooltip, Divider
 } from 'antd';
 import {
   PhoneOutlined, MailOutlined, UserOutlined,
   HomeOutlined, DollarCircleOutlined, CalendarOutlined,
   CheckCircleOutlined, EyeOutlined, DeleteOutlined, BellOutlined,
-  UsergroupAddOutlined, BankOutlined
+  UsergroupAddOutlined, BankOutlined, SearchOutlined, FilterOutlined,
+  EnvironmentOutlined
 } from '@ant-design/icons';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
 import { showSuccessAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
 import CustomTable from '../../../pages/custom/CustomTable';
 
+// --- THEME CONFIGURATION ---
+const THEME = {
+  primary: "#722ed1", // Purple
+  secondary: "#1890ff", // Blue
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
+};
+
 const typeConfig = {
   buy: { label: 'Buy Property', color: 'blue', icon: <HomeOutlined /> },
   sell: { label: 'Sell Property', color: 'purple', icon: <DollarCircleOutlined /> },
-  schedule_visit: { label: 'Schedule Visit', color: 'orange', icon: <CalendarOutlined /> },
+  schedule_visit: { label: 'Visit Request', color: 'orange', icon: <CalendarOutlined /> },
   rent: { label: 'Rent Property', color: 'cyan', icon: <BankOutlined /> },
-  partner: { label: 'Partner', color: 'green', icon: <UsergroupAddOutlined /> }
+  partner: { label: 'Partnership', color: 'green', icon: <UsergroupAddOutlined /> }
 };
 
 const statusConfig = {
@@ -39,6 +50,15 @@ const PropertyLeads = () => {
     itemsPerPage: 10,
     totalItems: 0
   });
+
+  // --- STATS CALCULATION ---
+  const stats = useMemo(() => {
+    return {
+      total: pagination.totalItems,
+      new: leads.filter(l => l.status === 'submit').length,
+      contacted: leads.filter(l => l.status === 'contacted').length,
+    };
+  }, [leads, pagination.totalItems]);
 
   const fetchLeads = async (tab = activeTab, page = 1, limit = 10, search = '') => {
     setLoading(true);
@@ -114,14 +134,21 @@ const PropertyLeads = () => {
     return 'N/A';
   };
 
+  // --- COLUMNS ---
   const columns = [
     {
-      title: 'Name',
+      title: 'Prospect Name',
+      key: 'name',
+      width: 250,
       render: (_, record) => (
         <Space>
-          <Avatar size="small" icon={<UserOutlined />} />
+          <Avatar 
+            style={{ backgroundColor: THEME.secondary }} 
+            icon={<UserOutlined />} 
+            size="large"
+          />
           <div>
-            <div className="font-medium">
+            <div className="font-bold text-gray-800">
               {getFullName(record)}
             </div>
             <div className="text-xs text-gray-500">
@@ -132,60 +159,77 @@ const PropertyLeads = () => {
       )
     },
     {
-      title: 'Type',
+      title: 'Intent',
+      key: 'type',
       render: (_, record) => {
         const config = typeConfig[record.type] || { label: 'Unknown', color: 'default', icon: <UserOutlined /> };
-        return <Tag icon={config.icon} color={config.color}>{config.label}</Tag>;
+        return (
+            <Tag icon={config.icon} color={config.color} style={{ borderRadius: 12, padding: '2px 10px' }}>
+                {config.label}
+            </Tag>
+        );
       }
     },
     {
-      title: 'Contact',
+      title: 'Contact Info',
+      key: 'contact',
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
-          <Space><MailOutlined className="text-gray-500" /> {record.email || 'N/A'}</Space>
-          <Space><PhoneOutlined className="text-gray-500" /> {record.mobile?.country_code || ''} {record.mobile?.number || 'N/A'}</Space>
-        </Space>
+        <div className="flex flex-col gap-1 text-gray-600">
+          <div className="flex items-center gap-2">
+             <MailOutlined className="text-gray-400"/> {record.email || 'N/A'}
+          </div>
+          <div className="flex items-center gap-2">
+             <PhoneOutlined className="text-gray-400"/> {record.mobile?.country_code} {record.mobile?.number}
+          </div>
+        </div>
       )
     },
     {
       title: 'Status',
+      key: 'status',
       render: (_, record) => {
         const config = statusConfig[record.status] || { label: 'Unknown', color: 'default', icon: <BellOutlined /> };
-        return <Tag icon={config.icon} color={config.color}>{config.label}</Tag>;
+        return <Badge status={record.status === 'contacted' ? 'success' : 'warning'} text={config.label} />;
       }
     },
     {
       title: 'Actions',
+      key: 'actions',
+      align: 'right',
       render: (_, record) => (
         <Space>
-          <Button
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => {
-              setSelectedLead(record);
-              setDrawerVisible(true);
-            }}
-          >
-            View
-          </Button>
+          <Tooltip title="View Details">
+            <Button
+                shape="circle"
+                icon={<EyeOutlined style={{ color: THEME.primary }} />}
+                style={{ borderColor: THEME.primary }}
+                onClick={() => {
+                setSelectedLead(record);
+                setDrawerVisible(true);
+                }}
+            />
+          </Tooltip>
 
           {record.status === 'submit' && (
-            <Button
-              type="primary"
-              size="small"
-              icon={<CheckCircleOutlined />}
-              onClick={() => markAsContacted(record._id)}
-            >
-              Mark Contacted
-            </Button>
+            <Tooltip title="Mark as Contacted">
+                <Button
+                shape="circle"
+                type="primary"
+                ghost
+                icon={<CheckCircleOutlined />}
+                onClick={() => markAsContacted(record._id)}
+                />
+            </Tooltip>
           )}
 
-          <Button
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => softDelete(record._id)}
-          />
+          <Tooltip title="Delete">
+            <Button
+                shape="circle"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => softDelete(record._id)}
+            />
+          </Tooltip>
         </Space>
       )
     }
@@ -196,8 +240,7 @@ const PropertyLeads = () => {
       key: 'all',
       label: (
         <span>
-          All Leads
-          <Badge count={leads.length} style={{ marginLeft: 8, backgroundColor: '#1890ff' }} />
+          <UsergroupAddOutlined /> All Leads
         </span>
       )
     },
@@ -206,75 +249,56 @@ const PropertyLeads = () => {
       label: (
         <span>
           {typeConfig[key].icon} {typeConfig[key].label}
-          <Badge 
-            count={leads.filter(l => l.type === key).length} 
-            style={{ marginLeft: 8, backgroundColor: typeConfig[key].color }} 
-          />
         </span>
       )
     }))
   ];
 
+  // --- DRAWER CONTENT RENDERER ---
   const renderTypeSpecificDetails = (lead) => {
     switch (lead.type) {
       case 'buy':
         return (
-          <Card title="Looking For">
-            <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Country">{lead.country || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Preferred City">{lead.preferred_city || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Budget">{lead.budget || 'N/A'}</Descriptions.Item>
-            </Descriptions>
-          </Card>
+          <Descriptions title="Buying Requirements" bordered column={1} size="small" layout="vertical" className="bg-white p-4 rounded border">
+            <Descriptions.Item label="Target Location">{lead.country}, {lead.preferred_city}</Descriptions.Item>
+            <Descriptions.Item label="Budget Range">{lead.budget || 'N/A'}</Descriptions.Item>
+          </Descriptions>
         );
 
       case 'sell':
         return (
-          <Card title="Property Details">
-            <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Country">{lead.country || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Preferred City">{lead.preferred_city || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Budget">{lead.budget || 'N/A'}</Descriptions.Item>
-              {lead.project_name && <Descriptions.Item label="Project">{lead.project_name}</Descriptions.Item>}
-              {lead.unit_type && <Descriptions.Item label="Unit Type">{lead.unit_type}</Descriptions.Item>}
-              {lead.bedroom_config && <Descriptions.Item label="Bedroom Config">{lead.bedroom_config}</Descriptions.Item>}
-              {lead.price && <Descriptions.Item label="Price">AED {lead.price.toLocaleString()}</Descriptions.Item>}
-              {lead.size_sqft && <Descriptions.Item label="Size">{lead.size_sqft} Sq.ft</Descriptions.Item>}
-              {lead.description && <Descriptions.Item label="Description">{lead.description}</Descriptions.Item>}
-            </Descriptions>
-          </Card>
+          <Descriptions title="Property for Sale" bordered column={1} size="small" className="bg-white p-4 rounded border">
+            <Descriptions.Item label="Location">{lead.country}, {lead.preferred_city}</Descriptions.Item>
+            <Descriptions.Item label="Asking Price">AED {lead.price?.toLocaleString() || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Project / Unit">{lead.project_name} ({lead.unit_type})</Descriptions.Item>
+            <Descriptions.Item label="Specs">{lead.bedroom_config}, {lead.size_sqft} Sq.ft</Descriptions.Item>
+            <Descriptions.Item label="Description">{lead.description}</Descriptions.Item>
+          </Descriptions>
         );
 
       case 'schedule_visit':
         return (
-          <Card title="Visit Request">
-            <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Occupation">{lead.occupation || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Location">{lead.location || 'N/A'}</Descriptions.Item>
-            </Descriptions>
-          </Card>
+          <Descriptions title="Visit Details" bordered column={1} size="small" className="bg-white p-4 rounded border">
+            <Descriptions.Item label="Visitor Occupation">{lead.occupation || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Current Location">{lead.location || 'N/A'}</Descriptions.Item>
+          </Descriptions>
         );
 
       case 'rent':
         return (
-          <Card title="Rental Requirements">
-            <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Country">{lead.country || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Preferred City">{lead.preferred_city || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Budget">{lead.budget || 'N/A'}</Descriptions.Item>
-            </Descriptions>
-          </Card>
+          <Descriptions title="Rental Needs" bordered column={1} size="small" className="bg-white p-4 rounded border">
+            <Descriptions.Item label="Preferred Location">{lead.country}, {lead.preferred_city}</Descriptions.Item>
+            <Descriptions.Item label="Budget">{lead.budget || 'N/A'}</Descriptions.Item>
+          </Descriptions>
         );
 
       case 'partner':
         return (
-          <Card title="Partner Details">
-            <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Company">{lead.company || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Stakeholder Type">{lead.stakeholder_type || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Message">{lead.message || 'N/A'}</Descriptions.Item>
-            </Descriptions>
-          </Card>
+          <Descriptions title="Partnership Proposal" bordered column={1} size="small" className="bg-white p-4 rounded border">
+            <Descriptions.Item label="Company Name">{lead.company || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Stakeholder Role">{lead.stakeholder_type || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Proposal Message">{lead.message || 'N/A'}</Descriptions.Item>
+          </Descriptions>
         );
 
       default:
@@ -284,45 +308,69 @@ const PropertyLeads = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      
+      {/* 1. Header & Stats */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Property Leads</h1>
-        <p className="text-gray-600 mt-1">Manage all Buy, Sell, Rent & Partner requests</p>
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Property Leads</h1>
+        <Row gutter={[16, 16]}>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+                    <Statistic 
+                        title="Total Leads" 
+                        value={pagination.totalItems} 
+                        prefix={<UsergroupAddOutlined style={{ color: THEME.primary }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.warning }}>
+                    <Statistic 
+                        title="New Submissions" 
+                        value={stats.new} // Note: This is based on current view page, ideally API provides totals
+                        prefix={<BellOutlined style={{ color: THEME.warning }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.success }}>
+                    <Statistic 
+                        title="Contacted" 
+                        value={stats.contacted} 
+                        prefix={<CheckCircleOutlined style={{ color: THEME.success }} />} 
+                    />
+                </Card>
+            </Col>
+        </Row>
       </div>
 
-      {/* New Leads Alert */}
-      {leads.some(l => l.status === 'submit') && (
-        <Alert
-          className="mb-6"
-          message={
-            <div className="flex items-center">
-              <BellOutlined className="mr-2 text-xl" />
-              <strong>{leads.filter(l => l.status === 'submit').length} new lead(s) waiting!</strong>
-            </div>
-          }
-          type="warning"
-          showIcon
-        />
-      )}
-
-      <Card className="mb-6">
-        <Row gutter={16} align="middle">
-          <Col flex="auto">
-            <Input.Search
-              placeholder="Search by name, email, mobile, company..."
-              allowClear
-              size="large"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onSearch={handleSearch}
+      {/* 2. Main Content */}
+      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
+        
+        {/* Search Bar */}
+        <div className="p-4 border-b border-gray-100 bg-white rounded-t-lg">
+            <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder="Search by name, email, mobile, company..."
+                allowClear
+                size="large"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onPressEnter={handleSearch}
+                style={{ maxWidth: 400 }}
             />
-          </Col>
-        </Row>
-      </Card>
+        </div>
 
-      <Card>
-        <Tabs activeKey={activeTab} onChange={handleTabChange} items={tabItems} type="card" />
+        {/* Tabs & Table */}
+        <Tabs 
+            activeKey={activeTab} 
+            onChange={handleTabChange} 
+            items={tabItems} 
+            type="card" 
+            size="large"
+            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
+        />
 
-        <div className="mt-6">
+        <div className="p-0">
           <CustomTable
             columns={columns}
             data={leads}
@@ -335,68 +383,91 @@ const PropertyLeads = () => {
         </div>
       </Card>
 
-      {/* Detail Drawer */}
+      {/* 3. Detail Drawer */}
       <Drawer
-        title="Lead Details"
+        title={
+            <div className="flex items-center gap-2">
+                <HomeOutlined style={{ color: THEME.primary }} />
+                <span>Lead Profile</span>
+            </div>
+        }
         placement="right"
-        width={650}
+        width={600}
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
+        destroyOnClose
+        bodyStyle={{ backgroundColor: '#f9fafb' }}
       >
         {selectedLead && (
           <div className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <Avatar size={70} icon={<UserOutlined />} />
-              <div>
-                <h3 className="text-2xl font-bold">{getFullName(selectedLead)}</h3>
-                <Tag 
-                  icon={typeConfig[selectedLead.type]?.icon || <UserOutlined />} 
-                  color={typeConfig[selectedLead.type]?.color || 'default'}
-                >
-                  {typeConfig[selectedLead.type]?.label || 'Unknown Type'}
-                </Tag>
-                <p className="text-gray-500 mt-1">
-                  Submitted: {new Date(selectedLead.createdAt).toLocaleString()}
-                </p>
+            
+            {/* Header Card */}
+            <Card bordered={false} className="shadow-sm">
+              <div className="flex items-start gap-4">
+                <Avatar size={64} icon={<UserOutlined />} style={{ backgroundColor: THEME.primary }} />
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold m-0 text-gray-800">{getFullName(selectedLead)}</h3>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Tag 
+                      color={typeConfig[selectedLead.type]?.color} 
+                      icon={typeConfig[selectedLead.type]?.icon}
+                    >
+                      {typeConfig[selectedLead.type]?.label}
+                    </Tag>
+                    <Tag color={statusConfig[selectedLead.status]?.color}>
+                      {statusConfig[selectedLead.status]?.label}
+                    </Tag>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-2">
+                    Received: {new Date(selectedLead.createdAt).toLocaleString()}
+                  </div>
+                </div>
               </div>
+            </Card>
+
+            {/* Contact Info */}
+            <Card title="Contact Information" size="small" bordered={false} className="shadow-sm">
+                <Descriptions column={1} bordered size="small">
+                    <Descriptions.Item label={<span className="text-gray-500"><MailOutlined/> Email</span>}>
+                        <a href={`mailto:${selectedLead.email}`} className="text-blue-600">{selectedLead.email || 'N/A'}</a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label={<span className="text-gray-500"><PhoneOutlined/> Mobile</span>}>
+                        <a href={`tel:${selectedLead.mobile?.country_code}${selectedLead.mobile?.number}`} className="text-blue-600">
+                            {selectedLead.mobile?.country_code} {selectedLead.mobile?.number}
+                        </a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label={<span className="text-gray-500"><BellOutlined/> Preference</span>}>
+                        {selectedLead.preferred_contact?.toUpperCase() || 'ANY'}
+                    </Descriptions.Item>
+                </Descriptions>
+            </Card>
+
+            {/* Type Specific Requirements */}
+            <div className="space-y-2">
+                <div className="text-sm font-semibold text-gray-500 uppercase ml-1">Requirement Details</div>
+                {renderTypeSpecificDetails(selectedLead)}
             </div>
 
-            <Descriptions bordered column={1}>
-              <Descriptions.Item label="Email">
-                <Space><MailOutlined /> {selectedLead.email || 'N/A'}</Space>
-              </Descriptions.Item>
-              <Descriptions.Item label="Mobile">
-                <Space><PhoneOutlined /> {selectedLead.mobile?.country_code || ''} {selectedLead.mobile?.number || 'N/A'}</Space>
-              </Descriptions.Item>
-              <Descriptions.Item label="Preferred Contact">
-                <Tag>{selectedLead.preferred_contact?.toUpperCase() || 'N/A'}</Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Status">
-                <Tag 
-                  icon={statusConfig[selectedLead.status]?.icon || <BellOutlined />} 
-                  color={statusConfig[selectedLead.status]?.color || 'default'}
-                >
-                  {statusConfig[selectedLead.status]?.label || 'Unknown'}
-                </Tag>
-              </Descriptions.Item>
-            </Descriptions>
-
-            {/* Type-specific Details */}
-            {renderTypeSpecificDetails(selectedLead)}
-
+            {/* Action Footer */}
             {selectedLead.status === 'submit' && (
-              <Button
-                type="primary"
-                size="large"
-                block
-                icon={<CheckCircleOutlined />}
-                onClick={() => {
-                  markAsContacted(selectedLead._id);
-                  setDrawerVisible(false);
-                }}
-              >
-                Mark as Contacted
-              </Button>
+              <div className="mt-8 pt-4 border-t border-gray-200">
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  icon={<CheckCircleOutlined />}
+                  style={{ backgroundColor: THEME.success, borderColor: THEME.success }}
+                  onClick={() => {
+                    markAsContacted(selectedLead._id);
+                    setDrawerVisible(false);
+                  }}
+                >
+                  Mark as Contacted
+                </Button>
+                <div className="text-center text-xs text-gray-400 mt-2">
+                    Acknowledging this lead will update its status to 'Contacted'.
+                </div>
+              </div>
             )}
           </div>
         )}

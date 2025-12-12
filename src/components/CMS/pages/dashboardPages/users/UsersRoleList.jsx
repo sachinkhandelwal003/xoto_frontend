@@ -1,5 +1,5 @@
 // src/pages/admin/UsersRoleList.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Button,
   Modal,
@@ -15,7 +15,10 @@ import {
   Avatar,
   Row,
   Col,
-  Statistic
+  Statistic,
+  Space,
+  Divider,
+  Badge
 } from 'antd';
 import {
   PlusOutlined,
@@ -26,26 +29,31 @@ import {
   DeleteOutlined,
   SearchOutlined,
   TeamOutlined,
-  SafetyCertificateFilled
+  SafetyCertificateFilled,
+  CheckCircleOutlined,
+  StopOutlined,
+  UsergroupAddOutlined
 } from '@ant-design/icons';
 import CustomTable from '../../../pages/custom/CustomTable';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
 import { showToast } from '../../../../../manageApi/utils/toast';
+
 const { Option } = Select;
 const { Title, Text } = Typography;
-const { TabPane } = Tabs;
 
-// --- THEME CONSTANTS ---
-const PURPLE_THEME = {
-  primary: '#5C039B',
-  secondary: '#8E44AD',
-  light: '#F3E5F5',
-  gradient: 'linear-gradient(135deg, #5C039B 0%, #8E44AD 100%)'
+// --- THEME CONFIGURATION ---
+const THEME = {
+  primary: "#722ed1", // Purple
+  secondary: "#1890ff", // Blue
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
 };
 
 const UsersRoleList = () => {
   const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([]); // This will only hold Supervisor & Accountant
+  const [roles, setRoles] = useState([]); // Only Supervisor & Accountant
   const [loading, setLoading] = useState(false);
   const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,17 +65,22 @@ const UsersRoleList = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
 
-  // --- API CALLS ---
+  // --- STATS CALCULATION ---
+  const stats = useMemo(() => {
+    return {
+      total: totalUsers,
+      active: users.filter(u => u.isActive).length,
+      rolesCount: roles.length
+    };
+  }, [totalUsers, users, roles]);
 
+  // --- API CALLS ---
   const fetchRoles = async () => {
     try {
       const res = await apiService.get('/roles', { params: { limit: 100 } });
       const allRoles = res.roles || [];
-      
-      // --- FILTER LOGIC: ONLY SUPERVISOR & ACCOUNTANT ---
       const allowedNames = ['Supervisor', 'Accountant'];
       const teamRoles = allRoles.filter(r => allowedNames.includes(r.name));
-      
       setRoles(teamRoles);
     } catch (err) {
       showToast('Failed to load roles', 'error');
@@ -97,7 +110,6 @@ const UsersRoleList = () => {
   };
 
   // --- EFFECTS ---
-
   useEffect(() => {
     fetchRoles();
     fetchUsers(1, 10, 'all');
@@ -111,10 +123,10 @@ const UsersRoleList = () => {
   }, [activeTab, searchText]);
 
   // --- HANDLERS ---
-
   const handleTabChange = (key) => {
     setActiveTab(key);
     setCurrentPage(1);
+    // API Call is handled by useEffect on activeTab change
   };
 
   const handlePageChange = (page, pageSize) => {
@@ -180,45 +192,46 @@ const UsersRoleList = () => {
   // --- COLUMNS ---
   const columns = [
     {
-      key: 'avatar',
-      title: '',
-      width: 60,
+      key: 'user',
+      title: 'Team Member',
       render: (_, r) => (
-        <Avatar 
-            style={{ backgroundColor: PURPLE_THEME.light, color: PURPLE_THEME.primary, verticalAlign: 'middle' }} 
-            size="large"
-        >
+        <Space>
+          <Avatar 
+            size="large" 
+            style={{ backgroundColor: THEME.primary, verticalAlign: 'middle' }}
+          >
             {r.name?.first_name?.charAt(0)?.toUpperCase()}
-        </Avatar>
-      )
-    },
-    {
-      key: 'info',
-      title: 'Member Details',
-      render: (_, r) => (
-        <div>
-            <div className="font-bold text-gray-800 text-base">
+          </Avatar>
+          <div>
+            <div className="font-bold text-gray-800">
                 {r.name?.first_name} {r.name?.last_name}
             </div>
-            <div className="text-gray-500 text-xs flex items-center gap-2">
+            <div className="text-xs text-gray-500 flex items-center gap-1">
                 <MailOutlined /> {r.email}
             </div>
-            <div className="text-gray-500 text-xs flex items-center gap-2 mt-1">
-                <PhoneOutlined /> {r.mobile}
-            </div>
-        </div>
+          </div>
+        </Space>
       ),
+    },
+    {
+      key: 'contact',
+      title: 'Contact',
+      render: (_, r) => (
+        <div className="text-gray-600">
+            <PhoneOutlined className="mr-2" /> {r.mobile}
+        </div>
+      )
     },
     {
       key: 'role',
       title: 'Role',
       render: (_, r) => {
-        let color = '#5C039B'; // Default purple
-        if (r.role?.name === 'Supervisor') color = '#fa8c16'; // Orange
-        if (r.role?.name === 'Accountant') color = '#52c41a'; // Green
+        let color = 'default';
+        if (r.role?.name === 'Supervisor') color = 'geekblue';
+        if (r.role?.name === 'Accountant') color = 'purple';
         
         return (
-            <Tag color={color} style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600 }}>
+            <Tag color={color} style={{ borderRadius: 12, padding: '2px 10px', fontWeight: 500 }}>
                 {r.role?.name || 'N/A'}
             </Tag>
         );
@@ -228,18 +241,22 @@ const UsersRoleList = () => {
       key: 'status',
       title: 'Status',
       render: (_, r) => (
-        <Switch
-          checked={r.isActive}
-          onChange={() => toggleStatus(r._id, r.isActive)}
-          checkedChildren="Active"
-          unCheckedChildren="Inactive"
-          style={{ backgroundColor: r.isActive ? '#52c41a' : undefined }}
-        />
+        <Space>
+            <Switch
+                checked={r.isActive}
+                onChange={() => toggleStatus(r._id, r.isActive)}
+                checkedChildren={<CheckCircleOutlined />}
+                unCheckedChildren={<StopOutlined />}
+                style={{ backgroundColor: r.isActive ? THEME.success : undefined }}
+            />
+            <span className="text-xs text-gray-500">{r.isActive ? 'Active' : 'Inactive'}</span>
+        </Space>
       ),
     },
     {
       key: 'actions',
       title: 'Action',
+      align: 'center',
       render: (_, r) => (
         <Popconfirm 
             title="Delete Member?" 
@@ -252,29 +269,45 @@ const UsersRoleList = () => {
           <Button 
             type="text" 
             danger 
+            shape="circle"
             icon={<DeleteOutlined />} 
-            className="hover:bg-red-50 rounded-full"
           />
         </Popconfirm>
       ),
     },
   ];
 
+  // --- TAB ITEMS CONFIGURATION ---
+  const tabItems = [
+    {
+      key: 'all',
+      label: (
+        <span>
+          <UsergroupAddOutlined /> All Members
+          <Badge count={totalUsers} style={{ marginLeft: 8, backgroundColor: '#1890ff' }} />
+        </span>
+      )
+    },
+    ...roles.map(role => ({
+      key: role._id,
+      label: (
+        <span>
+          <SafetyCertificateFilled /> {role.name}
+        </span>
+      )
+    }))
+  ];
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       
-      {/* HEADER SECTION */}
-      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <Title level={2} style={{ margin: 0, color: '#333', fontWeight: 800 }}>
-             Team <span style={{ color: PURPLE_THEME.primary }}>Management</span>
-          </Title>
-          <Text type="secondary" className="text-base">
-             Manage Supervisors & Accountants
-          </Text>
-        </div>
-        
-        <div className="flex gap-3">
+      {/* 1. Header & Stats */}
+      <div className="mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+                <Title level={3} style={{ margin: 0 }}>Team Management</Title>
+                <Text type="secondary">Manage Supervisors, Accountants, and other staff.</Text>
+            </div>
             <Button
                 type="primary"
                 size="large"
@@ -283,68 +316,60 @@ const UsersRoleList = () => {
                     form.resetFields();
                     setModalVisible(true);
                 }}
-                style={{
-                    background: PURPLE_THEME.gradient,
-                    border: 'none',
-                    borderRadius: '12px',
-                    height: '48px',
-                    padding: '0 24px',
-                    boxShadow: '0 4px 14px rgba(92, 3, 155, 0.3)'
-                }}
+                style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
             >
                 Add Team Member
             </Button>
         </div>
+
+        <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+                    <Statistic 
+                        title="Total Members" 
+                        value={stats.total} 
+                        prefix={<TeamOutlined style={{ color: THEME.primary }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={12}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.success }}>
+                    <Statistic 
+                        title="Active Members" 
+                        value={stats.active} 
+                        prefix={<CheckCircleOutlined style={{ color: THEME.success }} />} 
+                    />
+                </Card>
+            </Col>
+        </Row>
       </div>
 
-      {/* STATS & SEARCH */}
-      <Row gutter={16} className="mb-6">
-        <Col xs={24} md={8}>
-            <Card bordered={false} className="shadow-sm rounded-2xl bg-white mb-4 md:mb-0">
-                <Statistic 
-                    title="Total Team Members" 
-                    value={totalUsers} 
-                    prefix={<TeamOutlined style={{ color: PURPLE_THEME.primary }} />} 
-                    valueStyle={{ fontWeight: 'bold' }}
-                />
-            </Card>
-        </Col>
-        <Col xs={24} md={16}>
-             <Card bordered={false} className="shadow-sm rounded-2xl bg-white h-full flex items-center px-4">
-                <Input 
-                    prefix={<SearchOutlined style={{ color: '#bfbfbf', fontSize: '18px' }} />}
-                    placeholder="Search team members..." 
-                    bordered={false}
-                    size="large"
-                    onChange={(e) => setSearchText(e.target.value)}
-                    style={{ width: '100%' }}
-                />
-             </Card>
-        </Col>
-      </Row>
-
-      {/* TABS & TABLE CARD */}
+      {/* 2. Main Content Card */}
       <Card 
         bordered={false} 
-        className="shadow-md rounded-2xl overflow-hidden"
+        className="shadow-md rounded-lg"
         bodyStyle={{ padding: 0 }}
       >
+        <div className="p-4 border-b border-gray-100 bg-white rounded-t-lg">
+            <Input 
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder="Search by name, email, or mobile..." 
+                size="large"
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ maxWidth: 400 }}
+                allowClear
+            />
+        </div>
+
+        {/* --- TABS USING 'items' PROP --- */}
         <Tabs
             activeKey={activeTab}
             onChange={handleTabChange}
+            type="card"
             size="large"
-            tabBarStyle={{ 
-                padding: '0 24px', 
-                marginBottom: 0, 
-                background: '#fff',
-                borderBottom: '1px solid #f0f0f0' 
-            }}
-        >
-            <TabPane tab="All Team" key="all" />
-            {roles.map(role => (
-                <TabPane tab={role.name} key={role._id} />
-            ))}
-        </Tabs>
+            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
+            items={tabItems}
+        />
 
         <div className="p-0">
             <CustomTable
@@ -359,13 +384,11 @@ const UsersRoleList = () => {
         </div>
       </Card>
 
-      {/* CREATE USER MODAL */}
+      {/* 3. Create User Modal */}
       <Modal
         title={
-            <div className="flex items-center gap-3 text-xl font-bold text-gray-800">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                    <UserOutlined />
-                </div>
+            <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
+                <UserOutlined style={{ color: THEME.primary }} />
                 Add Team Member
             </div>
         }
@@ -376,19 +399,20 @@ const UsersRoleList = () => {
         }}
         footer={null}
         width={700}
-        centered
         destroyOnClose
+        centered
       >
-        <Form form={form} onFinish={handleCreate} layout="vertical" className="mt-4">
+        <Divider className="my-4" />
+        <Form form={form} onFinish={handleCreate} layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
                 <Form.Item name="first_name" label="First Name" rules={[{ required: true }]}>
-                    <Input prefix={<UserOutlined className="text-gray-400" />} size="large" className="rounded-lg" />
+                    <Input prefix={<UserOutlined className="text-gray-400" />} size="large" placeholder="John" />
                 </Form.Item>
             </Col>
             <Col span={12}>
                 <Form.Item name="last_name" label="Last Name" rules={[{ required: true }]}>
-                    <Input prefix={<UserOutlined className="text-gray-400" />} size="large" className="rounded-lg" />
+                    <Input prefix={<UserOutlined className="text-gray-400" />} size="large" placeholder="Doe" />
                 </Form.Item>
             </Col>
           </Row>
@@ -396,7 +420,7 @@ const UsersRoleList = () => {
           <Row gutter={16}>
             <Col span={12}>
                 <Form.Item name="email" label="Email Address" rules={[{ required: true, type: 'email' }]}>
-                    <Input prefix={<MailOutlined className="text-gray-400" />} size="large" className="rounded-lg" />
+                    <Input prefix={<MailOutlined className="text-gray-400" />} size="large" placeholder="john@example.com" />
                 </Form.Item>
             </Col>
             <Col span={12}>
@@ -409,45 +433,47 @@ const UsersRoleList = () => {
                     { pattern: /^[6-9]\d{9}$/, message: 'Invalid Indian mobile' },
                     ]}
                 >
-                    <Input prefix={<PhoneOutlined className="text-gray-400" />} maxLength={10} size="large" className="rounded-lg" />
+                    <Input prefix={<PhoneOutlined className="text-gray-400" />} maxLength={10} size="large" placeholder="9876543210" />
                 </Form.Item>
             </Col>
           </Row>
 
           <Form.Item name="role" label="Assign Role" rules={[{ required: true }]}>
-            <Select placeholder="Select role" size="large" className="rounded-lg">
+            <Select placeholder="Select role" size="large">
               {roles.map(r => (
                 <Option key={r._id} value={r._id}>
-                    <div className="flex items-center gap-2">
-                        <SafetyCertificateFilled style={{ color: PURPLE_THEME.primary }} /> {r.name}
-                    </div>
+                    <Space>
+                        <SafetyCertificateFilled style={{ color: THEME.secondary }} /> 
+                        {r.name}
+                    </Space>
                 </Option>
               ))}
             </Select>
           </Form.Item>
 
-          <Row gutter={16}>
-            <Col span={12}>
-                <Form.Item name="password" label="Password" rules={[{ required: true, min: 6 }]}>
-                    <Input.Password prefix={<LockOutlined className="text-gray-400" />} size="large" className="rounded-lg" />
-                </Form.Item>
-            </Col>
-            <Col span={12}>
-                <Form.Item name="confirm_password" label="Confirm Password" rules={[{ required: true }]}>
-                    <Input.Password prefix={<LockOutlined className="text-gray-400" />} size="large" className="rounded-lg" />
-                </Form.Item>
-            </Col>
-          </Row>
+          <div className="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-100">
+              <Row gutter={16}>
+                <Col span={12}>
+                    <Form.Item name="password" label="Password" rules={[{ required: true, min: 6 }]} style={{ marginBottom: 0 }}>
+                        <Input.Password prefix={<LockOutlined className="text-gray-400" />} size="large" placeholder="••••••" />
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item name="confirm_password" label="Confirm Password" rules={[{ required: true }]} style={{ marginBottom: 0 }}>
+                        <Input.Password prefix={<LockOutlined className="text-gray-400" />} size="large" placeholder="••••••" />
+                    </Form.Item>
+                </Col>
+              </Row>
+          </div>
 
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-            <Button size="large" onClick={() => setModalVisible(false)} className="rounded-lg">Cancel</Button>
+          <div className="flex justify-end gap-3 mt-6">
+            <Button size="large" onClick={() => setModalVisible(false)}>Cancel</Button>
             <Button 
                 type="primary" 
                 htmlType="submit" 
                 loading={loading} 
                 size="large"
-                style={{ background: PURPLE_THEME.primary, border: 'none' }}
-                className="rounded-lg px-8"
+                style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
             >
               Create Member
             </Button>

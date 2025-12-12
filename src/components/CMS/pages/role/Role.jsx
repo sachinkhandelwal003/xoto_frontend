@@ -13,8 +13,24 @@ import {
   Popconfirm,
   Tooltip,
   Tabs,
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Typography,
+  Divider,
+  Badge
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UndoOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  UndoOutlined,
+  TeamOutlined,
+  AppstoreOutlined,
+  SafetyCertificateOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons';
 import CustomTable from '../../pages/custom/CustomTable';
 import { apiService } from '../../../../manageApi/utils/custom.apiservice';
 import { showToast } from '../../../../manageApi/utils/toast';
@@ -22,6 +38,16 @@ import { showConfirmDialog, showSuccessAlert, showErrorAlert } from '../../../..
 
 const { Option } = Select;
 const { TextArea } = Input;
+const { Title, Text } = Typography;
+
+// --- THEME CONFIGURATION ---
+const THEME = {
+  primary: "#722ed1", // Purple
+  secondary: "#1890ff", // Blue
+  success: "#52c41a",
+  warning: "#faad14",
+  bgLight: "#f9f0ff", // Light Purple BG
+};
 
 const Role = () => {
   const { user, token } = useSelector((state) => state.auth);
@@ -275,38 +301,40 @@ const Role = () => {
         title: 'Code',
         sortable: true,
         filterable: false,
-        render: (value) => <span className="font-medium text-gray-900">{value}</span>,
+        render: (value) => <Tag color="purple">{value}</Tag>,
       },
       {
         key: 'name',
         title: 'Name',
         sortable: true,
         filterable: false,
-        render: (value) => <span className="text-gray-900">{value}</span>,
+        render: (value) => <span className="font-semibold text-gray-800">{value}</span>,
       },
       {
         key: 'category.name',
-        title: 'Category',
+        title: 'Platform/Category',
         sortable: true,
         filterable: true,
         filterKey: 'category',
         filterOptions: platforms
           .filter((p) => p.isActive)
           .map((p) => ({ value: p._id, label: p.name })),
-        render: (value, item) => <span className="text-gray-900">{item.category?.name || '--'}</span>,
+        render: (value, item) => (
+             item.category ? 
+             <Badge status="processing" text={item.category.name} color={THEME.primary} /> : 
+             <span className="text-gray-400">--</span>
+        ),
       },
       {
         key: 'description',
         title: 'Description',
-        render: (value) => <span className="text-gray-900">{value || '--'}</span>,
+        render: (value) => <span className="text-gray-500 text-sm truncate max-w-xs block">{value || '--'}</span>,
       },
       {
         key: 'isSuperAdmin',
-        title: 'Super Admin',
+        title: 'Privilege',
         render: (value) => (
-          <Tag color={value ? 'purple' : 'default'}>
-            {value ? 'Yes' : 'No'}
-          </Tag>
+          value ? <Tag icon={<SafetyCertificateOutlined />} color="gold">Super Admin</Tag> : <span className="text-gray-400">Standard</span>
         ),
       },
       {
@@ -320,17 +348,9 @@ const Role = () => {
           { value: false, label: 'Inactive' },
         ],
         render: (value) => (
-          <Tag color={value ? 'green' : 'red'}>
+          <Tag color={value ? 'success' : 'error'} style={{ borderRadius: 10 }}>
             {value ? 'Active' : 'Inactive'}
           </Tag>
-        ),
-      },
-      {
-        key: 'createdAt',
-        title: 'Created At',
-        sortable: true,
-        render: (value) => (
-          <span className="text-gray-900">{value ? new Date(value).toLocaleDateString() : '--'}</span>
         ),
       },
       {
@@ -338,52 +358,66 @@ const Role = () => {
         title: 'Actions',
         render: (value, item) => (
           <Space size="small">
-            <Tooltip title="Edit">
+            <Tooltip title="Edit Role">
               <Button
-                type="link"
-                icon={<EditOutlined />}
+                size="small"
+                shape="circle"
+                icon={<EditOutlined style={{ color: THEME.primary }} />}
+                style={{ borderColor: THEME.primary }}
                 onClick={() => openModal('role', item)}
               />
             </Tooltip>
             {item.isActive ? (
               <Popconfirm
-                title={`Are you sure to soft delete this role?`}
+                title="Soft Delete"
+                description="Mark this role as inactive?"
                 onConfirm={() => handleSoftDelete('roles', item)}
                 okText="Yes"
                 cancelText="No"
               >
                 <Button
-                  type="link"
+                  size="small"
+                  shape="circle"
                   icon={<DeleteOutlined />}
                   danger
                 />
               </Popconfirm>
             ) : (
-              <>
-                <Popconfirm
-                  title={`Are you sure to restore this role?`}
-                  onConfirm={() => handleRestore('roles', item)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button
-                    type="link"
-                    icon={<UndoOutlined />}
-                  />
-                </Popconfirm>
-                <Popconfirm
-                  title={`Are you sure to permanently delete this role?`}
-                  onConfirm={() => handlePermanentDelete('roles', item)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button
-                    type="link"
-                    icon={<DeleteOutlined />}
-                    danger
-                  />
-                </Popconfirm>
-              </>
+              <Space size={2}>
+                <Tooltip title="Restore">
+                    <Popconfirm
+                        title="Restore Role"
+                        description="Activate this role again?"
+                        onConfirm={() => handleRestore('roles', item)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                        size="small"
+                        shape="circle"
+                        icon={<UndoOutlined style={{ color: THEME.success }} />}
+                        style={{ borderColor: THEME.success }}
+                        />
+                    </Popconfirm>
+                </Tooltip>
+                <Tooltip title="Delete Permanently">
+                    <Popconfirm
+                        title="Delete Permanently"
+                        description="This action cannot be undone."
+                        onConfirm={() => handlePermanentDelete('roles', item)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                        size="small"
+                        shape="circle"
+                        icon={<DeleteOutlined />}
+                        danger
+                        type="primary"
+                        />
+                    </Popconfirm>
+                </Tooltip>
+              </Space>
             )}
           </Space>
         ),
@@ -397,15 +431,15 @@ const Role = () => {
     () => [
       {
         key: 'name',
-        title: 'Name',
+        title: 'Platform Name',
         sortable: true,
         filterable: false,
-        render: (value) => <span className="font-medium text-gray-900">{value}</span>,
+        render: (value) => <span className="font-semibold text-gray-800">{value}</span>,
       },
       {
         key: 'description',
         title: 'Description',
-        render: (value) => <span className="text-gray-900">{value || '--'}</span>,
+        render: (value) => <span className="text-gray-500">{value || '--'}</span>,
       },
       {
         key: 'isActive',
@@ -418,17 +452,17 @@ const Role = () => {
           { value: false, label: 'Inactive' },
         ],
         render: (value) => (
-          <Tag color={value ? 'green' : 'red'}>
-            {value ? 'Active' : 'Inactive'}
-          </Tag>
+            <Tag color={value ? 'success' : 'error'} style={{ borderRadius: 10 }}>
+              {value ? 'Active' : 'Inactive'}
+            </Tag>
         ),
       },
       {
         key: 'createdAt',
-        title: 'Created At',
+        title: 'Created Date',
         sortable: true,
         render: (value) => (
-          <span className="text-gray-900">{value ? new Date(value).toLocaleDateString() : '--'}</span>
+          <span className="text-gray-500 text-xs">{value ? new Date(value).toLocaleDateString() : '--'}</span>
         ),
       },
       {
@@ -436,52 +470,64 @@ const Role = () => {
         title: 'Actions',
         render: (value, item) => (
           <Space size="small">
-            <Tooltip title="Edit">
+            <Tooltip title="Edit Platform">
               <Button
-                type="link"
-                icon={<EditOutlined />}
+                size="small"
+                shape="circle"
+                icon={<EditOutlined style={{ color: THEME.primary }} />}
+                style={{ borderColor: THEME.primary }}
                 onClick={() => openModal('platform', item)}
               />
             </Tooltip>
             {item.isActive ? (
               <Popconfirm
-                title={`Are you sure to soft delete this platform?`}
+                title="Soft Delete"
+                description="Mark this platform as inactive?"
                 onConfirm={() => handleSoftDelete('platforms', item)}
                 okText="Yes"
                 cancelText="No"
               >
                 <Button
-                  type="link"
+                  size="small"
+                  shape="circle"
                   icon={<DeleteOutlined />}
                   danger
                 />
               </Popconfirm>
             ) : (
-              <>
-                <Popconfirm
-                  title={`Are you sure to restore this platform?`}
-                  onConfirm={() => handleRestore('platforms', item)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button
-                    type="link"
-                    icon={<UndoOutlined />}
-                  />
-                </Popconfirm>
-                <Popconfirm
-                  title={`Are you sure to permanently delete this platform?`}
-                  onConfirm={() => handlePermanentDelete('platforms', item)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button
-                    type="link"
-                    icon={<DeleteOutlined />}
-                    danger
-                  />
-                </Popconfirm>
-              </>
+              <Space size={2}>
+                <Tooltip title="Restore">
+                    <Popconfirm
+                        title="Restore Platform"
+                        onConfirm={() => handleRestore('platforms', item)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                        size="small"
+                        shape="circle"
+                        icon={<UndoOutlined style={{ color: THEME.success }} />}
+                        style={{ borderColor: THEME.success }}
+                        />
+                    </Popconfirm>
+                </Tooltip>
+                <Tooltip title="Delete Permanently">
+                    <Popconfirm
+                        title="Delete Permanently"
+                        onConfirm={() => handlePermanentDelete('platforms', item)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                        size="small"
+                        shape="circle"
+                        icon={<DeleteOutlined />}
+                        danger
+                        type="primary"
+                        />
+                    </Popconfirm>
+                </Tooltip>
+              </Space>
             )}
           </Space>
         ),
@@ -491,126 +537,181 @@ const Role = () => {
   );
 
   return (
-    <div className="min-h-screen p-6">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6">Role & Platform Management</h1>
+    <div className="min-h-screen p-6 bg-gray-50">
+      {/* 1. Header & Stats */}
+      <div className="mb-6">
+        <Title level={3} style={{ marginBottom: 16 }}>Role & Platform Management</Title>
+        <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+                    <Statistic 
+                        title="Total Roles" 
+                        value={rolePagination.totalResults} 
+                        prefix={<TeamOutlined style={{ color: THEME.primary }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={12}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.secondary }}>
+                    <Statistic 
+                        title="Total Platforms" 
+                        value={platformPagination.totalResults} 
+                        prefix={<AppstoreOutlined style={{ color: THEME.secondary }} />} 
+                    />
+                </Card>
+            </Col>
+        </Row>
+      </div>
 
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        type="card"
-        items={[
-          {
-            label: 'Roles',
-            key: 'roles',
-            children: (
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold text-gray-800">Roles</h2>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => openModal('role')}
-                    size="large"
-                  >
-                    Add Role
-                  </Button>
+      {/* 2. Main Content Card with Tabs */}
+      <Card 
+        bordered={false} 
+        className="shadow-md rounded-lg"
+        bodyStyle={{ padding: 0 }}
+      >
+        <Tabs
+            activeKey={activeTab}
+            onChange={setActiveTab}
+            type="card"
+            size="large"
+            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16 }}
+            items={[
+            {
+                label: <span><TeamOutlined /> Roles</span>,
+                key: 'roles',
+                children: (
+                <div className="p-4">
+                    <div className="flex justify-between items-center mb-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <div className="flex flex-col">
+                            <span className="font-semibold text-lg">System Roles</span>
+                            <span className="text-gray-500 text-xs">Manage user roles and permissions</span>
+                        </div>
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => openModal('role')}
+                            size="large"
+                            style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+                        >
+                            Add New Role
+                        </Button>
+                    </div>
+                    <CustomTable
+                        columns={roleColumns}
+                        data={roles}
+                        totalItems={rolePagination.totalResults}
+                        currentPage={rolePagination.currentPage}
+                        itemsPerPage={rolePagination.itemsPerPage}
+                        onPageChange={(page, itemsPerPage) => handlePageChange('roles', page, itemsPerPage)}
+                        onFilter={(filters) => handleFilter('roles', filters)}
+                        loading={loading.roles}
+                    />
                 </div>
-                <CustomTable
-                  columns={roleColumns}
-                  data={roles}
-                  totalItems={rolePagination.totalResults}
-                  currentPage={rolePagination.currentPage}
-                  itemsPerPage={rolePagination.itemsPerPage}
-                  onPageChange={(page, itemsPerPage) => handlePageChange('roles', page, itemsPerPage)}
-                  onFilter={(filters) => handleFilter('roles', filters)}
-                  loading={loading.roles}
-                />
-              </div>
-            ),
-          },
-          {
-            label: 'Platforms',
-            key: 'platforms',
-            children: (
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold text-gray-800">Platforms</h2>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => openModal('platform')}
-                    size="large"
-                  >
-                    Add Platform
-                  </Button>
+                ),
+            },
+            {
+                label: <span><AppstoreOutlined /> Platforms</span>,
+                key: 'platforms',
+                children: (
+                <div className="p-4">
+                    <div className="flex justify-between items-center mb-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <div className="flex flex-col">
+                            <span className="font-semibold text-lg">Platforms / Categories</span>
+                            <span className="text-gray-500 text-xs">Define system platforms</span>
+                        </div>
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => openModal('platform')}
+                            size="large"
+                            style={{ backgroundColor: THEME.secondary, borderColor: THEME.secondary }}
+                        >
+                            Add Platform
+                        </Button>
+                    </div>
+                    <CustomTable
+                        columns={platformColumns}
+                        data={platforms}
+                        totalItems={platformPagination.totalResults}
+                        currentPage={platformPagination.currentPage}
+                        itemsPerPage={platformPagination.itemsPerPage}
+                        onPageChange={(page, itemsPerPage) => handlePageChange('platforms', page, itemsPerPage)}
+                        onFilter={(filters) => handleFilter('platforms', filters)}
+                        loading={loading.platforms}
+                    />
                 </div>
-                <CustomTable
-                  columns={platformColumns}
-                  data={platforms}
-                  totalItems={platformPagination.totalResults}
-                  currentPage={platformPagination.currentPage}
-                  itemsPerPage={platformPagination.itemsPerPage}
-                  onPageChange={(page, itemsPerPage) => handlePageChange('platforms', page, itemsPerPage)}
-                  onFilter={(filters) => handleFilter('platforms', filters)}
-                  loading={loading.platforms}
-                />
-              </div>
-            ),
-          },
-        ]}
-      />
+                ),
+            },
+            ]}
+        />
+      </Card>
 
       {/* Role Modal */}
       <Modal
-        title={editingItem ? 'Edit Role' : 'Add New Role'}
+        title={
+            <div className="flex items-center gap-2 text-purple-800">
+                {editingItem ? <EditOutlined /> : <PlusOutlined />} 
+                {editingItem ? 'Edit Role' : 'Create New Role'}
+            </div>
+        }
         open={isModalOpen.role}
         onCancel={() => handleCancel('role')}
         footer={null}
         destroyOnClose
         maskClosable={false}
         width={600}
-        className="rounded-lg"
       >
+        <Divider className="my-3" />
         <Form
           layout="vertical"
           onFinish={handleSubmit(onSubmit)}
           className="mt-4"
         >
-          <Controller
-            name="code"
-            control={control}
-            rules={{ required: 'Please enter role code' }}
-            render={({ field }) => (
-              <Form.Item
-                label="Code"
-                validateStatus={errors.code ? 'error' : ''}
-                help={errors.code?.message}
-              >
-                <Input {...field} placeholder="Enter code" />
-              </Form.Item>
-            )}
-          />
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: 'Please enter role name' }}
-            render={({ field }) => (
-              <Form.Item
-                label="Name"
-                validateStatus={errors.name ? 'error' : ''}
-                help={errors.name?.message}
-              >
-                <Input {...field} placeholder="Enter name" />
-              </Form.Item>
-            )}
-          />
+          <Row gutter={16}>
+             <Col span={12}>
+                <Controller
+                    name="code"
+                    control={control}
+                    rules={{ required: 'Please enter role code' }}
+                    render={({ field }) => (
+                    <Form.Item
+                        label="Role Code"
+                        required
+                        validateStatus={errors.code ? 'error' : ''}
+                        help={errors.code?.message}
+                    >
+                        <Input {...field} placeholder="e.g. SUPER_ADMIN" />
+                    </Form.Item>
+                    )}
+                />
+             </Col>
+             <Col span={12}>
+                <Controller
+                    name="name"
+                    control={control}
+                    rules={{ required: 'Please enter role name' }}
+                    render={({ field }) => (
+                    <Form.Item
+                        label="Role Name"
+                        required
+                        validateStatus={errors.name ? 'error' : ''}
+                        help={errors.name?.message}
+                    >
+                        <Input {...field} placeholder="e.g. Super Administrator" />
+                    </Form.Item>
+                    )}
+                />
+             </Col>
+          </Row>
+          
           <Controller
             name="category"
             control={control}
             rules={{ required: 'Please select a category' }}
             render={({ field }) => (
               <Form.Item
-                label="Category"
+                label="Platform / Category"
+                required
                 validateStatus={errors.category ? 'error' : ''}
                 help={errors.category?.message}
               >
@@ -636,13 +737,13 @@ const Role = () => {
             control={control}
             render={({ field }) => (
               <Form.Item
-                label="Parent Role"
+                label="Parent Role (Optional)"
                 validateStatus={errors.parentRole ? 'error' : ''}
                 help={errors.parentRole?.message}
               >
                 <Select
                   {...field}
-                  placeholder="Select parent role (optional)"
+                  placeholder="Select parent role"
                   allowClear
                   loading={loading.roles}
                   disabled={loading.roles}
@@ -663,7 +764,7 @@ const Role = () => {
             control={control}
             render={({ field }) => (
               <Form.Item label="Description">
-                <TextArea {...field} rows={3} placeholder="Enter description" />
+                <TextArea {...field} rows={3} placeholder="Brief description of the role..." />
               </Form.Item>
             )}
           />
@@ -671,22 +772,24 @@ const Role = () => {
             name="isSuperAdmin"
             control={control}
             render={({ field: { value, onChange } }) => (
-              <Form.Item>
+              <Form.Item className="bg-purple-50 p-3 rounded border border-purple-100">
                 <Checkbox checked={value} onChange={(e) => onChange(e.target.checked)}>
-                  Super Admin Role
+                   <span className="font-medium text-purple-900">Grant Super Admin Privileges</span>
+                   <p className="text-xs text-gray-500 pl-6 m-0">This grants full access to all system features.</p>
                 </Checkbox>
               </Form.Item>
             )}
           />
-          <Form.Item className="text-right">
+          <Form.Item className="text-right mt-6">
             <Space>
               <Button onClick={() => handleCancel('role')}>Cancel</Button>
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={submitting}
+                style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
               >
-                {editingItem ? 'Update' : 'Create'}
+                {editingItem ? 'Update Role' : 'Create Role'}
               </Button>
             </Space>
           </Form.Item>
@@ -695,15 +798,20 @@ const Role = () => {
 
       {/* Platform Modal */}
       <Modal
-        title={editingItem ? 'Edit Platform' : 'Add New Platform'}
+        title={
+            <div className="flex items-center gap-2 text-blue-800">
+                {editingItem ? <EditOutlined /> : <PlusOutlined />} 
+                {editingItem ? 'Edit Platform' : 'Add New Platform'}
+            </div>
+        }
         open={isModalOpen.platform}
         onCancel={() => handleCancel('platform')}
         footer={null}
         destroyOnClose
         maskClosable={false}
-        width={600}
-        className="rounded-lg"
+        width={500}
       >
+        <Divider className="my-3" />
         <Form
           layout="vertical"
           onFinish={handleSubmit(onSubmit)}
@@ -715,11 +823,12 @@ const Role = () => {
             rules={{ required: 'Please enter platform name' }}
             render={({ field }) => (
               <Form.Item
-                label="Name"
+                label="Platform Name"
+                required
                 validateStatus={errors.name ? 'error' : ''}
                 help={errors.name?.message}
               >
-                <Input {...field} placeholder="Enter name" />
+                <Input {...field} placeholder="e.g. Web Admin, Mobile App" />
               </Form.Item>
             )}
           />
@@ -728,19 +837,20 @@ const Role = () => {
             control={control}
             render={({ field }) => (
               <Form.Item label="Description">
-                <TextArea {...field} rows={3} placeholder="Enter description" />
+                <TextArea {...field} rows={3} placeholder="Description of the platform..." />
               </Form.Item>
             )}
           />
-          <Form.Item className="text-right">
+          <Form.Item className="text-right mt-6">
             <Space>
               <Button onClick={() => handleCancel('platform')}>Cancel</Button>
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={submitting}
+                style={{ backgroundColor: THEME.secondary, borderColor: THEME.secondary }}
               >
-                {editingItem ? 'Update' : 'Create'}
+                {editingItem ? 'Update Platform' : 'Create Platform'}
               </Button>
             </Space>
           </Form.Item>

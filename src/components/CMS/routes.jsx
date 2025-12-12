@@ -51,6 +51,7 @@ import Packages from "./pages/packages/Packages";
 import MasterCategory from "./pages/estimateMaster/MasterCategory";
 import Enquiry from "./pages/dashboardPages/consult/Enquiry";
 import PropertyLeads from "./pages/dashboardPages/consult/PropertyLeads";
+import UpdateProfilePage from "./pages/dashboardPages/updates/UpdateProfilepage";
 
 const roleSlugMap = {
   0: "superadmin",
@@ -184,7 +185,7 @@ const CmsRoutes = () => {
 <Route path="freelancer" element={<FreelancerProfile />} />
 
       <Route path="freelancer/myprofile" element={<MyprofileFreelancer />} />
-      <Route path="/update" element={<UpdateFreelancerProfile />} />
+      <Route path="/update" element={<UpdateProfilePage />} />
 
       {/* Catch-all fallback */}
     </Routes>

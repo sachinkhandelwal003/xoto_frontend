@@ -1,91 +1,102 @@
-
+// src/components/CMS/pages/materials/AddMaterial.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { FiRefreshCw, FiEye, FiEdit, FiTrash2, FiRotateCcw, FiPlus, FiX } from 'react-icons/fi';
+import {
+  Button,
+  Input,
+  Modal,
+  message,
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Tabs,
+  Space,
+  Tooltip,
+  Typography,
+  Divider,
+  Form
+} from 'antd';
+import {
+  ArrowLeftOutlined,
+  SearchOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  RotateLeftOutlined,
+  PlusOutlined,
+  RestOutlined,
+  CheckCircleOutlined,
+  BgColorsOutlined,
+  UnorderedListOutlined
+} from '@ant-design/icons';
 import { format } from 'date-fns';
-import { Button, Input, Modal } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import CustomTable from '../../../CMS/pages/custom/CustomTable';
 import { apiService } from '../../../../manageApi/utils/custom.apiservice';
 import { showSuccessAlert, showErrorAlert, showConfirmDialog } from '../../../../manageApi/utils/sweetAlert';
-import { useNavigate } from 'react-router-dom';
 
 const { TextArea } = Input;
+const { Title, Text } = Typography;
+
+// --- THEME CONFIGURATION ---
+const THEME = {
+  primary: "#722ed1", // Purple
+  secondary: "#1890ff", // Blue
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
+};
 
 const AddMaterial = () => {
   const navigate = useNavigate();
 
-  // Form state for adding materials
-  const [form, setForm] = useState({
-    name: '',
-    description: '',
-    properties: [''],
-  });
-  const [errors, setErrors] = useState({});
+  // --- STATES ---
+  const [addForm] = Form.useForm();
+  const [editForm] = Form.useForm();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
 
-  // Table state for listing materials
+  // Data State
   const [materials, setMaterials] = useState([]);
-  const [trashedMaterials, setTrashedMaterials] = useState([]);
   const [loadingTable, setLoadingTable] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState('active');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  // Filter & Pagination
+  const [filters, setFilters] = useState({ search: '', status: 1 });
   const [pagination, setPagination] = useState({
     currentPage: 1,
-    totalPages: 1,
-    totalResults: 0,
     itemsPerPage: 10,
+    totalResults: 0,
   });
-  const [filters, setFilters] = useState({
-    search: '',
-    status: 1, // Default to active materials
-  });
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [activeTab, setActiveTab] = useState('active');
 
-  // Modal states
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
-  const [editForm, setEditForm] = useState({
-    name: '',
-    description: '',
-    properties: [''],
-  });
-  const [editErrors, setEditErrors] = useState({});
-
-  // Fetch materials
+  // --- API CALLS ---
   const fetchMaterials = useCallback(
-    async (page = 1, itemsPerPage = 10, filters = {}) => {
+    async (page = 1, itemsPerPage = 10, currentFilters = filters) => {
       setLoadingTable(true);
       try {
         const params = {
           page,
           limit: itemsPerPage,
-          status: filters.status,
+          status: currentFilters.status,
         };
-        if (filters.search) params.search = filters.search;
+        if (currentFilters.search) params.search = currentFilters.search;
 
         const response = await apiService.get('/materials', params);
 
-        if (filters.status === 0) {
-          setTrashedMaterials(response.materials || []);
-          setMaterials([]);
-        } else {
-          setMaterials(response.materials || []);
-          setTrashedMaterials([]);
-        }
+        setMaterials(response.materials || []);
         setPagination({
           currentPage: response.pagination?.page || 1,
-          totalPages: Math.ceil(response.pagination?.total / response.pagination?.limit) || 1,
-          totalResults: response.pagination?.total || 0,
           itemsPerPage: response.pagination?.limit || 10,
+          totalResults: response.pagination?.total || 0,
         });
       } catch (error) {
         showErrorAlert('Error', error.response?.data?.message || 'Failed to fetch materials');
-        if (filters.status === 0) {
-          setTrashedMaterials([]);
-        } else {
-          setMaterials([]);
-        }
+        setMaterials([]);
       } finally {
         setLoadingTable(false);
       }
@@ -93,654 +104,474 @@ const AddMaterial = () => {
     []
   );
 
-  // Handle input changes for add form
-  const handleChange = (field, value, index = null) => {
-    if (field === 'properties' && index !== null) {
-      const updatedProperties = [...form.properties];
-      updatedProperties[index] = value;
-      setForm((prev) => ({ ...prev, properties: updatedProperties }));
-      setErrors((prev) => ({ ...prev, properties: '' }));
-    } else {
-      setForm((prev) => ({ ...prev, [field]: value }));
-      setErrors((prev) => ({ ...prev, [field]: '' }));
-    }
+  useEffect(() => {
+    fetchMaterials(pagination.currentPage, pagination.itemsPerPage, filters);
+  }, [refreshTrigger, fetchMaterials, filters]);
+
+  // --- HANDLERS ---
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    const newStatus = key === 'active' ? 1 : 0;
+    const newFilters = { ...filters, status: newStatus };
+    setFilters(newFilters);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+    fetchMaterials(1, pagination.itemsPerPage, newFilters);
   };
 
-  // Handle input changes for edit form
-  const handleEditChange = (field, value, index = null) => {
-    if (field === 'properties' && index !== null) {
-      const updatedProperties = [...editForm.properties];
-      updatedProperties[index] = value;
-      setEditForm((prev) => ({ ...prev, properties: updatedProperties }));
-      setEditErrors((prev) => ({ ...prev, properties: '' }));
-    } else {
-      setEditForm((prev) => ({ ...prev, [field]: value }));
-      setEditErrors((prev) => ({ ...prev, [field]: '' }));
-    }
-  };
-
-  // Add a new property input field for add form
-  const addPropertyField = () => {
-    setForm((prev) => ({ ...prev, properties: [...prev.properties, ''] }));
-  };
-
-  // Add a new property input field for edit form
-  const addEditPropertyField = () => {
-    setEditForm((prev) => ({ ...prev, properties: [...prev.properties, ''] }));
-  };
-
-  // Remove a property input field for add form
-  const removePropertyField = (index) => {
-    if (form.properties.length > 1) {
-      const updatedProperties = form.properties.filter((_, i) => i !== index);
-      setForm((prev) => ({ ...prev, properties: updatedProperties }));
-    } else {
-      showErrorAlert('Error', 'At least one property is required');
-    }
-  };
-
-  // Remove a property input field for edit form
-  const removeEditPropertyField = (index) => {
-    if (editForm.properties.length > 1) {
-      const updatedProperties = editForm.properties.filter((_, i) => i !== index);
-      setEditForm((prev) => ({ ...prev, properties: updatedProperties }));
-    } else {
-      showErrorAlert('Error', 'At least one property is required');
-    }
-  };
-
-  // Validate add form
-  const validateForm = () => {
-    const newErrors = {};
-    if (!form.name.trim()) {
-      newErrors.name = 'Material name is required';
-    }
-    const validProperties = form.properties
-      .map((prop) => prop.trim())
-      .filter((prop) => prop !== '');
-    if (validProperties.length === 0) {
-      newErrors.properties = 'At least one valid property is required';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Validate edit form
-  const validateEditForm = () => {
-    const newErrors = {};
-    if (!editForm.name.trim()) {
-      newErrors.name = 'Material name is required';
-    }
-    const validProperties = editForm.properties
-      .map((prop) => prop.trim())
-      .filter((prop) => prop !== '');
-    if (validProperties.length === 0) {
-      newErrors.properties = 'At least one valid property is required';
-    }
-    setEditErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle add form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsLoadingForm(true);
-    try {
-      const payload = {
-        name: form.name.trim(),
-        description: form.description.trim(),
-        properties: form.properties
-          .map((prop) => prop.trim())
-          .filter((prop) => prop !== ''),
-      };
-      await apiService.post('/materials', payload);
-      showSuccessAlert('Success', 'Material created successfully');
-      setForm({ name: '', description: '', properties: [''] });
-      setErrors({});
-      setRefreshTrigger((prev) => prev + 1);
-    } catch (error) {
-      const errorData = error.response?.data;
-      if (errorData?.errors) {
-        setErrors(errorData.errors.reduce((acc, err) => ({ ...acc, [err.field]: err.message }), {}));
-      } else {
-        setErrors({ general: errorData?.message || 'Failed to create material' });
-        showErrorAlert('Error', errorData?.message || 'Failed to create material');
-      }
-    } finally {
-      setIsLoadingForm(false);
-    }
-  };
-
-  // Handle edit form submission
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateEditForm()) {
-      return;
-    }
-
-    setIsLoadingForm(true);
-    try {
-      const payload = {
-        name: editForm.name.trim(),
-        description: editForm.description.trim(),
-        properties: editForm.properties
-          .map((prop) => prop.trim())
-          .filter((prop) => prop !== ''),
-      };
-      await apiService.put(`/materials/${selectedMaterial._id}`, payload);
-      showSuccessAlert('Success', 'Material updated successfully');
-      setShowEditModal(false);
-      setEditErrors({});
-      setRefreshTrigger((prev) => prev + 1);
-    } catch (error) {
-      const errorData = error.response?.data;
-      if (errorData?.errors) {
-        setEditErrors(errorData.errors.reduce((acc, err) => ({ ...acc, [err.field]: err.message }), {}));
-      } else {
-        setEditErrors({ general: errorData?.message || 'Failed to update material' });
-        showErrorAlert('Error', errorData?.message || 'Failed to update material');
-      }
-    } finally {
-      setIsLoadingForm(false);
-    }
-  };
-
-  // Handle soft delete
-  const handleSoftDelete = async (materialId) => {
-    const result = await showConfirmDialog(
-      'Are you sure?',
-      'This material will be moved to the trash. You can restore it later.',
-      'Yes, move to trash!'
-    );
-    if (result.isConfirmed) {
-      setIsDeleting(true);
-      try {
-        await apiService.delete(`/materials/${materialId}`);
-        showSuccessAlert('Moved to Trash', 'Material has been moved to the trash.');
-        fetchMaterials(pagination.currentPage, pagination.itemsPerPage, filters);
-      } catch (error) {
-        showErrorAlert('Error', error.response?.data?.message || 'Failed to move material to trash');
-      } finally {
-        setIsDeleting(false);
-      }
-    }
-  };
-
-  // Handle restore
-  const handleRestore = async (materialId) => {
-    const result = await showConfirmDialog(
-      'Restore Material?',
-      'This will restore the material to active status.',
-      'Yes, restore it!'
-    );
-    if (result.isConfirmed) {
-      try {
-        await apiService.post(`/materials/${materialId}/restore`);
-        showSuccessAlert('Restored', 'Material has been restored successfully.');
-        fetchMaterials(pagination.currentPage, pagination.itemsPerPage, filters);
-      } catch (error) {
-        showErrorAlert('Error', error.response?.data?.message || 'Failed to restore material');
-      }
-    }
-  };
-
-  // Handle page change
-  const handlePageChange = (page, itemsPerPage) => {
-    fetchMaterials(page, itemsPerPage, filters);
-  };
-
-  // Handle filter change
-  const handleFilter = (newFilters) => {
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    const newFilters = { ...filters, search: value };
     setFilters(newFilters);
     fetchMaterials(1, pagination.itemsPerPage, newFilters);
   };
 
-  // Handle refresh
-  const handleRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1);
+  const handlePageChange = (page, itemsPerPage) => {
+    fetchMaterials(page, itemsPerPage, filters);
   };
 
-  // Open view modal
-  const openViewModal = (item) => {
-    setSelectedMaterial(item);
-    setShowViewModal(true);
+  // --- CRUD ACTIONS ---
+  const handleAddSubmit = async (values) => {
+    setIsLoadingForm(true);
+    try {
+      const payload = {
+        name: values.name.trim(),
+        description: values.description?.trim() || '',
+        properties: values.properties?.filter(p => p?.trim()) || [],
+      };
+
+      await apiService.post('/materials', payload);
+      showSuccessAlert('Success', 'Material created successfully');
+      
+      setIsAddModalOpen(false);
+      addForm.resetFields();
+      setRefreshTrigger(prev => prev + 1);
+    } catch (error) {
+      showErrorAlert('Error', error.response?.data?.message || 'Failed to create material');
+    } finally {
+      setIsLoadingForm(false);
+    }
   };
 
-  // Open edit modal
+  const handleEditSubmit = async (values) => {
+    setIsLoadingForm(true);
+    try {
+      const payload = {
+        name: values.name.trim(),
+        description: values.description?.trim() || '',
+        properties: values.properties?.filter(p => p?.trim()) || [],
+      };
+
+      await apiService.put(`/materials/${selectedMaterial._id}`, payload);
+      showSuccessAlert('Success', 'Material updated successfully');
+      
+      setShowEditModal(false);
+      setRefreshTrigger(prev => prev + 1);
+    } catch (error) {
+      showErrorAlert('Error', error.response?.data?.message || 'Failed to update material');
+    } finally {
+      setIsLoadingForm(false);
+    }
+  };
+
+  const handleSoftDelete = async (materialId) => {
+    const result = await showConfirmDialog(
+      'Move to Trash?',
+      'This material will be deactivated.',
+      'Yes, Trash it'
+    );
+    if (result.isConfirmed) {
+      try {
+        await apiService.delete(`/materials/${materialId}`);
+        showSuccessAlert('Moved to Trash', 'Material has been deactivated.');
+        setRefreshTrigger(prev => prev + 1);
+      } catch (error) {
+        showErrorAlert('Error', 'Failed to trash material');
+      }
+    }
+  };
+
+  const handleRestore = async (materialId) => {
+    const result = await showConfirmDialog(
+      'Restore Material?',
+      'This will reactivate the material.',
+      'Yes, Restore'
+    );
+    if (result.isConfirmed) {
+      try {
+        await apiService.post(`/materials/${materialId}/restore`);
+        showSuccessAlert('Restored', 'Material is active again.');
+        setRefreshTrigger(prev => prev + 1);
+      } catch (error) {
+        showErrorAlert('Error', 'Failed to restore material');
+      }
+    }
+  };
+
+  // --- MODAL OPENERS ---
   const openEditModal = (item) => {
     setSelectedMaterial(item);
-    setEditForm({
+    editForm.setFieldsValue({
       name: item.name,
-      description: item.description || '',
+      description: item.description,
       properties: item.properties && item.properties.length > 0 ? item.properties : [''],
     });
     setShowEditModal(true);
   };
 
-  // Fetch data when refreshTrigger or filters change
-  useEffect(() => {
-    fetchMaterials(pagination.currentPage, pagination.itemsPerPage, filters);
-  }, [refreshTrigger, fetchMaterials, filters]);
-
-  // Handle tab change
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setFilters((prev) => ({
-      ...prev,
-      status: tab === 'active' ? 1 : 0,
-    }));
-    setPagination((prev) => ({ ...prev, currentPage: 1 }));
-    setRefreshTrigger((prev) => prev + 1);
-  };
-
-  // Render error messages
-  const renderError = (field, errorsObj) => {
-    return errorsObj[field] ? (
-      <p className="text-red-500 text-xs italic mt-1">{errorsObj[field]}</p>
-    ) : null;
-  };
-
-  // Table columns for materials
-  const materialColumns = useMemo(
-    () => [
-    
-      {
-        key: 'name',
-        title: 'Material Name',
-        sortable: true,
-        filterable: true,
-        render: (value) => <span className="text-gray-900">{value || '--'}</span>,
-      },
-      {
-        key: 'description',
-        title: 'Description',
-        sortable: false,
-        render: (value) => <span className="text-gray-900">{value || '--'}</span>,
-      },
-      {
-        key: 'properties',
-        title: 'Properties',
-        sortable: false,
-        render: (properties) => (
-          <div className="flex flex-wrap gap-1">
-            {properties && properties.length > 0 ? (
-              properties.map((prop, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 text-xs rounded bg-gray-100 text-gray-800"
-                >
-                  {prop}
-                </span>
-              ))
-            ) : (
-              '--'
-            )}
-          </div>
-        ),
-      },
-      {
-        key: 'created_at',
-        title: 'Created At',
-        sortable: true,
-        render: (value) => (
-          <span className="text-gray-900">
-            {value ? format(new Date(value), 'dd/MM/yyyy') : '--'}
-          </span>
-        ),
-      },
-      {
-        key: 'actions',
-        title: 'Actions',
-        render: (value, item) => (
-          <div className="flex space-x-2">
-            <Button
-              icon={<FiEye />}
-              onClick={() => openViewModal(item)}
-              type="link"
-              className="text-blue-600 hover:text-blue-800"
-              title="View Details"
+  // --- COLUMNS ---
+  const columns = useMemo(() => [
+    {
+      key: 'name',
+      title: 'Material Name',
+      render: (text) => <span className="font-semibold text-gray-800">{text}</span>,
+    },
+    {
+      key: 'description',
+      title: 'Description',
+      width: 300,
+      render: (v) => <div className="truncate w-64 text-gray-500" title={v}>{v || '--'}</div>
+    },
+    {
+      key: 'properties',
+      title: 'Properties',
+      render: (properties) => (
+        <div className="flex flex-wrap gap-1">
+          {properties && properties.length > 0 ? (
+            properties.map((prop, index) => (
+              <span key={index} className="px-2 py-1 text-xs rounded bg-purple-50 text-purple-700 border border-purple-100">
+                {prop}
+              </span>
+            ))
+          ) : (
+            <span className="text-gray-400">--</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'created_at',
+      title: 'Created',
+      render: (v) => {
+        if (!v) return <span className="text-gray-400">--</span>;
+        const date = new Date(v);
+        return isNaN(date.getTime()) ? (
+            <span className="text-gray-400">--</span>
+        ) : (
+            <span className="text-gray-500 text-xs">{format(date, 'dd MMM yyyy')}</span>
+        );
+      }
+    },
+    {
+      key: 'actions',
+      title: 'Actions',
+      align: 'right',
+      render: (_, r) => (
+        <Space>
+          <Tooltip title="View">
+            <Button 
+                shape="circle" 
+                icon={<EyeOutlined style={{ color: THEME.primary }} />} 
+                onClick={() => { setSelectedMaterial(r); setShowViewModal(true); }}
             />
-            {activeTab === 'active' && (
-              <>
-                <Button
-                  icon={<FiEdit />}
-                  onClick={() => openEditModal(item)}
-                  type="link"
-                  className="text-blue-600 hover:text-blue-800"
-                  title="Edit Material"
+          </Tooltip>
+          
+          {activeTab === 'active' ? (
+            <>
+              <Tooltip title="Edit">
+                <Button 
+                    shape="circle" 
+                    icon={<EditOutlined style={{ color: THEME.secondary }} />} 
+                    onClick={() => openEditModal(r)}
                 />
-                <Button
-                  icon={<FiTrash2 />}
-                  onClick={() => handleSoftDelete(item._id)}
-                  type="link"
-                  className={`text-red-600 hover:text-red-800 ${isDeleting ? 'opacity-75 cursor-not-allowed' : ''}`}
-                  title="Move to Trash"
-                  disabled={isDeleting}
+              </Tooltip>
+              <Tooltip title="Trash">
+                <Button 
+                    shape="circle" 
+                    danger 
+                    icon={<DeleteOutlined />} 
+                    onClick={() => handleSoftDelete(r._id)}
                 />
-              </>
-            )}
-            {activeTab === 'trashed' && (
-              <Button
-                icon={<FiRotateCcw />}
-                onClick={() => handleRestore(item._id)}
-                type="link"
-                className="text-green-600 hover:text-green-800"
-                title="Restore Material"
-              />
-            )}
-          </div>
-        ),
-      },
-    ],
-    [isDeleting, activeTab]
-  );
+              </Tooltip>
+            </>
+          ) : (
+            <Tooltip title="Restore">
+                <Button 
+                    shape="circle" 
+                    icon={<RotateLeftOutlined style={{ color: THEME.success }} />} 
+                    onClick={() => handleRestore(r._id)}
+                    className="border-green-500"
+                />
+            </Tooltip>
+          )}
+        </Space>
+      )
+    }
+  ], [activeTab]);
+
+  // --- TAB CONFIG ---
+  const tabItems = [
+    { key: 'active', label: <span><BgColorsOutlined /> Active Materials</span> },
+    { key: 'trashed', label: <span><DeleteOutlined /> Trashed</span> },
+  ];
 
   return (
-    <div className="min-h-screen">
-      <div className="flex items-center mb-6">
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate(-1)}
-          className="mr-4"
-          type="primary"
-          shape="circle"
-        />
-        <h1 className="text-3xl font-bold text-gray-800">Materials Management</h1>
-      </div>
-
-      {/* Add Material Form */}
-      <div className="bg-white shadow-lg rounded-lg px-8 pt-6 pb-8 mb-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">Add New Material</h2>
-        <form onSubmit={handleSubmit}>
-          {errors.general && (
-            <p className="text-red-500 text-xs italic mb-4">{errors.general}</p>
-          )}
-          <div className="mb-6">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-              Material Name *
-            </label>
-            <Input
-              size="large"
-              value={form.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="e.g. Cotton"
-              status={errors.name ? 'error' : ''}
-            />
-            {renderError('name', errors)}
-          </div>
-
-          <div className="mb-6">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-              Description
-            </label>
-            <TextArea
-              size="large"
-              value={form.description}
-              onChange={(e) => handleChange('description', e.target.value)}
-              placeholder="e.g. Soft and breathable fabric"
-              rows={4}
-              status={errors.description ? 'error' : ''}
-            />
-            {renderError('description', errors)}
-          </div>
-
-          <div className="mb-6">
-            <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-              Properties *
-            </label>
-            {form.properties.map((prop, index) => (
-              <div key={index} className="flex items-center mb-2">
-                <Input
-                  size="large"
-                  value={prop}
-                  onChange={(e) => handleChange('properties', e.target.value, index)}
-                  placeholder={`e.g. ${['Soft', 'Durable', 'Lightweight'][index] || 'Property'}`}
-                  status={errors.properties ? 'error' : ''}
-                />
-                {form.properties.length > 1 && (
-                  <Button
-                    type="link"
-                    icon={<FiX />}
-                    onClick={() => removePropertyField(index)}
-                    className="ml-2 text-red-600 hover:text-red-800"
-                    title="Remove Property"
-                  />
-                )}
-              </div>
-            ))}
-            {renderError('properties', errors)}
-            <Button
-              type="link"
-              icon={<FiPlus />}
-              onClick={addPropertyField}
-              className="mt-2 text-blue-600 hover:text-blue-800"
-            >
-              Add Another Property
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              loading={isLoadingForm}
-              disabled={isLoadingForm}
-            >
-              {isLoadingForm ? 'Creating...' : 'Create Material'}
-            </Button>
-          </div>
-        </form>
-      </div>
-
-      {/* Tabs */}
+    <div className="p-6 bg-gray-50 min-h-screen">
+      
+      {/* 1. Header & Stats */}
       <div className="mb-6">
-        <div className="flex border-b">
-          <button
-            className={`px-4 py-2 font-semibold text-sm text-gray-700 border-b-2 ${
-              activeTab === 'active' ? 'border-blue-600 text-blue-600' : 'border-transparent'
-            }`}
-            onClick={() => handleTabChange('active')}
-          >
-            Active Materials
-          </button>
-          <button
-            className={`px-4 py-2 font-semibold text-sm text-gray-700 border-b-2 ${
-              activeTab === 'trashed' ? 'border-blue-600 text-blue-600' : 'border-transparent'
-            }`}
-            onClick={() => handleTabChange('trashed')}
-          >
-            Trashed Materials
-          </button>
+        <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-4">
+               
+                <div>
+                    <Title level={3} style={{ margin: 0 }}>Materials Management</Title>
+                    <Text type="secondary">Define materials and their properties.</Text>
+                </div>
+            </div>
+            <Button
+                type="primary"
+                size="large"
+                icon={<PlusOutlined />}
+                style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+                onClick={() => setIsAddModalOpen(true)}
+            >
+                Add Material
+            </Button>
         </div>
+
+        <Row gutter={[16, 16]}>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+                    <Statistic 
+                        title="Total Materials" 
+                        value={pagination.totalResults} 
+                        prefix={<UnorderedListOutlined style={{ color: THEME.primary }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.success }}>
+                    <Statistic 
+                        title="Active Materials" 
+                        value={activeTab === 'active' ? pagination.totalResults : '--'} 
+                        prefix={<CheckCircleOutlined style={{ color: THEME.success }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.error }}>
+                    <Statistic 
+                        title="Trashed Materials" 
+                        value={activeTab === 'trashed' ? pagination.totalResults : '--'} 
+                        prefix={<RestOutlined style={{ color: THEME.error }} />} 
+                    />
+                </Card>
+            </Col>
+        </Row>
       </div>
 
-   
-
-   
-
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow">
-        <CustomTable
-          columns={materialColumns}
-          data={(activeTab === 'active' ? materials : trashedMaterials).map((item, index) => ({
-            ...item,
-            key: item._id || index,
-          }))}
-          totalItems={pagination.totalResults}
-          currentPage={pagination.currentPage}
-          itemsPerPage={pagination.itemsPerPage}
-          onPageChange={handlePageChange}
-          onFilter={handleFilter}
-          loading={loadingTable}
-          filters={[
-            {
-              key: 'search',
-              type: 'text',
-              placeholder: 'Search by material name...',
-            },
-          ]}
-          emptyMessage={activeTab === 'active' ? 'No active materials found.' : 'No trashed materials found.'}
+      {/* 2. Main Content */}
+      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
+       
+        <Tabs
+            activeKey={activeTab}
+            onChange={handleTabChange}
+            type="card"
+            size="large"
+            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
+            items={tabItems}
         />
-      </div>
 
-      {/* View Modal */}
+        <div className="p-0">
+            <CustomTable
+                columns={columns}
+                data={materials}
+                loading={loadingTable}
+                totalItems={pagination.totalResults}
+                currentPage={pagination.currentPage}
+                itemsPerPage={pagination.itemsPerPage}
+                onPageChange={handlePageChange}
+            />
+        </div>
+      </Card>
+
+      {/* 3. ADD MATERIAL MODAL */}
+      <Modal
+        title={
+            <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
+                <PlusOutlined style={{ color: THEME.primary }} /> Add New Material
+            </div>
+        }
+        open={isAddModalOpen}
+        onCancel={() => { setIsAddModalOpen(false); addForm.resetFields(); }}
+        footer={null}
+        width={600}
+        destroyOnClose
+        centered
+      >
+        <Divider className="my-4" />
+        <Form form={addForm} onFinish={handleAddSubmit} layout="vertical" initialValues={{ properties: [''] }}>
+            <Form.Item name="name" label="Material Name" rules={[{ required: true }]}>
+                <Input size="large" placeholder="e.g. Cotton" />
+            </Form.Item>
+
+            <Form.Item name="description" label="Description">
+                <TextArea rows={3} placeholder="Describe the material..." />
+            </Form.Item>
+
+            <Form.List name="properties">
+                {(fields, { add, remove }) => (
+                    <>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="text-gray-700 font-medium">Properties</label>
+                            <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />} size="small">Add</Button>
+                        </div>
+                        {fields.map((field, index) => (
+                            <div key={field.key} className="flex gap-2 mb-2">
+                                <Form.Item
+                                    {...field}
+                                    validateTrigger={['onChange', 'onBlur']}
+                                    rules={[{ required: true, whitespace: true, message: "Required" }]}
+                                    noStyle
+                                >
+                                    <Input placeholder="Property (e.g. Durable)" />
+                                </Form.Item>
+                                {fields.length > 1 && (
+                                    <Button 
+                                        type="text" 
+                                        danger 
+                                        icon={<DeleteOutlined />} 
+                                        onClick={() => remove(field.name)} 
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </>
+                )}
+            </Form.List>
+
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
+                <Button size="large" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
+                <Button 
+                    type="primary" 
+                    htmlType="submit" 
+                    loading={isLoadingForm}
+                    size="large"
+                    style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+                >
+                    Create Material
+                </Button>
+            </div>
+        </Form>
+      </Modal>
+
+      {/* 4. EDIT MATERIAL MODAL */}
+      <Modal
+        title={
+            <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
+                <EditOutlined style={{ color: THEME.secondary }} /> Edit Material
+            </div>
+        }
+        open={showEditModal}
+        onCancel={() => setShowEditModal(false)}
+        footer={null}
+        width={600}
+        destroyOnClose
+        centered
+      >
+        <Divider className="my-4" />
+        <Form form={editForm} onFinish={handleEditSubmit} layout="vertical">
+            <Form.Item name="name" label="Material Name" rules={[{ required: true }]}>
+                <Input size="large" />
+            </Form.Item>
+
+            <Form.Item name="description" label="Description">
+                <TextArea rows={3} />
+            </Form.Item>
+
+            <Form.List name="properties">
+                {(fields, { add, remove }) => (
+                    <>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="text-gray-700 font-medium">Properties</label>
+                            <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />} size="small">Add</Button>
+                        </div>
+                        {fields.map((field, index) => (
+                            <div key={field.key} className="flex gap-2 mb-2">
+                                <Form.Item
+                                    {...field}
+                                    validateTrigger={['onChange', 'onBlur']}
+                                    rules={[{ required: true, whitespace: true, message: "Required" }]}
+                                    noStyle
+                                >
+                                    <Input placeholder="Property" />
+                                </Form.Item>
+                                {fields.length > 1 && (
+                                    <Button 
+                                        type="text" 
+                                        danger 
+                                        icon={<DeleteOutlined />} 
+                                        onClick={() => remove(field.name)} 
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </>
+                )}
+            </Form.List>
+
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
+                <Button size="large" onClick={() => setShowEditModal(false)}>Cancel</Button>
+                <Button 
+                    type="primary" 
+                    htmlType="submit" 
+                    loading={isLoadingForm}
+                    size="large"
+                    style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+                >
+                    Update Material
+                </Button>
+            </div>
+        </Form>
+      </Modal>
+
+      {/* 5. VIEW MODAL */}
       <Modal
         title="Material Details"
         open={showViewModal}
         onCancel={() => setShowViewModal(false)}
-        footer={[
-          <Button key="close" onClick={() => setShowViewModal(false)}>
-            Close
-          </Button>,
-        ]}
+        footer={[<Button key="close" onClick={() => setShowViewModal(false)}>Close</Button>]}
+        centered
       >
         {selectedMaterial && (
-          <>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold">Name:</label>
-              <p>{selectedMaterial.name}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold">Description:</label>
-              <p>{selectedMaterial.description || '--'}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold">Properties:</label>
-              <div className="flex flex-wrap gap-1">
-                {selectedMaterial.properties && selectedMaterial.properties.length > 0 ? (
-                  selectedMaterial.properties.map((prop, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 text-xs rounded bg-gray-100 text-gray-800"
-                    >
-                      {prop}
-                    </span>
-                  ))
-                ) : (
-                  '--'
-                )}
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold">Created At:</label>
-              <p>
-                {selectedMaterial.created_at
-                  ? format(new Date(selectedMaterial.created_at), 'dd/MM/yyyy')
-                  : '--'}
-              </p>
-            </div>
-            {selectedMaterial.status === 0 && (
-              <div className="mb-4">
-                <label className="block text-gray-700 font-bold">Deleted At:</label>
-                <p>
-                  {selectedMaterial.deletedAt
-                    ? format(new Date(selectedMaterial.deletedAt), 'dd/MM/yyyy')
-                    : '--'}
-                </p>
-              </div>
-            )}
-          </>
-        )}
-      </Modal>
-
-      {/* Edit Modal */}
-      <Modal
-        title="Edit Material"
-        open={showEditModal}
-        onCancel={() => setShowEditModal(false)}
-        footer={null}
-      >
-        {selectedMaterial && (
-          <form onSubmit={handleEditSubmit}>
-            {editErrors.general && (
-              <p className="text-red-500 text-xs italic mb-4">{editErrors.general}</p>
-            )}
-            <div className="mb-6">
-              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                Material Name *
-              </label>
-              <Input
-                size="large"
-                value={editForm.name}
-                onChange={(e) => handleEditChange('name', e.target.value)}
-                placeholder="e.g. Cotton"
-                status={editErrors.name ? 'error' : ''}
-              />
-              {renderError('name', editErrors)}
-            </div>
-
-            <div className="mb-6">
-              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                Description
-              </label>
-              <TextArea
-                size="large"
-                value={editForm.description}
-                onChange={(e) => handleEditChange('description', e.target.value)}
-                placeholder="e.g. Soft and breathable fabric"
-                rows={4}
-                status={editErrors.description ? 'error' : ''}
-              />
-              {renderError('description', editErrors)}
-            </div>
-
-            <div className="mb-6">
-              <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                Properties *
-              </label>
-              {editForm.properties.map((prop, index) => (
-                <div key={index} className="flex items-center mb-2">
-                  <Input
-                    size="large"
-                    value={prop}
-                    onChange={(e) => handleEditChange('properties', e.target.value, index)}
-                    placeholder={`e.g. ${['Soft', 'Durable', 'Lightweight'][index] || 'Property'}`}
-                    status={editErrors.properties ? 'error' : ''}
-                  />
-                  {editForm.properties.length > 1 && (
-                    <Button
-                      type="link"
-                      icon={<FiX />}
-                      onClick={() => removeEditPropertyField(index)}
-                      className="ml-2 text-red-600 hover:text-red-800"
-                      title="Remove Property"
-                    />
-                  )}
+            <div>
+                <Title level={4} style={{ margin: 0 }}>{selectedMaterial.name}</Title>
+                <Divider />
+                
+                <div className="space-y-4">
+                    <div>
+                        <Text strong className="block text-gray-600">Description:</Text>
+                        <p className="text-gray-700">{selectedMaterial.description || 'No description provided.'}</p>
+                    </div>
+                    <div>
+                        <Text strong className="block text-gray-600 mb-2">Properties:</Text>
+                        <div className="flex flex-wrap gap-2">
+                            {selectedMaterial.properties && selectedMaterial.properties.length > 0 ? (
+                                selectedMaterial.properties.map((prop, idx) => (
+                                    <Tag key={idx} color="purple">{prop}</Tag>
+                                ))
+                            ) : (
+                                <Text type="secondary">No properties listed.</Text>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex justify-between mt-4 text-xs text-gray-400 pt-4 border-t">
+                        <span>Created: {format(new Date(selectedMaterial.created_at || new Date()), 'dd MMM yyyy')}</span>
+                    </div>
                 </div>
-              ))}
-              {renderError('properties', editErrors)}
-              <Button
-                type="link"
-                icon={<FiPlus />}
-                onClick={addEditPropertyField}
-                className="mt-2 text-blue-600 hover:text-blue-800"
-              >
-                Add Another Property
-              </Button>
             </div>
-
-            <div className="flex items-center justify-between">
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                loading={isLoadingForm}
-                disabled={isLoadingForm}
-              >
-                {isLoadingForm ? 'Updating...' : 'Update Material'}
-              </Button>
-              <Button size="large" onClick={() => setShowEditModal(false)}>
-                Cancel
-              </Button>
-            </div>
-          </form>
         )}
       </Modal>
+
     </div>
   );
 };

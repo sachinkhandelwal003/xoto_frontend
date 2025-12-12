@@ -17,10 +17,11 @@ import {
   Badge,
   Typography,
   Avatar,
-  Divider
+  Row,
+  Col,
+  Statistic
 } from "antd";
 import {
-  UserOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
@@ -30,7 +31,9 @@ import {
   PhoneOutlined,
   MailOutlined,
   GlobalOutlined,
-  SafetyCertificateOutlined
+  SafetyCertificateOutlined,
+  TeamOutlined,
+  UserSwitchOutlined
 } from "@ant-design/icons";
 import moment from "moment";
 import { apiService } from "../../../../../../manageApi/utils/custom.apiservice";
@@ -41,13 +44,13 @@ const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
 // --- THEME CONFIGURATION ---
-const PURPLE_THEME = {
-  primary: '#722ed1',
-  primaryLight: '#9254de',
-  primaryBg: '#f9f0ff',
-  success: '#52c41a',
-  warning: '#faad14',
-  error: '#ff4d4f',
+const THEME = {
+  primary: "#722ed1", // Purple
+  secondary: "#1890ff", // Blue
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
 };
 
 // Role map
@@ -87,7 +90,7 @@ const Freelancers = () => {
   const [loading, setLoading] = useState(true);
   const [freelancers, setFreelancers] = useState([]);
   
-  // Kept stats only for Tab Badges (not for top cards)
+  // Stats state
   const [stats, setStats] = useState({ 
     total: 0, 
     pending: 0, 
@@ -116,9 +119,9 @@ const Freelancers = () => {
 
   // Status UI Config
   const statusConfig = {
-    0: { label: "Pending", color: "warning", icon: <ClockCircleOutlined />, bgColor: '#fff7e6', textColor: '#fa8c16' },
-    1: { label: "Approved", color: "success", icon: <CheckCircleOutlined />, bgColor: '#f6ffed', textColor: '#52c41a' },
-    2: { label: "Rejected", color: "error", icon: <CloseCircleOutlined />, bgColor: '#fff1f0', textColor: '#ff4d4f' },
+    0: { label: "Pending", color: "warning", icon: <ClockCircleOutlined /> },
+    1: { label: "Approved", color: "success", icon: <CheckCircleOutlined /> },
+    2: { label: "Rejected", color: "error", icon: <CloseCircleOutlined /> },
   };
 
   // Fetch Freelancers
@@ -147,11 +150,9 @@ const Freelancers = () => {
             itemsPerPage: paginationData.limit || limit,
           });
 
-          // Calculate stats for badges
           if (res.stats) {
             setStats(res.stats);
           } else {
-             // Basic fallback (optional)
              const all = res.freelancers || [];
              setStats(prev => ({...prev, [activeTab]: all.length})); 
           }
@@ -169,10 +170,10 @@ const Freelancers = () => {
     [activeTab, token, perm.canView]
   );
 
-  // Initial Fetch of Stats (for badges)
+  // Initial Fetch of Stats
   const fetchStats = useCallback(async () => {
     try {
-      const allRes = await apiService.get("/freelancer", { limit: 1 }); // Just to get stats object
+      const allRes = await apiService.get("/freelancer", { limit: 1 });
       if (allRes.success && allRes.stats) {
         setStats(allRes.stats);
       }
@@ -276,13 +277,13 @@ const Freelancers = () => {
         render: (_, record) => (
           <div className="flex items-center gap-3">
             <Avatar 
-                size={45} 
-                style={{ background: PURPLE_THEME.primaryBg, color: PURPLE_THEME.primary, border: `1px solid ${PURPLE_THEME.primaryLighter}` }}
+                size={48} 
+                style={{ background: THEME.bgLight, color: THEME.primary, border: `1px solid ${THEME.secondary}20` }}
             >
                 {record.name?.first_name?.[0]?.toUpperCase() || "F"}
             </Avatar>
             <div className="flex-1 min-w-0">
-              <div className="font-semibold text-gray-800 truncate">
+              <div className="font-semibold text-gray-800 truncate text-base">
                 {record.name?.first_name} {record.name?.last_name}
               </div>
               <div className="text-xs text-gray-500 flex items-center gap-1">
@@ -342,7 +343,7 @@ const Freelancers = () => {
           const status = record.status_info?.status ?? 0;
           const config = statusConfig[status];
           return (
-            <Tag color={config.color} style={{ borderRadius: 10, padding: '2px 10px', display: 'flex', width: 'fit-content', alignItems: 'center', gap: '4px' }}>
+            <Tag color={config.color} style={{ borderRadius: 12, padding: '2px 10px', display: 'flex', width: 'fit-content', alignItems: 'center', gap: '4px' }}>
                 {config.icon} {config.label}
             </Tag>
           );
@@ -352,13 +353,16 @@ const Freelancers = () => {
         title: "Actions",
         fixed: "right",
         width: 140,
+        align: 'center',
         render: (_, record) => (
           <Space>
             <Tooltip title="View Details">
               <Button
-                icon={<EyeOutlined />}
+                icon={<EyeOutlined style={{ color: THEME.primary }} />}
                 size="small"
+                shape="circle"
                 onClick={() => handleViewDetails(record)}
+                style={{ borderColor: THEME.primary }}
               />
             </Tooltip>
 
@@ -371,13 +375,14 @@ const Freelancers = () => {
                   onConfirm={() => handleApprove(record._id)}
                   okText="Yes"
                   cancelText="No"
-                  okButtonProps={{ style: { background: '#52c41a' }}}
+                  okButtonProps={{ style: { background: THEME.success, borderColor: THEME.success }}}
                 >
                   <Button
                     type="primary"
                     size="small"
+                    shape="circle"
                     icon={<CheckOutlined />}
-                    className="bg-green-600 hover:bg-green-500"
+                    style={{ backgroundColor: THEME.success, borderColor: THEME.success }}
                     loading={actionLoading === record._id}
                   />
                 </Popconfirm>
@@ -387,9 +392,9 @@ const Freelancers = () => {
             {activeTab === "pending" && perm.canReject && (
               <Tooltip title="Reject">
                 <Button
-                  type="primary"
                   danger
                   size="small"
+                  shape="circle"
                   icon={<CloseOutlined />}
                   onClick={() => openRejectModal(record)}
                   loading={actionLoading === record._id}
@@ -417,88 +422,116 @@ const Freelancers = () => {
   }
 
   // --- TAB CONFIGURATION ---
-  // Re-ordering so Approved is first conceptually, but using keys to control content
   const tabItems = [
     {
         key: 'approved',
-        label: 'Approved',
-        icon: <CheckCircleOutlined />,
-        count: stats.approved,
-        color: '#52c41a'
+        label: (
+            <span>
+                <CheckCircleOutlined /> Approved
+                <Badge count={stats.approved} style={{ marginLeft: 8, backgroundColor: THEME.success }} />
+            </span>
+        )
     },
     {
         key: 'pending',
-        label: 'Pending',
-        icon: <ClockCircleOutlined />,
-        count: stats.pending,
-        color: '#fa8c16'
+        label: (
+            <span>
+                <ClockCircleOutlined /> Pending
+                <Badge count={stats.pending} style={{ marginLeft: 8, backgroundColor: THEME.warning }} />
+            </span>
+        )
     },
     {
         key: 'rejected',
-        label: 'Rejected',
-        icon: <CloseCircleOutlined />,
-        count: stats.rejected,
-        color: '#ff4d4f'
+        label: (
+            <span>
+                <CloseCircleOutlined /> Rejected
+                <Badge count={stats.rejected} style={{ marginLeft: 8, backgroundColor: THEME.error }} />
+            </span>
+        )
     }
   ];
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       
-      {/* Header */}
+      {/* 1. Header & Stats */}
       <div className="mb-6">
-        <Title level={3}>Freelancer Management</Title>
-        <Text type="secondary">Manage partners, view profiles, and handle approvals</Text>
+        <div className="flex justify-between items-center mb-6">
+            <div>
+                <Title level={3} style={{ margin: 0 }}>Freelancer Management</Title>
+                <Text type="secondary">Review applications and manage freelancer profiles.</Text>
+            </div>
+        </div>
+
+        <Row gutter={[16, 16]}>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+                    <Statistic 
+                        title="Total Freelancers" 
+                        value={stats.total} 
+                        prefix={<TeamOutlined style={{ color: THEME.primary }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.warning }}>
+                    <Statistic 
+                        title="Pending Review" 
+                        value={stats.pending} 
+                        prefix={<UserSwitchOutlined style={{ color: THEME.warning }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.success }}>
+                    <Statistic 
+                        title="Active Partners" 
+                        value={stats.approved} 
+                        prefix={<CheckCircleOutlined style={{ color: THEME.success }} />} 
+                    />
+                </Card>
+            </Col>
+        </Row>
       </div>
 
-      {/* Filter Tabs */}
-      <Card bodyStyle={{ padding: 0 }} className="mb-6 overflow-hidden rounded-lg shadow-sm border-none">
+      {/* 2. Main Content */}
+      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
+        
+        {/* Filter Tabs */}
         <Tabs 
             activeKey={activeTab} 
             onChange={handleTabChange} 
             type="card" 
             size="large"
-            tabBarStyle={{ margin: 0, background: '#fff' }}
-        >
-            {tabItems.map(item => (
-                <TabPane 
-                    tab={
-                        <span className="flex items-center gap-2 px-4">
-                            {item.icon}
-                            {item.label}
-                            {item.count > 0 && (
-                                <Badge 
-                                    count={item.count} 
-                                    style={{ backgroundColor: item.color, marginLeft: 4 }} 
-                                />
-                            )}
-                        </span>
-                    }
-                    key={item.key}
-                />
-            ))}
-        </Tabs>
+            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
+            items={tabItems}
+        />
+
+        {/* Data Table */}
+        <div className="p-0">
+            <CustomTable
+                columns={columns}
+                data={freelancers}
+                loading={loading}
+                totalItems={pagination.totalResults}
+                currentPage={pagination.currentPage}
+                itemsPerPage={pagination.itemsPerPage}
+                onPageChange={handlePageChange}
+                scroll={{ x: 1000 }}
+                rowKey="_id"
+            />
+        </div>
       </Card>
 
-      {/* Data Table */}
-      <Card bodyStyle={{ padding: '0px' }} className="shadow-sm border-none">
-          <CustomTable
-            columns={columns}
-            data={freelancers}
-            loading={loading}
-            totalItems={pagination.totalResults}
-            currentPage={pagination.currentPage}
-            itemsPerPage={pagination.itemsPerPage}
-            onPageChange={handlePageChange}
-            scroll={{ x: 1000 }}
-            rowKey="_id"
-          />
-      </Card>
-
-      {/* Reject Modal */}
+      {/* 3. Reject Modal */}
       <Modal
         open={showRejectModal}
-        title={<span className="text-red-600"><CloseCircleOutlined /> Reject Application</span>}
+        title={
+            <div className="flex items-center gap-2 text-red-600 font-bold">
+                <CloseCircleOutlined /> Reject Application
+            </div>
+        }
         onCancel={() => setShowRejectModal(false)}
         footer={[
           <Button key="cancel" onClick={() => setShowRejectModal(false)}>
@@ -516,6 +549,8 @@ const Freelancers = () => {
           </Button>,
         ]}
         width={500}
+        destroyOnClose
+        centered
       >
         {selectedFreelancer && (
           <div className="pt-2">
@@ -528,10 +563,10 @@ const Freelancers = () => {
             />
             
             <div className="mb-4 p-3 bg-gray-50 rounded border border-gray-200">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <Avatar size="small" src={selectedFreelancer.avatar}>{selectedFreelancer.name?.first_name?.[0]}</Avatar>
                 <div>
-                    <div className="font-semibold text-sm">
+                    <div className="font-semibold text-sm text-gray-800">
                         {selectedFreelancer.name?.first_name} {selectedFreelancer.name?.last_name}
                     </div>
                     <div className="text-xs text-gray-500">{selectedFreelancer.email}</div>
@@ -539,9 +574,8 @@ const Freelancers = () => {
               </div>
             </div>
 
-            <Text strong>Rejection Reason:</Text>
+            <Text strong className="block mb-2">Rejection Reason:</Text>
             <TextArea
-              className="mt-2"
               rows={4}
               placeholder="E.g., Incomplete profile information, credentials not verified..."
               value={rejectionReason}

@@ -1,17 +1,28 @@
 // src/components/CMS/pages/dashboardPages/consult/Enquiry.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Card, Drawer, Descriptions, Tag, Button, Space, Badge,
-  Alert, message, Avatar, Row, Col, Input, Tabs, Select
+  Alert, message, Avatar, Row, Col, Input, Tabs, Statistic, Tooltip, Divider
 } from 'antd';
 import {
   PhoneOutlined, MailOutlined, MessageOutlined, UserOutlined,
   ClockCircleOutlined, CheckCircleOutlined, EyeOutlined,
-  DeleteOutlined, BellOutlined
+  DeleteOutlined, BellOutlined, SearchOutlined, SolutionOutlined,
+  WhatsAppOutlined
 } from '@ant-design/icons';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
 import { showSuccessAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
 import CustomTable from '../../../pages/custom/CustomTable';
+
+// --- THEME CONFIGURATION ---
+const THEME = {
+  primary: "#722ed1", // Purple
+  secondary: "#1890ff", // Blue
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
+};
 
 const statusConfig = {
   submit: { label: 'New Submission', color: 'orange', icon: <ClockCircleOutlined /> },
@@ -31,6 +42,7 @@ const Enquiry = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
 
+  // --- API CALLS ---
   const fetchEnquiries = async (status = activeTab, page = 1, limit = 10, search = '') => {
     setLoading(true);
     try {
@@ -75,8 +87,9 @@ const Enquiry = () => {
       await apiService.put(`/enquiry/${id}/contacted`);
       showSuccessAlert('Success!', 'Marked as contacted');
       fetchEnquiries(activeTab);
+      // Close drawer if open on the specific item
       if (selectedEnquiry?._id === id) {
-        setSelectedEnquiry({ ...selectedEnquiry, status: 'contacted' });
+        setDrawerVisible(false);
       }
     } catch (err) {
       message.error('Failed to update status');
@@ -96,15 +109,24 @@ const Enquiry = () => {
     }
   };
 
+  // --- COLUMNS ---
   const columns = [
     {
-      title: 'Name',
+      title: 'Contact Name',
       key: 'name',
+      width: 250,
       render: (_, record) => (
         <Space>
-          <Avatar size="small" icon={<UserOutlined />} />
+          <Avatar 
+            size="large" 
+            style={{ backgroundColor: THEME.primary, verticalAlign: 'middle' }}
+          >
+            {(record.full_name || record.name?.first_name)?.[0]?.toUpperCase()}
+          </Avatar>
           <div>
-            <div className="font-medium">{record.full_name || `${record.name.first_name} ${record.name.last_name}`}</div>
+            <div className="font-bold text-gray-800">
+                {record.full_name || `${record.name?.first_name} ${record.name?.last_name}`}
+            </div>
             <div className="text-xs text-gray-500">
               {new Date(record.createdAt).toLocaleDateString()}
             </div>
@@ -113,63 +135,82 @@ const Enquiry = () => {
       )
     },
     {
-      title: 'Contact',
+      title: 'Contact Details',
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
-          <Space><MailOutlined className="text-gray-500" /> {record.email}</Space>
-          <Space><PhoneOutlined className="text-gray-500" /> {record.mobile?.country_code || '+91'} {record.mobile?.number}</Space>
-        </Space>
+        <div className="flex flex-col gap-1 text-gray-600">
+          <div className="flex items-center gap-2">
+             <MailOutlined className="text-gray-400"/> {record.email}
+          </div>
+          <div className="flex items-center gap-2">
+             <PhoneOutlined className="text-gray-400"/> {record.mobile?.country_code || '+91'} {record.mobile?.number}
+          </div>
+        </div>
       )
     },
     {
       title: 'Preferred',
-      render: (_, record) => (
-        <Tag>
-          {record.preferred_contact === 'whatsapp' && 'WhatsApp'}
-          {record.preferred_contact === 'phone' && 'Call'}
-          {record.preferred_contact === 'email' && 'Email'}
-        </Tag>
-      )
+      render: (_, record) => {
+        let color = 'default';
+        let icon = null;
+        if(record.preferred_contact === 'whatsapp') { color = 'green'; icon = <WhatsAppOutlined />; }
+        if(record.preferred_contact === 'phone') { color = 'blue'; icon = <PhoneOutlined />; }
+        if(record.preferred_contact === 'email') { color = 'purple'; icon = <MailOutlined />; }
+
+        return (
+          <Tag color={color} icon={icon} className="capitalize px-3 py-1 rounded-full">
+            {record.preferred_contact || 'Any'}
+          </Tag>
+        );
+      }
     },
     {
       title: 'Status',
       render: (_, record) => {
-        const config = statusConfig[record.status];
-        return <Tag icon={config.icon} color={config.color}>{config.label}</Tag>;
+        const config = statusConfig[record.status] || statusConfig.submit;
+        return (
+            <Tag icon={config.icon} color={config.color} style={{ padding: '4px 10px', fontSize: '13px' }}>
+                {config.label}
+            </Tag>
+        );
       }
     },
     {
       title: 'Actions',
+      align: 'center',
       render: (_, record) => (
         <Space>
-          <Button
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => {
-              setSelectedEnquiry(record);
-              setDrawerVisible(true);
-            }}
-          >
-            View
-          </Button>
+          <Tooltip title="View Details">
+            <Button
+              shape="circle"
+              icon={<EyeOutlined style={{ color: THEME.primary }} />}
+              style={{ borderColor: THEME.primary }}
+              onClick={() => {
+                setSelectedEnquiry(record);
+                setDrawerVisible(true);
+              }}
+            />
+          </Tooltip>
 
           {record.status === 'submit' && (
-            <Button
-              type="primary"
-              size="small"
-              icon={<CheckCircleOutlined />}
-              onClick={() => markAsContacted(record._id)}
-            >
-              Mark Contacted
-            </Button>
+            <Tooltip title="Mark as Contacted">
+                <Button
+                shape="circle"
+                type="primary"
+                ghost
+                icon={<CheckCircleOutlined />}
+                onClick={() => markAsContacted(record._id)}
+                />
+            </Tooltip>
           )}
 
-          <Button
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => softDelete(record._id)}
-          />
+          <Tooltip title="Delete">
+            <Button
+                shape="circle"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => softDelete(record._id)}
+            />
+          </Tooltip>
         </Space>
       )
     }
@@ -181,7 +222,7 @@ const Enquiry = () => {
       label: (
         <span>
           {statusConfig.submit.icon} New Submissions
-          <Badge count={enquiries.filter(e => e.status === 'submit').length} style={{ marginLeft: 8, backgroundColor: '#fa8c16' }} />
+          <Badge count={pagination.totalItems} style={{ marginLeft: 8, backgroundColor: '#fa8c16' }} />
         </span>
       )
     },
@@ -189,8 +230,7 @@ const Enquiry = () => {
       key: 'contacted',
       label: (
         <span>
-          {statusConfig.contacted.icon} Contacted
-          <Badge count={enquiries.filter(e => e.status === 'contacted').length} style={{ marginLeft: 8, backgroundColor: '#52c41a' }} />
+          {statusConfig.contacted.icon} Contacted History
         </span>
       )
     }
@@ -198,44 +238,62 @@ const Enquiry = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      
+      {/* 1. Header & Stats */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Website Enquiries</h1>
-        <p className="text-gray-600 mt-1">All contact form submissions from your website</p>
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Website Enquiries</h1>
+        
+        <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+                    <Statistic 
+                        title="Total Active Enquiries" 
+                        value={pagination.totalItems} 
+                        prefix={<MessageOutlined style={{ color: THEME.primary }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={12}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.warning }}>
+                    <Statistic 
+                        title="Pending Response" 
+                        value={pagination.totalItems} // Note: Ideally filter for 'submit' count specifically if API allows
+                        prefix={<ClockCircleOutlined style={{ color: THEME.warning }} />} 
+                    />
+                </Card>
+            </Col>
+        </Row>
       </div>
 
-      {activeTab === 'submit' && enquiries.some(e => e.status === 'submit') && (
-        <Alert
-          className="mb-6"
-          message={
-            <div className="flex items-center">
-              <BellOutlined className="mr-2 text-xl" />
-              <strong>{enquiries.filter(e => e.status === 'submit').length} new enquiry(ies) waiting!</strong>
-            </div>
-          }
-          type="warning"
-          showIcon
-        />
-      )}
-
-      <Card className="mb-6">
-        <Row gutter={16} align="middle">
-          <Col flex="auto">
-            <Input.Search
-              placeholder="Search by name, email, mobile..."
-              allowClear
-              size="large"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onSearch={handleSearch}
+      {/* 2. Main Content */}
+      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
+        
+        {/* Search Bar */}
+        <div className="p-4 border-b border-gray-100 bg-white rounded-t-lg">
+            <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder="Search by name, email, or mobile number..."
+                allowClear
+                size="large"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onPressEnter={handleSearch}
+                style={{ maxWidth: 400 }}
+                className="rounded-md"
             />
-          </Col>
-        </Row>
-      </Card>
+        </div>
 
-      <Card>
-        <Tabs activeKey={activeTab} onChange={handleTabChange} items={tabItems} type="card" />
+        {/* Tabs & Table */}
+        <Tabs 
+            activeKey={activeTab} 
+            onChange={handleTabChange} 
+            items={tabItems} 
+            type="card" 
+            size="large"
+            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
+        />
 
-        <div className="mt-6">
+        <div className="p-0">
           <CustomTable
             columns={columns}
             data={enquiries}
@@ -248,66 +306,84 @@ const Enquiry = () => {
         </div>
       </Card>
 
-      {/* Fixed Drawer - This was the main error */}
+      {/* 3. Detail Drawer */}
       <Drawer
-        title="Enquiry Details"
+        title={
+            <div className="flex items-center gap-2">
+                <SolutionOutlined style={{ color: THEME.primary }} />
+                <span>Enquiry Details</span>
+            </div>
+        }
         placement="right"
-        width={600}
+        width={500}
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
+        destroyOnClose
+        bodyStyle={{ backgroundColor: '#f9fafb' }}
       >
         {selectedEnquiry && (
           <div className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <Avatar size={64} icon={<UserOutlined />} />
-              <div>
-                <h3 className="text-2xl font-bold">{selectedEnquiry.full_name}</h3>
-                <p className="text-gray-500">
-                  Submitted on {new Date(selectedEnquiry.createdAt).toLocaleString()}
-                </p>
-              </div>
-            </div>
-
-            <Descriptions bordered column={1} size="middle">
-              <Descriptions.Item label="Email">
-                <Space><MailOutlined /> {selectedEnquiry.email}</Space>
-              </Descriptions.Item>
-              <Descriptions.Item label="Mobile">
-                <Space><PhoneOutlined /> {selectedEnquiry.mobile?.country_code} {selectedEnquiry.mobile?.number}</Space>
-              </Descriptions.Item>
-              <Descriptions.Item label="Preferred Contact">
-                <Tag>
-                  {selectedEnquiry.preferred_contact === 'whatsapp' && 'WhatsApp'}
-                  {selectedEnquiry.preferred_contact === 'phone' && 'Phone Call'}
-                  {selectedEnquiry.preferred_contact === 'email' && 'Email'}
-                </Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="Status">
-                <Tag icon={statusConfig[selectedEnquiry.status].icon} color={statusConfig[selectedEnquiry.status].color}>
-                  {statusConfig[selectedEnquiry.status].label}
-                </Tag>
-              </Descriptions.Item>
-            </Descriptions>
-
-            <Card title={<span><MessageOutlined /> Customer Message</span>}>
-              <p className="text-gray-700 whitespace-pre-wrap text-base">
-                {selectedEnquiry.message || 'No message provided.'}
-              </p>
+            
+            {/* Header Card */}
+            <Card bordered={false} className="shadow-sm">
+                <div className="flex items-center gap-4">
+                    <Avatar size={64} style={{ backgroundColor: THEME.primary }} icon={<UserOutlined />} />
+                    <div>
+                        <h3 className="text-xl font-bold m-0">{selectedEnquiry.full_name || `${selectedEnquiry.name?.first_name}`}</h3>
+                        <div className="mt-2">
+                            <Tag color={statusConfig[selectedEnquiry.status].color}>
+                                {statusConfig[selectedEnquiry.status].label}
+                            </Tag>
+                        </div>
+                        <div className="text-gray-400 text-xs mt-1">
+                            Submitted: {new Date(selectedEnquiry.createdAt).toLocaleString()}
+                        </div>
+                    </div>
+                </div>
             </Card>
 
+            {/* Contact Info */}
+            <Card title="Contact Information" size="small" bordered={false} className="shadow-sm">
+                <Descriptions column={1} bordered size="small">
+                    <Descriptions.Item label={<span className="text-gray-500"><MailOutlined/> Email</span>}>
+                        <a href={`mailto:${selectedEnquiry.email}`} className="text-blue-600">{selectedEnquiry.email}</a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label={<span className="text-gray-500"><PhoneOutlined/> Mobile</span>}>
+                        <a href={`tel:${selectedEnquiry.mobile?.country_code}${selectedEnquiry.mobile?.number}`} className="text-blue-600">
+                            {selectedEnquiry.mobile?.country_code} {selectedEnquiry.mobile?.number}
+                        </a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label={<span className="text-gray-500"><BellOutlined/> Preference</span>}>
+                        {selectedEnquiry.preferred_contact?.toUpperCase()}
+                    </Descriptions.Item>
+                </Descriptions>
+            </Card>
+
+            {/* Message Box */}
+            <Card title="Message from Customer" size="small" bordered={false} className="shadow-sm">
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 italic">
+                    <MessageOutlined className="mr-2 text-gray-400" />
+                    "{selectedEnquiry.message || 'No additional message provided.'}"
+                </div>
+            </Card>
+
+            {/* Actions Footer */}
             {selectedEnquiry.status === 'submit' && (
-              <Button
-                type="primary"
-                size="large"
-                block
-                icon={<CheckCircleOutlined />}
-                onClick={() => {
-                  markAsContacted(selectedEnquiry._id);
-                  setDrawerVisible(false);
-                }}
-              >
-                Mark as Contacted
-              </Button>
+                <div className="mt-8 pt-4 border-t border-gray-200">
+                    <Button
+                        type="primary"
+                        size="large"
+                        block
+                        icon={<CheckCircleOutlined />}
+                        style={{ backgroundColor: THEME.success, borderColor: THEME.success }}
+                        onClick={() => markAsContacted(selectedEnquiry._id)}
+                    >
+                        Mark as Contacted
+                    </Button>
+                    <div className="text-center text-xs text-gray-400 mt-2">
+                        This will move the enquiry to the 'Contacted' tab.
+                    </div>
+                </div>
             )}
           </div>
         )}

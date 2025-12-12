@@ -12,6 +12,12 @@ import {
   Popconfirm,
   Tooltip,
   Tag,
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Badge,
+  Divider
 } from 'antd';
 import {
   PlusOutlined,
@@ -19,14 +25,28 @@ import {
   DeleteOutlined,
   ReloadOutlined,
   UndoOutlined,
+  PercentageOutlined,
+  FileProtectOutlined,
+  CheckCircleOutlined,
+  StopOutlined
 } from '@ant-design/icons';
-import CustomTable from '../custom/CustomTable';
+import CustomTable from '../../pages/custom/CustomTable';
 import { apiService } from '../../../../manageApi/utils/custom.apiservice';
 import { showToast } from '../../../../manageApi/utils/toast';
 import { showConfirmDialog, showSuccessAlert, showErrorAlert } from '../../../../manageApi/utils/sweetAlert';
 import { useForm, Controller } from 'react-hook-form';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
+
+// --- THEME CONFIGURATION ---
+const THEME = {
+  primary: "#722ed1", // Purple
+  secondary: "#1890ff", // Blue
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
+};
 
 const Tax = () => {
   const { token } = useSelector((state) => state.auth);
@@ -56,58 +76,64 @@ const Tax = () => {
     fetchTaxes();
   }, [token]);
 
-const fetchTaxes = async (page = 1, itemsPerPage = 10, filters = {}) => {
-  setLoading(true);
-  try {
-    const params = { page, limit: itemsPerPage };
-
-    // Ensure correct mapping for status filter (1, 0, or skip)
-    if (filters.status !== undefined && filters.status !== null && filters.status !== '') {
-      params.status = Number(filters.status); // Convert string/boolean to 0 or 1
-    }
-
-    const response = await apiService.get('/setting/tax', params);
-
-    setTaxes(response.taxes || []);
-    setPagination({
-      currentPage: response.pagination.currentPage || 1,
-      totalPages: response.pagination.totalPages || 1,
-      totalResults: response.pagination.totalRecords || 0,
-      itemsPerPage: response.pagination.perPage || 10,
-    });
-  } catch (error) {
-    console.error('Fetch taxes error:', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleFilter = (newFilters) => {
-  console.log('Applied filters:', newFilters);
-
-  // If filter is cleared, reset everything
-  if (!newFilters || Object.keys(newFilters).length === 0 || newFilters.status === undefined || newFilters.status === '') {
-    setFilters({});
-    fetchTaxes(1, pagination.itemsPerPage, {});
-  } else {
-    // Convert boolean or string to number (0 or 1)
-    const formattedFilters = {
-      ...newFilters,
-      status: newFilters.status === true || newFilters.status === '1' ? 1
-        : newFilters.status === false || newFilters.status === '0' ? 0
-        : undefined,
+  // --- STATS CALCULATION ---
+  const stats = useMemo(() => {
+    const activeCount = taxes.filter(t => t.status === 1).length;
+    const avgRate = taxes.length > 0 
+      ? (taxes.reduce((acc, curr) => acc + curr.rate, 0) / taxes.length).toFixed(1) 
+      : 0;
+    return {
+      total: pagination.totalResults,
+      active: activeCount,
+      avgRate: avgRate
     };
+  }, [taxes, pagination.totalResults]);
 
-    setFilters(formattedFilters);
-    fetchTaxes(1, pagination.itemsPerPage, formattedFilters);
-  }
-};
+  const fetchTaxes = async (page = 1, itemsPerPage = 10, filters = {}) => {
+    setLoading(true);
+    try {
+      const params = { page, limit: itemsPerPage };
 
+      if (filters.status !== undefined && filters.status !== null && filters.status !== '') {
+        params.status = Number(filters.status);
+      }
+
+      const response = await apiService.get('/setting/tax', params);
+
+      setTaxes(response.taxes || []);
+      setPagination({
+        currentPage: response.pagination.currentPage || 1,
+        totalPages: response.pagination.totalPages || 1,
+        totalResults: response.pagination.totalRecords || 0,
+        itemsPerPage: response.pagination.perPage || 10,
+      });
+    } catch (error) {
+      console.error('Fetch taxes error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilter = (newFilters) => {
+    if (!newFilters || Object.keys(newFilters).length === 0 || newFilters.status === undefined || newFilters.status === '') {
+      setFilters({});
+      fetchTaxes(1, pagination.itemsPerPage, {});
+    } else {
+      const formattedFilters = {
+        ...newFilters,
+        status: newFilters.status === true || newFilters.status === '1' ? 1
+          : newFilters.status === false || newFilters.status === '0' ? 0
+          : undefined,
+      };
+
+      setFilters(formattedFilters);
+      fetchTaxes(1, pagination.itemsPerPage, formattedFilters);
+    }
+  };
 
   const handlePageChange = (page, itemsPerPage) => {
     fetchTaxes(page, itemsPerPage, filters);
   };
-
 
   const openEditTax = (tax) => {
     setEditingTax(tax);
@@ -224,14 +250,17 @@ const handleFilter = (newFilters) => {
         key: 'taxName',
         title: 'Tax Name',
         sortable: true,
-        filterable: false,
-        render: (value) => <span className="font-medium text-gray-900">{value}</span>,
+        render: (value) => <span className="font-semibold text-gray-800">{value}</span>,
       },
       {
         key: 'rate',
-        title: 'Rate (%)',
+        title: 'Rate',
         sortable: true,
-        render: (value) => <span className="text-gray-900">{value.toFixed(2)}%</span>,
+        render: (value) => (
+            <Tag color="purple" style={{ fontSize: '13px' }}>
+                {value.toFixed(2)}%
+            </Tag>
+        ),
       },
       {
         key: 'status',
@@ -244,7 +273,10 @@ const handleFilter = (newFilters) => {
           { value: 0, label: 'Inactive' },
         ],
         render: (value) => (
-          <Tag color={value === 1 ? 'green' : 'red'}>{value === 1 ? 'Active' : 'Inactive'}</Tag>
+          <Badge 
+            status={value === 1 ? 'success' : 'error'} 
+            text={value === 1 ? 'Active' : 'Inactive'} 
+          />
         ),
       },
       {
@@ -252,49 +284,58 @@ const handleFilter = (newFilters) => {
         title: 'Created At',
         sortable: true,
         render: (value) => (
-          <span className="text-gray-900">{value ? new Date(value).toLocaleDateString() : '--'}</span>
+          <span className="text-gray-500 text-xs">{value ? new Date(value).toLocaleDateString() : '--'}</span>
         ),
       },
       {
         key: 'actions',
         title: 'Actions',
+        align: 'center',
         render: (value, record) => (
           <Space size="small">
             <Tooltip title="Edit">
               <Button
-                type="link"
-                icon={<EditOutlined />}
+                size="small"
+                shape="circle"
+                icon={<EditOutlined style={{ color: THEME.primary }} />}
+                style={{ borderColor: THEME.primary }}
                 onClick={() => openEditTax(record)}
               />
             </Tooltip>
             {record.status === 1 ? (
               <Popconfirm
-                title="Are you sure to soft delete this tax?"
+                title="Soft Delete"
+                description="Mark as inactive?"
                 onConfirm={() => handleSoftDeleteTax(record._id)}
                 okText="Yes"
                 cancelText="No"
               >
-                <Button type="link" icon={<DeleteOutlined />} danger />
+                <Button size="small" shape="circle" icon={<DeleteOutlined />} danger />
               </Popconfirm>
             ) : (
-              <>
-                <Popconfirm
-                  title="Are you sure to restore this tax?"
-                  onConfirm={() => handleRestoreTax(record._id)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button type="link" icon={<UndoOutlined />} />
-                </Popconfirm>
-                <Popconfirm
-                  title="Are you sure to permanently delete this tax?"
-                  onConfirm={() => handlePermanentDeleteTax(record._id)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button type="link" icon={<DeleteOutlined />} danger />
-                </Popconfirm>
-              </>
+              <Space size={2}>
+                <Tooltip title="Restore">
+                    <Popconfirm
+                        title="Restore Tax"
+                        onConfirm={() => handleRestoreTax(record._id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button size="small" shape="circle" icon={<UndoOutlined />} className="text-green-600 border-green-600" />
+                    </Popconfirm>
+                </Tooltip>
+                <Tooltip title="Delete Forever">
+                    <Popconfirm
+                        title="Permanent Delete"
+                        description="Cannot be undone."
+                        onConfirm={() => handlePermanentDeleteTax(record._id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button size="small" shape="circle" icon={<DeleteOutlined />} danger type="primary" />
+                    </Popconfirm>
+                </Tooltip>
+              </Space>
             )}
           </Space>
         ),
@@ -304,117 +345,198 @@ const handleFilter = (newFilters) => {
   );
 
   return (
-    <div className="min-h-screen ">
-      <div className="flex justify-between items-center mb-6">
-        <Title level={3} style={{ margin: 0, color: '#1f2937' }}>
-          Tax Management
-        </Title>
-        <Space>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setEditingTax(null);
-              reset();
-              setIsModalOpen(true);
-            }}
-            size="large"
-          >
-            Add Tax
-          </Button>
-          <Button
-            type="default"
-            icon={<ReloadOutlined />}
-            onClick={() => fetchTaxes(pagination.currentPage, pagination.itemsPerPage, filters)}
-            size="large"
-          >
-            Refresh
-          </Button>
-        </Space>
+    <div className="min-h-screen p-6 bg-gray-50">
+      
+      {/* 1. Header & Stats */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-6">
+            <div>
+                <Title level={3} style={{ margin: 0 }}>Tax Rules</Title>
+                <Text type="secondary">Configure tax rates for invoices and products.</Text>
+            </div>
+            <Space>
+                <Button
+                    icon={<ReloadOutlined />}
+                    onClick={() => fetchTaxes(pagination.currentPage, pagination.itemsPerPage, filters)}
+                    size="large"
+                >
+                    Refresh
+                </Button>
+                <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                        setEditingTax(null);
+                        reset();
+                        setIsModalOpen(true);
+                    }}
+                    size="large"
+                    style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+                >
+                    Add Tax
+                </Button>
+            </Space>
+        </div>
+
+        <Row gutter={[16, 16]}>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+                    <Statistic 
+                        title="Total Tax Rules" 
+                        value={stats.total} 
+                        prefix={<FileProtectOutlined style={{ color: THEME.primary }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.success }}>
+                    <Statistic 
+                        title="Active Rules" 
+                        value={stats.active} 
+                        prefix={<CheckCircleOutlined style={{ color: THEME.success }} />} 
+                    />
+                </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.warning }}>
+                    <Statistic 
+                        title="Average Rate" 
+                        value={stats.avgRate} 
+                        suffix="%"
+                        prefix={<PercentageOutlined style={{ color: THEME.warning }} />} 
+                    />
+                </Card>
+            </Col>
+        </Row>
       </div>
 
-      <CustomTable
-        columns={columns}
-        data={taxes}
-        totalItems={pagination.totalResults}
-        currentPage={pagination.currentPage}
-        itemsPerPage={pagination.itemsPerPage}
-        onPageChange={handlePageChange}
-        onFilter={handleFilter}
-        loading={loading}
-      />
+      {/* 2. Main Table Card */}
+      <Card 
+        bordered={false} 
+        className="shadow-md rounded-lg"
+        bodyStyle={{ padding: 0 }}
+      >
+        <div className="p-4 border-b border-gray-100 flex items-center gap-2">
+            <PercentageOutlined style={{ fontSize: '20px', color: THEME.primary }} />
+            <span className="font-semibold text-lg text-gray-700">Tax Rates List</span>
+        </div>
+        <CustomTable
+            columns={columns}
+            data={taxes}
+            totalItems={pagination.totalResults}
+            currentPage={pagination.currentPage}
+            itemsPerPage={pagination.itemsPerPage}
+            onPageChange={handlePageChange}
+            onFilter={handleFilter}
+            loading={loading}
+        />
+      </Card>
 
+      {/* 3. Modal */}
       <Modal
-        title={editingTax ? 'Edit Tax' : 'Add New Tax'}
+        title={
+            <div className="flex items-center gap-2 text-purple-800">
+                {editingTax ? <EditOutlined /> : <PlusOutlined />}
+                {editingTax ? 'Edit Tax Rule' : 'Add New Tax Rule'}
+            </div>
+        }
         open={isModalOpen}
         onCancel={handleCancel}
         footer={null}
         destroyOnClose
         maskClosable={false}
-        width={600}
-        className="rounded-lg"
+        width={500}
       >
+        <Divider className="my-3" />
         <Form layout="vertical" onFinish={handleSubmit(handleSaveTax)} className="mt-4">
-          <Controller
-            name="taxName"
-            control={control}
-            rules={{
-              required: 'Please input the tax name!',
-              maxLength: { value: 50, message: 'Tax name cannot exceed 50 characters' },
-              pattern: {
-                value: /^[a-zA-Z0-9\s\-&]+$/,
-                message: 'Tax name can only contain letters, numbers, spaces, hyphens, and ampersands',
-              },
-            }}
-            render={({ field }) => (
-              <Form.Item
-                label="Tax Name"
-                validateStatus={formErrors.taxName ? 'error' : ''}
-                help={formErrors.taxName?.message}
-              >
-                <Input {...field} placeholder="Enter tax name" />
-              </Form.Item>
-            )}
-          />
-          <Controller
-            name="rate"
-            control={control}
-            rules={{
-              required: 'Please input the tax rate!',
-              validate: (value) =>
-                parseFloat(value) >= 0 && parseFloat(value) <= 100
-                  ? true
-                  : 'Tax rate must be between 0 and 100',
-            }}
-            render={({ field }) => (
-              <Form.Item
-                label="Rate (%)"
-                validateStatus={formErrors.rate ? 'error' : ''}
-                help={formErrors.rate?.message}
-              >
-                <Input {...field} type="number" step="0.01" placeholder="Enter tax rate" />
-              </Form.Item>
-            )}
-          />
-          <Controller
-            name="status"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <Form.Item label="Status">
-                <Switch
-                  checked={value}
-                  onChange={onChange}
-                  checkedChildren="Active"
-                  unCheckedChildren="Inactive"
+          <Row gutter={16}>
+             <Col span={12}>
+                <Controller
+                    name="taxName"
+                    control={control}
+                    rules={{
+                    required: 'Please input the tax name!',
+                    maxLength: { value: 50, message: 'Tax name cannot exceed 50 characters' },
+                    pattern: {
+                        value: /^[a-zA-Z0-9\s\-&]+$/,
+                        message: 'Letters, numbers, spaces, hyphens only',
+                    },
+                    }}
+                    render={({ field }) => (
+                    <Form.Item
+                        label="Tax Name"
+                        required
+                        validateStatus={formErrors.taxName ? 'error' : ''}
+                        help={formErrors.taxName?.message}
+                    >
+                        <Input {...field} placeholder="e.g. VAT, GST" size="large" />
+                    </Form.Item>
+                    )}
                 />
-              </Form.Item>
-            )}
-          />
-          <Form.Item className="text-right">
+             </Col>
+             <Col span={12}>
+                <Controller
+                    name="rate"
+                    control={control}
+                    rules={{
+                    required: 'Please input the tax rate!',
+                    validate: (value) =>
+                        parseFloat(value) >= 0 && parseFloat(value) <= 100
+                        ? true
+                        : 'Rate must be between 0 and 100',
+                    }}
+                    render={({ field }) => (
+                    <Form.Item
+                        label="Rate (%)"
+                        required
+                        validateStatus={formErrors.rate ? 'error' : ''}
+                        help={formErrors.rate?.message}
+                    >
+                        <Input 
+                            {...field} 
+                            type="number" 
+                            step="0.01" 
+                            placeholder="0.00" 
+                            size="large" 
+                            suffix="%" 
+                        />
+                    </Form.Item>
+                    )}
+                />
+             </Col>
+          </Row>
+
+          <div className="bg-gray-50 p-4 rounded-lg mt-2 border border-gray-100">
+              <Controller
+                name="status"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <Form.Item label="Status" style={{ marginBottom: 0 }}>
+                    <div className="flex items-center gap-2">
+                        <Switch
+                            checked={value}
+                            onChange={onChange}
+                            checkedChildren="Active"
+                            unCheckedChildren="Inactive"
+                        />
+                        <span className="text-xs text-gray-500">Enable or disable this tax rule</span>
+                    </div>
+                  </Form.Item>
+                )}
+              />
+          </div>
+
+          <Form.Item className="text-right mt-6 mb-0">
             <Space>
-              <Button onClick={handleCancel}>Cancel</Button>
-              <Button type="primary" htmlType="submit" loading={submitting}>
-                {editingTax ? 'Update' : 'Add'}
+              <Button onClick={handleCancel} size="large">Cancel</Button>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={submitting}
+                size="large"
+                style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+              >
+                {editingTax ? 'Update Tax' : 'Create Tax'}
               </Button>
             </Space>
           </Form.Item>
