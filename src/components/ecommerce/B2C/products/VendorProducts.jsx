@@ -1,450 +1,337 @@
+// src/pages/vendor/VendorProducts.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiRefreshCw, FiEye, FiShoppingBag, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { Button, Spin, Tag, Empty } from 'antd';
+import { FiPlus, FiRefreshCw, FiEye, FiShoppingBag, FiSearch, FiEdit,FiClock ,FiX , FiTrash2 ,FiCheck } from 'react-icons/fi';
+import { Button, Tag, Input, Tabs, Card, Statistic, Row, Col, Badge, Space, Tooltip, Avatar, Typography } from 'antd';
+import CustomTable from '../../../CMS/pages/custom/CustomTable';
 import { apiService } from '../../../../manageApi/utils/custom.apiservice';
 import { showToast } from '../../../../manageApi/utils/toast';
-import CustomTable from '../../../CMS/pages/custom/CustomTable';
-import { useDeepCompareEffect } from 'react-use'; // For deep comparison of objects
+import { format } from 'date-fns';
+
+const { Title, Text } = Typography;
+
+// --- THEME ---
+const THEME = {
+  primary: "#722ed1",
+  secondary: "#1890ff",
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
+};
+
+// --- ROLE MAPPING (for dynamic links) ---
+const ROLE_SLUG_MAP = {
+  0: "superadmin",
+  1: "admin",
+  5: "vendor-b2c",
+  6: "vendor-b2b",
+  7: "freelancer",
+  11: "accountant",
+};
 
 const VendorProducts = () => {
-  const { user, token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  
+  // Dynamic role slug for links
+  const roleSlug = ROLE_SLUG_MAP[user?.role?.code] ?? "dashboard";
+  
+  // State
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('all');
   const [pagination, setPagination] = useState({
-    current_page: 1,
-    total_pages: 1,
-    total_results: 0,
-    items_per_page: 10,
+    currentPage: 1,
+    itemsPerPage: 10,
+    totalResults: 0,
+    totalPages: 1
   });
   
-  const ROUTES = {
-  SELLER_ADD_PRODUCT: '/dashboard/vendor-b2c/products/add',
-  SELLER_PRODUCT_REVIEW: '/dashboard/vendor-b2c/products/view',
-  SELLER_PRODUCT_INVENTORY: 'dashboard/b2c/product/inventory',
-};
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
     approved: 0,
-    rejected: 0,
+    rejected: 0
   });
-  const [activeTab, setActiveTab] = useState('all');
-  const [filters, setFilters] = useState({
-    verification_status: '',
-    search: '',
-    category_id: '',
-    date_filter: '',
-  });
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
 
-  // Fetch categories
-  const fetchCategories = async () => {
-    setCategoriesLoading(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // --- FETCH DATA ---
+  const fetchProducts = useCallback(async (page = 1, limit = 10, status = activeTab) => {
+    setLoading(true);
     try {
-      const response = await apiService.get('/categories');
-      setCategories(response.categories || []);
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-      setCategories([]);
-    } finally {
-      setCategoriesLoading(false);
-    }
-  };
+      // Build query params
+      const params = {
+        page,
+        limit,
+        search: searchTerm || undefined,
+      };
 
-  // Fetch stats
-  const fetchStats = async () => {
-    try {
-      const [totalRes, pendingRes, approvedRes, rejectedRes] = await Promise.all([
-        apiService.get('/products', { vendor_id: user.id, limit: 1 }),
-        apiService.get('/products', { vendor_id: user.id, verification_status: 'pending', limit: 1 }),
-        apiService.get('/products', { vendor_id: user.id, verification_status: 'approved', limit: 1 }),
-        apiService.get('/products', { vendor_id: user.id, verification_status: 'rejected', limit: 1 }),
-      ]);
-      setStats({
-        total: totalRes.pagination?.total || 0,
-        pending: pendingRes.pagination?.total || 0,
-        approved: approvedRes.pagination?.total || 0,
-        rejected: rejectedRes.pagination?.total || 0,
-      });
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
-    }
-  };
-
-  // Fetch products
-  const fetchProducts = useCallback(
-    async (page = 1, itemsPerPage = 10, filters = {}) => {
-      setLoading(true);
-      try {
-        const params = {
-          page,
-          limit: itemsPerPage,
-          vendor_id: user.id,
-          verification_status: filters.verification_status || undefined,
-          search: filters.search || undefined,
-          category_id: filters.category_id || undefined,
-          date_filter: filters.date_filter || undefined,
-        };
-
-        const response = await apiService.get('/products', params);
-        setProducts(response.products || []);
-        setPagination({
-          current_page: response.pagination?.page || 1,
-          total_pages: Math.ceil((response.pagination?.total || 0) / (response.pagination?.limit || 10)),
-          total_results: response.pagination?.total || 0,
-          items_per_page: response.pagination?.limit || 10,
-        });
-      } catch (error) {
-        setProducts([]);
-      } finally {
-        setLoading(false);
+      // Map tabs to API verification_status param
+      // 'all' tab sends no status filter
+      if (status !== 'all') {
+          params.verification_status = status;
       }
-    },
-    [user.id]
-  );
 
-  // Fetch data
-  useDeepCompareEffect(() => {
-    if (user.id) {
-      fetchCategories();
-      fetchStats();
-      fetchProducts(pagination.current_page, pagination.items_per_page, filters);
+      // API call (Token is handled by interceptor)
+      const res = await apiService.get('/products/vendor/my-products', params);
+      
+      setProducts(res.products || []);
+      
+      setPagination({
+        currentPage: res.pagination?.currentPage || 1,
+        itemsPerPage: res.pagination?.perPage || 10,
+        totalResults: res.pagination?.totalRecords || 0,
+        totalPages: res.pagination?.totalPages || 1
+      });
+
+      // Update stats if provided in response (or calculate locally if needed)
+      // Assuming your API might return stats in future or separate call.
+      // For now, we update total based on 'all' tab fetch.
+      if (status === 'all' && res.pagination) {
+         setStats(prev => ({ ...prev, total: res.pagination.totalRecords }));
+      }
+
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to fetch products', 'error');
+      setProducts([]);
+    } finally {
+      setLoading(false);
     }
-  }, [user.id, refreshTrigger, fetchProducts, pagination.current_page, pagination.items_per_page, filters]);
+  }, [activeTab, searchTerm]);
 
-  // Handle tab change
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setFilters((prev) => ({
-      ...prev,
-      verification_status: tab === 'all' ? '' : tab,
-    }));
-    setPagination((prev) => ({ ...prev, current_page: 1 }));
+  // Initial Fetch & Tab Change
+  useEffect(() => {
+    fetchProducts(1, pagination.itemsPerPage, activeTab);
+  }, [activeTab, searchTerm]); // Fetch on tab or search change
+
+  // --- HANDLERS ---
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    setPagination(prev => ({ ...prev, currentPage: 1 })); // Reset to page 1
   };
 
-  // Handle page change
-  const handlePageChange = (page, itemsPerPage) => {
-    setPagination((prev) => ({ ...prev, current_page: page, items_per_page: itemsPerPage }));
-    fetchProducts(page, itemsPerPage, filters);
+  const handlePageChange = (page, pageSize) => {
+    fetchProducts(page, pageSize, activeTab);
   };
 
-  // Handle filter change
-  const handleFilter = (newFilters) => {
-    const updatedFilters = { ...filters, ...newFilters };
-    setFilters(updatedFilters);
-    setPagination((prev) => ({ ...prev, current_page: 1 }));
-    fetchProducts(1, pagination.items_per_page, updatedFilters);
-  };
-
-  // Handle refresh
   const handleRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1);
+    fetchProducts(pagination.currentPage, pagination.itemsPerPage, activeTab);
   };
 
-  // Handle row expansion
-  const onExpand = (expanded, record) => {
-    setExpandedRowKeys((prev) => (expanded ? [...prev, record._id] : prev.filter((id) => id !== record._id)));
-  };
-
-  // Expanded row render
-  const expandedRowRender = (item) => {
-    return (
-      <div className="p-4 bg-gray-50">
-        <h4 className="font-bold">Pricing Details</h4>
-        <p>Cost Price: {item.pricing?.cost_price || 'N/A'}</p>
-        <p>MRP: {item.pricing?.mrp || 'N/A'}</p>
-        <p>Sale Price: {item.pricing?.sale_price || item.pricing?.base_price || 'N/A'}</p>
-        <p>Currency: {item.pricing?.currency?.symbol || item.pricing?.currency?.code || 'N/A'}</p>
-        <p>
-          Discount:{' '}
-          {item.pricing?.discount?.value
-            ? `${item.pricing.discount.type === 'percentage' ? `${item.pricing.discount.value}%` : `${item.pricing.currency?.symbol || '₹'} ${item.pricing.discount.value}`} (Valid till ${new Date(item.pricing.discount.valid_till || Date.now()).toLocaleDateString('en-GB')})`
-            : 'None'}
-        </p>
-        <p>
-          Tax: {item.pricing?.tax?.rate || 0}% {item.pricing?.tax?.type || 'N/A'} (
-          {item.pricing?.tax?.inclusive ? 'Inclusive' : 'Exclusive'})
-        </p>
-
-        <h4 className="font-bold mt-4">Shipping</h4>
-        <p>Weight: {item.shipping?.weight || 'N/A'}</p>
-        <p>
-          Dimensions:{' '}
-          {item.shipping?.dimensions
-            ? `${item.shipping.dimensions.length} x ${item.shipping.dimensions.width} x ${item.shipping.dimensions.height}`
-            : 'N/A'}
-        </p>
-        <p>Free Shipping: {item.shipping?.free_shipping ? 'Yes' : 'No'}</p>
-
-        <h4 className="font-bold mt-4">SEO</h4>
-        <p>Meta Title: {item.seo?.meta_title || 'N/A'}</p>
-        <p>Meta Description: {item.seo?.meta_description || 'N/A'}</p>
-        <p>Keywords: {item.seo?.keywords?.join(', ') || 'N/A'}</p>
-
-        <h4 className="font-bold mt-4">Inventory</h4>
-        {item.inventory?.length ? (
-          <ul>
-            {item.inventory.map((inv, idx) => (
-              <li key={idx}>
-                SKU: {inv.sku}, Quantity: {inv.quantity}, Warehouse: {inv.warehouse || 'N/A'}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No inventory</p>
-        )}
-
-        <h4 className="font-bold mt-4">Documents</h4>
-        {Object.entries(item.documents || {}).map(([key, doc]) =>
-          doc ? (
-            <p key={key}>
-              {key.replace('_', ' ')}: {doc.path} (Verified: {doc.verified ? 'Yes' : 'No'})
-            </p>
-          ) : null
-        ) || <p>No documents</p>}
-
-        <h4 className="font-bold mt-4">Images</h4>
-        {item.color_variants?.flatMap((variant) => variant.images || []).map((img, idx) => (
-          <p key={idx}>
-            Position {img.position}: {img.url} (Alt: {img.alt_text || 'N/A'})
-          </p>
-        )) || <p>No images</p>}
-
-        <h4 className="font-bold mt-4">3D Model</h4>
-        {item.three_d_model ? (
-          <p>
-            {item.three_d_model.url} (Format: {item.three_d_model.format}, Alt:{' '}
-            {item.three_d_model.alt_text || 'N/A'})
-          </p>
-        ) : (
-          <p>No 3D model</p>
-        )}
-      </div>
-    );
-  };
-
-  // Table columns
-  const productColumns = [
+  // --- COLUMNS ---
+  const columns = [
     {
-      key: 'name',
-      title: 'Product Name',
-      sortable: true,
-      render: (value) => <span className="text-gray-900 font-medium">{value || '--'}</span>,
-    },
-    {
-      key: 'category',
-      title: 'Category',
-      sortable: true,
-      render: (value, item) => (
-        <span className="text-gray-900">{item.category?.name || '--'}</span>
-      ),
-    },
-    {
-      key: 'price',
-      title: 'Price',
-      sortable: true,
-      render: (value, item) => (
-        <span className="text-gray-900 font-medium">
-          {`${item.pricing?.currency?.symbol || '₹'} ${
-            (item.pricing?.sale_price || item.pricing?.base_price || 0).toFixed(2)
-          }`}
-        </span>
-      ),
-    },
-    {
-      key: 'discount',
-      title: 'Discount',
-      sortable: false,
-      render: (value, item) => (
-        <span className="text-gray-900">
-          {item.pricing?.discount?.value
-            ? `${item.pricing.discount.type === 'percentage' ? `${item.pricing.discount.value}%` : `${item.pricing.currency?.symbol || '₹'} ${item.pricing.discount.value}`} (Valid till ${new Date(item.pricing.discount.valid_till || Date.now()).toLocaleDateString('en-GB')})`
-            : '--'}
-        </span>
-      ),
-    },
-    {
-      key: 'status',
-      title: 'Status',
-      sortable: true,
-      render: (value, item) => {
-        const statusConfig = {
-          pending: { class: 'bg-amber-100 text-amber-800', text: 'Pending' },
-          approved: { class: 'bg-emerald-100 text-emerald-800', text: 'Approved' },
-          rejected: { class: 'bg-rose-100 text-rose-800', text: 'Rejected' },
-        };
-
-        const config = statusConfig[item.verification_status?.status] || statusConfig.pending;
-
-        return (
-          <div>
-            <Tag className={`px-3 py-1 text-sm font-medium rounded-full ${config.class}`}>
-              {config.text}
-            </Tag>
-            {item.verification_status?.status === 'rejected' &&
-              item.verification_status?.rejection_reason && (
-                <div className="text-sm text-gray-500 mt-1">
-                  Reason: {item.verification_status.rejection_reason}
-                </div>
-              )}
-          </div>
-        );
+      title: 'Product Info',
+      width: 300,
+      render: (_, r) => {
+          // Get primary image
+          const primaryImg = r.color_variants?.[0]?.images?.find(i => i.is_primary)?.url 
+                          || r.color_variants?.[0]?.images?.[0]?.url;
+          
+          return (
+            <div className="flex items-center gap-3">
+              <Avatar 
+                shape="square" 
+                size={50} 
+                src={primaryImg ? `http://localhost:5000/${primaryImg}` : null}
+                icon={<FiShoppingBag />}
+                style={{ backgroundColor: THEME.bgLight, color: THEME.primary }}
+              />
+              <div>
+                <div className="font-semibold text-gray-800">{r.name}</div>
+                <div className="text-xs text-gray-500">Code: {r.product_code}</div>
+                <div className="text-xs text-purple-600">{r.category?.name}</div>
+              </div>
+            </div>
+          )
       },
     },
     {
-      key: 'created_at',
-      title: 'Created At',
-      sortable: true,
-      render: (value) => (
-        <span className="text-gray-900">
-          {value ? new Date(value).toLocaleDateString('en-GB') : '--'}
-        </span>
-      ),
+      title: 'Pricing',
+      width: 150,
+      render: (_, r) => {
+          const price = r.pricing?.sale_price || r.pricing?.base_price || 0;
+          const currency = r.pricing?.currency?.symbol || "₹";
+          return (
+              <div>
+                  <div className="font-medium text-gray-700">
+                      {currency} {price.toFixed(2)}
+                  </div>
+                  {r.pricing?.discount?.value > 0 && (
+                      <div className="text-xs text-green-600">
+                          {r.pricing.discount.type === 'percentage' ? `${r.pricing.discount.value}% Off` : `-${r.pricing.discount.value}`}
+                      </div>
+                  )}
+              </div>
+          )
+      }
     },
     {
-      key: 'actions',
-      title: 'Actions',
-      render: (value, item) => (
-        <div className="flex space-x-3">
-          <Link
-            to={`${ROUTES.SELLER_PRODUCT_REVIEW}/${item._id}`}
-            className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-100"
-            title="View Details"
-          >
-            <FiEye className="text-lg" />
-          </Link>
-          {item.verification_status?.status === 'approved' && (
-            <Link
-              to={`${ROUTES.SELLER_PRODUCT_INVENTORY}/${item._id}`}
-              className="text-purple-600 hover:text-purple-800 p-2 rounded-full hover:bg-purple-100"
-              title="Manage Inventory"
-            >
-              <FiShoppingBag className="text-lg" />
-            </Link>
-          )}
-        </div>
-      ),
+      title: 'Stock',
+      width: 120,
+      render: (_, r) => (
+          <Tag color={r.stock?.total_available > 0 ? "green" : "red"}>
+              {r.stock?.total_available || 0} Available
+          </Tag>
+      )
     },
+    {
+      title: 'Status',
+      width: 140,
+      render: (_, r) => {
+          const status = r.verification_status?.status || 'pending';
+          const map = {
+              pending: { color: 'warning', text: 'Pending' },
+              approved: { color: 'success', text: 'Approved' },
+              rejected: { color: 'error', text: 'Rejected' }
+          };
+          const config = map[status] || map.pending;
+
+          return <Badge status={config.color} text={config.text} />;
+      }
+    },
+    {
+      title: 'Date',
+      width: 120,
+      render: (_, r) => <span className="text-gray-500 text-xs">{format(new Date(r.createdAt), 'dd MMM yyyy')}</span>
+    },
+    {
+      title: 'Actions',
+      fixed: 'right',
+      width: 150,
+      render: (_, r) => (
+        <Space>
+            <Tooltip title="View Details">
+                <Link to={`/dashboard/${roleSlug}/products/view?productId=${r._id}`}>
+                    <Button type="text" shape="circle" icon={<FiEye className="text-blue-600"/>} />
+                </Link>
+            </Tooltip>
+            
+            {/* Inventory Link - Only if Approved */}
+            {r.verification_status?.status === 'approved' && (
+                <Tooltip title="Manage Inventory">
+                    <Link to={`/dashboard/${roleSlug}/product/inventory/${r._id}`}>
+                        <Button type="text" shape="circle" icon={<FiShoppingBag className="text-purple-600"/>} />
+                    </Link>
+                </Tooltip>
+            )}
+
+            {/* Edit Link (If not rejected or specific logic) */}
+            <Tooltip title="Edit Product">
+                <Link to={`/dashboard/${roleSlug}/products/edit/${r._id}`}>
+                    <Button type="text" shape="circle" icon={<FiEdit className="text-gray-600"/>} />
+                </Link>
+            </Tooltip>
+        </Space>
+      )
+    }
+  ];
+
+  // --- TAB ITEMS ---
+  const tabItems = [
+      { key: 'all', label: 'All Products' },
+      { 
+          key: 'approved', 
+          label: (
+              <span>
+                 <FiCheck className="inline mr-1"/> Approved
+              </span>
+          )
+      },
+      { 
+          key: 'pending', 
+          label: (
+              <span>
+                 <FiClock className="inline mr-1"/> Pending
+              </span>
+          )
+      },
+      { 
+          key: 'rejected', 
+          label: (
+              <span>
+                 <FiX className="inline mr-1"/> Rejected
+              </span>
+          )
+      }
   ];
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Product Requests</h1>
-          <div className="flex items-center gap-4">
-            <Button
-              icon={<FiRefreshCw className={loading ? 'animate-spin' : ''} />}
-              onClick={handleRefresh}
-              className="text-blue-600 hover:text-blue-800"
-            >
-              Refresh
-            </Button>
-            <Link
-              to={ROUTES.SELLER_ADD_PRODUCT}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
-            >
-              <FiPlus className="text-lg" />
-              Add Product
+    <div className="p-6 bg-gray-50 min-h-screen">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+          <Title level={3} style={{ margin: 0 }}>My Products</Title>
+          <Text type="secondary">Manage your product catalog and inventory.</Text>
+        </div>
+        <Space>
+          
+            <Link to={`/dashboard/${roleSlug}/products/add`}>
+                <Button 
+                    type="primary" 
+                    icon={<FiPlus />} 
+                    size="large"
+                    style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+                >
+                    Add Product
+                </Button>
             </Link>
-          </div>
-        </div>
+        </Space>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="bg-white rounded-lg shadow-md mb-8">
-          <nav className="flex border-b border-gray-200">
-            {['all', 'pending', 'approved', 'rejected'].map((tab) => (
-              <Button
-                key={tab}
-                onClick={() => handleTabChange(tab)}
-                className={`flex-1 py-4 px-6 text-center font-semibold text-sm ${
-                  activeTab === tab
-                    ? 'bg-blue-100 text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)} Requests
-              </Button>
-            ))}
-          </nav>
-        </div>
+      {/* Stats Cards (Optional - using total count from pagination for now) */}
+      <Row gutter={[16, 16]} className="mb-6">
+         <Col xs={24} sm={8}>
+            <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+                <Statistic title="Total Products" value={pagination.totalResults} prefix={<FiShoppingBag />} />
+            </Card>
+         </Col>
+         {/* You can fetch detailed counts if API supports it */}
+      </Row>
 
-        {/* Stats Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[
-            { label: 'Total Products', value: stats.total, color: 'text-gray-900' },
-            { label: 'Pending', value: stats.pending, color: 'text-orange-600' },
-            { label: 'Approved', value: stats.approved, color: 'text-green-600' },
-            { label: 'Rejected', value: stats.rejected, color: 'text-red-600' },
-          ].map((stat, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow"
-            >
-              <div className="text-sm font-medium text-gray-500">{stat.label}</div>
-              <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
-            </div>
-          ))}
+      {/* Main Content */}
+      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
+        
+        {/* Filters & Search */}
+        <div className="p-4 border-b border-gray-100 flex flex-wrap gap-4 justify-between items-center bg-white rounded-t-lg">
+            <Tabs 
+                activeKey={activeTab} 
+                onChange={handleTabChange} 
+                items={tabItems} 
+                className="custom-tabs"
+                style={{ marginBottom: 0 }}
+            />
+            
+            <Input 
+                prefix={<FiSearch className="text-gray-400"/>}
+                placeholder="Search products..."
+                style={{ maxWidth: 300 }}
+                allowClear
+                size="large"
+                onPressEnter={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { if(!e.target.value) setSearchTerm('') }}
+            />
         </div>
 
         {/* Table */}
-        <div>
-          <CustomTable
-            columns={productColumns}
-            data={products}
-            totalItems={pagination.total_results}
-            currentPage={pagination.current_page}
-            itemsPerPage={pagination.items_per_page}
-            onPageChange={handlePageChange}
-            onFilter={handleFilter}
-            loading={loading}
-            filters={[
-              {
-                key: 'search',
-                type: 'text',
-                placeholder: 'Search by name or description...',
-                className: 'bg-gray-100 text-gray-800 placeholder-gray-400 border-none focus:ring-indigo-600',
-              },
-              {
-                key: 'category_id',
-                type: 'select',
-                placeholder: categoriesLoading ? 'Loading Categories...' : 'All Categories',
-                options: [
-                  { value: '', label: 'All Categories' },
-                  ...categories.map((cat) => ({ value: cat._id, label: cat.name })),
-                ],
-                disabled: categoriesLoading,
-                className: 'bg-gray-100 text-gray-800 border-none focus:ring-indigo-600',
-              },
-              {
-                key: 'date_filter',
-                type: 'select',
-                placeholder: 'All Dates',
-                options: [
-                  { value: '', label: 'All Dates' },
-                  { value: 'today', label: 'Today' },
-                  { value: 'week', label: 'Last Week' },
-                  { value: 'month', label: 'Last Month' },
-                  { value: 'new', label: 'Last 24 Hours' },
-                ],
-                className: 'bg-gray-100 text-gray-800 border-none focus:ring-indigo-600',
-              },
-            ]}
-            expandedRowRender={expandedRowRender}
-            expandedRowKeys={expandedRowKeys}
-            onExpand={onExpand}
-            locale={{
-              emptyText: <Empty description="No products found" />,
-            }}
-          />
+        <div className="p-0">
+            <CustomTable
+                columns={columns}
+                data={products}
+                loading={loading}
+                totalItems={pagination.totalResults}
+                currentPage={pagination.currentPage}
+                itemsPerPage={pagination.itemsPerPage}
+                onPageChange={handlePageChange}
+                scroll={{ x: 1000 }}
+            />
         </div>
-      </div>
+      </Card>
+
     </div>
   );
 };

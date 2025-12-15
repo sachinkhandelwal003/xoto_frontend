@@ -80,8 +80,8 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-left-shape border-none "></div>
-      <div className="absolute bottom-0 right-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-right-shape border-none"></div>
+      <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape border-none "></div>
+      <div className="absolute bottom-0 right-0 w-70 h-10  bg-[var(--color-body)] z-[5] clip-right-shape border-none"></div>
 
       {/* Custom clip paths */}
       <style>{`

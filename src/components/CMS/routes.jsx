@@ -52,6 +52,11 @@ import MasterCategory from "./pages/estimateMaster/MasterCategory";
 import Enquiry from "./pages/dashboardPages/consult/Enquiry";
 import PropertyLeads from "./pages/dashboardPages/consult/PropertyLeads";
 import UpdateProfilePage from "./pages/dashboardPages/updates/UpdateProfilepage";
+import Inventory from "../ecommerce/B2C/products/Inventory";
+import ManageWarehouses from "../ecommerce/setting/ManageWareHouses";
+import AddAttributes from "../ecommerce/B2C/products/AddAttributes";
+import AddTags from "../ecommerce/B2C/products/AddTags";
+import UpdateProduct from "../ecommerce/B2C/products/UpdateProduct";
 
 const roleSlugMap = {
   0: "superadmin",
@@ -107,6 +112,8 @@ const componentMap = {
   "estimate/master/categories":<MasterCategory/>,
   deals: <Leads />,
 bookings:<Bookings/>,
+warehouse:<ManageWarehouses/>,
+
   "property/leads":<PropertyLeads/>,
 
 enquiries:<Enquiry/>,
@@ -178,8 +185,13 @@ const CmsRoutes = () => {
 
       <Route path="myprofile" element={<MyProfile />} />
             <Route path="products" element={<ProductReview />} />
+      <Route path="attributes/add" element={<AddAttributes />} />
+      <Route path="tags/add" element={<AddTags />} />
 
-      <Route path="products/view/:id" element={<ProductProfile />} />
+      <Route path="products/view" element={<ProductProfile />} />
+             <Route path="products/edit/:id" element={<UpdateProduct />} />
+
+       <Route path="product/inventory/:id" element={<Inventory />} />
       <Route path="seller/:id" element={<VendorB2CProfile />} />
             <Route path="seller/product/:id" element={<ProductRequestB2C />} />
 <Route path="freelancer" element={<FreelancerProfile />} />

@@ -21,9 +21,6 @@ import {
   InputNumber
 } from "antd";
 import {
-  UserOutlined,
-  UploadOutlined,
-  SaveOutlined,
   ShopOutlined,
   BankOutlined,
   FileProtectOutlined,
@@ -31,7 +28,8 @@ import {
   ContactsOutlined,
   RocketOutlined,
   CheckCircleOutlined,
-  LoadingOutlined
+  UploadOutlined,
+  SaveOutlined
 } from "@ant-design/icons";
 import { apiService } from "../../../../../manageApi/utils/custom.apiservice";
 import { showToast } from "../../../../../manageApi/utils/toast";
@@ -102,7 +100,8 @@ const UpdateVendorProfile = () => {
           pan_number: data.registration?.pan_number,
           gstin: data.registration?.gstin,
           business_license_number: data.registration?.business_license_number,
-          shop_act_license_number: data.registration?.shop_act_license, // Note naming
+          // Note: shop_act_license_number is the text field, shop_act_license is the file field below
+          shop_act_license_number: data.registration?.shop_act_license, 
 
           // Bank Details
           bank_account_number: data.bank_details?.bank_account_number,
@@ -111,7 +110,7 @@ const UpdateVendorProfile = () => {
           bank_name: data.bank_details?.bank_name,
           branch_name: data.bank_details?.branch_name,
           upi_id: data.bank_details?.upi_id,
-          preferred_currency: data.bank_details?.preferred_currency, // ID
+          preferred_currency: data.bank_details?.preferred_currency,
 
           // Contacts
           primary_contact_name: data.contacts?.primary_contact?.name,
@@ -163,77 +162,55 @@ const UpdateVendorProfile = () => {
     }
   };
 
-  // --- HANDLERS ---
-
-  const handleUpload = async (info, fieldKey) => {
-     // Implement real upload logic here.
-     // For now, this is a placeholder showing success.
-     // In real scenario: const formData = new FormData(); formData.append('file', info.file); await api...
-     if(info.file.status === 'done') {
-         message.success(`${fieldKey} uploaded successfully`);
-     }
+  // --- HELPER FOR UPLOADS ---
+  // This ensures standard AntD file list format is passed to form state
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
   };
 
-  // Custom request to simulate/handle upload for Ant Design Upload
-  const dummyRequest = ({ file, onSuccess }) => {
-    setTimeout(() => {
-      onSuccess("ok");
-    }, 0);
-  };
-
+  // --- SUBMIT HANDLER ---
   const onFinish = async (values) => {
     setSaving(true);
     
-    // Create FormData for file uploads + text data
     const formData = new FormData();
 
-    // Append text fields
     Object.keys(values).forEach(key => {
-        if(key === 'categories' || key === 'delivery_modes') {
-            // Arrays need specific handling often (e.g. comma separated or multiple append)
-            // Based on your controller: vendor.store_details.categories = data.categories.split(",")
-            if(Array.isArray(values[key])) {
-                formData.append(key, values[key].join(',')); 
-            }
-        } else if (typeof values[key] === 'object' && values[key] !== null && !values[key].file) {
-             // Handle nested objects like social_links if they aren't flattened in form
-             // But here we flattened most fields.
-             // If social_links is object:
-             if(key === 'social_links') {
-                 Object.keys(values[key]).forEach(subKey => {
-                     formData.append(`social_links[${subKey}]`, values[key][subKey]);
-                 });
-             }
-        } else if(values[key] !== undefined && values[key] !== null && !values[key].file) {
-            formData.append(key, values[key]);
+        const value = values[key];
+
+        // 1. Handle File Uploads
+        // Ant Design returns files in an array (fileList) with an 'originFileObj' property
+        if (Array.isArray(value) && value.length > 0 && value[0].originFileObj) {
+            // Append the actual binary file
+            formData.append(key, value[0].originFileObj);
+        }
+        // 2. Handle standard Arrays (like Categories, Delivery Modes)
+        // If it's an array but NOT a file list
+        else if (Array.isArray(value) && (!value[0] || !value[0].originFileObj)) {
+            formData.append(key, value.join(',')); 
+        }
+        // 3. Handle Nested Objects (Social Links)
+        else if (key === 'social_links' && typeof value === 'object') {
+             Object.keys(value).forEach(subKey => {
+                 formData.append(`social_links[${subKey}]`, value[subKey]);
+             });
+        }
+        // 4. Handle Standard Text/Numbers
+        else if (value !== undefined && value !== null) {
+            formData.append(key, value);
         }
     });
 
-    // Append Files (Ant Design Upload puts file in values[key].file.originFileObj if raw)
-    // Adjust based on how you hook up the Upload component's onChange
-    
-    // Using direct file objects from state or form if managed manually is often easier with FormData
-    // Here assuming AntD Upload 'fileList' logic is handled separately or we grab from document.getElementById for native inputs
-    
-    // NOTE: For this example, we assume the backend handles the fields directly as sent in the JSON body 
-    // unless they are files. Your controller mixes req.body and req.files.
-    // If using 'formdata' mode in Postman/Axios:
-    
     try {
-      // For file uploads in AntD Form, we usually need to extract the File object
-      // Let's assume we are sending this as multipart/form-data
-      
-      // Explicitly append files if they exist in state/form
-      // Example: 
-      // if (logoFile) formData.append('logo', logoFile);
-
       const response = await apiService.put("/vendor/b2c/profile/update", formData, {
          headers: { "Content-Type": "multipart/form-data" }
       });
       
       if (response.success) {
         showToast("Profile updated successfully!", "success");
-        fetchProfile(); // Refresh data
+        fetchProfile(); // Refresh data to show new files
       }
     } catch (error) {
       showToast(error.response?.data?.message || "Update failed", "error");
@@ -262,7 +239,7 @@ const UpdateVendorProfile = () => {
              <Text type="secondary">
                 {vendorData?.name?.first_name} {vendorData?.name?.last_name} | {vendorData?.email}
              </Text>
-             <div className="mt-2">
+               <div className="mt-2">
                 <Badge 
                     status={
                         vendorData?.onboarding_status === 'approved' ? 'success' : 
@@ -439,7 +416,7 @@ const UpdateVendorProfile = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
-                                <Form.Item name="shop_act_license_number" label="Shop Act License">
+                                <Form.Item name="shop_act_license_number" label="Shop Act License (Number)">
                                     <Input />
                                 </Form.Item>
                             </Col>
@@ -539,7 +516,7 @@ const UpdateVendorProfile = () => {
                     </Card>
                 )}
 
-                {/* TAB: DOCUMENTS */}
+                {/* TAB: DOCUMENTS - FIXED UPLOAD LOGIC */}
                 {activeTab === 'documents' && (
                     <Card title="Document Uploads" className="shadow-sm rounded-lg">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -549,7 +526,7 @@ const UpdateVendorProfile = () => {
                                 { key: 'pan_card', label: 'PAN Card' },
                                 { key: 'gst_certificate', label: 'GST Certificate' },
                                 { key: 'cancelled_cheque', label: 'Cancelled Cheque' },
-                                { key: 'shop_act_license', label: 'Shop Act License' },
+                                { key: 'shop_act_license', label: 'Shop Act License (File)' },
                             ].map((doc) => (
                                 <div key={doc.key} className="border p-4 rounded-lg bg-gray-50">
                                     <Text strong>{doc.label}</Text>
@@ -572,16 +549,21 @@ const UpdateVendorProfile = () => {
                                             <div className="mb-2 text-xs text-red-400">Not Uploaded</div>
                                         )}
                                         
-                                        {/* Ant Design Upload - Manual Handling */}
-                                        <Form.Item name={doc.key} valuePropName="file" getValueFromEvent={(e) => e && e.file}>
+                                        {/* FIXED UPLOAD COMPONENT */}
+                                        <Form.Item 
+                                            name={doc.key} 
+                                            valuePropName="fileList" 
+                                            getValueFromEvent={normFile}
+                                            noStyle={false} // Ensure it renders properly
+                                        >
                                             <Upload 
                                                 name={doc.key}
-                                                customRequest={dummyRequest}
-                                                showUploadList={true}
+                                                beforeUpload={() => false} // IMPORTANT: Prevents auto-upload, allows manual submit
+                                                listType="text"
                                                 maxCount={1}
                                             >
                                                 <Button icon={<UploadOutlined />} block>
-                                                    Upload / Update
+                                                    Click to Upload
                                                 </Button>
                                             </Upload>
                                         </Form.Item>

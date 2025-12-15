@@ -1,43 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Form, 
-  Input, 
-  Select, 
-  Button, 
-  Steps, 
-  Card, 
-  Row, 
-  Col, 
+import {
+  Form,
+  Input,
+  Select,
+  Button,
+  Steps,
+  Card,
+  Row,
+  Col,
   Checkbox,
   Typography,
   message,
   Spin
 } from 'antd';
-import { 
-  UserOutlined, 
-  ShopOutlined, 
+import {
+  UserOutlined,
+  ShopOutlined,
   FileTextOutlined,
   CheckCircleOutlined,
   ArrowLeftOutlined,
   ArrowRightOutlined,
   SafetyOutlined,
-  CheckCircleFilled // Used for success screen
+  CheckCircleFilled
 } from '@ant-design/icons';
-import { apiService } from '../../../manageApi/utils/custom.apiservice'; // Ensure path is correct
+import { useForm, Controller } from 'react-hook-form';
+import { apiService } from '../../../manageApi/utils/custom.apiservice';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const SellerPage = () => {
-  const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false); // New Success State
-  
-  // Design Constants using your CSS Variable
+  const [success, setSuccess] = useState(false);
+  const [apiErrors, setApiErrors] = useState({});
+
   const themeColor = 'var(--color-primary)';
+
+  const {
+    control,
+    handleSubmit,
+    trigger,
+    setValue,
+    setError,
+    clearErrors,
+    formState: { errors }
+  } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      mobile: { country_code: '+91' }
+    }
+  });
 
   const businessTypes = [
     { label: 'Individual / Sole Proprietor', value: 'Individual / Sole Proprietor' },
@@ -63,10 +78,8 @@ const SellerPage = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await apiService.get('/categories'); // Adjusted to match apiService pattern
-      // Check if response is the data directly or if it has a data property (depends on your axios interceptor)
-      const categoryData = response.data || response; 
-      
+      const response = await apiService.get('/categories');
+      const categoryData = response.data || response;
       if (categoryData.categories) {
         const categoryOptions = categoryData.categories.map(category => ({
           label: category.parent ? `${category.name} (${category.parent.name})` : category.name,
@@ -76,346 +89,112 @@ const SellerPage = () => {
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      message.error('Failed to load categories');
     } finally {
       setLoading(false);
     }
   };
 
-  // --- STEPS COMPONENTS ---
-  
-  const Step1 = () => (
-    <>
-      <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
-        <UserOutlined style={{ color: themeColor }} /> Personal Information
-      </Title>
-      
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="First Name"
-            name="first_name"
-            rules={[{ required: true, message: 'Required' }]}
-          >
-            <Input size="large" placeholder="Enter first name" />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            label="Last Name"
-            name="last_name"
-            rules={[{ required: true, message: 'Required' }]}
-          >
-            <Input size="large" placeholder="Enter last name" />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Form.Item
-        label="Email Address"
-        name="email"
-        rules={[{ required: true, type: 'email', message: 'Valid email required' }]}
-      >
-        <Input size="large" placeholder="Enter email address" />
-      </Form.Item>
-
-      <Row gutter={16}>
-        <Col span={6}>
-          <Form.Item
-            label="Code"
-            name={['mobile', 'country_code']}
-            initialValue="+91"
-          >
-            <Select size="large">
-              <Select.Option value="+91">+91 (IN)</Select.Option>
-              <Select.Option value="+1">+1 (US)</Select.Option>
-              <Select.Option value="+44">+44 (UK)</Select.Option>
-            </Select>
-          </Form.Item>
-        </Col>
-        <Col span={18}>
-          <Form.Item
-            label="Phone Number"
-            name={['mobile', 'number']}
-            rules={[{ required: true, pattern: /^\d{10}$/, message: '10 digits required' }]}
-          >
-            <Input size="large" placeholder="9876543210" style={{ width: '100%' }} />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[{ required: true, min: 6 }]}
-          >
-            <Input.Password size="large" placeholder="Password" />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            label="Confirm"
-            name="confirmPassword"
-            dependencies={['password']}
-            rules={[
-              { required: true },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('password') === value) return Promise.resolve();
-                  return Promise.reject(new Error('Mismatch!'));
-                },
-              }),
-            ]}
-          >
-            <Input.Password size="large" placeholder="Confirm" />
-          </Form.Item>
-        </Col>
-      </Row>
-    </>
-  );
-
-  const Step2 = () => (
-    <>
-      <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
-        <ShopOutlined style={{ color: themeColor }} /> Store Information
-      </Title>
-
-      <Form.Item
-        label="Store Name"
-        name={['store_details', 'store_name']}
-        rules={[{ required: true }]}
-      >
-        <Input size="large" placeholder="Enter store name" />
-      </Form.Item>
-
-      <Form.Item
-        label="Business Type"
-        name={['store_details', 'store_type']}
-        rules={[{ required: true }]}
-      >
-        <Select size="large" placeholder="Select type" options={businessTypes} />
-      </Form.Item>
-
-      <Form.Item
-        label="Categories"
-        name={['store_details', 'categories']}
-        rules={[{ required: true }]}
-      >
-        <Select
-          mode="multiple"
-          size="large"
-          placeholder="Select categories"
-          options={categories}
-          loading={loading}
-          optionFilterProp="label"
-        />
-      </Form.Item>
-
-      <Form.Item
-        label="Description"
-        name={['store_details', 'store_description']}
-      >
-        <TextArea rows={4} placeholder="Describe your store..." showCount maxLength={500} />
-      </Form.Item>
-    </>
-  );
-
-  const Step3 = () => (
-    <>
-      <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
-        <FileTextOutlined style={{ color: themeColor }} /> Business Details
-      </Title>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            label="PAN Number"
-            name={['registration', 'pan_number']}
-            rules={[{ required: true }]}
-          >
-            <Input size="large" placeholder="ABCDE1234F" />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            label="GSTIN (Optional)"
-            name={['registration', 'gstin']}
-          >
-            <Input size="large" placeholder="GSTIN" />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Form.Item
-        label="Address"
-        name={['store_details', 'store_address']}
-        rules={[{ required: true }]}
-      >
-        <Input size="large" placeholder="Full address" />
-      </Form.Item>
-
-      <Row gutter={16}>
-        <Col span={8}>
-          <Form.Item
-            label="City"
-            name={['store_details', 'city']}
-            rules={[{ required: true }]}
-          >
-            <Input size="large" />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            label="Country"
-            name={['store_details', 'country']}
-            rules={[{ required: true }]}
-          >
-            <Select size="large" options={countries} />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            label="PIN Code"
-            name={['store_details', 'pincode']}
-            rules={[{ required: true }]}
-          >
-            <Input size="large" />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Form.Item
-        name={['meta', 'agreed_to_terms']}
-        valuePropName="checked"
-        rules={[
-          {
-            validator: (_, value) =>
-              value ? Promise.resolve() : Promise.reject(new Error('Required')),
-          },
-        ]}
-      >
-        <Checkbox>I agree to the Terms and Conditions</Checkbox>
-      </Form.Item>
-    </>
-  );
-
-  const steps = [
-    { title: 'Personal', content: <Step1 />, icon: <UserOutlined /> },
-    { title: 'Store', content: <Step2 />, icon: <ShopOutlined /> },
-    { title: 'Business', content: <Step3 />, icon: <FileTextOutlined /> },
-  ];
-
-  // --- LOGIC ---
+  const steps = ['Personal', 'Store', 'Business'];
 
   const handleNext = async () => {
-    try {
-      const fields = getStepFields(currentStep);
-      await form.validateFields(fields);
-      if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
-    } catch (error) {
-      console.log('Validation Failed:', error);
+    let fieldsToValidate = [];
+
+    if (currentStep === 0) {
+      fieldsToValidate = ['first_name', 'last_name', 'email', 'mobile.country_code', 'mobile.number', 'password', 'confirmPassword'];
+    } else if (currentStep === 1) {
+      fieldsToValidate = ['store_details.store_name', 'store_details.store_type', 'store_details.categories'];
+    } else if (currentStep === 2) {
+      fieldsToValidate = ['registration.pan_number', 'store_details.store_address', 'store_details.city', 'store_details.country', 'store_details.pincode', 'meta.agreed_to_terms'];
+    }
+
+    const result = await trigger(fieldsToValidate);
+    if (result) {
+      setCurrentStep(prev => prev + 1);
     }
   };
 
   const handlePrev = () => {
-    if (currentStep > 0) setCurrentStep(currentStep - 1);
+    setCurrentStep(prev => prev - 1);
   };
 
-  const getStepFields = (stepIndex) => {
-    const stepFields = {
-      0: ['first_name', 'last_name', 'email', ['mobile', 'country_code'], ['mobile', 'number'], 'password', 'confirmPassword'],
-      1: [['store_details', 'store_name'], [['store_details', 'store_type']], [['store_details', 'categories']]],
-      2: [['registration', 'pan_number'], ['store_details', 'store_address'], ['store_details', 'city'], ['store_details', 'country'], ['store_details', 'pincode'], ['meta', 'agreed_to_terms']]
-    };
-    return stepFields[stepIndex] || [];
-  };
+  const onSubmit = async (data) => {
+    if (data.password !== data.confirmPassword) {
+      message.error('Passwords do not match');
+      return;
+    }
 
-  // --- MAIN SUBMISSION HANDLER ---
-  const handleSubmit = async () => {
     setSubmitting(true);
-    
+    setApiErrors({});
+
+    const payload = {
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      mobile: {
+        country_code: data.mobile?.country_code || '+91',
+        number: data.mobile?.number || ''
+      },
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      store_details: {
+        store_name: data.store_details?.store_name,
+        store_description: data.store_details?.store_description || '',
+        store_type: data.store_details?.store_type,
+        store_address: data.store_details?.store_address,
+        city: data.store_details?.city,
+        country: data.store_details?.country,
+        pincode: data.store_details?.pincode,
+        categories: data.store_details?.categories || []
+      },
+      registration: {
+        pan_number: data.registration?.pan_number,
+        gstin: data.registration?.gstin || ''
+      },
+      meta: {
+        agreed_to_terms: data.meta?.agreed_to_terms
+      }
+    };
+
+    console.log(payload)
     try {
-      // 1. Get all values (including hidden steps)
-      const allValues = form.getFieldsValue(true);
-
-      // 2. Construct Payload
-      const payload = {
-        first_name: allValues.first_name,
-        last_name: allValues.last_name,
-        email: allValues.email,
-        mobile: {
-          country_code: allValues.mobile?.country_code || '+91',
-          number: allValues.mobile?.number || ''
-        },
-        password: allValues.password,
-        confirmPassword: allValues.confirmPassword,
-        store_details: {
-          store_name: allValues.store_details?.store_name,
-          store_description: allValues.store_details?.store_description || '',
-          store_type: allValues.store_details?.store_type,
-          store_address: allValues.store_details?.store_address,
-          city: allValues.store_details?.city,
-          country: allValues.store_details?.country,
-          pincode: allValues.store_details?.pincode,
-          categories: allValues.store_details?.categories || []
-        },
-        registration: {
-          pan_number: allValues.registration?.pan_number,
-          gstin: allValues.registration?.gstin || ''
-        },
-        meta: {
-          agreed_to_terms: allValues.meta?.agreed_to_terms
-        }
-      };
-
-      console.log('Submitting Payload:', JSON.stringify(payload, null, 2));
-
-      // 3. Use apiService
       await apiService.post('/vendor/b2c', payload);
-
-      // 4. Success State
       setSuccess(true);
       message.success('Registration successful! Awaiting approval.');
-      form.resetFields();
+   } catch (err) {
+  const res = err.response?.data;
 
-    } catch (err) {
-      console.error('Submission Error:', err);
-      
-      const res = err.response?.data;
-      
-      // Handle Validation Errors from API (e.g., "store_details.store_name": "Required")
-      if (res?.errors) {
-        const formErrors = [];
-        
-        // Convert API error format to Ant Design error format
-        if (Array.isArray(res.errors)) {
-            // If errors is an array of objects: [{field: 'email', message: 'invalid'}]
-            res.errors.forEach(e => {
-                // Split dot notation for Ant Design (e.g. 'store_details.store_name' -> ['store_details', 'store_name'])
-                const namePath = e.field.includes('.') ? e.field.split('.') : e.field;
-                formErrors.push({
-                    name: namePath,
-                    errors: [e.message]
-                });
-            });
-        }
-        
-        if (formErrors.length > 0) {
-            form.setFields(formErrors);
-            message.error('Please fix the highlighted errors.');
-        } else {
-            message.error(res.message || 'Registration failed.');
-        }
-      } else {
-        message.error(res?.message || 'An error occurred. Please try again.');
-      }
-    } finally {
+  if (res?.errors && Array.isArray(res.errors)) {
+    const errorMap = {};
+
+    res.errors.forEach(e => {
+      errorMap[e.field] = e.message;
+
+      setError(e.field, {
+        type: "server",
+        message: e.message,
+      });
+    });
+
+    setApiErrors(errorMap);
+
+    // Scroll to first error
+    const firstErrorField = res.errors[0].field;
+    const el = document.querySelector(`[name="${firstErrorField}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    message.error(`Please fix ${res.errors.length} error(s).`);
+  } else {
+    message.error(res?.message || "Registration failed. Please try again.");
+  }
+}
+ finally {
       setSubmitting(false);
     }
   };
 
-  // --- RENDER SUCCESS SCREEN ---
   if (success) {
     return (
       <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center p-6">
@@ -423,18 +202,13 @@ const SellerPage = () => {
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircleFilled style={{ fontSize: '48px', color: '#52c41a' }} />
           </div>
-          <Title level={2} style={{ marginBottom: '16px' }}>Registration Successful!</Title>
+          <Title level={2}>Registration Successful!</Title>
           <Text type="secondary" style={{ fontSize: '16px', display: 'block', marginBottom: '32px' }}>
             Your request has been sent to the <strong>Admin</strong>.<br />
             You will receive an email once approved.
           </Text>
-          <Button 
-            type="primary" 
-            size="large" 
-            href="/login" 
-            block
-            style={{ height: '48px', fontSize: '16px', backgroundColor: themeColor, borderColor: themeColor }}
-          >
+          <Button type="primary" size="large" href="/login" block
+            style={{ height: '48px', fontSize: '16px', backgroundColor: themeColor, borderColor: themeColor }}>
             Go to Login
           </Button>
         </div>
@@ -442,12 +216,9 @@ const SellerPage = () => {
     );
   }
 
-  // --- RENDER FORM SCREEN ---
   return (
     <div className="min-h-screen bg-[var(--color-primary)] flex items-center justify-center py-10 px-4">
       <div style={{ maxWidth: 1200, width: '100%' }}>
-        
-        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 40, color: 'white' }}>
           <div style={{
             display: 'inline-flex',
@@ -469,36 +240,26 @@ const SellerPage = () => {
         </div>
 
         <Row gutter={[32, 32]}>
-          {/* Left Sidebar - Steps */}
           <Col xs={24} lg={8}>
-            <Card
-              bordered={false}
-              style={{
-                background: 'rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-                height: '100%',
-                color: 'white'
-              }}
-              bodyStyle={{ padding: 32 }}
-            >
-              <Steps
-                direction="vertical"
-                current={currentStep}
-                items={steps.map((step, index) => ({
-                  title: <span style={{ color: currentStep >= index ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>{step.title}</span>,
-                  icon: (
-                    <div style={{
-                      background: currentStep >= index ? '#fff' : 'transparent',
-                      color: currentStep >= index ? themeColor : 'rgba(255,255,255,0.5)',
-                      border: `1px solid ${currentStep >= index ? '#fff' : 'rgba(255,255,255,0.5)'}`,
-                      width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                      {currentStep > index ? <CheckCircleOutlined /> : step.icon}
-                    </div>
-                  )
-                }))}
-              />
-              
+            <Card bordered={false} style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', height: '100%', color: 'white' }} bodyStyle={{ padding: 32 }}>
+              <Steps direction="vertical" current={currentStep}>
+                {steps.map((title, index) => (
+                  <Steps.Step
+                    key={index}
+                    title={<span style={{ color: currentStep >= index ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>{title}</span>}
+                    icon={
+                      <div style={{
+                        background: currentStep >= index ? '#fff' : 'transparent',
+                        color: currentStep >= index ? themeColor : 'rgba(255,255,255,0.5)',
+                        border: `1px solid ${currentStep >= index ? '#fff' : 'rgba(255,255,255,0.5)'}`,
+                        width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        {currentStep > index ? <CheckCircleOutlined /> : index === 0 ? <UserOutlined /> : index === 1 ? <ShopOutlined /> : <FileTextOutlined />}
+                      </div>
+                    }
+                  />
+                ))}
+              </Steps>
               <div style={{ marginTop: 40, borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 20 }}>
                 <Text style={{ color: '#fff', display: 'block', marginBottom: 10 }}><CheckCircleOutlined /> Fast Approval</Text>
                 <Text style={{ color: '#fff', display: 'block', marginBottom: 10 }}><CheckCircleOutlined /> Low Commission</Text>
@@ -507,65 +268,172 @@ const SellerPage = () => {
             </Card>
           </Col>
 
-          {/* Right Side - Form */}
           <Col xs={24} lg={16}>
-            <Card
-              bordered={false}
-              style={{
-                borderRadius: 16,
-                boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                background: '#fff',
-                height: '100%'
-              }}
-              bodyStyle={{ padding: 40 }}
-            >
-               <Form
-                form={form}
-                layout="vertical"
-                onFinish={handleSubmit}
-                initialValues={{ mobile: { country_code: '+91' } }}
-              >
-                {/* Content Area */}
-                <div style={{ minHeight: 400 }}>
-                  {steps[currentStep].content}
-                </div>
+            <Card bordered={false} style={{ borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', background: '#fff' }} bodyStyle={{ padding: 40 }}>
+              <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+                <Spin spinning={submitting}>
+                  {/* Step 1: Personal Information */}
+                  {currentStep === 0 && (
+                    <>
+                      <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
+                        <UserOutlined style={{ color: themeColor }} /> Personal Information
+                      </Title>
+                      <Row gutter={16}>
+                        <Col span={12}>
+                          <Form.Item label="First Name" required validateStatus={errors.first_name ? 'error' : ''} help={errors.first_name?.message || apiErrors.first_name}>
+                            <Controller name="first_name" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item label="Last Name" required validateStatus={errors.last_name ? 'error' : ''} help={errors.last_name?.message || apiErrors.last_name}>
+                            <Controller name="last_name" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
 
-                {/* Footer Buttons */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32, paddingTop: 24, borderTop: '1px solid #f0f0f0' }}>
-                  <Button 
-                    size="large" 
-                    onClick={handlePrev} 
-                    disabled={currentStep === 0}
-                    icon={<ArrowLeftOutlined />}
-                  >
-                    Back
-                  </Button>
-                  
-                  {currentStep < steps.length - 1 ? (
-                    <Button 
-                      type="primary" 
-                      size="large" 
-                      onClick={handleNext}
-                      style={{ background: themeColor, borderColor: themeColor }}
-                      icon={<ArrowRightOutlined />}
-                    >
-                      Continue
-                    </Button>
-                  ) : (
-                    <Button 
-                      type="primary" 
-                      size="large" 
-                      htmlType="submit" 
-                      loading={submitting}
-                      style={{ background: themeColor, borderColor: themeColor }}
-                      icon={<CheckCircleOutlined />}
-                    >
-                      Register Vendor
-                    </Button>
+                      <Form.Item label="Email Address" required validateStatus={errors.email ? 'error' : ''} help={errors.email?.message || apiErrors.email}>
+                        <Controller name="email" control={control} rules={{ required: 'Required', type: 'email' }} render={({ field }) => <Input size="large" {...field} />} />
+                      </Form.Item>
+
+                      <Row gutter={16}>
+                        <Col span={6}>
+                          <Form.Item label="Code">
+                            <Controller name="mobile.country_code" control={control} render={({ field }) => (
+                              <Select size="large" {...field}>
+                                <Select.Option value="+91">+91 (IN)</Select.Option>
+                                <Select.Option value="+1">+1 (US)</Select.Option>
+                                <Select.Option value="+44">+44 (UK)</Select.Option>
+                              </Select>
+                            )} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={18}>
+                          <Form.Item label="Phone Number" required validateStatus={errors.mobile?.number ? 'error' : ''} help={errors.mobile?.number?.message || apiErrors['mobile.number']}>
+                            <Controller name="mobile.number" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+
+                      <Row gutter={16}>
+                        <Col span={12}>
+                          <Form.Item label="Password" required validateStatus={errors.password ? 'error' : ''} help={errors.password?.message}>
+                            <Controller name="password" control={control} rules={{ required: 'Required', minLength: { value: 6, message: 'Min 6 characters' } }} render={({ field }) => <Input.Password size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item label="Confirm Password" required validateStatus={errors.confirmPassword ? 'error' : ''} help={errors.confirmPassword?.message}>
+                            <Controller name="confirmPassword" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input.Password size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </>
                   )}
-                </div>
+
+                  {/* Step 2: Store Information */}
+                  {currentStep === 1 && (
+                    <>
+                      <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
+                        <ShopOutlined style={{ color: themeColor }} /> Store Information
+                      </Title>
+                      <Form.Item label="Store Name" required validateStatus={errors.store_details?.store_name ? 'error' : ''} help={errors.store_details?.store_name?.message}>
+                        <Controller name="store_details.store_name" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
+                      </Form.Item>
+
+                      <Form.Item label="Business Type" required validateStatus={errors.store_details?.store_type ? 'error' : ''} help={errors.store_details?.store_type?.message}>
+                        <Controller name="store_details.store_type" control={control} rules={{ required: 'Required' }} render={({ field }) => (
+                          <Select size="large" options={businessTypes} {...field} />
+                        )} />
+                      </Form.Item>
+
+                      <Form.Item label="Categories" required validateStatus={errors.store_details?.categories ? 'error' : ''} help={errors.store_details?.categories?.message}>
+                        <Controller name="store_details.categories" control={control} rules={{ required: 'Select at least one category' }} render={({ field }) => (
+                          <Select mode="multiple" size="large" loading={loading} options={categories} optionFilterProp="label" {...field} />
+                        )} />
+                      </Form.Item>
+
+                      <Form.Item label="Description">
+                        <Controller name="store_details.store_description" control={control} render={({ field }) => (
+                          <TextArea rows={4} showCount maxLength={500} {...field} />
+                        )} />
+                      </Form.Item>
+                    </>
+                  )}
+
+                  {/* Step 3: Business Details */}
+                  {currentStep === 2 && (
+                    <>
+                      <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
+                        <FileTextOutlined style={{ color: themeColor }} /> Business Details
+                      </Title>
+                      <Row gutter={16}>
+                        <Col span={12}>
+                          <Form.Item label="PAN Number" required validateStatus={errors.registration?.pan_number ? 'error' : ''} help={errors.registration?.pan_number?.message}>
+                            <Controller name="registration.pan_number" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item label="GSTIN (Optional)">
+                            <Controller name="registration.gstin" control={control} render={({ field }) => <Input size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+
+                      <Form.Item label="Address" required validateStatus={errors.store_details?.store_address ? 'error' : ''} help={errors.store_details?.store_address?.message}>
+                        <Controller name="store_details.store_address" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
+                      </Form.Item>
+
+                      <Row gutter={16}>
+                        <Col span={8}>
+                          <Form.Item label="City" required validateStatus={errors.store_details?.city ? 'error' : ''} help={errors.store_details?.city?.message}>
+                            <Controller name="store_details.city" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                          <Form.Item label="Country" required validateStatus={errors.store_details?.country ? 'error' : ''} help={errors.store_details?.country?.message}>
+                            <Controller name="store_details.country" control={control} rules={{ required: 'Required' }} render={({ field }) => (
+                              <Select size="large" options={countries} {...field} />
+                            )} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                          <Form.Item label="PIN Code" required validateStatus={errors.store_details?.pincode ? 'error' : ''} help={errors.store_details?.pincode?.message}>
+                            <Controller name="store_details.pincode" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+
+                      <Form.Item validateStatus={errors.meta?.agreed_to_terms ? 'error' : ''} help={errors.meta?.agreed_to_terms?.message}>
+                        <Controller
+                          name="meta.agreed_to_terms"
+                          control={control}
+                          rules={{ required: 'You must agree to terms' }}
+                          render={({ field }) => (
+                            <Checkbox checked={field.value} onChange={e => field.onChange(e.target.checked)}>
+                              I agree to the Terms and Conditions
+                            </Checkbox>
+                          )}
+                        />
+                      </Form.Item>
+                    </>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32, paddingTop: 24, borderTop: '1px solid #f0f0f0' }}>
+                    <Button size="large" onClick={handlePrev} disabled={currentStep === 0} icon={<ArrowLeftOutlined />}>
+                      Back
+                    </Button>
+                    {currentStep < steps.length - 1 ? (
+                      <Button type="primary" size="large" onClick={handleNext} style={{ background: themeColor, borderColor: themeColor }} icon={<ArrowRightOutlined />}>
+                        Continue
+                      </Button>
+                    ) : (
+                      <Button type="primary" size="large" htmlType="submit" loading={submitting} style={{ background: themeColor, borderColor: themeColor }} icon={<CheckCircleOutlined />}>
+                        Register Vendor
+                      </Button>
+                    )}
+                  </div>
+                </Spin>
               </Form>
-              
+
               <div style={{ marginTop: 20, textAlign: 'center' }}>
                 <Text type="secondary" style={{ fontSize: 12 }}>
                   <SafetyOutlined style={{ color: '#52c41a' }} /> Your data is encrypted and secure.

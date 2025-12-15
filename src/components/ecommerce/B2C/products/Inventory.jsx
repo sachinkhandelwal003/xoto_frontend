@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+// src/pages/vendor/Inventory.jsx
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   FiPlus,
@@ -9,66 +10,69 @@ import {
   FiArrowLeft,
   FiBox,
   FiAlertTriangle,
-  FiEye,
+  FiSearch,
+  FiArchive,
+  FiCalendar
 } from 'react-icons/fi';
 import {
   Button,
   Card,
-  Table,
   Input,
   Form,
   Select,
   DatePicker,
-  Spin,
-  message,
   Modal,
   Row,
   Col,
-  Typography,
   Tag,
   Space,
-  Pagination,
   Tabs,
-  Empty,InputNumber
+  InputNumber,
+  Badge,
+  Tooltip
 } from 'antd';
 import moment from 'moment';
 import { apiService } from '../../../../manageApi/utils/custom.apiservice';
 import { showToast } from '../../../../manageApi/utils/toast';
+import CustomTable from '../../../../components/CMS/pages/custom/CustomTable';
 import { debounce } from 'lodash';
 
-const { Title, Text: TypographyText } = Typography;
 const { TabPane } = Tabs;
 const { Option } = Select;
+
+// --- THEME CONFIGURATION ---
+const THEME = {
+  primary: "#722ed1",
+  secondary: "#1890ff",
+  success: "#52c41a",
+  warning: "#faad14",
+  error: "#ff4d4f",
+  bgLight: "#f9f0ff",
+};
 
 const Inventory = () => {
   const { id: productId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
+  
+  // --- STATE ---
   const [inventory, setInventory] = useState([]);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [historyLoading, setHistoryLoading] = useState(false);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  const [historyPagination, setHistoryPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  const [filters, setFilters] = useState({
-    sku: '',
-    warehouse: '',
-  });
-  const [historyFilters, setHistoryFilters] = useState({
-    type: '',
-    startDate: null,
-    endDate: null,
-  });
+  
+  // Pagination
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+  const [historyPagination, setHistoryPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+
+  // Filters
+  const [filters, setFilters] = useState({ sku: '', warehouse: '' });
+  const [historyFilters, setHistoryFilters] = useState({ type: '', startDate: null, endDate: null });
+  
   const [warehouses, setWarehouses] = useState([]);
+  
+  // Modal
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingInventory, setEditingInventory] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -78,12 +82,7 @@ const Inventory = () => {
   const searchParams = new URLSearchParams(location.search);
   const historySku = searchParams.get('sku') || '';
 
-  // Sync token with localStorage
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem('token', token);
-    }
-  }, [token]);
+  // --- API CALLS ---
 
   // Fetch warehouses
   const fetchWarehouses = useCallback(async () => {
@@ -91,574 +90,491 @@ const Inventory = () => {
       const response = await apiService.get('/vendor/warehouses', { vendor_id: user.id });
       if (response.success) {
         setWarehouses(response.warehouses || []);
-      } else {
-        throw new Error(response.message || 'Failed to fetch warehouses');
       }
     } catch (error) {
-      showToast(error.response?.data?.message || error.message || 'Failed to fetch warehouses', 'error');
+      showToast('Failed to fetch warehouses', 'error');
     }
   }, [user.id]);
 
   // Fetch inventory
-  const fetchInventory = useCallback(
-    async (page = 1, pageSize = 10, filters = {}) => {
-      setLoading(true);
-      try {
-        const params = {
-          page,
-          limit: pageSize,
-          sku: filters.sku || undefined,
-          warehouse: filters.warehouse || undefined,
-        };
-        const response = await apiService.get(`/products/${productId}/inventory`, params);
-        if (response.success) {
-          setInventory(response.inventory || []);
-          setPagination({
-            current: response.pagination?.page || 1,
-            pageSize: response.pagination?.limit || 10,
-            total: response.pagination?.total || 0,
-          });
-        } else {
-          throw new Error(response.message || 'Failed to fetch inventory');
-        }
-      } catch (error) {
-        showToast(error.response?.data?.message || error.message || 'Failed to fetch inventory', 'error');
-        setInventory([]);
-      } finally {
-        setLoading(false);
+  const fetchInventory = useCallback(async (page = 1, pageSize = 10, currentFilters = filters) => {
+    setLoading(true);
+    try {
+      const params = {
+        page,
+        limit: pageSize,
+        sku: currentFilters.sku || undefined,
+        warehouse: currentFilters.warehouse || undefined,
+      };
+      const response = await apiService.get(`/products/${productId}/inventory`, params);
+      if (response.success) {
+        setInventory(response.inventory || []);
+        setPagination({
+          current: response.pagination?.page || 1,
+          pageSize: response.pagination?.limit || 10,
+          total: response.pagination?.total || 0,
+        });
       }
-    },
-    [productId]
-  );
+    } catch (error) {
+      showToast('Failed to fetch inventory', 'error');
+      setInventory([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [productId, filters]);
 
   // Fetch inventory history
-  const fetchInventoryHistory = useCallback(
-    async (page = 1, pageSize = 10, filters = {}) => {
-      setHistoryLoading(true);
-      try {
-        const params = {
-          page,
-          limit: pageSize,
-          sku: historySku || filters.sku || undefined,
-          type: filters.type || undefined,
-          startDate: filters.startDate ? moment(filters.startDate).toISOString() : undefined,
-          endDate: filters.endDate ? moment(filters.endDate).toISOString() : undefined,
-        };
-        const response = await apiService.get(`/products/${productId}/inventory/history`, params);
-        if (response.success) {
-          setHistory(response.movements || []);
-          setHistoryPagination({
-            current: response.pagination?.page || 1,
-            pageSize: response.pagination?.limit || 10,
-            total: response.pagination?.total || 0,
-          });
-        } else {
-          throw new Error(response.message || 'Failed to fetch inventory history');
-        }
-      } catch (error) {
-        showToast(error.response?.data?.message || error.message || 'Failed to fetch inventory history', 'error');
-        setHistory([]);
-      } finally {
-        setHistoryLoading(false);
+  const fetchInventoryHistory = useCallback(async (page = 1, pageSize = 10, currentFilters = historyFilters) => {
+    setHistoryLoading(true);
+    try {
+      const params = {
+        page,
+        limit: pageSize,
+        sku: historySku || currentFilters.sku || undefined,
+        type: currentFilters.type || undefined,
+        startDate: currentFilters.startDate ? moment(currentFilters.startDate).toISOString() : undefined,
+        endDate: currentFilters.endDate ? moment(currentFilters.endDate).toISOString() : undefined,
+      };
+      const response = await apiService.get(`/products/${productId}/inventory/history`, params);
+      if (response.success) {
+        setHistory(response.movements || []);
+        setHistoryPagination({
+          current: response.pagination?.page || 1,
+          pageSize: response.pagination?.limit || 10,
+          total: response.pagination?.total || 0,
+        });
       }
-    },
-    [productId, historySku]
-  );
+    } catch (error) {
+      showToast('Failed to fetch history', 'error');
+      setHistory([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, [productId, historySku, historyFilters]);
 
-  // Debounced filter handler
-  const debouncedHandleFilter = useCallback(
-    debounce((newFilters) => {
-      const updatedFilters = { ...filters, ...newFilters };
-      setFilters(updatedFilters);
-      fetchInventory(1, pagination.pageSize, updatedFilters);
-    }, 500),
-    [fetchInventory, pagination.pageSize]
-  );
+  // Debounced handlers
+  const debouncedHandleFilter = useCallback(debounce((newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    // Note: useEffect will trigger the fetch when filters change if included in deps, 
+    // but here we manually call or let the effect handle it.
+    // For safety, relying on effect dependency or manual call:
+    fetchInventory(1, pagination.pageSize, { ...filters, ...newFilters });
+  }, 500), [fetchInventory, pagination.pageSize, filters]);
 
-  // Debounced history filter handler
-  const debouncedHandleHistoryFilter = useCallback(
-    debounce((newFilters) => {
-      const updatedFilters = { ...historyFilters, ...newFilters };
-      setHistoryFilters(updatedFilters);
-      fetchInventoryHistory(1, historyPagination.pageSize, updatedFilters);
-    }, 500),
-    [fetchInventoryHistory, historyPagination.pageSize]
-  );
+  const debouncedHandleHistoryFilter = useCallback(debounce((newFilters) => {
+    setHistoryFilters(prev => ({ ...prev, ...newFilters }));
+    fetchInventoryHistory(1, historyPagination.pageSize, { ...historyFilters, ...newFilters });
+  }, 500), [fetchInventoryHistory, historyPagination.pageSize, historyFilters]);
 
-  // Fetch data on mount
+  // Initial Load
   useEffect(() => {
     if (user.id && productId) {
       fetchWarehouses();
       fetchInventory(pagination.current, pagination.pageSize, filters);
-      fetchInventoryHistory(historyPagination.current, historyPagination.pageSize, {
-        ...historyFilters,
-        sku: historySku,
-      });
+      fetchInventoryHistory(historyPagination.current, historyPagination.pageSize, { ...historyFilters, sku: historySku });
     }
-  }, [user.id, productId, refreshTrigger, fetchWarehouses, fetchInventory, fetchInventoryHistory, historySku]);
+  }, [refreshTrigger]); // Keep dependencies minimal to avoid loops, rely on explicit refresh
 
-  // Handle table pagination
-  const handleTableChange = (page, pageSize) => {
+  // --- HANDLERS ---
+
+  const handleInventoryPageChange = (page, pageSize) => {
     fetchInventory(page, pageSize, filters);
   };
 
-  // Handle history table pagination
-  const handleHistoryTableChange = (page, pageSize) => {
+  const handleHistoryPageChange = (page, pageSize) => {
     fetchInventoryHistory(page, pageSize, historyFilters);
   };
 
-  // Show modal for create/edit
   const showModal = (inventoryItem = null) => {
     setEditingInventory(inventoryItem);
     if (inventoryItem) {
       form.setFieldsValue({
-        sku: inventoryItem.sku || '',
-        quantity: inventoryItem.quantity || '',
-        low_stock_threshold: inventoryItem.low_stock_threshold || 5,
-        warehouse: inventoryItem.warehouse?._id || '',
+        sku: inventoryItem.sku,
+        quantity: inventoryItem.quantity,
+        low_stock_threshold: inventoryItem.low_stock_threshold,
+        warehouse: inventoryItem.warehouse?._id,
         expiry_date: inventoryItem.expiry_date ? moment(inventoryItem.expiry_date) : null,
         type: 'adjustment',
         note: '',
       });
     } else {
-      form.setFieldsValue({
-        sku: '',
-        quantity: '',
-        low_stock_threshold: 5,
-        warehouse: '',
-        expiry_date: null,
-        type: 'initial',
-        note: '',
-      });
+      form.resetFields();
+      form.setFieldsValue({ type: 'initial', low_stock_threshold: 5 });
     }
     setIsModalVisible(true);
   };
 
-  // Handle form submission
-  const handleSubmit = async () => {
+  const handleSubmit = async (values) => {
     try {
-      const values = await form.validateFields();
       const payload = {
         sku: values.sku.trim(),
         quantity: parseInt(values.quantity),
         low_stock_threshold: parseInt(values.low_stock_threshold),
         warehouse: values.warehouse,
-        note: values.note || undefined,
+        note: values.note,
         type: values.type,
+        expiry_date: values.expiry_date ? moment(values.expiry_date).toISOString() : undefined
       };
 
-      if (values.expiry_date) {
-        payload.expiry_date = moment(values.expiry_date).toISOString();
-      }
-
-      let response;
-      if (editingInventory) {
-        response = await apiService.put(`/products/${productId}/inventory`, payload);
-      } else {
-        response = await apiService.post(`/products/${productId}/inventory/create`, payload);
-      }
-
-      if (response.success) {
-        message.success(
-          response.message || (editingInventory ? 'Inventory updated successfully' : 'Inventory created successfully')
-        );
-        setIsModalVisible(false);
-        setEditingInventory(null);
-        setRefreshTrigger((prev) => prev + 1);
-        form.resetFields();
-      } else {
-        throw new Error(response.message || 'Failed to save inventory');
-      }
+      const url = editingInventory 
+        ? `/products/${productId}/inventory` 
+        : `/products/${productId}/inventory/create`;
+      
+      const method = editingInventory ? 'put' : 'post';
+      
+      await apiService[method](url, payload);
+      
+      showToast(editingInventory ? 'Inventory updated' : 'Inventory created', 'success');
+      setIsModalVisible(false);
+      setRefreshTrigger(prev => prev + 1);
     } catch (error) {
-      message.error(error.response?.data?.message || error.message || 'Failed to save inventory');
+      showToast(error.response?.data?.message || 'Operation failed', 'error');
     }
   };
 
-  // Inventory table columns
-  const inventoryColumns = [
+  // --- COLUMNS ---
+
+  const inventoryColumns = useMemo(() => [
     {
-      title: 'SKU',
-      dataIndex: 'sku',
-      key: 'sku',
-      render: (text) => <TypographyText strong>{text || '--'}</TypographyText>,
+      title: 'SKU Info',
+      width: 200,
+      render: (_, r) => (
+        <div className="flex items-center gap-2">
+            <div className="p-2 bg-purple-50 rounded text-purple-600"><FiBox /></div>
+            <div>
+                <div className="font-semibold text-gray-800">{r.sku || '--'}</div>
+                <div className="text-xs text-gray-400">ID: {r._id?.substring(0, 8)}...</div>
+            </div>
+        </div>
+      ),
     },
     {
-      title: 'Quantity',
-      dataIndex: 'quantity',
-      key: 'quantity',
-      render: (text) => text || 0,
+      title: 'Stock Level',
+      width: 150,
+      render: (_, r) => (
+        <div>
+            <div className="text-lg font-bold text-gray-700">{r.quantity}</div>
+            <div className="text-xs text-gray-500">Reserved: {r.reserved || 0}</div>
+        </div>
+      ),
     },
     {
-      title: 'Reserved',
-      dataIndex: 'reserved',
-      key: 'reserved',
-      render: (text) => text || 0,
-    },
-    {
-      title: 'Low Stock',
-      dataIndex: 'low_stock',
-      key: 'low_stock',
-      render: (low_stock) => (
-        <Tag color={low_stock ? 'red' : 'green'} icon={low_stock ? <FiAlertTriangle /> : null}>
-          {low_stock ? 'Low' : 'Normal'}
+      title: 'Status',
+      width: 120,
+      render: (_, r) => (
+        <Tag color={r.low_stock ? 'red' : 'green'} icon={r.low_stock ? <FiAlertTriangle /> : <FiClock />}>
+          {r.low_stock ? 'Low Stock' : 'In Stock'}
         </Tag>
       ),
     },
     {
-      title: 'Threshold',
-      dataIndex: 'low_stock_threshold',
-      key: 'low_stock_threshold',
-      render: (text) => text || 5,
-    },
-    {
       title: 'Warehouse',
-      dataIndex: 'warehouse',
-      key: 'warehouse',
-      render: (warehouse) => warehouse?.name || 'N/A',
+      dataIndex: ['warehouse', 'name'],
+      width: 180,
+      render: (text) => <span className="text-gray-600">{text || 'N/A'}</span>
     },
     {
-      title: 'Expiry Date',
+      title: 'Expiry',
       dataIndex: 'expiry_date',
-      key: 'expiry_date',
-      render: (date) => (
-        <TypographyText type={date && new Date(date) < new Date() ? 'danger' : ''}>
-          {date ? new Date(date).toLocaleDateString('en-GB') : '--'}
-        </TypographyText>
-      ),
-    },
-    {
-      title: 'Last Updated',
-      dataIndex: 'updated_at',
-      key: 'updated_at',
-      render: (date) => (date ? new Date(date).toLocaleDateString('en-GB') : '--'),
+      width: 120,
+      render: (date) => date ? (
+        <span className={moment(date).isBefore(moment()) ? 'text-red-500 font-medium' : 'text-gray-600'}>
+            {moment(date).format('DD MMM YYYY')}
+        </span>
+      ) : <span className="text-gray-400">--</span>
     },
     {
       title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
+      fixed: 'right',
+      width: 120,
+      render: (_, r) => (
         <Space>
-          <Button
-            type="link"
-            icon={<FiClock />}
-            onClick={() =>
-              navigate(`/sawtar/cms/seller/b2c/product/inventory/${productId}/history?sku=${record.sku}`)
-            }
-            title="View History"
-          />
-          <Button
-            type="link"
-            icon={<FiEdit />}
-            onClick={() => showModal(record)}
-            title="Update Inventory"
-          />
+          <Tooltip title="View History">
+             <Button 
+                type="text" 
+                shape="circle" 
+                icon={<FiClock className="text-blue-500" />}
+                onClick={() => navigate(`/sawtar/cms/seller/b2c/product/inventory/${productId}/history?sku=${r.sku}`)}
+             />
+          </Tooltip>
+          <Tooltip title="Edit Stock">
+             <Button 
+                type="text" 
+                shape="circle" 
+                icon={<FiEdit className="text-green-600" />}
+                onClick={() => showModal(r)}
+             />
+          </Tooltip>
         </Space>
       ),
     },
-  ];
+  ], []);
 
-  // History table columns
-  const historyColumns = [
+  const historyColumns = useMemo(() => [
     {
-      title: 'SKU',
-      dataIndex: 'sku',
-      key: 'sku',
-      render: (text) => text || '--',
+        title: 'Movement Info',
+        width: 200,
+        render: (_, r) => (
+            <div>
+                <div className="font-medium text-gray-800">{r.sku}</div>
+                <Tag className="mt-1 capitalize" color={r.type === 'in' ? 'blue' : r.type === 'out' ? 'orange' : 'default'}>
+                    {r.type}
+                </Tag>
+            </div>
+        )
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-      render: (text) => <TypographyText style={{ textTransform: 'capitalize' }}>{text}</TypographyText>,
+        title: 'Quantity Change',
+        dataIndex: 'quantity',
+        width: 120,
+        render: (val, r) => (
+            <span className={`font-bold ${r.type === 'out' ? 'text-red-500' : 'text-green-600'}`}>
+                {r.type === 'out' ? '-' : '+'}{val}
+            </span>
+        )
     },
     {
-      title: 'Quantity',
-      dataIndex: 'quantity',
-      key: 'quantity',
+        title: 'Note',
+        dataIndex: 'note',
+        width: 250,
+        render: (text) => <span className="text-gray-500 italic">{text || 'No remarks'}</span>
     },
     {
-      title: 'Note',
-      dataIndex: 'note',
-      key: 'note',
-      render: (text) => text || '-',
-    },
-    {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
-      render: (date) => new Date(date).toLocaleString('en-GB'),
-    },
-  ];
-
-  if (loading && inventory.length === 0) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
-        <Spin size="large" />
-        <TypographyText style={{ marginLeft: 16, color: '#666' }}>Loading inventory...</TypographyText>
-      </div>
-    );
-  }
+        title: 'Date',
+        dataIndex: 'date',
+        width: 180,
+        render: (date) => (
+            <div className="flex items-center gap-2 text-gray-600">
+                <FiCalendar /> {moment(date).format('DD MMM YYYY, h:mm a')}
+            </div>
+        )
+    }
+  ], []);
 
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      <Card style={{ marginBottom: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        <Row justify="space-between" align="middle">
-          <Col>
-            <Title level={2} style={{ margin: 0 }}>
-              Manage Inventory
-            </Title>
-          </Col>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      
+      {/* 1. Header */}
+      <div className="mb-6">
+         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+             <div className="flex items-center gap-3">
+                 <Button 
+                    icon={<FiArrowLeft />} 
+                    type="text" 
+                    onClick={() => navigate(-1)} 
+                    className="text-gray-500 hover:text-gray-700"
+                 />
+                 <div>
+                    <h1 className="text-2xl font-bold text-gray-900 m-0">Inventory Management</h1>
+                    <p className="text-gray-500 m-0">Manage stock levels across warehouses</p>
+                 </div>
+             </div>
+             
+             <div className="flex gap-2">
+                 <Button 
+                    icon={<FiRefreshCw className={loading ? 'animate-spin' : ''} />} 
+                    onClick={() => setRefreshTrigger(p => p + 1)}
+                 >
+                    Refresh
+                 </Button>
+                 <Button 
+                    type="primary" 
+                    icon={<FiPlus />} 
+                    onClick={() => showModal()}
+                    style={{ backgroundColor: THEME.primary }}
+                 >
+                    Add Stock
+                 </Button>
+             </div>
+         </div>
+      </div>
+
+      {/* 2. Main Content Card */}
+      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
          
-          
-          <Col>
-            <Space>
-              <Button
-                icon={<FiRefreshCw className={loading ? 'anticon-spin' : ''} />}
-                onClick={() => setRefreshTrigger((prev) => prev + 1)}
-                disabled={loading}
-              >
-                Refresh
-              </Button>
-              <Button
-                type="primary"
-                icon={<FiPlus />}
-                onClick={() => showModal()}
-              >
-                Add Inventory
-              </Button>
-               <Col>
-           
-                       <FiArrowLeft
-                         onClick={() => navigate(-1)}
-                         style={{ fontSize: '24px', cursor: 'pointer', color: '#1890ff' }}
-                       />
-                     
-          </Col>
-            </Space>
-          </Col>
-        </Row>
+         <Tabs 
+            defaultActiveKey="inventory" 
+            size="large"
+            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
+            type="card"
+         >
+            {/* TAB 1: INVENTORY */}
+            <TabPane tab={<Space><FiArchive /> Current Stock</Space>} key="inventory">
+                {/* Filters */}
+                <div className="p-4 border-b border-gray-100 bg-white">
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} md={8}>
+                            <Input 
+                                prefix={<FiSearch className="text-gray-400"/>}
+                                placeholder="Search by SKU..." 
+                                onChange={(e) => debouncedHandleFilter({ sku: e.target.value })}
+                            />
+                        </Col>
+                        <Col xs={24} md={8}>
+                            <Select 
+                                style={{ width: '100%' }} 
+                                placeholder="Filter by Warehouse"
+                                allowClear
+                                onChange={(val) => debouncedHandleFilter({ warehouse: val })}
+                            >
+                                {warehouses.map(w => <Option key={w._id} value={w._id}>{w.name}</Option>)}
+                            </Select>
+                        </Col>
+                        <Col xs={24} md={8} className="flex justify-end">
+                            <Button onClick={() => {
+                                setFilters({ sku: '', warehouse: '' });
+                                fetchInventory(1, pagination.pageSize, { sku: '', warehouse: '' });
+                            }}>
+                                Clear Filters
+                            </Button>
+                        </Col>
+                    </Row>
+                </div>
+
+                {/* Table */}
+                <div className="p-0">
+                    <CustomTable 
+                        columns={inventoryColumns}
+                        data={inventory}
+                        loading={loading}
+                        totalItems={pagination.total}
+                        currentPage={pagination.current}
+                        itemsPerPage={pagination.pageSize}
+                        onPageChange={handleInventoryPageChange}
+                        scroll={{ x: 1000 }}
+                    />
+                </div>
+            </TabPane>
+
+            {/* TAB 2: HISTORY */}
+            <TabPane tab={<Space><FiClock /> Movement History {historySku && `(SKU: ${historySku})`}</Space>} key="history">
+                 {/* Filters */}
+                 <div className="p-4 border-b border-gray-100 bg-white">
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} md={6}>
+                            <Select 
+                                style={{ width: '100%' }} 
+                                placeholder="Movement Type"
+                                allowClear
+                                onChange={(val) => debouncedHandleHistoryFilter({ type: val })}
+                            >
+                                <Option value="in">Stock In</Option>
+                                <Option value="out">Stock Out</Option>
+                                <Option value="adjustment">Adjustment</Option>
+                                <Option value="initial">Initial</Option>
+                            </Select>
+                        </Col>
+                        <Col xs={24} md={6}>
+                            <DatePicker 
+                                style={{ width: '100%' }} 
+                                placeholder="Start Date"
+                                onChange={(date) => debouncedHandleHistoryFilter({ startDate: date })}
+                            />
+                        </Col>
+                        <Col xs={24} md={6}>
+                            <DatePicker 
+                                style={{ width: '100%' }} 
+                                placeholder="End Date"
+                                onChange={(date) => debouncedHandleHistoryFilter({ endDate: date })}
+                            />
+                        </Col>
+                        <Col xs={24} md={6}>
+                            <Button block onClick={() => {
+                                setHistoryFilters({ type: '', startDate: null, endDate: null });
+                                fetchInventoryHistory(1, historyPagination.pageSize, {});
+                            }}>
+                                Reset
+                            </Button>
+                        </Col>
+                    </Row>
+                </div>
+
+                {/* Table */}
+                <div className="p-0">
+                    <CustomTable 
+                        columns={historyColumns}
+                        data={history}
+                        loading={historyLoading}
+                        totalItems={historyPagination.total}
+                        currentPage={historyPagination.current}
+                        itemsPerPage={historyPagination.pageSize}
+                        onPageChange={handleHistoryPageChange}
+                        scroll={{ x: 800 }}
+                    />
+                </div>
+            </TabPane>
+         </Tabs>
       </Card>
 
-      <Tabs defaultActiveKey="inventory" type="card">
-        <TabPane tab={<Space><FiBox /> Inventory</Space>} key="inventory">
-          <Card style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-            <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-              <Col xs={24} sm={12} md={8}>
-                <Input
-                  placeholder="Search by SKU..."
-                  value={filters.sku}
-                  onChange={(e) => debouncedHandleFilter({ sku: e.target.value })}
-                  allowClear
-                />
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Select
-                  style={{ width: '100%' }}
-                  placeholder="Select Warehouse"
-                  value={filters.warehouse}
-                  onChange={(value) => debouncedHandleFilter({ warehouse: value })}
-                  allowClear
-                >
-                  <Option value="">All Warehouses</Option>
-                  {warehouses.map((wh) => (
-                    <Option key={wh._id} value={wh._id}>{wh.name}</Option>
-                  ))}
-                </Select>
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Button
-                  onClick={() => debouncedHandleFilter({ sku: '', warehouse: '' })}
-                  style={{ width: '100%' }}
-                >
-                  Clear Filters
-                </Button>
-              </Col>
-            </Row>
-            <Table
-              columns={inventoryColumns}
-              dataSource={inventory}
-              rowKey="_id"
-              loading={loading}
-              pagination={false}
-              locale={{
-                emptyText: <Empty description="No inventory found" imageStyle={{ height: 60 }} />,
-              }}
-            />
-            {pagination.total > pagination.pageSize && (
-              <Pagination
-                style={{ marginTop: 16, textAlign: 'center' }}
-                current={pagination.current}
-                pageSize={pagination.pageSize}
-                total={pagination.total}
-                onChange={handleTableChange}
-                showSizeChanger
-                onShowSizeChange={handleTableChange}
-              />
-            )}
-          </Card>
-        </TabPane>
-        <TabPane tab={<Space><FiClock /> History {historySku ? `(SKU: ${historySku})` : ''}</Space>} key="history">
-          <Card style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-            <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-              <Col xs={24} sm={12} md={6}>
-                <Select
-                  style={{ width: '100%' }}
-                  placeholder="Select Type"
-                  value={historyFilters.type}
-                  onChange={(value) => debouncedHandleHistoryFilter({ type: value })}
-                  allowClear
-                >
-                  <Option value="">All Types</Option>
-                  <Option value="initial">Initial</Option>
-                  <Option value="in">Stock In</Option>
-                  <Option value="out">Stock Out</Option>
-                  <Option value="adjustment">Adjustment</Option>
-                </Select>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <DatePicker
-                  style={{ width: '100%' }}
-                  placeholder="Start Date"
-                  value={historyFilters.startDate ? moment(historyFilters.startDate) : null}
-                  onChange={(date) => debouncedHandleHistoryFilter({ startDate: date })}
-                />
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <DatePicker
-                  style={{ width: '100%' }}
-                  placeholder="End Date"
-                  value={historyFilters.endDate ? moment(historyFilters.endDate) : null}
-                  onChange={(date) => debouncedHandleHistoryFilter({ endDate: date })}
-                />
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Button
-                  onClick={() => debouncedHandleHistoryFilter({ type: '', startDate: null, endDate: null })}
-                  style={{ width: '100%' }}
-                >
-                  Clear Filters
-                </Button>
-              </Col>
-            </Row>
-            <Table
-              columns={historyColumns}
-              dataSource={history}
-              rowKey={(record, index) => `${record.sku}-${index}`}
-              loading={historyLoading}
-              pagination={false}
-              locale={{
-                emptyText: <Empty description="No inventory history found" imageStyle={{ height: 60 }} />,
-              }}
-            />
-            {historyPagination.total > historyPagination.pageSize && (
-              <Pagination
-                style={{ marginTop: 16, textAlign: 'center' }}
-                current={historyPagination.current}
-                pageSize={historyPagination.pageSize}
-                total={historyPagination.total}
-                onChange={handleHistoryTableChange}
-                showSizeChanger
-                onShowSizeChange={handleHistoryTableChange}
-              />
-            )}
-          </Card>
-        </TabPane>
-      </Tabs>
-
-      {/* Create/Edit Modal */}
+      {/* CREATE / EDIT MODAL */}
       <Modal
         open={isModalVisible}
-        onCancel={() => {
-          setIsModalVisible(false);
-          form.resetFields();
-        }}
+        title={editingInventory ? 'Update Stock' : 'Add New Inventory'}
+        onCancel={() => { setIsModalVisible(false); form.resetFields(); }}
         footer={null}
-        centered
-        title={editingInventory ? 'Update Inventory' : 'Create New Inventory'}
+        width={600}
+        destroyOnClose
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
-          <Form.Item
-            label="SKU"
-            name="sku"
-            rules={[{ required: true, message: 'SKU is required' }]}
-          >
-            <Input disabled={!!editingInventory} />
-          </Form.Item>
-     <Form.Item
-  label="Quantity"
-  name="quantity"
-  rules={[
-    { required: true, message: 'Quantity is required' },
-    { type: 'number', min: 0, message: 'Quantity cannot be negative' },
-  ]}
->
-  <InputNumber min={0} style={{ width: '100%' }} />
-</Form.Item>
-          <Form.Item
-            label="Low Stock Threshold"
-            name="low_stock_threshold"
-            rules={[
-              { required: true, message: 'Low stock threshold is required' },
-              { type: 'number', min: 0, message: 'Threshold cannot be negative' },
-            ]}
-          >
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item
-            label="Warehouse"
-            name="warehouse"
-            rules={[{ required: true, message: 'Warehouse is required' }]}
-          >
-            <Select placeholder="Select Warehouse">
-              {warehouses.map((wh) => (
-                <Option key={wh._id} value={wh._id}>{wh.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="Expiry Date"
-            name="expiry_date"
-          >
-            <DatePicker style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item
-            label="Movement Type"
-            name="type"
-            rules={[{ required: true, message: 'Movement type is required' }]}
-          >
-            <Select>
-              <Option value="initial">Initial</Option>
-              <Option value="in">Stock In</Option>
-              <Option value="out">Stock Out</Option>
-              <Option value="adjustment">Adjustment</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="Note"
-            name="note"
-          >
-            <Input.TextArea rows={3} />
-          </Form.Item>
-          <Form.Item>
-            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button
-                onClick={() => {
-                  setIsModalVisible(false);
-                  form.resetFields();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit" loading={form.isFieldsValidating()}>
-                {editingInventory ? 'Update' : 'Create'}
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
+         <Form form={form} layout="vertical" onFinish={handleSubmit}>
+            <Row gutter={16}>
+                <Col span={12}>
+                    <Form.Item name="sku" label="SKU" rules={[{ required: true }]}>
+                        <Input disabled={!!editingInventory} placeholder="e.g. ITEM-001" />
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item name="warehouse" label="Warehouse" rules={[{ required: true }]}>
+                        <Select placeholder="Select Location">
+                            {warehouses.map(w => <Option key={w._id} value={w._id}>{w.name}</Option>)}
+                        </Select>
+                    </Form.Item>
+                </Col>
+            </Row>
+
+            <Row gutter={16}>
+                <Col span={12}>
+                    <Form.Item name="quantity" label="Quantity" rules={[{ required: true }]}>
+                        <InputNumber style={{ width: '100%' }} min={0} />
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item name="low_stock_threshold" label="Low Stock Alert Limit">
+                        <InputNumber style={{ width: '100%' }} min={0} />
+                    </Form.Item>
+                </Col>
+            </Row>
+
+            <Row gutter={16}>
+                <Col span={12}>
+                    <Form.Item name="type" label="Movement Type" rules={[{ required: true }]}>
+                        <Select>
+                            <Option value="initial">Initial Stock</Option>
+                            <Option value="in">Stock In (Purchase)</Option>
+                            <Option value="out">Stock Out (Sale/Loss)</Option>
+                            <Option value="adjustment">Correction/Adjustment</Option>
+                        </Select>
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item name="expiry_date" label="Expiry Date (Optional)">
+                        <DatePicker style={{ width: '100%' }} />
+                    </Form.Item>
+                </Col>
+            </Row>
+
+            <Form.Item name="note" label="Notes / Remarks">
+                <Input.TextArea rows={2} placeholder="Reason for update..." />
+            </Form.Item>
+
+            <div className="flex justify-end gap-3 pt-2">
+                <Button onClick={() => setIsModalVisible(false)}>Cancel</Button>
+                <Button type="primary" htmlType="submit" style={{ backgroundColor: THEME.primary }}>
+                    {editingInventory ? 'Update Inventory' : 'Add Inventory'}
+                </Button>
+            </div>
+         </Form>
       </Modal>
+
     </div>
   );
 };
