@@ -2,14 +2,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Card, Drawer, Descriptions, Tag, Button, Space, Badge,
-  Alert, message, Avatar, Row, Col, Input, Tabs, Select, Statistic, Tooltip, Divider
+  Alert, message, Avatar, Row, Col, Input, Tabs, Select, Statistic, Tooltip, Divider, Empty
 } from 'antd';
 import {
   PhoneOutlined, MailOutlined, UserOutlined,
   HomeOutlined, DollarCircleOutlined, CalendarOutlined,
   CheckCircleOutlined, EyeOutlined, DeleteOutlined, BellOutlined,
   UsergroupAddOutlined, BankOutlined, SearchOutlined, FilterOutlined,
-  EnvironmentOutlined
+  EnvironmentOutlined, RiseOutlined, BuildOutlined, QuestionCircleOutlined,
+  SolutionOutlined
 } from '@ant-design/icons';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
 import { showSuccessAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
@@ -25,17 +26,25 @@ const THEME = {
   bgLight: "#f9f0ff",
 };
 
+// --- CONFIGURATION FOR ALL LEAD TYPES ---
 const typeConfig = {
-  buy: { label: 'Buy Property', color: 'blue', icon: <HomeOutlined /> },
-  sell: { label: 'Sell Property', color: 'purple', icon: <DollarCircleOutlined /> },
-  schedule_visit: { label: 'Visit Request', color: 'orange', icon: <CalendarOutlined /> },
-  rent: { label: 'Rent Property', color: 'cyan', icon: <BankOutlined /> },
-  partner: { label: 'Partnership', color: 'green', icon: <UsergroupAddOutlined /> }
+  buy: { label: 'Buy', color: 'blue', icon: <HomeOutlined /> },
+  sell: { label: 'Sell', color: 'purple', icon: <DollarCircleOutlined /> },
+  rent: { label: 'Rent', color: 'cyan', icon: <BankOutlined /> },
+  schedule_visit: { label: 'Visit', color: 'orange', icon: <CalendarOutlined /> },
+  partner: { label: 'Partner', color: 'green', icon: <UsergroupAddOutlined /> },
+  // New Types Added
+  investor: { label: 'Investor', color: 'gold', icon: <RiseOutlined /> },
+  developer: { label: 'Developer', color: 'geekblue', icon: <BuildOutlined /> },
+  consultation: { label: 'Consultation', color: 'volcano', icon: <SolutionOutlined /> },
+  enquiry: { label: 'Enquiry', color: 'magenta', icon: <QuestionCircleOutlined /> }
 };
 
 const statusConfig = {
   submit: { label: 'New Lead', color: 'orange', icon: <BellOutlined /> },
-  contacted: { label: 'Contacted', color: 'green', icon: <CheckCircleOutlined /> }
+  contacted: { label: 'Contacted', color: 'green', icon: <CheckCircleOutlined /> },
+  converted: { label: 'Converted', color: 'blue', icon: <CheckCircleOutlined /> },
+  dead: { label: 'Dead', color: 'red', icon: <DeleteOutlined /> }
 };
 
 const PropertyLeads = () => {
@@ -51,7 +60,7 @@ const PropertyLeads = () => {
     totalItems: 0
   });
 
-  // --- STATS CALCULATION ---
+  // --- STATS CALCULATION (Client side for current page, ideally backend provides this) ---
   const stats = useMemo(() => {
     return {
       total: pagination.totalItems,
@@ -68,6 +77,7 @@ const PropertyLeads = () => {
       if (tab !== 'all') params.type = tab;
 
       const res = await apiService.get('/property/lead', params);
+      
       if (res.success) {
         setLeads(res.data);
         setPagination({
@@ -77,6 +87,7 @@ const PropertyLeads = () => {
         });
       }
     } catch (err) {
+      console.error(err);
       message.error('Failed to load property leads');
     } finally {
       setLoading(false);
@@ -102,14 +113,19 @@ const PropertyLeads = () => {
 
   const markAsContacted = async (id) => {
     try {
-      await apiService.put(`/property/lead/${id}/contacted`);
+      // Assuming you have a generic update or specific endpoint
+      // Adjust endpoint based on your backend routes
+      await apiService.put(`/property/lead/${id}`, { status: 'contacted' });
       showSuccessAlert('Success!', 'Lead marked as contacted');
-      fetchLeads(activeTab);
+      
+      // Update local state to reflect change immediately
+      setLeads(prev => prev.map(l => l._id === id ? { ...l, status: 'contacted' } : l));
+      
       if (selectedLead?._id === id) {
         setSelectedLead({ ...selectedLead, status: 'contacted' });
       }
     } catch (err) {
-      message.error('Failed to update');
+      message.error('Failed to update status');
     }
   };
 
@@ -119,7 +135,7 @@ const PropertyLeads = () => {
       try {
         await apiService.delete(`/property/lead/${id}`);
         showSuccessAlert('Deleted', 'Lead moved to trash');
-        fetchLeads(activeTab);
+        fetchLeads(activeTab, pagination.currentPage, pagination.itemsPerPage, searchTerm);
       } catch (err) {
         message.error('Delete failed');
       }
@@ -146,7 +162,9 @@ const PropertyLeads = () => {
             style={{ backgroundColor: THEME.secondary }} 
             icon={<UserOutlined />} 
             size="large"
-          />
+          >
+            {record.name?.first_name?.[0]?.toUpperCase()}
+          </Avatar>
           <div>
             <div className="font-bold text-gray-800">
               {getFullName(record)}
@@ -162,7 +180,7 @@ const PropertyLeads = () => {
       title: 'Intent',
       key: 'type',
       render: (_, record) => {
-        const config = typeConfig[record.type] || { label: 'Unknown', color: 'default', icon: <UserOutlined /> };
+        const config = typeConfig[record.type] || { label: record.type, color: 'default', icon: <UserOutlined /> };
         return (
             <Tag icon={config.icon} color={config.color} style={{ borderRadius: 12, padding: '2px 10px' }}>
                 {config.label}
@@ -176,10 +194,12 @@ const PropertyLeads = () => {
       render: (_, record) => (
         <div className="flex flex-col gap-1 text-gray-600">
           <div className="flex items-center gap-2">
-             <MailOutlined className="text-gray-400"/> {record.email || 'N/A'}
+             <MailOutlined className="text-gray-400"/> 
+             <span className="text-xs">{record.email || 'N/A'}</span>
           </div>
           <div className="flex items-center gap-2">
-             <PhoneOutlined className="text-gray-400"/> {record.mobile?.country_code} {record.mobile?.number}
+             <PhoneOutlined className="text-gray-400"/> 
+             <span className="text-xs">{record.mobile?.country_code} {record.mobile?.number}</span>
           </div>
         </div>
       )
@@ -188,7 +208,7 @@ const PropertyLeads = () => {
       title: 'Status',
       key: 'status',
       render: (_, record) => {
-        const config = statusConfig[record.status] || { label: 'Unknown', color: 'default', icon: <BellOutlined /> };
+        const config = statusConfig[record.status] || { label: record.status, color: 'default', icon: <BellOutlined /> };
         return <Badge status={record.status === 'contacted' ? 'success' : 'warning'} text={config.label} />;
       }
     },
@@ -204,8 +224,8 @@ const PropertyLeads = () => {
                 icon={<EyeOutlined style={{ color: THEME.primary }} />}
                 style={{ borderColor: THEME.primary }}
                 onClick={() => {
-                setSelectedLead(record);
-                setDrawerVisible(true);
+                  setSelectedLead(record);
+                  setDrawerVisible(true);
                 }}
             />
           </Tooltip>
@@ -262,25 +282,18 @@ const PropertyLeads = () => {
           <Descriptions title="Buying Requirements" bordered column={1} size="small" layout="vertical" className="bg-white p-4 rounded border">
             <Descriptions.Item label="Target Location">{lead.country}, {lead.preferred_city}</Descriptions.Item>
             <Descriptions.Item label="Budget Range">{lead.budget || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Desired Bedrooms">{lead.desired_bedrooms || 'N/A'}</Descriptions.Item>
           </Descriptions>
         );
 
       case 'sell':
         return (
           <Descriptions title="Property for Sale" bordered column={1} size="small" className="bg-white p-4 rounded border">
-            <Descriptions.Item label="Location">{lead.country}, {lead.preferred_city}</Descriptions.Item>
+            <Descriptions.Item label="Location">{lead.country}, {lead.preferred_city} ({lead.area})</Descriptions.Item>
+            <Descriptions.Item label="Project / Unit">{lead.project_name}</Descriptions.Item>
+            <Descriptions.Item label="Specs">{lead.bedroom_config}</Descriptions.Item>
             <Descriptions.Item label="Asking Price">AED {lead.price?.toLocaleString() || 'N/A'}</Descriptions.Item>
-            <Descriptions.Item label="Project / Unit">{lead.project_name} ({lead.unit_type})</Descriptions.Item>
-            <Descriptions.Item label="Specs">{lead.bedroom_config}, {lead.size_sqft} Sq.ft</Descriptions.Item>
             <Descriptions.Item label="Description">{lead.description}</Descriptions.Item>
-          </Descriptions>
-        );
-
-      case 'schedule_visit':
-        return (
-          <Descriptions title="Visit Details" bordered column={1} size="small" className="bg-white p-4 rounded border">
-            <Descriptions.Item label="Visitor Occupation">{lead.occupation || 'N/A'}</Descriptions.Item>
-            <Descriptions.Item label="Current Location">{lead.location || 'N/A'}</Descriptions.Item>
           </Descriptions>
         );
 
@@ -292,17 +305,44 @@ const PropertyLeads = () => {
           </Descriptions>
         );
 
-      case 'partner':
+      case 'schedule_visit':
         return (
-          <Descriptions title="Partnership Proposal" bordered column={1} size="small" className="bg-white p-4 rounded border">
+          <Descriptions title="Visit Details" bordered column={1} size="small" className="bg-white p-4 rounded border">
+            <Descriptions.Item label="Visitor Occupation">{lead.occupation || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Current Location">{lead.location || 'N/A'}</Descriptions.Item>
+          </Descriptions>
+        );
+
+      case 'partner':
+      case 'investor':
+      case 'developer':
+        return (
+          <Descriptions title={`${typeConfig[lead.type].label} Details`} bordered column={1} size="small" className="bg-white p-4 rounded border">
             <Descriptions.Item label="Company Name">{lead.company || 'N/A'}</Descriptions.Item>
             <Descriptions.Item label="Stakeholder Role">{lead.stakeholder_type || 'N/A'}</Descriptions.Item>
-            <Descriptions.Item label="Proposal Message">{lead.message || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Message">{lead.message || 'N/A'}</Descriptions.Item>
+          </Descriptions>
+        );
+
+      case 'consultation':
+        return (
+          <Descriptions title="Consultation Request" bordered column={1} size="small" className="bg-white p-4 rounded border">
+            <Descriptions.Item label="Consultant Type">
+                <Tag color="cyan">{lead.consultant_type?.toUpperCase() || 'GENERAL'}</Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="Message">{lead.message || 'N/A'}</Descriptions.Item>
+          </Descriptions>
+        );
+
+      case 'enquiry':
+        return (
+          <Descriptions title="General Enquiry" bordered column={1} size="small" className="bg-white p-4 rounded border">
+            <Descriptions.Item label="Message">{lead.message || 'N/A'}</Descriptions.Item>
           </Descriptions>
         );
 
       default:
-        return null;
+        return <Empty description="No specific details available" />;
     }
   };
 
@@ -326,7 +366,7 @@ const PropertyLeads = () => {
                 <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.warning }}>
                     <Statistic 
                         title="New Submissions" 
-                        value={stats.new} // Note: This is based on current view page, ideally API provides totals
+                        value={stats.new} 
                         prefix={<BellOutlined style={{ color: THEME.warning }} />} 
                     />
                 </Card>
@@ -407,12 +447,12 @@ const PropertyLeads = () => {
                 <Avatar size={64} icon={<UserOutlined />} style={{ backgroundColor: THEME.primary }} />
                 <div className="flex-1">
                   <h3 className="text-xl font-bold m-0 text-gray-800">{getFullName(selectedLead)}</h3>
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
                     <Tag 
                       color={typeConfig[selectedLead.type]?.color} 
                       icon={typeConfig[selectedLead.type]?.icon}
                     >
-                      {typeConfig[selectedLead.type]?.label}
+                      {typeConfig[selectedLead.type]?.label || selectedLead.type}
                     </Tag>
                     <Tag color={statusConfig[selectedLead.status]?.color}>
                       {statusConfig[selectedLead.status]?.label}

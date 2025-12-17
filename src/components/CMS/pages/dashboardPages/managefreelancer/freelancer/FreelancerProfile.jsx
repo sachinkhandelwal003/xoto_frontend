@@ -1,40 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
-import { apiService } from "../../../../../../manageApi/utils/custom.apiservice";
-import { showToast } from "../../../../../../manageApi/utils/toast";
+import { useNavigate, useLocation } from "react-router-dom";
+import { apiService } from "../../../../../../manageApi/utils/custom.apiservice"; // Adjust path as needed
+import { showToast } from "../../../../../../manageApi/utils/toast"; // Adjust path as needed
 import {
   FaArrowLeft,
-  FaFile,
   FaBuilding,
   FaPhone,
   FaEnvelope,
-  FaGlobe,
-  FaClock,
-  FaStar,
-  FaChartLine,
-  FaUsers,
   FaBox,
   FaServicestack,
-  FaInfoCircle,
-  FaHistory,
   FaBriefcase,
-  FaTools,
-  FaRuler,
   FaLanguage,
   FaMoneyBill,
   FaIdCard,
-  FaCertificate,
   FaMapMarkerAlt,
   FaUserCheck,
   FaAward,
   FaRegCheckCircle,
   FaRegTimesCircle,
+  FaClock,
 } from "react-icons/fa";
 import { PiShieldCheck } from "react-icons/pi";
-
 import {
-  ArrowDownOutlined,
   CheckOutlined,
   CloseOutlined,
   EyeOutlined,
@@ -48,11 +35,7 @@ import {
   Spin,
   Avatar,
   Tag,
-  Divider,
-  List,
   Tooltip,
-  Table,
-  Collapse,
   Typography,
   Image,
   Space,
@@ -61,67 +44,69 @@ import {
   Empty,
   Badge,
   Statistic,
-  Progress,
   Descriptions,
-  Timeline,
-  Rate,
 } from "antd";
-import { useLocation } from "react-router-dom";
 
 const { Title, Text, Paragraph } = Typography;
-const { Panel } = Collapse;
 const { TextArea } = Input;
 
-const FreelancerProfile = () => {
-const location = useLocation();
-const params = new URLSearchParams(location.search);
-const freelancerId = params.get("freelancerId");
+// Define base URL for images
+const BASE_URL = "http://localhost:5000";
 
+const FreelancerProfile = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  
+  // Get freelancerId from Query Params (?freelancerId=...)
+  const params = new URLSearchParams(location.search);
+  const freelancerId = params.get("freelancerId");
+
   const [freelancer, setFreelancer] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [verifyingDoc, setVerifyingDoc] = useState(null);
-  const [selectedDocument, setSelectedDocument] = useState(null);
+  
+  // Modal States
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState(null);
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
+  const [verifyingDoc, setVerifyingDoc] = useState(null);
   const [selectedDocId, setSelectedDocId] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
   const [reason, setReason] = useState("");
   const [suggestion, setSuggestion] = useState("");
 
-  // Purple theme configuration
+  // Theme Config
   const theme = {
     primary: "#7e22ce",
     primaryLight: "#a855f7",
-    primaryDark: "#6b21a8",
     secondary: "#f3e8ff",
-    accent: "#c084fc",
     text: "#1f2937",
     textLight: "#6b7280",
     background: "#faf5ff",
     cardBg: "#ffffff",
   };
 
- const fetchFreelancer = async () => {
-  setLoading(true);
-  try {
-    const response = await apiService.get(`/freelancer?freelancerId=${freelancerId}`);
+  // --- API Calls ---
+  const fetchFreelancer = async () => {
+    if (!freelancerId) return;
+    setLoading(true);
+    try {
+      const response = await apiService.get(`/freelancer?freelancerId=${freelancerId}`);
+      if (response.success) {
+        setFreelancer(response.freelancer);
+      }
+    } catch (error) {
+      console.error("Error fetching freelancer:", error);
+      showToast("Failed to load freelancer details", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // backend returns: { success: true, freelancer }
-    setFreelancer(response.freelancer);
-  } catch (error) {
-    console.error("Error fetching freelancer:", error);
-    showToast("Failed to load freelancer details", "error");
-  } finally {
-    setLoading(false);
-  }
-};
+  useEffect(() => {
+    fetchFreelancer();
+  }, [freelancerId]);
 
-useEffect(() => {
-  fetchFreelancer();
-}, [freelancerId]);
-;
-
+  // --- Document Logic ---
   const openVerificationModal = (docId, approving) => {
     setSelectedDocId(docId);
     setIsApproving(approving);
@@ -139,19 +124,22 @@ useEffect(() => {
     setVerifyingDoc(selectedDocId);
     try {
       await apiService.put("/freelancer/document/verification/check", {
-        freelancerId: id,
+        freelancerId: freelancerId, // Use the ID from params
         documentId: selectedDocId,
         verified: isApproving,
         reason: reason.trim(),
         suggestion: suggestion.trim(),
       });
+      
       showToast(
         `Document ${isApproving ? "approved" : "rejected"} successfully`,
         "success"
       );
-      fetchFreelancer();
+      
       setVerificationModalOpen(false);
+      fetchFreelancer(); // Refresh data
     } catch (error) {
+      console.error(error);
       showToast(
         error.response?.data?.message || "Failed to update document",
         "error"
@@ -162,7 +150,7 @@ useEffect(() => {
   };
 
   const downloadDocument = (path) => {
-    window.open(`http://localhost:5000/${path}`, "_blank");
+    window.open(`${BASE_URL}/${path}`, "_blank");
   };
 
   const openImageModal = (document) => {
@@ -175,85 +163,13 @@ useEffect(() => {
     setSelectedDocument(null);
   };
 
-  const isImageFile = (filename) => {
-    if (!filename) return false;
-    const imageExtensions = [
-      ".jpg",
-      ".jpeg",
-      ".png",
-      ".gif",
-      ".bmp",
-      ".webp",
-      ".svg",
-    ];
-    return imageExtensions.some((ext) => filename.toLowerCase().endsWith(ext));
-  };
-
-  if (loading) {
-    return (
-      <div 
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: theme.background }}
-      >
-        <div className="text-center">
-          <Spin size="large" style={{ color: theme.primary }} />
-          <div className="mt-4">
-            <Text style={{ color: theme.primary, fontSize: '16px' }}>
-              Loading freelancer profile...
-            </Text>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!freelancer) {
-    return (
-      <div 
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: theme.background }}
-      >
-        <Card className="text-center shadow-lg border-0">
-          <div style={{ color: theme.primary, fontSize: '48px', marginBottom: '16px' }}>
-            <FaUserCheck />
-          </div>
-          <Title level={3} style={{ color: theme.text }}>
-            Freelancer Not Found
-          </Title>
-          <Text style={{ color: theme.textLight }}>
-            The freelancer you're looking for doesn't exist or has been removed.
-          </Text>
-          <div className="mt-6">
-            <Button 
-              type="primary" 
-              onClick={() => navigate(-1)}
-              style={{ 
-                background: theme.primary, 
-                borderColor: theme.primary,
-                padding: '8px 24px',
-                height: 'auto'
-              }}
-            >
-              <FaArrowLeft className="mr-2" />
-              Back to Freelancers
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  const fullName =
-    `${freelancer.name?.first_name || ""} ${freelancer.name?.last_name || ""}`.trim();
-
+  // --- Status Config ---
   const statusConfig = {
     0: { color: "#f59e0b", label: "Pending", icon: <FaClock /> },
     1: { color: "#10b981", label: "Approved", icon: <FaRegCheckCircle /> },
     2: { color: "#ef4444", label: "Rejected", icon: <FaRegTimesCircle /> },
-    3: { color: "#6b7280", label: "Suspended", icon: <PiShieldCheck  /> },
+    3: { color: "#6b7280", label: "Suspended", icon: <PiShieldCheck /> },
   };
-
-  const currentStatus = statusConfig[freelancer.status_info?.status] || statusConfig[0];
 
   const documentTypeLabel = {
     resume: "Resume",
@@ -263,572 +179,275 @@ useEffect(() => {
     certificate: "Certificate",
   };
 
-  // Stats for the header
-  const stats = [
-    {
-      title: "Experience",
-      value: freelancer.professional?.experience_years || 0,
-      suffix: "years",
-      icon: <FaAward style={{ color: theme.primary }} />,
-    },
-    {
-      title: "Services",
-      value: freelancer.services_offered?.length || 0,
-      icon: <FaServicestack style={{ color: theme.primary }} />,
-    },
-    {
-      title: "Languages",
-      value: freelancer.languages?.length || 0,
-      icon: <FaLanguage style={{ color: theme.primary }} />,
-    },
-    {
-      title: "Portfolio",
-      value: freelancer.portfolio?.length || 0,
-      icon: <FaBox style={{ color: theme.primary }} />,
-    },
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <Spin size="large" style={{ color: theme.primary }} />
+        <Text className="mt-4 text-gray-500">Loading Profile...</Text>
+      </div>
+    );
+  }
+
+  if (!freelancer) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="text-center shadow-md">
+          <FaUserCheck className="text-4xl text-gray-400 mx-auto mb-4" />
+          <Title level={4}>Freelancer Not Found</Title>
+          <Button onClick={() => navigate(-1)}>Go Back</Button>
+        </Card>
+      </div>
+    );
+  }
+
+  const fullName = `${freelancer.name?.first_name || ""} ${freelancer.name?.last_name || ""}`.trim();
+  const currentStatus = statusConfig[freelancer.status_info?.status] || statusConfig[0];
 
   return (
-    <div 
-      className="min-h-screen p-6"
-      style={{ background: theme.background }}
-    >
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <Button
-              icon={<FaArrowLeft />}
-              onClick={() => navigate(-1)}
-              style={{ 
-                color: theme.primary, 
-                borderColor: theme.primary,
-                marginBottom: '16px'
-              }}
-            >
-              Back to Freelancers
-            </Button>
-            <Title 
-              level={1} 
-              style={{ 
-                color: theme.text,
-                margin: 0
-              }}
-            >
-              Freelancer Profile
-            </Title>
-            <Text style={{ color: theme.textLight }}>
-              Complete details and management for {fullName}
-            </Text>
-          </div>
-          
-          <Badge
-            count={currentStatus.label}
-            style={{ 
-              backgroundColor: currentStatus.color,
-              fontSize: '12px',
-              padding: '4px 12px'
-            }}
-          />
-        </div>
-
-        {/* Profile Header Card */}
-        <Card 
-          className="shadow-2xl border-0 mb-8"
-          style={{ 
-            background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.primaryLight} 100%)`,
-            color: 'white'
-          }}
+    <div className="min-h-screen p-6" style={{ background: theme.background }}>
+      {/* --- HEADER --- */}
+      <div className="mb-6">
+        <Button
+          icon={<FaArrowLeft />}
+          onClick={() => navigate(-1)}
+          className="mb-4 text-purple-700 border-purple-200 hover:text-purple-900"
         >
-          <Row gutter={[32, 32]} align="middle">
-            <Col xs={24} md={6} className="text-center">
-              <Avatar
-                size={120}
-                src={
-                  freelancer.profile_image
-                    ? `http://localhost:5000/${freelancer.profile_image}`
-                    : undefined
-                }
-                style={{ 
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  border: '4px solid rgba(255,255,255,0.3)'
-                }}
-              >
-                <span style={{ fontSize: '36px', color: 'white' }}>
+          Back
+        </Button>
+
+        <Card 
+          className="shadow-xl border-0 overflow-hidden"
+          bodyStyle={{ padding: 0 }}
+        >
+          <div 
+            className="p-8" 
+            style={{ background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.primaryLight} 100%)` }}
+          >
+            <Row gutter={[24, 24]} align="middle">
+              <Col xs={24} md={4} className="text-center md:text-left">
+                <Avatar
+                  size={120}
+                  src={freelancer.profile_image ? `${BASE_URL}/${freelancer.profile_image}` : undefined}
+                  className="border-4 border-white/30 shadow-lg"
+                  icon={<FaUserCheck />}
+                >
                   {fullName.charAt(0)}
-                </span>
-              </Avatar>
-            </Col>
-            
-            <Col xs={24} md={10}>
-              <Title level={2} style={{ color: 'white', margin: 0 }}>
-                {fullName || "N/A"}
-              </Title>
-              <Paragraph style={{ color: 'rgba(255,255,255,0.8)', margin: '8px 0' }}>
-                <FaEnvelope className="mr-2" />
-                {freelancer.email}
-              </Paragraph>
-              <Paragraph style={{ color: 'rgba(255,255,255,0.8)', margin: '8px 0' }}>
-                <FaPhone className="mr-2" />
-                {freelancer.mobile?.number ? 
-                  `${freelancer.mobile.country_code} ${freelancer.mobile.number}` : 
-                  "--"
-                }
-                {freelancer.is_mobile_verified && (
-                  <Badge 
-                    count="Verified" 
-                    style={{ 
-                      backgroundColor: '#10b981',
-                      marginLeft: '8px'
-                    }} 
-                  />
-                )}
-              </Paragraph>
-              <Paragraph style={{ color: 'rgba(255,255,255,0.8)', margin: '8px 0' }}>
-                <FaMapMarkerAlt className="mr-2" />
-                {freelancer.location?.city || "--"}, {freelancer.location?.country || "--"}
-              </Paragraph>
-            </Col>
-            
-            <Col xs={24} md={8}>
-              <Row gutter={[16, 16]}>
-                {stats.map((stat, index) => (
-                  <Col xs={12} key={index}>
-                    <Statistic
-                      title={
-                        <Text style={{ color: 'rgba(255,255,255,0.8)' }}>
-                          {stat.title}
-                        </Text>
-                      }
-                      value={stat.value}
-                      prefix={stat.icon}
-                      valueStyle={{ color: 'white', fontSize: '24px' }}
-                      suffix={stat.suffix}
+                </Avatar>
+              </Col>
+              
+              <Col xs={24} md={12} className="text-white text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                  <Title level={2} style={{ color: 'white', margin: 0 }}>{fullName}</Title>
+                  <Tag color={currentStatus.color} className="border-0 font-bold px-3 py-1 rounded-full">
+                    {currentStatus.icon} {currentStatus.label}
+                  </Tag>
+                </div>
+                
+                <Space direction="vertical" size={1} className="text-purple-100">
+                  <span className="flex items-center gap-2"><FaEnvelope /> {freelancer.email}</span>
+                  <span className="flex items-center gap-2">
+                    <FaPhone /> {freelancer.mobile?.country_code} {freelancer.mobile?.number}
+                    {freelancer.is_mobile_verified && <Badge status="success" text={<span className="text-green-300 text-xs">Verified</span>} />}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <FaMapMarkerAlt /> {freelancer.location?.city}, {freelancer.location?.country}
+                  </span>
+                </Space>
+              </Col>
+
+              <Col xs={24} md={8}>
+                <Row gutter={[16, 16]}>
+                  <Col span={12}>
+                    <Statistic 
+                      title={<span className="text-purple-200">Experience</span>} 
+                      value={freelancer.professional?.experience_years} 
+                      suffix="Years" 
+                      valueStyle={{ color: 'white' }} 
+                      prefix={<FaAward />} 
                     />
                   </Col>
-                ))}
-              </Row>
-            </Col>
-          </Row>
+                  <Col span={12}>
+                    <Statistic 
+                      title={<span className="text-purple-200">Services</span>} 
+                      value={freelancer.services_offered?.length} 
+                      valueStyle={{ color: 'white' }} 
+                      prefix={<FaServicestack />} 
+                    />
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          </div>
         </Card>
       </div>
 
-      {/* Main Content Grid */}
       <Row gutter={[24, 24]}>
-        {/* Left Column - Basic Info & Professional Details */}
+        {/* --- LEFT COLUMN (Info) --- */}
         <Col xs={24} lg={8}>
-          <Row gutter={[24, 24]}>
-            {/* Basic Information */}
-            <Col xs={24}>
-              <Card
-                className="shadow-lg border-0"
-                style={{ background: theme.cardBg }}
-                title={
-                  <div style={{ color: theme.primary }}>
-                    <FaBuilding className="mr-2" />
-                    Basic Information
-                  </div>
-                }
-              >
-                <Descriptions column={1} size="small">
-                  <Descriptions.Item label="Email">
-                    <Text strong>{freelancer.email}</Text>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Mobile">
-                    <Text strong>
-                      {freelancer.mobile?.number ? 
-                        `${freelancer.mobile.country_code} ${freelancer.mobile.number}` : 
-                        "--"
-                      }
-                    </Text>
-                    {freelancer.is_mobile_verified && (
-                      <Badge 
-                        count="Verified" 
-                        style={{ 
-                          backgroundColor: '#10b981',
-                          marginLeft: '8px'
-                        }} 
-                      />
-                    )}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Languages">
-                    <Space wrap>
-                      {freelancer.languages?.map((lang, index) => (
-                        <Tag 
-                          key={index}
-                          style={{ 
-                            background: theme.secondary,
-                            color: theme.primary,
-                            border: `1px solid ${theme.primaryLight}`
-                          }}
-                        >
-                          {lang}
-                        </Tag>
-                      )) || "--"}
-                    </Space>
-                  </Descriptions.Item>
-                </Descriptions>
-              </Card>
-            </Col>
+          <Space direction="vertical" className="w-full" size="large">
+            
+            {/* Basic Info */}
+            <Card title={<span><FaBuilding className="mr-2 text-purple-600"/> Basic Info</span>} className="shadow-sm">
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label="Languages">
+                  <Space wrap>
+                    {freelancer.languages?.map(l => (
+                      <Tag key={l} color="purple">{l}</Tag>
+                    ))}
+                  </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label="Pincode">{freelancer.location?.pincode}</Descriptions.Item>
+                <Descriptions.Item label="Joined">{new Date(freelancer.meta?.created_at).toLocaleDateString()}</Descriptions.Item>
+              </Descriptions>
+            </Card>
 
-            {/* Professional Details */}
-            <Col xs={24}>
-              <Card
-                className="shadow-lg border-0"
-                style={{ background: theme.cardBg }}
-                title={
-                  <div style={{ color: theme.primary }}>
-                    <FaBriefcase className="mr-2" />
-                    Professional Details
-                  </div>
-                }
-              >
-                <Descriptions column={1} size="small">
-                  <Descriptions.Item label="Experience">
-                    <Text strong>
-                      {freelancer.professional?.experience_years || 0} years
-                    </Text>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Availability">
-                    <Tag 
-                      color="blue"
-                      style={{ 
-                        background: theme.secondary,
-                        color: theme.primary
-                      }}
-                    >
-                      {freelancer.professional?.availability || "Not specified"}
-                    </Tag>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Bio">
-                    <Paragraph 
-                      style={{ 
-                        color: theme.textLight,
-                        fontStyle: freelancer.professional?.bio ? 'normal' : 'italic'
-                      }}
-                    >
-                      {freelancer.professional?.bio || "No bio provided"}
-                    </Paragraph>
-                  </Descriptions.Item>
-                </Descriptions>
-              </Card>
-            </Col>
+            {/* Professional */}
+            <Card title={<span><FaBriefcase className="mr-2 text-purple-600"/> Professional</span>} className="shadow-sm">
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label="Availability">
+                  <Tag color="blue">{freelancer.professional?.availability}</Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Working Radius">
+                  {freelancer.professional?.working_radius} km
+                </Descriptions.Item>
+                <Descriptions.Item label="Bio">
+                  <Paragraph ellipsis={{ rows: 3, expandable: true }}>
+                    {freelancer.professional?.bio}
+                  </Paragraph>
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
 
-            {/* Payment Information */}
-            <Col xs={24}>
-              <Card
-                className="shadow-lg border-0"
-                style={{ background: theme.cardBg }}
-                title={
-                  <div style={{ color: theme.primary }}>
-                    <FaMoneyBill className="mr-2" />
-                    Payment Information
-                  </div>
-                }
-              >
-                <Descriptions column={1} size="small">
-                  <Descriptions.Item label="Preferred Method">
-                    <Text strong>
-                      {freelancer.payment?.preferred_method || "Not specified"}
-                    </Text>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Advance Percentage">
-                    <Text strong>
-                      {freelancer.payment?.advance_percentage || 0}%
-                    </Text>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="GST Number">
-                    <Text strong>
-                      {freelancer.payment?.gst_number || "Not provided"}
-                    </Text>
-                  </Descriptions.Item>
-                </Descriptions>
-              </Card>
-            </Col>
-          </Row>
+            {/* Payment */}
+            <Card title={<span><FaMoneyBill className="mr-2 text-purple-600"/> Payment Details</span>} className="shadow-sm">
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label="Method">{freelancer.payment?.preferred_method}</Descriptions.Item>
+                <Descriptions.Item label="Currency">
+                   {freelancer.payment?.preferred_currency?.code} ({freelancer.payment?.preferred_currency?.symbol})
+                </Descriptions.Item>
+                <Descriptions.Item label="GST No">{freelancer.payment?.gst_number || "N/A"}</Descriptions.Item>
+              </Descriptions>
+            </Card>
+          </Space>
         </Col>
 
-        {/* Right Column - Services & Documents */}
+        {/* --- RIGHT COLUMN (Services & Docs) --- */}
         <Col xs={24} lg={16}>
-          <Row gutter={[24, 24]}>
-            {/* Services Offered */}
-           <Col xs={24}>
-  <Card
-    className="shadow-lg border-0"
-    style={{ background: theme.cardBg }}
-    title={
-      <div style={{ color: theme.primary }}>
-        <FaServicestack className="mr-2" />
-        Services Offered ({freelancer.services_offered?.length || 0})
-      </div>
-    }
-  >
-    {freelancer.services_offered?.length > 0 ? (
-      <List
-        dataSource={freelancer.services_offered}
-        renderItem={(service, index) => (
-          <List.Item>
-            <Card
-              style={{
-                width: "100%",
-                border: `1px solid ${theme.secondary}`,
-                background: theme.background,
-              }}
-              bodyStyle={{ padding: "16px" }}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  {/* Category */}
-                  <Title level={5} style={{ color: theme.primary, margin: 0 }}>
-                    {service.category?.name || "Unknown Category"}
-                  </Title>
-
-                  {/* ✅ Correct Subcategories */}
-                  <Text style={{ color: theme.textLight }}>
-                    {service.subcategories?.length
-                      ? service.subcategories.map((s) => s.name).join(", ")
-                      : "No subcategories"}
-                  </Text>
-
-                  {/* Description */}
-                  <Paragraph style={{ margin: "8px 0", color: theme.text }}>
-                    {service.description}
-                  </Paragraph>
-
-                  {/* Price Tag */}
-                  {service.price_range && (
-                    <Tag
-                      style={{
-                        background: theme.primary,
-                        color: "white",
-                        border: "none",
-                      }}
-                    >
-                      {service.price_range} / {service.unit}
-                    </Tag>
-                  )}
-                </div>
-
-                {/* Images */}
-                {service.images?.length > 0 && (
-                  <div className="flex gap-2">
-                    {service.images.slice(0, 2).map((img, i) => (
-                      <Image
-                        key={i}
-                        width={60}
-                        height={60}
-                        src={`http://localhost:5000/${img}`}
-                        style={{
-                          objectFit: "cover",
-                          borderRadius: "8px",
-                          border: `2px solid ${theme.secondary}`,
-                        }}
-                        preview={{
-                          mask: <EyeOutlined style={{ color: "white" }} />,
-                        }}
-                      />
-                    ))}
-
-                    {/* +more images indicator */}
-                    {service.images.length > 2 && (
-                      <div
-                        style={{
-                          width: 60,
-                          height: 60,
-                          background: theme.secondary,
-                          borderRadius: "8px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: theme.primary,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        +{service.images.length - 2}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+          <Space direction="vertical" className="w-full" size="large">
+            
+            {/* Services */}
+            <Card title={<span><FaServicestack className="mr-2 text-purple-600"/> Services Offered</span>} className="shadow-sm">
+               {freelancer.services_offered?.length > 0 ? (
+                 freelancer.services_offered.map((service) => (
+                   <Card key={service._id} type="inner" className="mb-4 bg-gray-50 border-gray-200">
+                     <div className="flex justify-between items-start">
+                        <div>
+                          <Title level={5} className="m-0 text-purple-800">{service.category?.name}</Title>
+                          <Text type="secondary" className="block text-xs mb-2">
+                             {service.subcategories?.map(sub => sub.name).join(", ")}
+                          </Text>
+                          <Paragraph className="text-gray-600 mb-2">{service.description}</Paragraph>
+                          <Tag color="green" className="text-base px-3 py-1">
+                             {freelancer.payment?.preferred_currency?.symbol} {service.price_range} / {service.unit}
+                          </Tag>
+                        </div>
+                        {/* Service Images */}
+                        {service.images?.length > 0 && (
+                          <div className="flex gap-2">
+                             {service.images.slice(0,2).map((img, i) => (
+                               <Image 
+                                 key={i} 
+                                 width={60} 
+                                 height={60} 
+                                 src={`${BASE_URL}/${img}`} 
+                                 className="rounded border"
+                               />
+                             ))}
+                          </div>
+                        )}
+                     </div>
+                   </Card>
+                 ))
+               ) : <Empty description="No Services Listed" />}
             </Card>
-          </List.Item>
-        )}
-      />
-    ) : (
-      <Empty
-        description="No services offered yet"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      />
-    )}
-  </Card>
-</Col>
 
+            {/* Documents (Admin Verification) */}
+            <Card title={<span><FaIdCard className="mr-2 text-purple-600"/> Documents & Verification</span>} className="shadow-sm">
+              <Row gutter={[16, 16]}>
+                {freelancer.documents?.map((doc) => (
+                  <Col xs={24} sm={12} key={doc._id}>
+                    <Card size="small" className="h-full border-gray-200 hover:shadow-md transition-shadow">
+                      <div className="flex justify-between items-start mb-2">
+                         <Text strong className="capitalize">{documentTypeLabel[doc.type] || doc.type}</Text>
+                         <Badge status={doc.verified ? "success" : "processing"} text={doc.verified ? "Verified" : "Pending"} />
+                      </div>
+                      
+                      <Space className="w-full justify-between mt-4">
+                        <Space>
+                           <Tooltip title="View">
+                             <Button size="small" icon={<EyeOutlined />} onClick={() => openImageModal(doc)} />
+                           </Tooltip>
+                           <Tooltip title="Download">
+                             <Button size="small" icon={<DownloadOutlined />} onClick={() => downloadDocument(doc.path)} />
+                           </Tooltip>
+                        </Space>
 
-            {/* Documents & Certificates */}
-            <Col xs={24}>
-              <Card
-                className="shadow-lg border-0"
-                style={{ background: theme.cardBg }}
-                title={
-                  <div style={{ color: theme.primary }}>
-                    <FaIdCard className="mr-2" />
-                    Documents & Certificates ({freelancer.documents?.length || 0})
-                  </div>
-                }
-              >
-                {freelancer.documents?.length > 0 ? (
-                  <Row gutter={[16, 16]}>
-                    {freelancer.documents.map((doc, index) => (
-                      <Col xs={24} md={12} lg={8} key={doc._id || index}>
-                        <Card
-                          size="small"
-                          style={{ 
-                            border: `1px solid ${theme.secondary}`,
-                            background: theme.background
-                          }}
-                          actions={[
-                            <Tooltip title="Download">
-                              <DownloadOutlined 
-                                onClick={() => downloadDocument(doc.path)}
-                                style={{ color: theme.primary }}
-                              />
-                            </Tooltip>,
-                            <Tooltip title="Preview">
-                              <EyeOutlined 
-                                onClick={() => openImageModal(doc)}
-                                style={{ color: theme.primary }}
-                              />
-                            </Tooltip>,
-                            !doc.verified && (
-                              <Tooltip title="Approve">
-                                <CheckOutlined 
-                                  onClick={() => openVerificationModal(doc._id, true)}
-                                  style={{ color: '#10b981' }}
-                                />
-                              </Tooltip>
-                            ),
-                            !doc.verified && (
-                              <Tooltip title="Reject">
-                                <CloseOutlined 
-                                  onClick={() => openVerificationModal(doc._id, false)}
-                                  style={{ color: '#ef4444' }}
-                                />
-                              </Tooltip>
-                            ),
-                          ]}
-                        >
-                          <Card.Meta
-                            title={
-                              <Text strong style={{ color: theme.text }}>
-                                {documentTypeLabel[doc.type] || doc.type}
-                              </Text>
-                            }
-                            description={
-                              <Space direction="vertical" size="small">
-                                <Badge
-                                  status={doc.verified ? "success" : "processing"}
-                                  text={doc.verified ? "Verified" : "Pending Verification"}
-                                />
-                                {doc.uploaded_at && (
-                                  <Text type="secondary" style={{ fontSize: '12px' }}>
-                                    Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}
-                                  </Text>
-                                )}
-                              </Space>
-                            }
-                          />
-                        </Card>
-                      </Col>
-                    ))}
-                  </Row>
-                ) : (
-                  <Empty 
-                    description="No documents uploaded"
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  />
-                )}
-              </Card>
-            </Col>
+                        {/* Admin Actions */}
+                        {!doc.verified && (
+                          <Space>
+                             <Tooltip title="Approve">
+                               <Button size="small" type="primary" className="bg-green-500 border-green-500 hover:bg-green-600" icon={<CheckOutlined />} onClick={() => openVerificationModal(doc._id, true)} />
+                             </Tooltip>
+                             <Tooltip title="Reject">
+                               <Button size="small" type="primary" danger icon={<CloseOutlined />} onClick={() => openVerificationModal(doc._id, false)} />
+                             </Tooltip>
+                          </Space>
+                        )}
+                      </Space>
+                      
+                      <div className="text-xs text-gray-400 mt-2 text-right">
+                        Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}
+                      </div>
+                    </Card>
+                  </Col>
+                ))}
+                {(!freelancer.documents || freelancer.documents.length === 0) && <Empty className="w-full" description="No documents uploaded" />}
+              </Row>
+            </Card>
 
-            {/* Portfolio Items */}
+            {/* Portfolio */}
             {freelancer.portfolio?.length > 0 && (
-              <Col xs={24}>
-                <Card
-                  className="shadow-lg border-0"
-                  style={{ background: theme.cardBg }}
-                  title={
-                    <div style={{ color: theme.primary }}>
-                      <FaBox className="mr-2" />
-                      Portfolio ({freelancer.portfolio.length})
-                    </div>
-                  }
-                >
-                  <Row gutter={[16, 16]}>
-                    {freelancer.portfolio.map((item, index) => (
-                      <Col xs={24} md={12} key={index}>
-                        <Card
-                          hoverable
-                          style={{ 
-                            border: `1px solid ${theme.secondary}`,
-                            background: theme.background
-                          }}
-                          cover={
-                            item.images?.length > 0 ? (
-                              <Image
-                                alt={item.title}
-                                src={`http://localhost:5000/${item.images[0]}`}
-                                height={200}
-                                style={{ objectFit: 'cover' }}
-                                preview={false}
-                              />
-                            ) : null
-                          }
-                        >
-                          <Card.Meta
-                            title={item.title}
-                            description={
-                              <Space direction="vertical" size="small">
-                                <Text type="secondary">
-                                  {item.category?.name} → {item.subcategory?.name}
-                                </Text>
-                                <Paragraph 
-                                  ellipsis={{ rows: 2 }}
-                                  style={{ color: theme.textLight, margin: 0 }}
-                                >
-                                  {item.description}
-                                </Paragraph>
-                                {item.completed_at && (
-                                  <Text type="secondary" style={{ fontSize: '12px' }}>
-                                    Completed: {new Date(item.completed_at).toLocaleDateString()}
-                                  </Text>
-                                )}
-                              </Space>
-                            }
-                          />
-                        </Card>
+              <Card title={<span><FaBox className="mr-2 text-purple-600"/> Portfolio</span>} className="shadow-sm">
+                 <Row gutter={[16, 16]}>
+                    {freelancer.portfolio.map((item, idx) => (
+                      <Col xs={24} md={12} key={idx}>
+                         <Card hoverable className="h-full" cover={item.images?.[0] && <img alt="portfolio" src={`${BASE_URL}/${item.images[0]}`} className="h-40 object-cover" />}>
+                            <Card.Meta 
+                              title={item.title}
+                              description={
+                                <div>
+                                   <Text type="secondary" className="text-xs">{item.category?.name} - {item.subcategory?.name}</Text>
+                                   <Paragraph ellipsis={{ rows: 2 }} className="mt-1 mb-0">{item.description}</Paragraph>
+                                </div>
+                              }
+                            />
+                         </Card>
                       </Col>
                     ))}
-                  </Row>
-                </Card>
-              </Col>
+                 </Row>
+              </Card>
             )}
-          </Row>
+
+          </Space>
         </Col>
       </Row>
 
-      {/* Image Modal */}
-      <Modal
-        open={imageViewerOpen}
-        onCancel={closeImageModal}
-        footer={null}
-        width={800}
-        style={{ top: 20 }}
-      >
+      {/* --- MODALS --- */}
+      
+      {/* Image Preview */}
+      <Modal open={imageViewerOpen} onCancel={closeImageModal} footer={null} width={800} centered>
         {selectedDocument && (
-          <Image
-            src={`http://localhost:5000/${selectedDocument.path}`}
-            style={{ width: '100%', borderRadius: '8px' }}
-          />
+          <img src={`${BASE_URL}/${selectedDocument.path}`} alt="Document" style={{ width: '100%', maxHeight: '80vh', objectFit: 'contain' }} />
         )}
       </Modal>
 
@@ -836,44 +455,33 @@ useEffect(() => {
       <Modal
         open={verificationModalOpen}
         onCancel={() => setVerificationModalOpen(false)}
-        footer={null}
-        style={{ top: 20 }}
-      >
-        <Title level={4} style={{ color: theme.text }}>
-          {isApproving ? "Approve" : "Reject"} Document
-        </Title>
-        <TextArea
-          placeholder={isApproving ? "Optional comments..." : "Reason for rejection (required)"}
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          rows={3}
-          style={{ marginBottom: '16px' }}
-        />
-        <TextArea
-          placeholder="Suggestions for improvement (optional)"
-          value={suggestion}
-          onChange={(e) => setSuggestion(e.target.value)}
-          rows={3}
-          style={{ marginBottom: '16px' }}
-        />
-        <div className="flex justify-end gap-3">
-          <Button onClick={() => setVerificationModalOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            type={isApproving ? "primary" : "danger"}
-            onClick={handleSubmitVerification}
+        title={isApproving ? "Approve Document" : "Reject Document"}
+        footer={[
+          <Button key="back" onClick={() => setVerificationModalOpen(false)}>Cancel</Button>,
+          <Button 
+            key="submit" 
+            type="primary" 
+            danger={!isApproving}
+            className={isApproving ? "bg-green-600" : ""}
             loading={verifyingDoc === selectedDocId}
-            disabled={!isApproving && !reason.trim()}
-            style={{
-              background: isApproving ? theme.primary : '#ef4444',
-              borderColor: isApproving ? theme.primary : '#ef4444'
-            }}
+            onClick={handleSubmitVerification}
           >
-            {isApproving ? "Approve Document" : "Reject Document"}
+            {isApproving ? "Approve" : "Reject"}
           </Button>
-        </div>
+        ]}
+      >
+         {!isApproving && (
+            <div className="mb-4">
+               <Text strong className="text-red-500">Reason for Rejection *</Text>
+               <TextArea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Document is blurry" />
+            </div>
+         )}
+         <div>
+            <Text strong>Suggestion (Optional)</Text>
+            <TextArea rows={2} value={suggestion} onChange={(e) => setSuggestion(e.target.value)} placeholder="e.g. Please upload a clearer scan" />
+         </div>
       </Modal>
+
     </div>
   );
 };

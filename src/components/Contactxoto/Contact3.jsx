@@ -52,6 +52,7 @@ export default function QuickEnquiry() {
     setLoading(true);
 
     const payload = {
+        type: "enquiry",              // ✅ REQUIRED
       name: {
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim()
@@ -62,11 +63,10 @@ export default function QuickEnquiry() {
       },
       email: formData.email.trim().toLowerCase(),
       message: formData.message.trim(),
-      preferred_contact: "phone" // Hardcoded as requested
     };
 
     try {
-      await apiService.post("/enquiry/", payload);
+      await apiService.post("/property/lead", payload);
 
       showSuccessAlert(
         "Thank You!",

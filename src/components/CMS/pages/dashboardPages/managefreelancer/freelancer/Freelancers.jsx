@@ -19,7 +19,8 @@ import {
   Avatar,
   Row,
   Col,
-  Statistic
+  Statistic,
+  Table
 } from "antd";
 import {
   CheckCircleOutlined,
@@ -33,7 +34,11 @@ import {
   GlobalOutlined,
   SafetyCertificateOutlined,
   TeamOutlined,
-  UserSwitchOutlined
+  UserSwitchOutlined,
+  FileTextOutlined,
+  StopOutlined,
+  UserAddOutlined,
+  CreditCardOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import { apiService } from "../../../../../../manageApi/utils/custom.apiservice";
@@ -45,8 +50,8 @@ const { Title, Text } = Typography;
 
 // --- THEME CONFIGURATION ---
 const THEME = {
-  primary: "#722ed1", // Purple
-  secondary: "#1890ff", // Blue
+  primary: "#722ed1",
+  secondary: "#1890ff",
   success: "#52c41a",
   warning: "#faad14",
   error: "#ff4d4f",
@@ -105,10 +110,17 @@ const Freelancers = () => {
     itemsPerPage: 10,
   });
 
+  // Action States
   const [selectedFreelancer, setSelectedFreelancer] = useState(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [actionLoading, setActionLoading] = useState(null);
+
+  // Rate Card Modal States
+  const [showRateCardModal, setShowRateCardModal] = useState(false);
+  const [rateCardData, setRateCardData] = useState([]);
+  const [rateCardFreelancerName, setRateCardFreelancerName] = useState("");
+  const [rateCardCurrency, setRateCardCurrency] = useState(""); // ✅ Added Currency State
 
   // Status mapping for API
   const statusMap = { 
@@ -122,6 +134,17 @@ const Freelancers = () => {
     0: { label: "Pending", color: "warning", icon: <ClockCircleOutlined /> },
     1: { label: "Approved", color: "success", icon: <CheckCircleOutlined /> },
     2: { label: "Rejected", color: "error", icon: <CloseCircleOutlined /> },
+  };
+
+  // Onboarding Status UI Config
+  const onboardingStatusConfig = {
+    registered: { label: "Registered", color: "default", icon: <UserAddOutlined /> },
+    profile_incomplete: { label: "Profile Incomplete", color: "warning", icon: <FileTextOutlined /> },
+    profile_submitted: { label: "Profile Submitted", color: "processing", icon: <ClockCircleOutlined /> },
+    under_review: { label: "Under Review", color: "processing", icon: <EyeOutlined /> },
+    approved: { label: "Approved", color: "success", icon: <CheckCircleOutlined /> },
+    rejected: { label: "Rejected", color: "error", icon: <CloseCircleOutlined /> },
+    suspended: { label: "Suspended", color: "volcano", icon: <StopOutlined /> },
   };
 
   // Fetch Freelancers
@@ -258,6 +281,18 @@ const Freelancers = () => {
       navigate(`/dashboard/${roleSlug}/freelancer?freelancerId=${freelancer._id}`)
   };
 
+  // --- HANDLE VIEW RATE CARD ---
+  const handleViewRateCard = (record) => {
+    setRateCardData(record.services_offered || []);
+    setRateCardFreelancerName(`${record.name?.first_name} ${record.name?.last_name}`);
+    
+    // ✅ Extract Currency Symbol
+    const symbol = record.payment?.preferred_currency?.symbol || ""; 
+    setRateCardCurrency(symbol);
+    
+    setShowRateCardModal(true);
+  };
+
   const formatMobile = (freelancer) => {
     if (freelancer.mobile) {
       if (typeof freelancer.mobile === 'object') {
@@ -268,9 +303,9 @@ const Freelancers = () => {
     return "—";
   };
 
-  // --- COLUMNS ---
-  const columns = useMemo(
-    () => [
+  // --- MAIN TABLE COLUMNS ---
+  const columns = useMemo(() => {
+    const baseCols = [
       {
         title: "Freelancer Profile",
         width: 280,
@@ -295,7 +330,26 @@ const Freelancers = () => {
             </div>
           </div>
         ),
-      },
+      }
+    ];
+
+    if (activeTab !== 'approved') {
+        baseCols.push({
+            title: "Onboarding Status",
+            width: 180,
+            render: (_, record) => {
+              const status = record.onboarding_status || "registered";
+              const config = onboardingStatusConfig[status];
+              return (
+                <Tag color={config.color} style={{ borderRadius: 12, padding: "2px 10px", display: "flex", width: "fit-content", alignItems: "center", gap: "6px" }}>
+                  {config.icon} {config.label}
+                </Tag>
+              );
+            },
+        });
+    }
+
+    baseCols.push(
       {
         title: "Contact & Location",
         width: 200,
@@ -327,8 +381,8 @@ const Freelancers = () => {
         render: (_, record) => (
             <Space direction="vertical" size={2}>
                 <Tag color="purple">
-                     <SafetyCertificateOutlined className="mr-1"/>
-                     {record.professional?.experience_years || 0} Years Exp.
+                      <SafetyCertificateOutlined className="mr-1"/>
+                      {record.professional?.experience_years || 0} Years Exp.
                 </Tag>
                 <div className="text-xs text-gray-500 pl-1">
                     {record.services_offered?.length || 0} Services Offered
@@ -366,7 +420,18 @@ const Freelancers = () => {
               />
             </Tooltip>
 
-            {/* Actions for Pending Tab */}
+            {activeTab === 'approved' && (
+                <Tooltip title="View Rate Card">
+                    <Button
+                        icon={<CreditCardOutlined style={{ color: '#13c2c2' }} />}
+                        size="small"
+                        shape="circle"
+                        onClick={() => handleViewRateCard(record)}
+                        style={{ borderColor: '#13c2c2' }}
+                    />
+                </Tooltip>
+            )}
+
             {activeTab === "pending" && perm.canApprove && (
               <Tooltip title="Approve">
                 <Popconfirm
@@ -403,10 +468,11 @@ const Freelancers = () => {
             )}
           </Space>
         ),
-      },
-    ],
-    [activeTab, perm, actionLoading, navigate, roleSlug]
-  );
+      }
+    );
+
+    return baseCols;
+  }, [activeTab, perm, actionLoading, navigate, roleSlug]);
 
   if (!perm.canView) {
     return (
@@ -449,6 +515,48 @@ const Freelancers = () => {
                 <Badge count={stats.rejected} style={{ marginLeft: 8, backgroundColor: THEME.error }} />
             </span>
         )
+    }
+  ];
+
+  // --- RATE CARD MODAL COLUMNS ---
+  const rateCardColumns = [
+    {
+        title: "Category",
+        key: "category",
+        render: (_, record) => (
+            <div className="flex items-center gap-2">
+                <Avatar src={record.category?.icon} shape="square" size="small" />
+                <Text strong>{record.category?.name}</Text>
+            </div>
+        )
+    },
+    {
+        title: "Subcategories",
+        key: "subcategories",
+        render: (_, record) => (
+            <div className="flex flex-wrap gap-1">
+                {record.subcategories?.length > 0 ? (
+                    record.subcategories.map(sub => <Tag key={sub._id}>{sub.name}</Tag>)
+                ) : <Text type="secondary">N/A</Text>}
+            </div>
+        )
+    },
+    {
+        title: "Price Range",
+        dataIndex: "price_range",
+        key: "price_range",
+        render: (text) => (
+            // ✅ Display Currency + Price
+            <Tag color="green" style={{ fontSize: '14px', padding: '4px 10px' }}>
+                {rateCardCurrency} {text || "N/A"}
+            </Tag>
+        )
+    },
+    {
+        title: "Unit",
+        dataIndex: "unit",
+        key: "unit",
+        render: (text) => <Text type="secondary">{text || "N/A"}</Text>
     }
   ];
 
@@ -556,7 +664,7 @@ const Freelancers = () => {
           <div className="pt-2">
             <Alert
               message="Action Required"
-              description="Please provide a valid reason for rejection. This will be sent to the freelancer."
+              description="Please provide a valid reason for rejection."
               type="warning"
               showIcon
               className="mb-4"
@@ -564,7 +672,7 @@ const Freelancers = () => {
             
             <div className="mb-4 p-3 bg-gray-50 rounded border border-gray-200">
               <div className="flex items-center gap-3">
-                <Avatar size="small" src={selectedFreelancer.avatar}>{selectedFreelancer.name?.first_name?.[0]}</Avatar>
+                <Avatar size="small">{selectedFreelancer.name?.first_name?.[0]}</Avatar>
                 <div>
                     <div className="font-semibold text-sm text-gray-800">
                         {selectedFreelancer.name?.first_name} {selectedFreelancer.name?.last_name}
@@ -577,7 +685,7 @@ const Freelancers = () => {
             <Text strong className="block mb-2">Rejection Reason:</Text>
             <TextArea
               rows={4}
-              placeholder="E.g., Incomplete profile information, credentials not verified..."
+              placeholder="E.g., Incomplete profile information..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               maxLength={500}
@@ -586,6 +694,36 @@ const Freelancers = () => {
           </div>
         )}
       </Modal>
+
+      {/* 4. RATE CARD MODAL */}
+      <Modal
+        open={showRateCardModal}
+        title={
+            <div className="flex items-center gap-2 text-gray-700">
+                <CreditCardOutlined style={{ color: '#13c2c2' }} /> 
+                Rate Card: <span className="font-bold">{rateCardFreelancerName}</span>
+            </div>
+        }
+        onCancel={() => setShowRateCardModal(false)}
+        footer={[
+            <Button key="close" type="primary" onClick={() => setShowRateCardModal(false)}>
+                Close
+            </Button>
+        ]}
+        width={700}
+        centered
+      >
+        <Table 
+            dataSource={rateCardData}
+            columns={rateCardColumns}
+            pagination={false}
+            rowKey="_id"
+            bordered
+            size="small"
+            locale={{ emptyText: "No services found in rate card" }}
+        />
+      </Modal>
+
     </div>
   );
 };

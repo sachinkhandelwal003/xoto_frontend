@@ -57,6 +57,7 @@ import ManageWarehouses from "../ecommerce/setting/ManageWareHouses";
 import AddAttributes from "../ecommerce/B2C/products/AddAttributes";
 import AddTags from "../ecommerce/B2C/products/AddTags";
 import UpdateProduct from "../ecommerce/B2C/products/UpdateProduct";
+import ViewProject from "./pages/dashboardPages/managefreelancer/freelancer/Projects/ViewProjects";
 
 const roleSlugMap = {
   0: "superadmin",
@@ -193,6 +194,8 @@ const CmsRoutes = () => {
 
        <Route path="product/inventory/:id" element={<Inventory />} />
       <Route path="seller/:id" element={<VendorB2CProfile />} />
+            <Route path="projects/:id" element={<ViewProject/>} />
+
             <Route path="seller/product/:id" element={<ProductRequestB2C />} />
 <Route path="freelancer" element={<FreelancerProfile />} />
 

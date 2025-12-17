@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 import {
   FiRefreshCw,
   FiEye,
@@ -199,6 +201,7 @@ const ProductRequestB2C = () => {
 
   const [categories, setCategories] = useState([]);
   const [serverErrors, setServerErrors] = useState([]); // For pricing modal errors
+const navigate = useNavigate();
 
   const fetchCategories = async () => {
     try {
@@ -224,7 +227,7 @@ const ProductRequestB2C = () => {
         Object.keys(params).forEach(key => {
           if (params[key] === "" || params[key] === undefined) delete params[key];
         });
-        const res = await apiService.get("/products", { params });
+        const res = await apiService.get("/products",params );
         setProducts(res.products || []);
 
         setPagination({
@@ -483,12 +486,15 @@ if (!isConfirmed) return;
         render: (_, r) => (
           <Space>
             <Tooltip title="View Details">
-              <Button
-                type="text"
-                shape="circle"
-                icon={<FiEye style={{ color: THEME.primary }} />}
-                href={`/dashboard/${roleSlug}/products?productId=${r._id}`}
-              />
+             <Button
+  type="text"
+  shape="circle"
+  icon={<FiEye style={{ color: THEME.primary }} />}
+  onClick={() =>
+    navigate(`/dashboard/${roleSlug}/products?productId=${r._id}`)
+  }
+/>
+
             </Tooltip>
             {perm.canEdit && (
               <Tooltip title="Edit Pricing">
