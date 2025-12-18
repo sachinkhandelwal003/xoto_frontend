@@ -100,7 +100,7 @@ const LocationCategoryModal = () => {
   const renderLocation = () => (
     <motion.div {...fadeIn} className="text-center py-10">
       <EnvironmentOutlined className="text-5xl text-purple-600 mb-6" />
-      <Title level={2}>Locate Property [C1.0] </Title>
+      <Title level={2}>Locate Property</Title>
       <Paragraph>Detecting coordinates for property mapping. [cite: 6]</Paragraph>
       <Button type="primary" size="large" onClick={handleLocation} loading={loading} className="bg-purple-600 rounded-full">
         Grant Access <RightOutlined />
@@ -110,7 +110,7 @@ const LocationCategoryModal = () => {
 
   const renderCategories = () => (
     <motion.div {...fadeIn}>
-      <Title level={3} className="text-center mb-8">Select Service Category [C1.5] </Title>
+      <Title level={3} className="text-center mb-8">Select Service Category </Title>
       <Row gutter={[20, 20]}>
         {categories.map(cat => (
           <Col span={12} key={cat._id}>
@@ -167,7 +167,7 @@ const LocationCategoryModal = () => {
     return (
       <motion.div {...fadeIn}>
         <div className="flex justify-between items-center mb-4">
-            <Title level={3} className="m-0 text-purple-800">Visual Preview [C1.10] </Title>
+            <Title level={3} className="m-0 text-purple-800">Visual Preview </Title>
             <Tag color="blue" icon={<EyeOutlined />}>Static Overlay [cite: 8]</Tag>
         </div>
         <div className="rounded-2xl overflow-hidden shadow-2xl mb-6 border-4 border-white">
@@ -176,7 +176,7 @@ const LocationCategoryModal = () => {
         <div className="flex justify-between">
           <Button size="large" onClick={() => setStep(3)}>Back</Button>
           <Button type="primary" size="large" className="bg-purple-600 border-none" onClick={() => setStep(5)}>
-            Generate Mood Board [C1.11]  <RightOutlined />
+            Generate Mood Board   <RightOutlined />
           </Button>
         </div>
       </motion.div>
@@ -190,7 +190,7 @@ const LocationCategoryModal = () => {
 
     return (
       <motion.div {...fadeIn}>
-        <Title level={3} className="text-purple-800 font-extrabold uppercase italic mb-4">Mood Board [C2.12] [cite: 6]</Title>
+        <Title level={3} className="text-purple-800 font-extrabold uppercase italic mb-4">Mood Board </Title>
         <div className="grid grid-cols-4 gap-3 mb-6">
           {imgIds.map((id, i) => (
             <motion.div key={i} whileHover={{ scale: 1.02 }} className={`rounded-xl overflow-hidden shadow-lg border-2 border-white ${i === 0 ? 'col-span-2 row-span-2' : ''}`}>
@@ -201,7 +201,7 @@ const LocationCategoryModal = () => {
         <div className="flex justify-between">
           <Button size="large" onClick={() => setStep(4)}>Back</Button>
           <Button type="primary" size="large" className="bg-purple-600 border-none" onClick={() => setStep(6)}>
-            Choose Package Tier [C1.13]  <RightOutlined />
+            Choose Package Tier <RightOutlined />
           </Button>
         </div>
       </motion.div>
@@ -210,7 +210,7 @@ const LocationCategoryModal = () => {
 
   const renderPackages = () => (
     <motion.div {...fadeIn}>
-      <Title level={2} className="text-center mb-4 text-purple-900 font-bold uppercase">Package Tiers [C1.13] </Title>
+      <Title level={2} className="text-center mb-4 text-purple-900 font-bold uppercase">Package Tiers</Title>
       <Paragraph className="text-center text-gray-400 mb-8 font-semibold">Select a tier to define your render quality and estimate depth. </Paragraph>
       {loadingPackages ? <Spin size="large" className="block mx-auto" /> : (
         <Row gutter={[20, 20]}>
@@ -250,7 +250,7 @@ const LocationCategoryModal = () => {
       <motion.div {...fadeIn}>
         <div className="text-center mb-8">
           <Badge status="processing" text="Estimation Generated" />
-          <Title level={2} className="mt-2 text-purple-900 font-black italic">Project Estimate [C1.24] </Title>
+          <Title level={2} className="mt-2 text-purple-900 font-black italic">Project Estimate </Title>
           <Text type="secondary">Based on project tier: <strong>{pkg?.name}</strong></Text>
         </div>
         <Row gutter={24} className="mb-8">
@@ -276,7 +276,7 @@ const LocationCategoryModal = () => {
         <div className="flex justify-between items-center">
           <Button size="large" onClick={() => setStep(6)}>Back to Packages</Button>
           <Button type="primary" size="large" className="bg-purple-600 border-none px-12 h-14 rounded-2xl font-black shadow-xl" onClick={() => setIsVisible(false)}>
-            Unlock Tier [C1.19]  <RightOutlined />
+            Unlock Tier  <RightOutlined />
           </Button>
         </div>
       </motion.div>
