@@ -54,6 +54,7 @@ import InteriorCalculator from "./components/homepage/AiPlanner/InteriorCalculat
 import MainCalculatorPage from "./components/homepage/AiPlanner/MainCalculatorPage";
 import CustomerLogin from "./components/login/CustomerLogin";
 import AIPlannerDemoPage from "./components/homepage/AiPlanner/AIPlannerDemoPage";
+import LocationCategoryModal from "./components/modal/LocationCategoryModal";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -247,6 +248,7 @@ function LayoutWrapper({ children }) {
 function App() {
   return (
     <LayoutWrapper>
+      {/* <LocationCategoryModal /> */}
       <ScrollToTop />
       <Suspense fallback={<Loader />}>
         <Routes>

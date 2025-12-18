@@ -8,12 +8,24 @@ import MagazineSlider from "../magazines/MagazinePage";
 import Moduleboat from "./Moduleboat";
 import XobiaChatbot from "./XobiaChatbot";
 import { motion } from "framer-motion";
+import LocationCategoryModal from "../modal/LocationCategoryModal";
+import { useEffect } from "react";
 
 const Home = () => {
   const [isModuleOpen, setIsModuleOpen] = useState(false);
+    const [showLocationModal, setShowLocationModal] = useState(false);
 
+  useEffect(() => {
+    setShowLocationModal(true);
+  }, []);
   return (
     <>
+
+
+         {showLocationModal && (
+        <LocationCategoryModal />
+      )}
+
       <HeroSection />
       <HomeDesign />
       <AIPoweredEcosystemSection />
