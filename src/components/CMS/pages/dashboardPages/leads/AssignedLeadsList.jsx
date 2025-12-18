@@ -144,6 +144,7 @@ const AssignedLeadsList = () => {
         try {
             const params = { page, limit, supervisor: user?.id, ...filterParams };
             const response = await apiService.get('/estimates', params);
+            console.log(response.data)
             if (response.success) {
                 setLeads(response.data);
                 setPagination(prev => ({ ...prev, currentPage: response.pagination?.page || page, itemsPerPage: response.pagination?.limit || limit, totalItems: response.pagination?.total || 0 }));
@@ -374,6 +375,7 @@ const AssignedLeadsList = () => {
                 return <Tag color={cfg.color}>{cfg.label}</Tag>;
             }
         },
+        
         {
             title: 'Actions',
             fixed: 'right',
@@ -432,69 +434,108 @@ const AssignedLeadsList = () => {
             </div>
 
             {/* --- DRAWER: FULL DETAILS (LEFT SIDE) --- */}
-            <Drawer title="Lead Details" width={800} onClose={() => setDrawerVisible(false)} open={drawerVisible}>
-                {selectedLead && (
-                    <div>
-                         <div className="flex justify-between items-start mb-6 p-4 bg-purple-50 rounded border border-purple-100">
-                            <div>
-                                <h3 className="text-xl font-bold text-purple-800 m-0">{selectedLead.service_type} - {selectedLead.subcategory?.label}</h3>
-                                <div className="text-gray-500">Lead ID: {selectedLead._id}</div>
-                            </div>
-                            <Tag color={statusConfig[selectedLead.status]?.color}>{statusConfig[selectedLead.status]?.label}</Tag>
-                         </div>
+     {/* --- DRAWER: FULL DETAILS (LEFT SIDE) --- */}
+<Drawer 
+    title={<span className="text-purple-700"><FileTextOutlined /> Lead Full Information</span>} 
+    width={850} 
+    onClose={() => setDrawerVisible(false)} 
+    open={drawerVisible}
+>
+    {selectedLead && (
+        <div className="p-2">
+            {/* Lead Status Header */}
+            <div className="flex justify-between items-center mb-6 p-5 bg-purple-50 rounded-xl border border-purple-100 shadow-sm">
+                <div>
+                    <h3 className="text-xl font-bold text-purple-800 m-0">
+                        {selectedLead.service_type} - {selectedLead.subcategory?.label}
+                    </h3>
+                    <Text type="secondary">ID: {selectedLead._id}</Text>
+                </div>
+                <Badge status={statusConfig[selectedLead.status]?.color} text={statusConfig[selectedLead.status]?.label} />
+            </div>
 
-                         <Row gutter={16}>
-                             <Col span={12}>
-                                 <DetailCard title="Customer" icon={<IdcardOutlined />}>
-                                     <Descriptions column={1} size="small">
-                                         <Descriptions.Item label="Name">{selectedLead.customer_name}</Descriptions.Item>
-                                         <Descriptions.Item label="Email">{selectedLead.customer_email}</Descriptions.Item>
-                                         <Descriptions.Item label="Mobile">{formatMobileNumber(selectedLead.customer_mobile)}</Descriptions.Item>
-                                     </Descriptions>
-                                 </DetailCard>
-                                 <DetailCard title="Area & Specs" icon={<ToolOutlined />}>
-                                      <div className="grid grid-cols-2 gap-4 text-center">
-                                          <div className="p-2 bg-gray-50 rounded">
-                                              <div className="text-lg font-bold text-purple-600">{selectedLead.area_sqft}</div>
-                                              <div className="text-xs text-gray-500">Total Sq.Ft</div>
-                                          </div>
-                                          <div className="p-2 bg-gray-50 rounded">
-                                              <div className="text-lg font-bold">{selectedLead.area_length} x {selectedLead.area_width}</div>
-                                              <div className="text-xs text-gray-500">Dimensions</div>
-                                          </div>
-                                      </div>
-                                      <div className="mt-4">
-                                          <div className="font-semibold">Description:</div>
-                                          <p className="text-gray-600 text-sm">{selectedLead.description}</p>
-                                      </div>
-                                 </DetailCard>
-                             </Col>
-                             <Col span={12}>
-                                 <DetailCard title="Workflow" icon={<HistoryOutlined />}>
-                                     <Timeline>
-                                         <Timeline.Item color="green">Created: {formatDate(selectedLead.createdAt)}</Timeline.Item>
-                                         <Timeline.Item color="blue">Assigned to You</Timeline.Item>
-                                         <Timeline.Item color={selectedLead.sent_to_freelancers?.length > 0 ? 'purple' : 'gray'}>
-                                             Sent to {selectedLead.sent_to_freelancers?.length || 0} Freelancers
-                                         </Timeline.Item>
-                                         <Timeline.Item color={selectedLead.final_quotation ? 'green' : 'gray'}>
-                                             Final Quotation {selectedLead.final_quotation ? 'Created' : 'Pending'}
-                                         </Timeline.Item>
-                                     </Timeline>
-                                 </DetailCard>
-                                 
-                                 {selectedLead.attachments?.length > 0 && (
-                                     <DetailCard title="Attachments" icon={<PaperClipOutlined />}>
-                                         {selectedLead.attachments.map((file, i) => (
-                                             <Button key={i} icon={<FileOutlined />} size="small" className="mb-1 w-full text-left">View Attachment {i+1}</Button>
-                                         ))}
-                                     </DetailCard>
-                                 )}
-                             </Col>
-                         </Row>
-                    </div>
-                )}
-            </Drawer>
+            <Row gutter={16}>
+                <Col span={14}>
+                    <DetailCard title="Customer Details" icon={<IdcardOutlined />}>
+                        <Descriptions column={1} size="small" bordered={false}>
+                            <Descriptions.Item label={<Text strong><UserOutlined /> Name</Text>}>{selectedLead.customer_name}</Descriptions.Item>
+                            <Descriptions.Item label={<Text strong><MailOutlined /> Email</Text>}>{selectedLead.customer_email}</Descriptions.Item>
+                            <Descriptions.Item label={<Text strong><PhoneOutlined /> Mobile</Text>}>{formatMobileNumber(selectedLead.customer_mobile)}</Descriptions.Item>
+                        </Descriptions>
+                    </DetailCard>
+
+                    {/* --- NEW SECTION: SHOW ASSIGNED FREELANCERS HERE --- */}
+                    <DetailCard title="Assigned Freelancers" icon={<TeamOutlined />}>
+                        {selectedLead.sent_to_freelancers && selectedLead.sent_to_freelancers.length > 0 ? (
+                            <List
+                                itemLayout="horizontal"
+                                dataSource={selectedLead.sent_to_freelancers}
+                                renderItem={(f) => (
+                                    <List.Item className="px-0">
+                                        <List.Item.Meta
+                                            avatar={<Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />}
+                                            title={<Text strong>{f.full_name || `${f.name?.first_name} ${f.name?.last_name}`}</Text>}
+                                            description={
+                                                <Space direction="vertical" size={0}>
+                                                    <Text type="secondary" style={{ fontSize: '12px' }}><MailOutlined /> {f.email}</Text>
+                                                    <Text type="secondary" style={{ fontSize: '12px' }}><PhoneOutlined /> {formatMobileNumber(f.mobile)}</Text>
+                                                </Space>
+                                            }
+                                        />
+                                        <Tag color="green">Notified</Tag>
+                                    </List.Item>
+                                )}
+                            />
+                        ) : (
+                            <Alert 
+                                message="No Freelancers Assigned" 
+                                description="This lead has not been sent to any freelancers yet." 
+                                type="info" 
+                                showIcon 
+                                action={
+                                    <Button size="small" type="primary" onClick={() => { setDrawerVisible(false); openFreelancerDrawer(selectedLead); }}>
+                                        Assign Now
+                                    </Button>
+                                }
+                            />
+                        )}
+                    </DetailCard>
+                </Col>
+
+                <Col span={10}>
+                    <DetailCard title="Area Specifications" icon={<CalculatorOutlined />}>
+                        <div className="flex justify-around bg-gray-50 p-3 rounded-lg border mb-3">
+                            <div className="text-center">
+                                <Title level={4} className="m-0" style={{ color: PURPLE_THEME.primary }}>{selectedLead.area_sqft}</Title>
+                                <Text size="small" type="secondary">Sq.Ft</Text>
+                            </div>
+                            <Divider type="vertical" style={{ height: '40px' }} />
+                            <div className="text-center">
+                                <Title level={4} className="m-0">{selectedLead.area_length}x{selectedLead.area_width}</Title>
+                                <Text size="small" type="secondary">Dimensions</Text>
+                            </div>
+                        </div>
+                        <Text strong>Description:</Text>
+                        <p className="text-gray-600 mt-1" style={{ fontSize: '13px' }}>{selectedLead.description}</p>
+                    </DetailCard>
+
+                    <DetailCard title="Process Timeline" icon={<HistoryOutlined />}>
+                        <Timeline mode="left" className="mt-2" size="small">
+                            <Timeline.Item color="green" label="Created">{formatDate(selectedLead.createdAt)}</Timeline.Item>
+                            <Timeline.Item color="blue" label="Assigned">Lead assigned to you</Timeline.Item>
+                            <Timeline.Item 
+                                color={selectedLead.sent_to_freelancers?.length > 0 ? 'purple' : 'gray'} 
+                                label="Freelancers"
+                            >
+                                {selectedLead.sent_to_freelancers?.length || 0} notified
+                            </Timeline.Item>
+                        </Timeline>
+                    </DetailCard>
+                </Col>
+            </Row>
+        </div>
+    )}
+</Drawer>
 
             {/* --- DRAWER: SELECT FREELANCERS --- */}
             <Drawer title="Select Freelancers" width={500} onClose={() => setFreelancerDrawerVisible(false)} open={freelancerDrawerVisible}>

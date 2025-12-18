@@ -53,6 +53,7 @@ import InteriorPlanner from "./components/homepage/AiPlanner/InteriorPlanner";
 import InteriorCalculator from "./components/homepage/AiPlanner/InteriorCalculator";
 import MainCalculatorPage from "./components/homepage/AiPlanner/MainCalculatorPage";
 import CustomerLogin from "./components/login/CustomerLogin";
+import AIPlannerDemoPage from "./components/homepage/AiPlanner/AIPlannerDemoPage";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -252,6 +253,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/landscaping" element={<Landspackng />} />
                     <Route path="/aiPlanner" element={<AIPlanner />} />
+                    <Route path="/aiPlanner/demo" element={<AIPlannerDemoPage />} />
+
                                         <Route path="/aiPlanner/interior" element={<InteriorPlanner />} />
 
                     <Route path="/estimate/calculator" element={<Calculator />} />

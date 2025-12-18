@@ -7,6 +7,7 @@ import logoNew from "../../assets/img/logoNew.png";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+/* ... (Language Data stays exactly the same as your snippet) ... */
 /* ------------------- LANGUAGE DATA ------------------- */
 export const languages = [
   {
@@ -202,7 +203,6 @@ const navItems = [
   { key: "properties", path: "/marketplace" },
   { key: "blogs", path: "/explore" },
 ];
-
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -210,20 +210,21 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   const { t, i18n } = useTranslation("common");
-
   const langRef = useRef(null);
   const mobileMenuRef = useRef(null);
+
+  // Sync selected language with i18n instance on load
+  useEffect(() => {
+    const currentLang = languages.find(l => l.code === i18n.language) || languages[0];
+    setSelectedLang(currentLang);
+  }, [i18n.language]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (langRef.current && !langRef.current.contains(e.target)) {
         setLangOpen(false);
       }
-      if (
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(e.target) &&
-        !e.target.closest("button")
-      ) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target) && !e.target.closest(".mobile-toggle")) {
         setMobileOpen(false);
       }
     };
@@ -238,286 +239,155 @@ const Navbar = () => {
   }, []);
 
   return (
-    <>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"
-        }`}
-      >
-        <div className="max-w-8xl mx-auto px-4 py-5">
-          <div className="flex items-center justify-between h-12">
-            {/* Logo */}
-            <Link to="/" className="flex flex-col items-center">
-              <img src={logoNew} alt="Logo" className="h-14 w-auto" />
-              <span className="text-gray-900 text-[10px]">
-                {t("nav.tagline")}
-              </span>
-            </Link>
+    <nav
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"
+      }`}
+    >
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          
+          {/* 1. LOGO SECTION - Responsive Sizing */}
+          <Link to="/" className="flex flex-col items-center flex-shrink-0">
+            <img src={logoNew} alt="Logo" className="h-10 sm:h-12 lg:h-14 w-auto" />
+            <span className="text-gray-900 text-[8px] sm:text-[10px] whitespace-nowrap">
+              {t("nav.tagline")}
+            </span>
+          </Link>
 
-            {/* ---------------- DESKTOP NAV ---------------- */}
-            <div className="hidden lg:flex items-center space-x-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.key}
-                  to={item.path}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-[#5C039B]"
-                >
-                  {t(`nav.${item.key}`)}
-                </Link>
-              ))}
-            </div>
-
-            {/* ---------------- DESKTOP RIGHT ---------------- */}
-            <div className="hidden lg:flex items-center space-x-4">
-              <div ref={langRef} className="relative">
-                <button
-                  onClick={() => setLangOpen(!langOpen)}
-                  className="flex items-center gap-2 px-3 py-2 bg-gray-50 border rounded-xl"
-                >
-                  <div className="w-5 h-5">
-                    <selectedLang.Flag />
-                  </div>
-                  <span className="text-sm font-semibold">
-                    {selectedLang.name}
-                  </span>
-                  <ChevronDown
-                    className={`w-4 h-4 ${langOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {langOpen && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          setSelectedLang(lang);
-                          i18n.changeLanguage(lang.code); // 🔥 STEP 5
-                          setLangOpen(false);
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 hover:bg-purple-50"
-                      >
-                        <div className="w-5 h-5">
-                          <lang.Flag />
-                        </div>
-                        {lang.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <Link to="/contact">
-                <button className="px-6 py-2 bg-[#5C039B] text-white rounded-xl">
-                  {t("nav.contact")}
-                </button>
-              </Link>
-              <Link to="/login">
-                <button className="px-6 py-2 bg-[#5C039B] text-white rounded-xl">
-                  {t("nav.login")}
-                </button>
-              </Link>
-            </div>
-
-            {/* ---------------- MOBILE TOGGLE ---------------- */}
-            <div className="lg:hidden">
-              <button onClick={() => setMobileOpen(!mobileOpen)}>
-                {mobileOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ---------------- MOBILE MENU ---------------- */}
-        <div
-          ref={mobileMenuRef}
-          className={`lg:hidden fixed inset-x-0 top-16 bg-white transition-all duration-300 ${
-            mobileOpen ? "translate-y-0" : "-translate-y-full"
-          }`}
-        >
-          <div className="px-4 py-4 space-y-1">
+          {/* 2. DESKTOP NAV - Hidden on screens < 1200px (xl) for better spacing */}
+          <div className="hidden xl:flex items-center space-x-1">
             {navItems.map((item) => (
               <Link
                 key={item.key}
                 to={item.path}
-                onClick={() => setMobileOpen(false)}
-                className="block px-4 py-3 hover:bg-purple-50"
+                className="px-3 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-[#5C039B] whitespace-nowrap"
               >
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
           </div>
-        </div>
-      </nav>
 
-      {/* Spacer */}
-      <div className="h-20" />
-    </>
+          {/* 3. RIGHT SECTION (Lang & Auth) */}
+          <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
+            {/* Language Dropdown */}
+            <div ref={langRef} className="relative">
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-2 px-3 py-2 bg-gray-50 border rounded-xl hover:bg-gray-100 transition-colors"
+              >
+                <div className="w-5 h-4">
+                  <selectedLang.Flag />
+                </div>
+                <span className="text-sm font-semibold">{selectedLang.name}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${langOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {langOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-100 max-h-[60vh] overflow-y-auto z-[60]">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setSelectedLang(lang);
+                        i18n.changeLanguage(lang.code);
+                        setLangOpen(false);
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 hover:bg-purple-50 text-sm"
+                    >
+                      <div className="w-5 h-4"><lang.Flag /></div>
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link to="/contact">
+                <button className="px-4 xl:px-6 py-2 bg-[#5C039B] text-white rounded-xl text-sm font-medium hover:bg-opacity-90 transition-all">
+                  {t("nav.contact")}
+                </button>
+              </Link>
+               <Link to="/login">
+                <button className="px-4 xl:px-6 py-2 bg-[#5C039B] text-white rounded-xl text-sm font-medium hover:bg-opacity-90 transition-all">
+                  {t("nav.login")}
+                </button>
+              </Link>
+             
+            </div>
+          </div>
+
+          {/* 4. MOBILE/TABLET TOGGLE */}
+          <div className="lg:hidden flex items-center gap-4">
+             {/* Small Screen Lang Toggle */}
+             <div className="w-6 h-4"><selectedLang.Flag /></div>
+             
+             <button 
+              className="mobile-toggle p-2 text-gray-700" 
+              onClick={() => setMobileOpen(!mobileOpen)}
+             >
+              {mobileOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. MOBILE MENU - Full height overlay for better UX */}
+      <div
+        ref={mobileMenuRef}
+        className={`lg:hidden fixed inset-x-0 top-[80px] bg-white border-t shadow-2xl transition-all duration-300 ease-in-out transform ${
+          mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        } overflow-y-auto max-h-[calc(100vh-80px)]`}
+      >
+        <div className="px-6 py-8 space-y-4">
+          {navItems.map((item) => (
+            <Link
+              key={item.key}
+              to={item.path}
+              onClick={() => setMobileOpen(false)}
+              className="block text-lg font-medium text-gray-800 hover:text-[#5C039B] border-b border-gray-50 pb-2"
+            >
+              {t(`nav.${item.key}`)}
+            </Link>
+          ))}
+          
+          <div className="pt-6 grid grid-cols-2 gap-4">
+            <Link to="/contact" className="w-full" onClick={() => setMobileOpen(false)}>
+              <button className="w-full py-3 bg-[#5C039B] text-white rounded-xl font-semibold">
+                {t("nav.contact")}
+              </button>
+            </Link>
+            <Link to="/login" className="w-full" onClick={() => setMobileOpen(false)}>
+              <button className="w-full py-3 border-2 border-[#5C039B] text-[#5C039B] rounded-xl font-semibold">
+                {t("nav.login")}
+              </button>
+            </Link>
+          </div>
+
+          <div className="pt-6 border-t">
+            <p className="text-xs text-gray-500 mb-4 uppercase tracking-wider">Select Language</p>
+            <div className="grid grid-cols-3 gap-2">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => {
+                    setSelectedLang(lang);
+                    i18n.changeLanguage(lang.code);
+                    setMobileOpen(false);
+                  }}
+                  className={`flex flex-col items-center p-2 rounded-lg border ${selectedLang.code === lang.code ? 'bg-purple-50 border-purple-200' : 'border-gray-100'}`}
+                >
+                  <div className="w-6 h-4 mb-1"><lang.Flag /></div>
+                  <span className="text-[10px] font-bold">{lang.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 };
 
 export default Navbar;
-
-// ("use client");
-
-// import React, { useState, useRef, useEffect } from "react";
-// import { FaBars, FaTimes } from "react-icons/fa";
-// import { Link } from "react-router-dom";
-// import logoNew from "../../assets/img/logoNew.png";
-// import { ChevronDown } from "lucide-react";
-
-// /* ------------------- LANGUAGE DATA ------------------- */
-// export const languages = [
-//   { code: "en", name: "EN", Flag: () => (<svg viewBox="0 0 20 15" className="w-full h-full"><rect width="20" height="15" fill="#012169"/></svg>) },
-//   { code: "hi", name: "HI", Flag: () => (<svg viewBox="0 0 20 15" className="w-full h-full"><rect width="20" height="15" fill="#FF9933"/></svg>) },
-//   { code: "ar", name: "AR", Flag: () => (<svg viewBox="0 0 20 15" className="w-full h-full"><rect width="20" height="15" fill="#007A3D"/></svg>) },
-//   { code: "ru", name: "RU", Flag: () => (<svg viewBox="0 0 20 15" className="w-full h-full"><rect width="20" height="15" fill="#0039A6"/></svg>) },
-// ];
-
-// /* ------------------- NAV ITEMS ------------------- */
-// const navItems = [
-//   { title: "Home", path: "/" },
-//   { title: "Landscaping", path: "/landscaping" },
-//   { title: "Interiors", path: "/services/interior" },
-//   { title: "Partner Eco-System", path: "/ecosystem" },
-//   { title: "Xoto Store", path: "/ecommerce/b2c" },
-//   { title: "Blogs", path: "/explore" },
-//   { title: "Properties", path: "/marketplace" },
-// ];
-
-// const Navbar = () => {
-//   const [mobileOpen, setMobileOpen] = useState(false);
-//   const [langOpen, setLangOpen] = useState(false);
-//   const [selectedLang, setSelectedLang] = useState(languages[0]);
-//   const [scrolled, setScrolled] = useState(false);
-
-//   const langRef = useRef(null);
-//   const mobileMenuRef = useRef(null);
-
-//   useEffect(() => {
-//     const handleClickOutside = (e) => {
-//       if (langRef.current && !langRef.current.contains(e.target)) {
-//         setLangOpen(false);
-//       }
-//       if (
-//         mobileMenuRef.current &&
-//         !mobileMenuRef.current.contains(e.target) &&
-//         !e.target.closest("button")
-//       ) {
-//         setMobileOpen(false);
-//       }
-//     };
-//     document.addEventListener("mousedown", handleClickOutside);
-//     return () => document.removeEventListener("mousedown", handleClickOutside);
-//   }, []);
-
-//   useEffect(() => {
-//     const handleScroll = () => setScrolled(window.scrollY > 10);
-//     window.addEventListener("scroll", handleScroll);
-//     return () => window.removeEventListener("scroll", handleScroll);
-//   }, []);
-
-//   return (
-//     <>
-//       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-white"}`}>
-//         <div className="max-w-8xl mx-auto px-4 py-5">
-//           <div className="flex items-center justify-between h-12">
-
-//             {/* Logo */}
-//             <Link to="/" className="flex flex-col items-center">
-//               <img src={logoNew} alt="Logo" className="h-14 w-auto" />
-//               <span className="text-gray-900 text-[10px]">Powered by AI. Inspired by you.</span>
-//             </Link>
-
-//             {/* Desktop Nav */}
-//             <div className="hidden lg:flex items-center space-x-1">
-//               {navItems.map((item) => (
-//                 <Link
-//                   key={item.title}
-//                   to={item.path}
-//                   className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-purple-700"
-//                 >
-//                   {item.title}
-//                 </Link>
-//               ))}
-
-//               {/* ✅ Mortgage (no dropdown) */}
-//               <Link
-//                 to="/mortgage/services"
-//                 className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg transition-all hover:bg-purple-50 hover:text-purple-700"
-//               >
-//                 Mortgage
-//               </Link>
-//             </div>
-
-//             {/* Desktop Right */}
-//             <div className="hidden lg:flex items-center space-x-4">
-//               <div ref={langRef} className="relative">
-//                 <button
-//                   onClick={() => setLangOpen(!langOpen)}
-//                   className="flex items-center gap-2 px-3 py-2 bg-gray-50 border rounded-xl"
-//                 >
-//                   <div className="w-5 h-5"><selectedLang.Flag /></div>
-//                   <span className="text-sm font-semibold">{selectedLang.name}</span>
-//                   <ChevronDown className={`w-4 h-4 ${langOpen ? "rotate-180" : ""}`} />
-//                 </button>
-
-//                 {langOpen && (
-//                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl">
-//                     {languages.map((lang) => (
-//                       <button
-//                         key={lang.code}
-//                         onClick={() => { setSelectedLang(lang); setLangOpen(false); }}
-//                         className="flex w-full items-center gap-3 px-4 py-3 hover:bg-purple-50"
-//                       >
-//                         <div className="w-5 h-5"><lang.Flag /></div>
-//                         {lang.name}
-//                       </button>
-//                     ))}
-//                   </div>
-//                 )}
-//               </div>
-
-//               <Link to="/contact"><button className="px-6 py-2 bg-purple-600 text-white rounded-xl">Contact Us</button></Link>
-//               <Link to="/login"><button className="px-6 py-2 bg-purple-600 text-white rounded-xl">Login</button></Link>
-//             </div>
-
-//             {/* Mobile */}
-//             <div className="lg:hidden flex items-center gap-2">
-//               <button onClick={() => setMobileOpen(!mobileOpen)}>
-//                 {mobileOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Mobile Menu */}
-//         <div
-//           ref={mobileMenuRef}
-//           className={`lg:hidden fixed inset-x-0 top-16 bg-white transition-all ${mobileOpen ? "translate-y-0" : "-translate-y-full"}`}
-//         >
-//           <div className="px-4 py-4 space-y-1">
-//             {navItems.map((item) => (
-//               <Link key={item.title} to={item.path} onClick={() => setMobileOpen(false)} className="block px-4 py-3 hover:bg-purple-50">
-//                 {item.title}
-//               </Link>
-//             ))}
-
-//             {/* ✅ Mobile Mortgage */}
-//             <Link
-//               to="/mortgage/services"
-//               onClick={() => setMobileOpen(false)}
-//               className="block px-4 py-3 hover:bg-purple-50"
-//             >
-//               Mortgage
-//             </Link>
-//           </div>
-//         </div>
-//       </nav>
-
-//       <div className="h-20" />
-//     </>
-//   );
-// };
-
-// export default Navbar;
