@@ -17,7 +17,7 @@ const CompleteProductView = () => {
     location: 'Beverly Hills, CA',
     duration: '3 months',
     completedDate: 'June 2023',
-    priceRange: '$50,000 - $75,000',
+    priceRange: 'AED50,000 - AED75,000',
     rating: 4.7,
     reviewCount: 28,
     description: 'This modern luxury villa features an open-concept design with high-end finishes, custom cabinetry, and smart home integration. The design focuses on clean lines, natural materials, and a neutral color palette with bold accents.',
@@ -138,7 +138,7 @@ const CompleteProductView = () => {
               {project.images.map((_, index) => (
                 <button
                   key={index}
-                  className={`w-2 h-2 rounded-full ${activeImage === index ? 'bg-white' : 'bg-white bg-opacity-50'}`}
+                  className={`w-2 h-2 rounded-full AED{activeImage === index ? 'bg-white' : 'bg-white bg-opacity-50'}`}
                   onClick={() => setActiveImage(index)}
                 />
               ))}
@@ -148,7 +148,7 @@ const CompleteProductView = () => {
                 className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100"
                 onClick={() => setFavorite(!favorite)}
               >
-                <FaHeart className={`w-5 h-5 ${favorite ? 'text-red-500' : 'text-gray-400'}`} />
+                <FaHeart className={`w-5 h-5 AED{favorite ? 'text-red-500' : 'text-gray-400'}`} />
               </button>
            
             </div>
@@ -157,12 +157,12 @@ const CompleteProductView = () => {
             {project.images.map((image, index) => (
               <button
                 key={index}
-                className={`rounded-md overflow-hidden aspect-square ${activeImage === index ? 'ring-2 ring-blue-500' : ''}`}
+                className={`rounded-md overflow-hidden aspect-square AED{activeImage === index ? 'ring-2 ring-blue-500' : ''}`}
                 onClick={() => setActiveImage(index)}
               >
                 <img
                   src={image}
-                  alt={`Thumbnail ${index + 1}`}
+                  alt={`Thumbnail AED{index + 1}`}
                   className="w-full h-full object-cover"
                 />
               </button>
@@ -249,7 +249,7 @@ const CompleteProductView = () => {
                   <div className="flex-1 mx-2 h-2.5 bg-gray-200 rounded-full">
                     <div
                       className="h-2.5 bg-yellow-400 rounded-full"
-                      style={{ width: `${(project.reviews.filter(r => Math.floor(r.rating) === star).length / project.reviews.length) * 100}%` }}
+                      style={{ width: `AED{(project.reviews.filter(r => Math.floor(r.rating) === star).length / project.reviews.length) * 100}%` }}
                     ></div>
                   </div>
                   <span className="w-10 text-gray-600 text-right">
@@ -275,7 +275,7 @@ const CompleteProductView = () => {
                   <div className="flex space-x-2">
                     {review.images.map((img, idx) => (
                       <button key={idx} className="w-16 h-16 rounded overflow-hidden">
-                        <img src={img} alt={`Review ${review.id} image ${idx}`} className="w-full h-full object-cover" />
+                        <img src={img} alt={`Review AED{review.id} image AED{idx}`} className="w-full h-full object-cover" />
                       </button>
                     ))}
                   </div>

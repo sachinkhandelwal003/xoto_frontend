@@ -234,9 +234,9 @@ const ProductCard = ({ product, onViewClick, onAddToCart }) => {
         {/* Price */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <span className="text-2xl font-bold text-gray-900">${product.price}</span>
+            <span className="text-2xl font-bold text-gray-900">AED{product.price}</span>
             {product.originalPrice && (
-              <span className="ml-2 text-lg text-gray-400 line-through">${product.originalPrice}</span>
+              <span className="ml-2 text-lg text-gray-400 line-through">AED{product.originalPrice}</span>
             )}
           </div>
         </div>

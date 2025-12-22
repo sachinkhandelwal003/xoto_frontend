@@ -20,7 +20,7 @@ export default function MainCalculatorPage() {
              
               
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                Smart <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">Property</span> Calculators
+                Smart Property Calculators
               </h1>
               
               <p className="text-xl text-purple-100 max-w-3xl mx-auto mb-12">
@@ -61,7 +61,7 @@ export default function MainCalculatorPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Choose Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-600">Calculator</span>
+              Choose Your Calculator
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Professional tools designed for accurate property investment calculations

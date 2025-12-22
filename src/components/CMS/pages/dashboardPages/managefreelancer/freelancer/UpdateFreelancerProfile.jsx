@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "../../../../../../manageApi/utils/custom.apiservice";
@@ -22,7 +22,6 @@ import {
   Tabs,
   Table,
   Alert,
-  Badge
 } from "antd";
 import {
   UserOutlined,
@@ -48,7 +47,7 @@ const { Option } = Select;
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 
-// Define standard unit options
+// Define standard unit options - SAME AS REGISTRATION
 const unitOptions = [
   { label: "Per Hour", value: "per hour" },
   { label: "Per Sq. Ft", value: "per sq.ft" },
@@ -72,9 +71,9 @@ const UpdateFreelancerProfile = () => {
   const [rateLoading, setRateLoading] = useState(false);
   const [rateCardValues, setRateCardValues] = useState({}); 
 
-  // Data States
-  const [categories, setCategories] = useState([]);
-  const [subcategoriesMap, setSubcategoriesMap] = useState({}); 
+  // Data States - EXACTLY SAME AS REGISTRATION FORM
+  const [subcategories, setSubcategories] = useState([]); // From /estimate/master/category/name/Landscaping/subcategories
+  const [typesMap, setTypesMap] = useState({}); // { [serviceIndex]: [{value, label}] } - Same as Registration
   const [currencies, setCurrencies] = useState([]); 
 
   // File States
@@ -89,19 +88,37 @@ const UpdateFreelancerProfile = () => {
 
   const [activeTab, setActiveTab] = useState("basic");
 
-  // Initial Fetch
+  // Use refs to store initial data and prevent unnecessary refreshes
+  const initialDataRef = useRef(null);
+  const isInitialMount = useRef(true);
+  const hasFetchedTypesRef = useRef(false);
+
+  // Initial Fetch - SAME AS REGISTRATION
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [profileRes, categoriesRes, currenciesRes] = await Promise.all([
+        
+        // Fetch subcategories FIRST (like Registration form)
+        const subcategoriesRes = await fetchSubcategories();
+        setSubcategories(subcategoriesRes);
+        
+        // Then fetch profile and currencies
+        const [profileRes, currenciesRes] = await Promise.all([
           apiService.get("/freelancer/profile"),
-          fetchCategories(),
           fetchCurrencies()
         ]);
 
         if (profileRes.success) {
           setFreelancer(profileRes.freelancer);
+          
+          // Store initial data in ref
+          initialDataRef.current = {
+            profile: profileRes.freelancer,
+            subcategories: subcategoriesRes,
+            currencies: currenciesRes
+          };
+          
           const formattedData = formatFormData(profileRes.freelancer);
           form.setFieldsValue(formattedData);
           
@@ -109,29 +126,42 @@ const UpdateFreelancerProfile = () => {
             setPreviewImage(`http://localhost:5000/${profileRes.freelancer.profile_image}`);
           }
 
-          // Rate Card Init
+          // Rate Card Init - Use actual type data with labels
           const initialRates = {};
           if (profileRes.freelancer.services_offered) {
-            profileRes.freelancer.services_offered.forEach(s => {
-              initialRates[s._id] = {
-                price_range: s.price_range || "",
-                unit: s.unit || "per hour"
-              };
+            profileRes.freelancer.services_offered.forEach(service => {
+              if (service.subcategories) {
+                service.subcategories.forEach(subcat => {
+                  const type = subcat.type;
+                  if (type?._id) {
+                    initialRates[type._id] = {
+                      price_range: subcat.price_range || "",
+                      unit: subcat.unit || "per hour",
+                      serviceId: service._id,
+                      typeId: type._id,
+                      typeLabel: type.label
+                    };
+                  }
+                });
+              }
             });
           }
           setRateCardValues(initialRates);
 
-          // Subcategories Init
-          if (formattedData.services && formattedData.services.length > 0) {
-            formattedData.services.forEach((service, index) => {
-              if (service.category) {
-                fetchSubcategories(service.category, index);
+          // Fetch types for existing services - SAME AS REGISTRATION
+          if (profileRes.freelancer.services_offered?.length && subcategoriesRes.length) {
+            // Reset the flag for initial fetch
+            hasFetchedTypesRef.current = false;
+            
+            profileRes.freelancer.services_offered.forEach((service, index) => {
+              const subcategoryId = service.category?._id;
+              if (subcategoryId) {
+                fetchTypes(subcategoryId, index);
               }
             });
           }
         }
 
-        if (categoriesRes) setCategories(categoriesRes);
         if (currenciesRes) setCurrencies(currenciesRes);
 
       } catch (error) {
@@ -145,23 +175,56 @@ const UpdateFreelancerProfile = () => {
     fetchData();
   }, [form]);
 
-  // --- API Helpers ---
-  const fetchCategories = async () => {
+  // --- API Helpers - EXACTLY SAME AS REGISTRATION FORM ---
+  const fetchSubcategories = async () => {
     try {
-      const response = await apiService.get("/freelancer/category?active=true");
-      return response.data ? response.data.map(c => ({ value: c._id, label: c.name, ...c })) : [];
-    } catch (error) { return []; }
+      const res = await apiService.get(
+        "/estimate/master/category/name/Landscaping/subcategories"
+      );
+      if (res.success) {
+        return res.data || [];
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching subcategories:", error);
+      return [];
+    }
   };
 
-  const fetchSubcategories = async (categoryId, index) => {
-    if (!categoryId) return;
+  // Fetch types when subcategory selected - EXACTLY SAME AS REGISTRATION
+  const fetchTypes = async (subcategoryId, serviceIndex, force = false) => {
+    if (!subcategoryId) return;
+
+    const sub = subcategories.find(s => s._id === subcategoryId);
+    if (!sub?.category) return;
+
+    // Don't fetch if already fetched and not forced
+    if (!force && typesMap[serviceIndex] && hasFetchedTypesRef.current) {
+      return;
+    }
+
     try {
-      const response = await apiService.get(`/freelancer/subcategory?category=${categoryId}`);
-      if (response.data) {
-        const subs = response.data.map(s => ({ value: s._id, label: s.name }));
-        setSubcategoriesMap(prev => ({ ...prev, [index]: subs }));
+      const res = await apiService.get(
+        `/estimate/master/category/${sub.category}/subcategories/${subcategoryId}/types`
+      );
+
+      if (res.success) {
+        const formatted = (res.data || []).map(item => ({
+          value: item._id,
+          label: item.label
+        }));
+
+        setTypesMap(prev => ({
+          ...prev,
+          [serviceIndex]: formatted
+        }));
+        
+        // Mark as fetched
+        hasFetchedTypesRef.current = true;
       }
-    } catch (error) { console.error(error); }
+    } catch (err) {
+      console.error("Error loading types:", err);
+    }
   };
 
   const fetchCurrencies = async () => {
@@ -171,31 +234,36 @@ const UpdateFreelancerProfile = () => {
     } catch (error) { return []; }
   };
 
-  const handleCategoryChange = (value, index) => {
-    const services = form.getFieldValue('services');
-    if (services && services[index]) {
-      services[index].subcategories = [];
+  // Handle subcategory change - SAME AS REGISTRATION
+  const handleSubcategoryChange = (value, index) => {
+    const services = form.getFieldValue('services') || [];
+    if (services[index]) {
+      services[index].types = []; // Clear types when subcategory changes
       form.setFieldsValue({ services });
     }
-    fetchSubcategories(value, index);
+    fetchTypes(value, index, true); // Force fetch
   };
 
   // --- Rate Card Logic ---
-  const handleRateInputChange = (serviceId, field, value) => {
+  const handleRateInputChange = (typeId, field, value) => {
     setRateCardValues(prev => ({
       ...prev,
-      [serviceId]: { ...prev[serviceId], [field]: value }
+      [typeId]: { ...prev[typeId], [field]: value }
     }));
   };
 
-  const updateSingleRateCard = async (serviceId) => {
+  const updateSingleRateCard = async (typeId) => {
     try {
       setRateLoading(true);
-      const values = rateCardValues[serviceId];
-      if(!values?.price_range) return showToast("Price range is required", "warning");
+      const values = rateCardValues[typeId];
+      if(!values?.price_range) {
+        showToast("Price range is required", "warning");
+        return;
+      }
 
       const payload = {
-        serviceId: serviceId,
+        serviceId: values.serviceId,
+        typeId: values.typeId,
         price_range: values.price_range,
         unit: values.unit
       };
@@ -203,131 +271,208 @@ const UpdateFreelancerProfile = () => {
       const response = await apiService.put('/freelancer/rate-card', payload);
 
       if (response.success) {
-        showToast("Rate card updated!", "success");
+        showToast("Rate card updated successfully!", "success");
+        // Update local state without refreshing everything
         setFreelancer(prev => {
-           const updatedServices = prev.services_offered.map(s => 
-              s._id === serviceId ? { ...s, price_range: values.price_range, unit: values.unit } : s
-           );
-           return { ...prev, services_offered: updatedServices };
+          const updatedServices = prev.services_offered.map(service => {
+            if (service._id === values.serviceId) {
+              const updatedSubcats = service.subcategories.map(subcat => {
+                if (subcat.type?._id === typeId) {
+                  return { 
+                    ...subcat, 
+                    price_range: values.price_range, 
+                    unit: values.unit 
+                  };
+                }
+                return subcat;
+              });
+              return { ...service, subcategories: updatedSubcats };
+            }
+            return service;
+          });
+          return { ...prev, services_offered: updatedServices };
         });
+        
+        // Update rate card values
+        setRateCardValues(prev => ({
+          ...prev,
+          [typeId]: { ...prev[typeId], price_range: values.price_range, unit: values.unit }
+        }));
       } else {
         showToast(response.message || "Update failed", "error");
       }
     } catch (error) {
+      console.error("Rate card update error:", error);
       showToast("Update failed", "error");
     } finally {
       setRateLoading(false);
     }
   };
 
+  // Rate Card Columns - Shows type labels from your backend
   const rateCardColumns = [
     {
       title: 'Service Category',
       key: 'category',
-      render: (_, record) => (
-        <Space>
-           {record.category?.icon && <Avatar src={record.category.icon} shape="square" size="small" />}
-           <div className="flex flex-col">
-             <Text strong>{record.category?.name || "Unknown Category"}</Text>
-             <Text type="secondary" style={{ fontSize: 12 }}>
-               {record.subcategories?.map(s => s.name).join(", ")}
-             </Text>
-           </div>
-        </Space>
+      width: 200,
+      render: (_, service) => {
+        // Find category name from subcategories list (same as Registration)
+        const subcategoryId = service.category?._id || service.category;
+        const subcategory = subcategories.find(s => s._id === subcategoryId);
+        const categoryName = subcategory?.label || 
+                            service.category?.name || 
+                            service.category?.label || 
+                            "Unknown Category";
+        
+        return (
+          <Space>
+            {service.category?.icon && <Avatar src={service.category.icon} shape="square" size="small" />}
+            <div className="flex flex-col">
+              <Text strong>{categoryName}</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {service.description || "No description"}
+              </Text>
+            </div>
+          </Space>
+        );
+      }
+    },
+    {
+      title: 'Service Type',
+      key: 'type',
+      width: 200,
+      render: (_, service) => (
+        <div>
+          {service.subcategories?.map((subcat, index) => {
+            const typeName = subcat.type?.label || 
+                            subcat.type?.name || 
+                            "Unknown Type";
+            return (
+              <div key={subcat._id || index} className="mb-2 p-2 bg-gray-50 rounded">
+                <Text strong>{typeName}</Text>
+              </div>
+            );
+          })}
+        </div>
       )
     },
     {
       title: 'Price Range',
       key: 'price',
       width: 200,
-      render: (_, record) => (
-        <Input 
-          value={rateCardValues[record._id]?.price_range}
-          onChange={(e) => handleRateInputChange(record._id, 'price_range', e.target.value)}
-          placeholder="e.g. 100-200"
-          prefix={freelancer?.payment?.preferred_currency?.symbol || "$"}
-        />
+      render: (_, service) => (
+        <div>
+          {service.subcategories?.map((subcat, index) => {
+            const typeId = subcat.type?._id;
+            if (!typeId) return null;
+            
+            return (
+              <div key={subcat._id || index} className="mb-2">
+                <Input 
+                  value={rateCardValues[typeId]?.price_range || ""}
+                  onChange={(e) => handleRateInputChange(typeId, 'price_range', e.target.value)}
+                  placeholder="e.g. 100-200"
+                  prefix={freelancer?.payment?.preferred_currency?.symbol || "$"}
+                />
+              </div>
+            );
+          })}
+        </div>
       )
     },
     {
       title: 'Unit',
       key: 'unit',
       width: 180,
-      render: (_, record) => (
-        <Select 
-          value={rateCardValues[record._id]?.unit}
-          onChange={(value) => handleRateInputChange(record._id, 'unit', value)}
-          placeholder="Select Unit"
-          style={{ width: '100%' }}
-        >
-          {unitOptions.map((opt) => (
-            <Option key={opt.value} value={opt.value}>{opt.label}</Option>
-          ))}
-        </Select>
+      render: (_, service) => (
+        <div>
+          {service.subcategories?.map((subcat, index) => {
+            const typeId = subcat.type?._id;
+            if (!typeId) return null;
+            
+            return (
+              <div key={subcat._id || index} className="mb-2">
+                <Select 
+                  value={rateCardValues[typeId]?.unit || "per hour"}
+                  onChange={(value) => handleRateInputChange(typeId, 'unit', value)}
+                  placeholder="Select Unit"
+                  style={{ width: '100%' }}
+                >
+                  {unitOptions.map((opt) => (
+                    <Option key={opt.value} value={opt.value}>{opt.label}</Option>
+                  ))}
+                </Select>
+              </div>
+            );
+          })}
+        </div>
       )
     },
     {
       title: 'Action',
       key: 'action',
       width: 100,
-      render: (_, record) => (
-        <Button 
-          type="primary" 
-          ghost 
-          size="small"
-          loading={rateLoading}
-          onClick={() => updateSingleRateCard(record._id)}
-        >
-          Update
-        </Button>
+      render: (_, service) => (
+        <div>
+          {service.subcategories?.map((subcat, index) => {
+            const typeId = subcat.type?._id;
+            if (!typeId) return null;
+            
+            return (
+              <div key={subcat._id || index} className="mb-2">
+                <Button 
+                  type="primary" 
+                  ghost 
+                  size="small"
+                  loading={rateLoading}
+                  onClick={() => updateSingleRateCard(typeId)}
+                >
+                  Update
+                </Button>
+              </div>
+            );
+          })}
+        </div>
       )
     }
   ];
 
-  // --- Form Formatting ---
+  // --- Form Formatting - Matches Registration data structure ---
   const formatFormData = (data) => {
+    if (!data) return {};
+
     return {
-      firstName: data.name?.first_name,
-      lastName: data.name?.last_name,
-      mobile: data.mobile?.number,
+      firstName: data.name?.first_name || "",
+      lastName: data.name?.last_name || "",
+      mobile: data.mobile?.number || "",
       countryCode: data.mobile?.country_code || '+91',
       languages: data.languages || [],
-      experienceYears: data.professional?.experience_years,
-      availability: data.professional?.availability,
+      experienceYears: data.professional?.experience_years || 0,
+      availability: data.professional?.availability || "Full-time",
       workingRadius: data.professional?.working_radius,
-      bio: data.professional?.bio,
+      bio: data.professional?.bio || "",
       skills: data.professional?.skills?.join(', ') || '',
-      city: data.location?.city,
-      state: data.location?.state,
-      country: data.location?.country || 'India',
-      pincode: data.location?.pincode,
-      preferredMethod: data.payment?.preferred_method,
+      city: data.location?.city || "",
+      state: data.location?.state || "",
+      country: data.location?.country || 'UAE',
+      po_box: data.location?.po_box || "",
+      preferredMethod: data.payment?.preferred_method || "Cash",
       preferredCurrency: data.payment?.preferred_currency?._id || data.payment?.preferred_currency,
       advancePercentage: data.payment?.advance_percentage,
-      gstNumber: data.payment?.gst_number,
+      gstNumber: data.payment?.gst_number || data.payment?.vat_number || "",
+      // Format services EXACTLY like Registration form expects
       services: data.services_offered?.map(service => ({
-        category: service.category?._id || service.category,
-        subcategories: service.subcategories?.map(sub => sub._id || sub) || [],
-        description: service.description,
-        priceRange: service.price_range,
-        unit: service.unit,
+        _id: service._id,
+        category: service.category?._id, // SUBCATEGORY ID
+        types: service.subcategories?.map(sub => sub.type?._id) || [],
+        description: service.description || "",
         isActive: service.is_active !== false
       })) || [],
-      portfolio: data.portfolio?.map(item => ({
-        title: item.title,
-        category: item.category?._id || item.category,
-        subcategory: item.subcategory?._id || item.subcategory,
-        description: item.description,
-        area: item.area,
-        duration: item.duration,
-        clientName: item.client_name,
-        completedAt: item.completed_at ? moment(item.completed_at) : null,
-        featured: item.featured || false
-      })) || []
+      portfolio: []
     };
   };
 
-  // --- File Handling (Initial) ---
+  // --- File Handling ---
   const handleProfileImageChange = (info) => {
     if (info.file.status === 'removed') {
       setProfileImage(null);
@@ -352,11 +497,11 @@ const UpdateFreelancerProfile = () => {
     setTimeout(() => { onSuccess("ok"); }, 0); 
   };
 
-  // --- RE-UPLOAD HANDLER FOR REJECTED DOCUMENTS ---
+  // --- RE-UPLOAD HANDLER ---
   const handleReupload = async (options, documentId) => {
     const { file, onSuccess, onError } = options;
     const formData = new FormData();
-    formData.append('file', file); // Backend expects 'file'
+    formData.append('file', file);
 
     try {
       showToast("Uploading...", "info");
@@ -368,12 +513,16 @@ const UpdateFreelancerProfile = () => {
         onSuccess("Ok");
         showToast("Document re-uploaded successfully!", "success");
         
-        // Update local state immediately
+        // Update local state without full refresh
         setFreelancer(prev => {
-            const updatedDocs = prev.documents.map(d => 
-                d._id === documentId ? res.document : d
-            );
-            return { ...prev, documents: updatedDocs, onboarding_status: res.onboarding_status };
+          const updatedDocs = prev.documents.map(d => 
+            d._id === documentId ? res.document : d
+          );
+          return { 
+            ...prev, 
+            documents: updatedDocs, 
+            onboarding_status: res.onboarding_status || prev.onboarding_status 
+          };
         });
       } else {
         showToast(res.message, "error");
@@ -386,48 +535,113 @@ const UpdateFreelancerProfile = () => {
     }
   };
 
-  // --- MAIN FORM SUBMISSION (Initial/Full Update) ---
+  // --- MAIN FORM SUBMISSION - Optimized to prevent unnecessary refreshes ---
   const onFinish = async (values) => {
     try {
       setSaving(true);
+      
+      // Check if anything actually changed
+      const initialData = initialDataRef.current?.profile;
+      if (initialData) {
+        const isSameData = compareFormData(initialData, values);
+        if (isSameData && !profileImage && Object.values(fileList).every(arr => arr.length === 0)) {
+          showToast("No changes detected", "info");
+          setSaving(false);
+          return;
+        }
+      }
+      
       const formData = new FormData();
 
-      // ... (Rest of FormData logic same as before) ...
-      formData.append('name[first_name]', values.firstName);
-      formData.append('name[last_name]', values.lastName);
-      formData.append('mobile[country_code]', values.countryCode);
-      formData.append('mobile[number]', values.mobile);
-      if (values.languages) values.languages.forEach(lang => formData.append('languages[]', lang));
-      if (profileImage) formData.append('profile_image', profileImage);
+      // Basic Info
+      formData.append('name[first_name]', values.firstName || "");
+      formData.append('name[last_name]', values.lastName || "");
+      formData.append('mobile[country_code]', values.countryCode || '+91');
+      formData.append('mobile[number]', values.mobile || "");
       
-      formData.append('professional', JSON.stringify({
-        experience_years: values.experienceYears,
-        availability: values.availability,
-        working_radius: values.workingRadius,
-        bio: values.bio,
-        skills: typeof values.skills === 'string' ? values.skills.split(',') : values.skills
-      }));
+      // Languages
+      if (values.languages) {
+        values.languages.forEach(lang => formData.append('languages[]', lang));
+      }
 
-      formData.append('location', JSON.stringify({
-        city: values.city, state: values.state, country: values.country, pincode: values.pincode
-      }));
+      // Profile Image
+      if (profileImage) {
+        formData.append('profile_image', profileImage);
+      }
 
-      formData.append('payment', JSON.stringify({
-        preferred_method: values.preferredMethod,
-        advance_percentage: values.advancePercentage,
-        gst_number: values.gstNumber,
+      // Professional Info
+      const professionalData = {
+        experience_years: values.experienceYears || 0,
+        availability: values.availability || "Full-time",
+        bio: values.bio || "",
+        skills: typeof values.skills === 'string' ? 
+          values.skills.split(',').map(s => s.trim()).filter(s => s) : 
+          values.skills || []
+      };
+      formData.append('professional', JSON.stringify(professionalData));
+
+      // Location
+      const locationData = {
+        city: values.city || "",
+        state: values.state || "",
+        country: values.country || "UAE",
+        po_box: values.po_box || ""
+      };
+      formData.append('location', JSON.stringify(locationData));
+
+      // Payment
+      const paymentData = {
+        preferred_method: values.preferredMethod || "Cash",
         preferred_currency: values.preferredCurrency
-      }));
+      };
+      if (values.gstNumber) paymentData.vat_number = values.gstNumber;
+      formData.append('payment', JSON.stringify(paymentData));
 
+      // Services Offered - SAME STRUCTURE AS REGISTRATION
       if (values.services) {
-        const servicesData = values.services.map(s => ({
-          category: s.category, subcategories: s.subcategories, description: s.description,
-          price_range: s.priceRange, unit: s.unit, is_active: s.isActive
-        }));
+        const servicesData = values.services.map(service => {
+          // Find existing service to preserve existing subcategories
+          const existingService = freelancer?.services_offered?.find(s => s._id === service._id);
+          const existingSubcategories = existingService?.subcategories || [];
+          
+          // Create subcategories array with types
+          const subcategoriesData = (service.types || []).map(typeId => {
+            // Check if this type already exists
+            const existingSubcat = existingSubcategories.find(subcat => 
+              subcat.type?._id === typeId || subcat.type === typeId
+            );
+            
+            if (existingSubcat) {
+              // Keep existing price and unit
+              return {
+                type: typeId,
+                price_range: existingSubcat.price_range || "",
+                unit: existingSubcat.unit || "per hour",
+                is_active: true
+              };
+            } else {
+              // New type
+              return {
+                type: typeId,
+                price_range: "",
+                unit: "per hour",
+                is_active: true
+              };
+            }
+          });
+
+          return {
+            _id: service._id,
+            category: service.category, // This is subcategory ID
+            description: service.description || "",
+            is_active: service.isActive !== false,
+            subcategories: subcategoriesData
+          };
+        });
         formData.append('services_offered', JSON.stringify(servicesData));
       }
 
-      // Append new files (Initial Uploads)
+      // Documents
       if (fileList.resume.length) formData.append('resume', fileList.resume[0].originFileObj);
       if (fileList.identityProof.length) formData.append('identityProof', fileList.identityProof[0].originFileObj);
       if (fileList.addressProof.length) formData.append('addressProof', fileList.addressProof[0].originFileObj);
@@ -439,18 +653,107 @@ const UpdateFreelancerProfile = () => {
       
       if (response.success) {
         showToast("Profile updated successfully!", "success");
-        setFreelancer(response.freelancer);
-        form.setFieldsValue(formatFormData(response.freelancer));
+        
+        // Update local state without triggering full re-fetch
+        setFreelancer(prev => {
+          const updated = response.freelancer || prev;
+          return {
+            ...prev,
+            ...updated,
+            profileProgress: response.freelancer?.profileProgress || prev.profileProgress
+          };
+        });
+        
+        // Update form with new data
+        const formattedData = formatFormData(response.freelancer || freelancer);
+        form.setFieldsValue(formattedData);
+        
+        // Update rate card values
+        const updatedRates = {};
+        if (response.freelancer?.services_offered) {
+          response.freelancer.services_offered.forEach(service => {
+            if (service.subcategories) {
+              service.subcategories.forEach(subcat => {
+                const type = subcat.type;
+                if (type?._id) {
+                  updatedRates[type._id] = {
+                    price_range: subcat.price_range || "",
+                    unit: subcat.unit || "per hour",
+                    serviceId: service._id,
+                    typeId: type._id,
+                    typeLabel: type.label || "Unknown Type"
+                  };
+                }
+              });
+            }
+          });
+        }
+        setRateCardValues(updatedRates);
+        
+        // Update initial data ref
+        initialDataRef.current = {
+          ...initialDataRef.current,
+          profile: response.freelancer || freelancer
+        };
+        
+        // Reset file states
         setProfileImage(null);
         setFileList({ resume: [], identityProof: [], addressProof: [], certificate: [] });
+        
+        // Update preview image if profile image was updated
+        if (response.freelancer?.profile_image) {
+          setPreviewImage(`http://localhost:5000/${response.freelancer.profile_image}`);
+        }
       } else {
         showToast(response.message || "Failed to update profile", "error");
       }
     } catch (error) {
+      console.error("Profile update error:", error);
       showToast("Failed to update profile", "error");
     } finally {
       setSaving(false);
     }
+  };
+
+  // Helper function to compare form data
+  const compareFormData = (initial, current) => {
+    // Compare basic info
+    if (initial.name?.first_name !== current.firstName ||
+        initial.name?.last_name !== current.lastName ||
+        initial.mobile?.country_code !== current.countryCode ||
+        initial.mobile?.number !== current.mobile) {
+      return false;
+    }
+    
+    // Compare professional info
+    if (initial.professional?.experience_years !== current.experienceYears ||
+        initial.professional?.availability !== current.availability ||
+        initial.professional?.bio !== current.bio) {
+      return false;
+    }
+    
+    // Compare location
+    if (initial.location?.city !== current.city ||
+        initial.location?.state !== current.state ||
+        initial.location?.country !== current.country ||
+        initial.location?.po_box !== current.po_box) {
+      return false;
+    }
+    
+    // Compare payment
+    if (initial.payment?.preferred_method !== current.preferredMethod ||
+        initial.payment?.preferred_currency?._id !== current.preferredCurrency ||
+        initial.payment?.vat_number !== current.gstNumber) {
+      return false;
+    }
+    
+    // Compare languages
+    const currentLangs = Array.isArray(current.languages) ? current.languages : [];
+    if (JSON.stringify(initial.languages?.sort()) !== JSON.stringify(currentLangs.sort())) {
+      return false;
+    }
+    
+    return true;
   };
 
   if (loading) return <Spin size="large" className="flex justify-center mt-10" />;
@@ -459,7 +762,7 @@ const UpdateFreelancerProfile = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header with progress */}
         <Card className="mb-6 shadow-sm border-0 bg-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center space-x-6">
@@ -485,12 +788,20 @@ const UpdateFreelancerProfile = () => {
                 <Title level={2} className="m-0 text-gray-800">
                   {freelancer.name?.first_name} {freelancer.name?.last_name}
                 </Title>
-                <Tag color="blue" className="mt-2">
-                  {freelancer.professional?.experience_years || 0} years exp
-                </Tag>
-                <Tag color={freelancer.status_info?.status === 2 ? 'red' : 'blue'}>
-                    {freelancer.onboarding_status}
-                </Tag>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <Tag color="blue">
+                    {freelancer.professional?.experience_years || 0} years exp
+                  </Tag>
+                  <Tag color={freelancer.onboarding_status === 'approved' ? 'green' : 
+                            freelancer.onboarding_status === 'rejected' ? 'red' : 'blue'}>
+                    {freelancer.onboarding_status?.replace('_', ' ') || 'Unknown'}
+                  </Tag>
+                  {freelancer.profileProgress && (
+                    <Tag color="orange">
+                      {freelancer.profileProgress.completionPercentage}% Complete
+                    </Tag>
+                  )}
+                </div>
               </div>
             </div>
             <Button 
@@ -503,16 +814,34 @@ const UpdateFreelancerProfile = () => {
               Save Full Profile
             </Button>
           </div>
+          
+          {/* Progress Bar */}
+          {freelancer.profileProgress && (
+            <div className="mt-6">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-600">Profile Completion</span>
+                <span className="font-medium">{freelancer.profileProgress.completionPercentage}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-blue-600 h-2.5 rounded-full" 
+                  style={{ width: `${freelancer.profileProgress.completionPercentage}%` }}
+                ></div>
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                {freelancer.profileProgress.summary}
+              </div>
+            </div>
+          )}
         </Card>
 
         {/* Main Form */}
         <Form form={form} layout="vertical" onFinish={onFinish} size="large">
           <Tabs activeKey={activeTab} onChange={setActiveTab} type="card" className="bg-white p-4 rounded shadow-sm">
             
-            {/* ... TABS 1-6 ARE SAME AS BEFORE (Basic, Professional, Location, Services, Rate Card, Payment) ... */}
+            {/* Basic Info Tab */}
             <TabPane tab={<span><UserOutlined /> Basic Info</span>} key="basic">
-               {/* Same content as previous... */}
-               <Row gutter={[24, 16]}>
+              <Row gutter={[24, 16]}>
                 <Col xs={24} md={12}>
                   <Form.Item label="First Name" name="firstName" rules={[{ required: true }]}>
                     <Input />
@@ -525,16 +854,16 @@ const UpdateFreelancerProfile = () => {
                 </Col>
                 <Col xs={24} md={12}>
                   <Form.Item label="Mobile" required style={{ marginBottom: 0 }}>
-                      <Input.Group compact>
-                        <Form.Item name="countryCode" noStyle rules={[{ required: true }]}>
-                            <Select style={{ width: '30%' }}>
-                                <Option value="+91">+91</Option>
-                                <Option value="+971">+971</Option>
-                            </Select>
-                        </Form.Item>
-                        <Form.Item name="mobile" noStyle rules={[{ required: true }]}>
-                            <Input style={{ width: '70%' }} />
-                        </Form.Item>
+                    <Input.Group compact>
+                      <Form.Item name="countryCode" noStyle rules={[{ required: true }]}>
+                        <Select style={{ width: '30%' }}>
+                          <Option value="+91">+91</Option>
+                          <Option value="+971">+971</Option>
+                        </Select>
+                      </Form.Item>
+                      <Form.Item name="mobile" noStyle rules={[{ required: true }]}>
+                        <Input style={{ width: '70%' }} />
+                      </Form.Item>
                     </Input.Group>
                   </Form.Item>
                 </Col>
@@ -550,206 +879,282 @@ const UpdateFreelancerProfile = () => {
               </Row>
             </TabPane>
 
+            {/* Professional Tab */}
             <TabPane tab={<span><SolutionOutlined /> Professional</span>} key="professional">
-               {/* Same content as previous... */}
-               <Row gutter={[24, 16]}>
-                  <Col xs={24} md={12}><Form.Item label="Experience (Years)" name="experienceYears"><InputNumber className="w-full" /></Form.Item></Col>
-                  <Col xs={24} md={12}><Form.Item label="Availability" name="availability"><Select><Option value="Full-time">Full-time</Option><Option value="Part-time">Part-time</Option></Select></Form.Item></Col>
-                  <Col xs={24} md={12}><Form.Item label="Working Radius" name="workingRadius"><Input /></Form.Item></Col>
-                  <Col xs={24}><Form.Item label="Bio" name="bio" rules={[{ required: true }]}><TextArea rows={4} /></Form.Item></Col>
-                  <Col xs={24}><Form.Item label="Skills" name="skills" help="Comma separated"><Input /></Form.Item></Col>
+              <Row gutter={[24, 16]}>
+                <Col xs={24} md={12}>
+                  <Form.Item label="Experience (Years)" name="experienceYears">
+                    <InputNumber className="w-full" min={0} max={50} />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="Availability" name="availability">
+                    <Select>
+                      <Option value="Full-time">Full-time</Option>
+                      <Option value="Part-time">Part-time</Option>
+                      <Option value="Project-based">Project-based</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24}>
+                  <Form.Item label="Bio" name="bio" rules={[{ required: true, message: 'Please enter your professional bio' }]}>
+                    <TextArea rows={4} maxLength={1000} showCount placeholder="Describe your professional background..." />
+                  </Form.Item>
+                </Col>
               </Row>
             </TabPane>
 
+            {/* Location Tab */}
             <TabPane tab={<span><EnvironmentOutlined /> Location</span>} key="location">
-               {/* Same content as previous... */}
-               <Row gutter={[24, 16]}>
-                <Col xs={24} md={12}><Form.Item label="City" name="city"><Input /></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="State" name="state"><Input /></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="Country" name="country"><Input /></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="Pincode" name="pincode"><Input /></Form.Item></Col>
+              <Row gutter={[24, 16]}>
+                 <Col xs={24} md={12}>
+                  <Form.Item label="Country" name="country">
+                    <Select>
+                      <Option value="UAE">UAE</Option>
+                      <Option value="India">India</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                   <Col xs={24} md={12}>
+                  <Form.Item label="State" name="state">
+                    <Input placeholder="Enter your state/province" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="City" name="city">
+                    <Input placeholder="Enter your city" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="po_box/ZIP Code" name="po_box">
+                    <Input placeholder="Enter your po_box" />
+                  </Form.Item>
+                </Col>
               </Row>
             </TabPane>
 
+            {/* Services Setup Tab - EXACTLY LIKE REGISTRATION FORM */}
             <TabPane tab={<span><ToolFilled /> Services (Setup)</span>} key="services">
-               {/* Same content as previous... */}
-               <div className="bg-blue-50 p-3 mb-4 rounded border border-blue-100">
-                <Text type="secondary"><ToolFilled /> Use this tab to <b>Add</b> or <b>Remove</b> services. Use the "Rate Card" tab to quickly update prices.</Text>
+              <div className="bg-blue-50 p-3 mb-4 rounded border border-blue-100">
+                <Text type="secondary">
+                  <ToolFilled /> Add your services here. Select a service category and specializations.
+                </Text>
               </div>
               <Form.List name="services">
                 {(fields, { add, remove }) => (
                   <>
                     {fields.map(({ key, name, ...restField }) => (
-                      <Card key={key} size="small" className="mb-4 bg-gray-50" extra={<Button danger icon={<DeleteOutlined />} onClick={() => remove(name)} />}>
+                      <Card key={key} size="small" className="mb-4 bg-gray-50" 
+                        extra={<Button danger icon={<DeleteOutlined />} onClick={() => remove(name)} />}>
                         <Row gutter={[16, 16]}>
+                          {/* Service Category - SAME AS REGISTRATION */}
                           <Col xs={24} md={12}>
-                            <Form.Item {...restField} label="Category" name={[name, 'category']} rules={[{ required: true }]}>
-                              <Select onChange={(val) => handleCategoryChange(val, name)}>
-                                {categories.map(c => <Option key={c.value} value={c.value}>{c.label}</Option>)}
+                            <Form.Item 
+                              {...restField} 
+                              label="What service do you offer?" 
+                              name={[name, 'category']} 
+                              rules={[{ required: true, message: 'Please select a service category' }]}
+                            >
+                              <Select
+                                placeholder="Select a service category"
+                                onChange={(value) => handleSubcategoryChange(value, name)}
+                              >
+                                {subcategories.map(sub => (
+                                  <Option key={sub._id} value={sub._id}>
+                                    {sub.label}
+                                  </Option>
+                                ))}
                               </Select>
                             </Form.Item>
                           </Col>
+                          
+                          {/* Specializations - SAME AS REGISTRATION */}
                           <Col xs={24} md={12}>
-                            <Form.Item {...restField} label="Subcategories" name={[name, 'subcategories']}>
-                              <Select mode="multiple" disabled={!subcategoriesMap[name]}>
-                                {subcategoriesMap[name]?.map(s => <Option key={s.value} value={s.value}>{s.label}</Option>)}
+                            <Form.Item 
+                              {...restField} 
+                              label="Specializations (Multiple)" 
+                              name={[name, 'types']}
+                              rules={[{ required: true, message: 'Please select at least one specialization' }]}
+                            >
+                              <Select mode="multiple">
+                                {(typesMap[name] || []).map(t => (
+                                  <Option key={t.value} value={t.value}>
+                                    {t.label}
+                                  </Option>
+                                ))}
                               </Select>
                             </Form.Item>
                           </Col>
-                          <Col xs={24}><Form.Item {...restField} label="Description" name={[name, 'description']}><TextArea rows={2} /></Form.Item></Col>
-                          <Col xs={24} md={8}><Form.Item {...restField} label="Price" name={[name, 'priceRange']}><Input /></Form.Item></Col>
-                          <Col xs={24} md={8}>
-                             <Form.Item {...restField} label="Unit" name={[name, 'unit']}>
-                               <Select placeholder="Select Unit">
-                                  {unitOptions.map(u => <Option key={u.value} value={u.value}>{u.label}</Option>)}
-                               </Select>
-                             </Form.Item>
+                          
+                          {/* Description - SAME AS REGISTRATION */}
+                          <Col xs={24}>
+                            <Form.Item 
+                              {...restField} 
+                              label="Service Description" 
+                              name={[name, 'description']}
+                              rules={[{ required: true, message: 'Please enter service description' }]}
+                            >
+                              <TextArea 
+                                rows={4}
+                                placeholder="Describe your expertise..."
+                                maxLength={500}
+                                showCount
+                              />
+                            </Form.Item>
                           </Col>
-                          <Col xs={24} md={8}>
-                             <Form.Item {...restField} label="Status" name={[name, 'isActive']} valuePropName="checked" initialValue={true}>
-                               <Switch />
-                             </Form.Item>
+                          
+                          <Col xs={24}>
+                            <Form.Item 
+                              {...restField} 
+                              label="Status" 
+                              name={[name, 'isActive']} 
+                              valuePropName="checked" 
+                              initialValue={true}
+                            >
+                              <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+                            </Form.Item>
                           </Col>
                         </Row>
                       </Card>
                     ))}
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>Add Service</Button>
+                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                      Add Another Service
+                    </Button>
                   </>
                 )}
               </Form.List>
             </TabPane>
 
+            {/* Rate Card Tab - Shows existing types with labels */}
             <TabPane tab={<span><CreditCardOutlined /> Rate Card</span>} key="rate-card">
-               {/* Same content as previous... */}
-               <div className="mb-4">
-                 <Title level={5}>Quick Price Adjustment</Title>
-                 <Text type="secondary">Update your pricing for active services individually without saving the whole profile.</Text>
+              <div className="mb-4">
+                <Title level={5}>Quick Price Adjustment</Title>
+                <Text type="secondary">Update your pricing for each service specialization.</Text>
               </div>
               
-              <Table 
-                dataSource={freelancer.services_offered} 
-                columns={rateCardColumns}
-                rowKey="_id"
-                pagination={false}
-                bordered
-              />
+              {freelancer.services_offered?.length > 0 ? (
+                <Table 
+                  dataSource={freelancer.services_offered} 
+                  columns={rateCardColumns}
+                  rowKey="_id"
+                  pagination={false}
+                  bordered
+                  loading={rateLoading}
+                  scroll={{ x: 800 }}
+                />
+              ) : (
+                <Alert
+                  message="No services found"
+                  description="Please add services in the Services tab first."
+                  type="info"
+                  showIcon
+                />
+              )}
             </TabPane>
 
+            {/* Payment Tab */}
             <TabPane tab={<span><DollarCircleOutlined /> Payment</span>} key="payment">
-               {/* Same content as previous... */}
-               <Row gutter={[24, 16]}>
+              <Row gutter={[24, 16]}>
                 <Col xs={24} md={12}>
-                  <Form.Item label="Preferred Method" name="preferredMethod">
+                  <Form.Item label="Preferred Payment Method" name="preferredMethod">
                     <Select>
                       <Option value="Cash">Cash</Option>
                       <Option value="Bank Transfer">Bank Transfer</Option>
+                      <Option value="Online Payment">Online Payment</Option>
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                   <Form.Item label="Currency" name="preferredCurrency">
-                     <Select placeholder="Select Currency" loading={!currencies.length}>
-                        {currencies.map(curr => (
-                           <Option key={curr._id} value={curr._id}>
-                             {curr.code} - {curr.symbol} ({curr.name})
-                           </Option>
-                        ))}
-                     </Select>
-                   </Form.Item>
-                </Col>
-                <Col xs={24} md={12}>
-                  <Form.Item label="Advance %" name="advancePercentage">
-                    <InputNumber min={0} max={100} formatter={v => `${v}%`} parser={v => v.replace('%', '')} className="w-full" />
+                  <Form.Item label="Currency" name="preferredCurrency">
+                    <Select placeholder="Select Currency" loading={!currencies.length}>
+                      {currencies.map(curr => (
+                        <Option key={curr._id} value={curr._id}>
+                          {curr.code} - {curr.symbol} ({curr.name})
+                        </Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Form.Item label="GST Number" name="gstNumber">
-                    <Input />
+                  <Form.Item label="VAT Number" name="gstNumber">
+                    <Input placeholder="Enter VAT if applicable" />
                   </Form.Item>
                 </Col>
               </Row>
             </TabPane>
 
-            {/* TAB 7: DOCUMENTS - UPDATED FOR RE-UPLOAD */}
+            {/* Documents Tab */}
             <TabPane tab={<span><FileTextOutlined /> Documents</span>} key="documents">
-               <Row gutter={[24, 24]}>
-                 {['resume', 'identityProof', 'addressProof', 'certificate'].map(type => {
-                   
-                   // Find existing document state
-                   const doc = freelancer.documents?.find(d => d.type === type);
-                   const isRejected = doc?.verified === false && doc?.reason;
-                   const isVerified = doc?.verified === true;
-                   
-                   return (
-                     <Col xs={24} md={12} key={type}>
-                       <Card 
-                         title={type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1')} 
-                         size="small"
-                         className={isRejected ? "border-red-400" : ""}
-                         headStyle={isRejected ? { color: '#ff4d4f' } : {}}
-                       >
-                         
-                         {/* 1. Verified State */}
-                         {isVerified && (
-                           <div className="mb-4 text-green-600 flex items-center">
-                             <CheckCircleOutlined className="mr-2" /> Verified & Approved
-                           </div>
-                         )}
+              <Row gutter={[24, 24]}>
+                {['resume', 'identityProof', 'addressProof', 'certificate'].map(type => {
+                  const doc = freelancer.documents?.find(d => d.type === type);
+                  const isRejected = doc?.verified === false && doc?.reason;
+                  const isVerified = doc?.verified === true;
+                  
+                  return (
+                    <Col xs={24} md={12} key={type}>
+                      <Card 
+                        title={type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1')} 
+                        size="small"
+                        className={isRejected ? "border-red-400" : ""}
+                        headStyle={isRejected ? { color: '#ff4d4f' } : {}}
+                      >
+                        {/* Verified State */}
+                        {isVerified && (
+                          <div className="mb-4 text-green-600 flex items-center">
+                            <CheckCircleOutlined className="mr-2" /> Verified & Approved
+                          </div>
+                        )}
 
-                         {/* 2. Rejected State */}
-                         {isRejected && (
-                           <Alert 
-                             message="Document Rejected" 
-                             description={
-                               <div>
-                                 <div><strong>Reason:</strong> {doc.reason}</div>
-                                 {doc.suggestion && <div><strong>Suggestion:</strong> {doc.suggestion}</div>}
-                               </div>
-                             }
-                             type="error" 
-                             showIcon 
-                             className="mb-4"
-                           />
-                         )}
+                        {/* Rejected State */}
+                        {isRejected && (
+                          <Alert 
+                            message="Document Rejected" 
+                            description={
+                              <div>
+                                <div><strong>Reason:</strong> {doc.reason}</div>
+                                {doc.suggestion && <div><strong>Suggestion:</strong> {doc.suggestion}</div>}
+                              </div>
+                            }
+                            type="error" 
+                            showIcon 
+                            className="mb-4"
+                          />
+                        )}
 
-                         {/* 3. Pending/New State */}
-                         {!isVerified && !isRejected && doc && (
-                           <div className="mb-2 text-blue-600">
-                             <FileTextOutlined /> Document Uploaded (Pending Review)
-                           </div>
-                         )}
+                        {/* Pending/New State */}
+                        {!isVerified && !isRejected && doc && (
+                          <div className="mb-2 text-blue-600">
+                            <FileTextOutlined /> Document Uploaded (Pending Review)
+                          </div>
+                        )}
 
-                         {/* ACTION AREA */}
-                         {/* Show upload button if: Not verified AND (Rejected OR Not uploaded yet) */}
-                         {!isVerified && (
-                           <Upload
-                             // If rejected, call re-upload API immediately. Else, add to fileList for batch save.
-                             customRequest={isRejected ? (options) => handleReupload(options, doc._id) : customRequest}
-                             
-                             fileList={isRejected ? [] : fileList[type]} // Clear list for re-upload mode
-                             
-                             onChange={(info) => {
-                               // Only handle local state change for initial upload
-                               if (!isRejected) handleDocumentChange(info, type);
-                             }}
-                             
-                             showUploadList={!isRejected} // Hide standard list for re-upload button
-                             maxCount={1}
-                           >
-                             <Button 
-                               icon={isRejected ? <SyncOutlined /> : <UploadOutlined />}
-                               type={isRejected ? "primary" : "default"}
-                               danger={isRejected}
-                             >
-                               {isRejected ? "Re-upload Document" : "Click to Upload"}
-                             </Button>
-                           </Upload>
-                         )}
-                       </Card>
-                     </Col>
-                   );
-                 })}
-               </Row>
+                        {/* Action Area */}
+                        {!isVerified && (
+                          <Upload
+                            customRequest={isRejected ? (options) => handleReupload(options, doc._id) : customRequest}
+                            fileList={isRejected ? [] : fileList[type]}
+                            onChange={(info) => {
+                              if (!isRejected) handleDocumentChange(info, type);
+                            }}
+                            showUploadList={!isRejected}
+                            maxCount={1}
+                            beforeUpload={() => false}
+                          >
+                            <Button 
+                              icon={isRejected ? <SyncOutlined /> : <UploadOutlined />}
+                              type={isRejected ? "primary" : "default"}
+                              danger={isRejected}
+                            >
+                              {isRejected ? "Re-upload Document" : "Click to Upload"}
+                            </Button>
+                          </Upload>
+                        )}
+                      </Card>
+                    </Col>
+                  );
+                })}
+              </Row>
             </TabPane>
 
           </Tabs>

@@ -123,21 +123,25 @@ const FreelancerProfile = () => {
 
     setVerifyingDoc(selectedDocId);
     try {
-      await apiService.put("/freelancer/document/verification/check", {
-        freelancerId: freelancerId, // Use the ID from params
+      const response = await apiService.put("/freelancer/document/verification/check", {
+        freelancerId: freelancerId,
         documentId: selectedDocId,
         verified: isApproving,
         reason: reason.trim(),
         suggestion: suggestion.trim(),
       });
       
-      showToast(
-        `Document ${isApproving ? "approved" : "rejected"} successfully`,
-        "success"
-      );
-      
-      setVerificationModalOpen(false);
-      fetchFreelancer(); // Refresh data
+      if (response.success) {
+        showToast(
+          `Document ${isApproving ? "approved" : "rejected"} successfully`,
+          "success"
+        );
+        
+        setVerificationModalOpen(false);
+        fetchFreelancer(); // Refresh data
+      } else {
+        showToast(response.message || "Failed to update document", "error");
+      }
     } catch (error) {
       console.error(error);
       showToast(
@@ -260,7 +264,7 @@ const FreelancerProfile = () => {
                   <Col span={12}>
                     <Statistic 
                       title={<span className="text-purple-200">Experience</span>} 
-                      value={freelancer.professional?.experience_years} 
+                      value={freelancer.professional?.experience_years || 0} 
                       suffix="Years" 
                       valueStyle={{ color: 'white' }} 
                       prefix={<FaAward />} 
@@ -269,7 +273,7 @@ const FreelancerProfile = () => {
                   <Col span={12}>
                     <Statistic 
                       title={<span className="text-purple-200">Services</span>} 
-                      value={freelancer.services_offered?.length} 
+                      value={freelancer.services_offered?.length || 0} 
                       valueStyle={{ color: 'white' }} 
                       prefix={<FaServicestack />} 
                     />
@@ -287,7 +291,7 @@ const FreelancerProfile = () => {
           <Space direction="vertical" className="w-full" size="large">
             
             {/* Basic Info */}
-            <Card title={<span><FaBuilding className="mr-2 text-purple-600"/> Basic Info</span>} className="shadow-sm">
+            <Card title={<span>Basic Info</span>} className="shadow-sm">
               <Descriptions column={1} size="small">
                 <Descriptions.Item label="Languages">
                   <Space wrap>
@@ -296,36 +300,78 @@ const FreelancerProfile = () => {
                     ))}
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Pincode">{freelancer.location?.pincode}</Descriptions.Item>
-                <Descriptions.Item label="Joined">{new Date(freelancer.meta?.created_at).toLocaleDateString()}</Descriptions.Item>
+                <Descriptions.Item label="Pincode">{freelancer.location?.pincode || "N/A"}</Descriptions.Item>
+                <Descriptions.Item label="Joined">
+                  {freelancer.meta?.created_at ? new Date(freelancer.meta.created_at).toLocaleDateString() : "N/A"}
+                </Descriptions.Item>
               </Descriptions>
             </Card>
 
             {/* Professional */}
-            <Card title={<span><FaBriefcase className="mr-2 text-purple-600"/> Professional</span>} className="shadow-sm">
+            <Card title={<span> Professional</span>} className="shadow-sm">
               <Descriptions column={1} size="small">
                 <Descriptions.Item label="Availability">
-                  <Tag color="blue">{freelancer.professional?.availability}</Tag>
+                  <Tag color="blue">{freelancer.professional?.availability || "Not specified"}</Tag>
                 </Descriptions.Item>
-                <Descriptions.Item label="Working Radius">
-                  {freelancer.professional?.working_radius} km
-                </Descriptions.Item>
+               
                 <Descriptions.Item label="Bio">
                   <Paragraph ellipsis={{ rows: 3, expandable: true }}>
-                    {freelancer.professional?.bio}
+                    {freelancer.professional?.bio || "No bio provided"}
                   </Paragraph>
                 </Descriptions.Item>
               </Descriptions>
             </Card>
 
+  <Card
+  title={
+    <span>
+      Location
+    </span>
+  }
+  className="shadow-sm"
+>
+  <Descriptions column={1} size="small">
+    {/* Availability */}
+ 
+
+    {/* Location */}
+    <Descriptions.Item >
+      {freelancer.location ? (
+        <div className="flex flex-col gap-1">
+          <span>
+            <strong>City:</strong>{" "}
+            {freelancer.location.city || "—"}
+          </span>
+          <span>
+            <strong>State:</strong>{" "}
+            {freelancer.location.state || "—"}
+          </span>
+          <span>
+            <strong>Country:</strong>{" "}
+            {freelancer.location.country || "—"}
+          </span>
+          <span>
+            <strong>PO Box:</strong>{" "}
+            {freelancer.location.po_box || "—"}
+          </span>
+        </div>
+      ) : (
+        <Tag color="default">Location not provided</Tag>
+      )}
+    </Descriptions.Item>
+  </Descriptions>
+</Card>
+
             {/* Payment */}
-            <Card title={<span><FaMoneyBill className="mr-2 text-purple-600"/> Payment Details</span>} className="shadow-sm">
+            <Card title={<span> Payment Details</span>} className="shadow-sm">
               <Descriptions column={1} size="small">
-                <Descriptions.Item label="Method">{freelancer.payment?.preferred_method}</Descriptions.Item>
+                <Descriptions.Item label="Method">{freelancer.payment?.preferred_method || "N/A"}</Descriptions.Item>
                 <Descriptions.Item label="Currency">
-                   {freelancer.payment?.preferred_currency?.code} ({freelancer.payment?.preferred_currency?.symbol})
+                  {freelancer.payment?.preferred_currency?.code ? 
+                    `${freelancer.payment.preferred_currency.code} (${freelancer.payment.preferred_currency.symbol})` : 
+                    "N/A"}
                 </Descriptions.Item>
-                <Descriptions.Item label="GST No">{freelancer.payment?.gst_number || "N/A"}</Descriptions.Item>
+                <Descriptions.Item label="Vat Number">{freelancer.payment?.vat_number || "N/A"}</Descriptions.Item>
               </Descriptions>
             </Card>
           </Space>
@@ -336,77 +382,129 @@ const FreelancerProfile = () => {
           <Space direction="vertical" className="w-full" size="large">
             
             {/* Services */}
-            <Card title={<span><FaServicestack className="mr-2 text-purple-600"/> Services Offered</span>} className="shadow-sm">
-               {freelancer.services_offered?.length > 0 ? (
-                 freelancer.services_offered.map((service) => (
-                   <Card key={service._id} type="inner" className="mb-4 bg-gray-50 border-gray-200">
-                     <div className="flex justify-between items-start">
-                        <div>
-                          <Title level={5} className="m-0 text-purple-800">{service.category?.name}</Title>
-                          <Text type="secondary" className="block text-xs mb-2">
-                             {service.subcategories?.map(sub => sub.name).join(", ")}
-                          </Text>
-                          <Paragraph className="text-gray-600 mb-2">{service.description}</Paragraph>
-                          <Tag color="green" className="text-base px-3 py-1">
-                             {freelancer.payment?.preferred_currency?.symbol} {service.price_range} / {service.unit}
-                          </Tag>
-                        </div>
-                        {/* Service Images */}
-                        {service.images?.length > 0 && (
-                          <div className="flex gap-2">
-                             {service.images.slice(0,2).map((img, i) => (
-                               <Image 
-                                 key={i} 
-                                 width={60} 
-                                 height={60} 
-                                 src={`${BASE_URL}/${img}`} 
-                                 className="rounded border"
-                               />
-                             ))}
-                          </div>
-                        )}
-                     </div>
-                   </Card>
-                 ))
-               ) : <Empty description="No Services Listed" />}
-            </Card>
+           <Card
+  title={
+    <span>
+      Services Offered
+    </span>
+  }
+  className="shadow-sm"
+>
+  {freelancer.services_offered?.length > 0 ? (
+    freelancer.services_offered.map((service) => (
+      <Card
+        key={service._id}
+        type="inner"
+        className="mb-4 bg-gray-50 border-gray-200"
+      >
+        {/* Service Header */}
+        <Title level={5} className="m-0 text-purple-800">
+          {service.category?.label || "Unnamed Service"}
+        </Title>
+
+        {/* Service Description */}
+        <Paragraph className="text-gray-600 mb-3">
+          {service.description || "No description provided"}
+        </Paragraph>
+
+        {/* Sub-Services */}
+        {service.subcategories?.length > 0 ? (
+          <div className="space-y-2">
+            {service.subcategories.map((sub) => (
+              <div
+                key={sub._id}
+                className="flex justify-between items-center bg-white p-3 rounded border"
+              >
+                {/* Sub-service name */}
+                <Text strong>
+                  {sub.type?.label || "Unnamed Sub-Service"}
+                </Text>
+
+                {/* Pricing */}
+                <Tag color="green" className="text-sm px-3 py-1">
+                  {freelancer.payment?.preferred_currency?.symbol || "$"}{" "}
+                  {sub.price_range || "Not set"}{" "}
+                  {sub.unit ? `/ ${sub.unit}` : ""}
+                </Tag>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Text type="secondary">No sub-services added</Text>
+        )}
+
+        {/* Service Images */}
+        {service.images?.length > 0 && (
+          <div className="flex gap-2 mt-4">
+            {service.images.slice(0, 3).map((img, i) => (
+              <Image
+                key={i}
+                width={70}
+                height={70}
+                src={`${BASE_URL}/${img}`}
+                className="rounded border"
+                alt="Service"
+              />
+            ))}
+          </div>
+        )}
+      </Card>
+    ))
+  ) : (
+    <Empty description="No Services Listed" />
+  )}
+</Card>
+
 
             {/* Documents (Admin Verification) */}
-            <Card title={<span><FaIdCard className="mr-2 text-purple-600"/> Documents & Verification</span>} className="shadow-sm">
+            <Card title={<span> Documents & Verification</span>} className="shadow-sm">
               <Row gutter={[16, 16]}>
                 {freelancer.documents?.map((doc) => (
                   <Col xs={24} sm={12} key={doc._id}>
                     <Card size="small" className="h-full border-gray-200 hover:shadow-md transition-shadow">
                       <div className="flex justify-between items-start mb-2">
-                         <Text strong className="capitalize">{documentTypeLabel[doc.type] || doc.type}</Text>
-                         <Badge status={doc.verified ? "success" : "processing"} text={doc.verified ? "Verified" : "Pending"} />
+                        <Text strong className="capitalize">{documentTypeLabel[doc.type] || doc.type}</Text>
+                        <Badge 
+                          status={doc.verified ? "success" : doc.reason ? "error" : "processing"} 
+                          text={doc.verified ? "Verified" : doc.reason ? "Rejected" : "Pending"} 
+                        />
                       </div>
                       
                       <Space className="w-full justify-between mt-4">
                         <Space>
-                           <Tooltip title="View">
-                             <Button size="small" icon={<EyeOutlined />} onClick={() => openImageModal(doc)} />
-                           </Tooltip>
-                           <Tooltip title="Download">
-                             <Button size="small" icon={<DownloadOutlined />} onClick={() => downloadDocument(doc.path)} />
-                           </Tooltip>
+                          <Tooltip title="View">
+                            <Button size="small" icon={<EyeOutlined />} onClick={() => openImageModal(doc)} />
+                          </Tooltip>
+                          <Tooltip title="Download">
+                            <Button size="small" icon={<DownloadOutlined />} onClick={() => downloadDocument(doc.path)} />
+                          </Tooltip>
                         </Space>
 
                         {/* Admin Actions */}
-                        {!doc.verified && (
+                        {!doc.verified && !doc.reason && (
                           <Space>
-                             <Tooltip title="Approve">
-                               <Button size="small" type="primary" className="bg-green-500 border-green-500 hover:bg-green-600" icon={<CheckOutlined />} onClick={() => openVerificationModal(doc._id, true)} />
-                             </Tooltip>
-                             <Tooltip title="Reject">
-                               <Button size="small" type="primary" danger icon={<CloseOutlined />} onClick={() => openVerificationModal(doc._id, false)} />
-                             </Tooltip>
+                            <Tooltip title="Approve">
+                              <Button size="small" type="primary" className="bg-green-500 border-green-500 hover:bg-green-600" icon={<CheckOutlined />} onClick={() => openVerificationModal(doc._id, true)} />
+                            </Tooltip>
+                            <Tooltip title="Reject">
+                              <Button size="small" type="primary" danger icon={<CloseOutlined />} onClick={() => openVerificationModal(doc._id, false)} />
+                            </Tooltip>
                           </Space>
+                        )}
+                        
+                        {/* Show rejection reason if rejected */}
+                        {doc.reason && (
+                          <div className="text-xs text-red-500">
+                            Reason: {doc.reason}
+                          </div>
                         )}
                       </Space>
                       
                       <div className="text-xs text-gray-400 mt-2 text-right">
-                        Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}
+                        Uploaded: {doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : "N/A"}
+                        {doc.verified_at && (
+                          <div>Verified: {new Date(doc.verified_at).toLocaleDateString()}</div>
+                        )}
                       </div>
                     </Card>
                   </Col>
@@ -418,23 +516,31 @@ const FreelancerProfile = () => {
             {/* Portfolio */}
             {freelancer.portfolio?.length > 0 && (
               <Card title={<span><FaBox className="mr-2 text-purple-600"/> Portfolio</span>} className="shadow-sm">
-                 <Row gutter={[16, 16]}>
-                    {freelancer.portfolio.map((item, idx) => (
-                      <Col xs={24} md={12} key={idx}>
-                         <Card hoverable className="h-full" cover={item.images?.[0] && <img alt="portfolio" src={`${BASE_URL}/${item.images[0]}`} className="h-40 object-cover" />}>
-                            <Card.Meta 
-                              title={item.title}
-                              description={
-                                <div>
-                                   <Text type="secondary" className="text-xs">{item.category?.name} - {item.subcategory?.name}</Text>
-                                   <Paragraph ellipsis={{ rows: 2 }} className="mt-1 mb-0">{item.description}</Paragraph>
-                                </div>
-                              }
-                            />
-                         </Card>
-                      </Col>
-                    ))}
-                 </Row>
+                <Row gutter={[16, 16]}>
+                  {freelancer.portfolio.map((item, idx) => (
+                    <Col xs={24} md={12} key={idx}>
+                      <Card hoverable className="h-full" 
+                        cover={item.images?.[0] && (
+                          <img alt="portfolio" src={`${BASE_URL}/${item.images[0]}`} className="h-40 object-cover" />
+                        )}
+                      >
+                        <Card.Meta 
+                          title={item.title || "Untitled Project"}
+                          description={
+                            <div>
+                              <Text type="secondary" className="text-xs">
+                                {item.category?.name || "Uncategorized"} - {item.subcategory?.name || "No subcategory"}
+                              </Text>
+                              <Paragraph ellipsis={{ rows: 2 }} className="mt-1 mb-0">
+                                {item.description || "No description"}
+                              </Paragraph>
+                            </div>
+                          }
+                        />
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
               </Card>
             )}
 
@@ -447,7 +553,15 @@ const FreelancerProfile = () => {
       {/* Image Preview */}
       <Modal open={imageViewerOpen} onCancel={closeImageModal} footer={null} width={800} centered>
         {selectedDocument && (
-          <img src={`${BASE_URL}/${selectedDocument.path}`} alt="Document" style={{ width: '100%', maxHeight: '80vh', objectFit: 'contain' }} />
+          <img 
+            src={`${BASE_URL}/${selectedDocument.path}`} 
+            alt="Document" 
+            style={{ width: '100%', maxHeight: '80vh', objectFit: 'contain' }} 
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "https://via.placeholder.com/800x600?text=Document+Not+Found";
+            }}
+          />
         )}
       </Modal>
 
@@ -462,7 +576,7 @@ const FreelancerProfile = () => {
             key="submit" 
             type="primary" 
             danger={!isApproving}
-            className={isApproving ? "bg-green-600" : ""}
+            className={isApproving ? "bg-green-600 border-green-600 hover:bg-green-700" : ""}
             loading={verifyingDoc === selectedDocId}
             onClick={handleSubmitVerification}
           >
@@ -470,16 +584,27 @@ const FreelancerProfile = () => {
           </Button>
         ]}
       >
-         {!isApproving && (
-            <div className="mb-4">
-               <Text strong className="text-red-500">Reason for Rejection *</Text>
-               <TextArea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Document is blurry" />
-            </div>
-         )}
-         <div>
-            <Text strong>Suggestion (Optional)</Text>
-            <TextArea rows={2} value={suggestion} onChange={(e) => setSuggestion(e.target.value)} placeholder="e.g. Please upload a clearer scan" />
-         </div>
+        {!isApproving && (
+          <div className="mb-4">
+            <Text strong className="text-red-500">Reason for Rejection *</Text>
+            <TextArea 
+              rows={3} 
+              value={reason} 
+              onChange={(e) => setReason(e.target.value)} 
+              placeholder="e.g. Document is blurry, incomplete information, etc." 
+              required
+            />
+          </div>
+        )}
+        <div>
+          <Text strong>Suggestion (Optional)</Text>
+          <TextArea 
+            rows={2} 
+            value={suggestion} 
+            onChange={(e) => setSuggestion(e.target.value)} 
+            placeholder="e.g. Please upload a clearer scan, provide complete address proof, etc." 
+          />
+        </div>
       </Modal>
 
     </div>

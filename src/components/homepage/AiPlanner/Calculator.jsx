@@ -1,266 +1,587 @@
 // src/components/homepage/AiPlanner/GardenCalculator.jsx
 import React, { useState, useEffect } from 'react';
 import {
-  Card, Button, Typography, Form, Input, Select, Space, Row, Col, message, Spin, Result
+  Card, Button, Typography, Form, Input, Select, Space, Row, Col, 
+  message, Spin, Result, Divider, Image, Badge, Empty, Tag
 } from 'antd';
 import {
   UserOutlined, MailOutlined, CheckCircleOutlined,
   SmileOutlined, HomeOutlined, BuildOutlined,
   EnvironmentOutlined, CalculatorOutlined, PhoneFilled, 
-  ArrowRightOutlined, ArrowLeftOutlined, CheckOutlined
+  ArrowRightOutlined, ArrowLeftOutlined, CheckOutlined,
+  CompassOutlined, PictureOutlined, ExperimentOutlined ,
+  EnvironmentFilled, StarFilled
 } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiService } from '../../../manageApi/utils/custom.apiservice';
-import { showSuccessAlert } from '../../../manageApi/utils/sweetAlert';
-import logoNew from "../../../assets/img/logoNew.png";
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icons in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const { Title, Text } = Typography;
-const { TextArea } = Input;
 
-const countryCodes = [
-  { value: "+91", label: "🇮🇳 +91" },
-  { value: "+971", label: "🇦🇪 +971" },
-  { value: "+966", label: "🇸🇦 +966" },
-  { value: "+1", label: "🇺🇸 +1" },
-  { value: "+44", label: "🇬🇧 +44" },
-  { value: "+61", label: "🇦🇺 +61" },
-];
+const BASE_URL = 'http://localhost:5000';
+const BRAND_PURPLE = '#5C039B';
 
-// Simplified steps for cleaner UI header
 const steps = [
-  { title: 'Type', icon: <EnvironmentOutlined /> },
+  { title: 'Location', icon: <CompassOutlined /> },
+  { title: 'Service', icon: <EnvironmentOutlined /> },
   { title: 'Style', icon: <HomeOutlined /> },
-  { title: 'Area', icon: <CalculatorOutlined /> },
-  { title: 'Package', icon: <BuildOutlined /> },
+  { title: 'Preview', icon: <PictureOutlined /> },
+  { title: 'Moodboard', icon: <ExperimentOutlined  /> },
+  { title: 'Dimensions', icon: <CalculatorOutlined /> },
+  { title: 'Packages', icon: <BuildOutlined /> },
   { title: 'Contact', icon: <PhoneFilled /> },
 ];
 
-const Calculator = () => {
-  // --- STATE (Unchanged) ---
-  const [activeStep, setActiveStep] = useState(0);
+// Reverse geocoding function
+const reverseGeocode = async (lat, lng) => {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+  );
+  const data = await res.json();
+  const a = data.address || {};
+
+  const city =
+    a.city ||
+    a.town ||
+    a.municipality ||
+    a.county ||
+    ""; // REAL city only
+
+  const area =
+    a.suburb ||
+    a.neighbourhood ||
+    a.quarter ||
+    "";
+
+  return {
+    country: a.country || "",
+    state: a.state || a.region || "",
+    city,
+    area,
+    fullAddress: data.display_name || ""
+  };
+};
+
+
+
+// Map Picker Component
+const MapPicker = ({ coords, onChange }) => {
+  const [position, setPosition] = useState(coords.lat && coords.lng ? [coords.lat, coords.lng] : [25.2048, 55.2708]); // Default to Dubai
   
+  useEffect(() => {
+    if (coords.lat && coords.lng) {
+      setPosition([coords.lat, coords.lng]);
+    }
+  }, [coords.lat, coords.lng]);
+
+  const LocationMarker = () => {
+    useMapEvents({
+      async click(e) {
+        const newPosition = [e.latlng.lat, e.latlng.lng];
+        setPosition(newPosition);
+        onChange({ lat: newPosition[0], lng: newPosition[1] });
+      },
+    });
+
+    return position ? <Marker position={position} /> : null;
+  };
+
+  return (
+    <MapContainer
+      center={position}
+      zoom={15}
+      style={{ height: 300, width: "100%", borderRadius: "1rem", zIndex: 1 }}
+      scrollWheelZoom={true}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <LocationMarker />
+    </MapContainer>
+  );
+};
+
+const Calculator = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [form] = Form.useForm();
+
+  // Data Collections
   const [subcategories, setSubcategories] = useState([]);
   const [types, setTypes] = useState([]);
   const [packages, setPackages] = useState([]);
+  const [typeGallery, setTypeGallery] = useState(null);
+  const [moodboardData, setMoodboardData] = useState([]);
+
+  // User Selections
+const [coords, setCoords] = useState({
+  lat: null,
+  lng: null,
+  country: "",
+  state: "",
+  city: "",
+  area: "",
+  address: ""
+});
 
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [selectedPackage, setSelectedPackage] = useState('');
   const [length, setLength] = useState('');
   const [width, setWidth] = useState('');
-
-  const [loadingSubcat, setLoadingSubcat] = useState(true);
-  const [loadingTypes, setLoadingTypes] = useState(false);
-  const [loadingPackages, setLoadingPackages] = useState(true);
-
-  const [form] = Form.useForm();
-  const [countryCode, setCountryCode] = useState("+971");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  
+  const [loading, setLoading] = useState({
+    subcat: true,
+    types: false,
+    gallery: false,
+    moodboard: false,
+    packages: true,
+    submitting: false,
+    geocoding: false
+  });
 
   const areaSqFt = length && width ? Math.round(parseFloat(length) * parseFloat(width)) : 0;
 
-  // --- API CALLS (Unchanged) ---
+  // --- API FETCHING ---
   useEffect(() => {
-    const fetchSubcategories = async () => {
-      setLoadingSubcat(true);
+    const initFetch = async () => {
       try {
         const res = await apiService.get("/estimate/master/category/name/Landscaping/subcategories");
         if (res.success) setSubcategories(res.data || []);
       } catch (err) {
-        message.error("Failed to load landscaping types");
+        message.error("Error loading services");
       } finally {
-        setLoadingSubcat(false);
+        setLoading(prev => ({ ...prev, subcat: false }));
       }
     };
-    fetchSubcategories();
+    initFetch();
   }, []);
 
   useEffect(() => {
-    if (!selectedSubcategory) {
-      setTypes([]);
-      setSelectedType('');
-      return;
-    }
+    if (!selectedSubcategory) return;
     const fetchTypes = async () => {
-      setLoadingTypes(true);
+      setLoading(prev => ({ ...prev, types: true }));
       try {
-        const subcat = subcategories.find(s => s._id === selectedSubcategory);
-        if (!subcat) return;
-        const res = await apiService.get(`/estimate/master/category/${subcat.category}/subcategories/${selectedSubcategory}/types`);
+        const sub = subcategories.find(s => s._id === selectedSubcategory);
+        const res = await apiService.get(`/estimate/master/category/${sub.category}/subcategories/${selectedSubcategory}/types`);
         if (res.success) setTypes(res.data || []);
       } catch (err) {
-        message.error("Failed to load styles");
+        message.error("Error loading styles");
       } finally {
-        setLoadingTypes(false);
+        setLoading(prev => ({ ...prev, types: false }));
       }
     };
     fetchTypes();
   }, [selectedSubcategory, subcategories]);
 
   useEffect(() => {
-    const fetchPackages = async () => {
-      setLoadingPackages(true);
+    const fetchPkgs = async () => {
       try {
         const res = await apiService.get("/packages");
-        if (res.success && res.packages) {
-          setPackages(res.packages.filter(p => p.isActive));
-        }
+        if (res.success) setPackages(res.packages.filter(p => p.isActive));
       } catch (err) {
-        message.error("Failed to load packages");
+        message.error("Error loading packages");
       } finally {
-        setLoadingPackages(false);
+        setLoading(prev => ({ ...prev, packages: false }));
       }
     };
-    fetchPackages();
+    fetchPkgs();
   }, []);
 
-  // --- HANDLERS (Unchanged) ---
-  const onFinish = async (values) => {
-    if (!mobileNumber || mobileNumber.length < 8) {
-      return message.error("Please enter a valid mobile number");
-    }
-    setSubmitting(true);
+  // --- ACTIONS ---
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) return message.error("Geolocation not supported");
+    setLoading(prev => ({ ...prev, submitting: true, geocoding: true }));
+    
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        
+        try {
+          const geo = await reverseGeocode(lat, lng);
+          
+      setCoords({
+  lat,
+  lng,
+  country: geo.country,
+  state: geo.state,
+  city: geo.city,
+  area: geo.area,
+  address: geo.fullAddress
+});
 
-    const payload = {
-      service_type: "landscape",
-      customer_name: values.customer_name.trim(),
-      customer_email: values.customer_email.trim().toLowerCase(),
-      customer_mobile: { country_code: countryCode, number: mobileNumber.replace(/\D/g, "").slice(0, 15) },
-      subcategory: selectedSubcategory,
-      type: selectedType,
-      package: selectedPackage,
-      area_length: parseFloat(length),
-      area_width: parseFloat(width),
-      area_sqft: areaSqFt,
-      description: values.description?.trim() || "Landscaping project via Garden Calculator"
-    };
 
+          
+          message.success("Location synchronized!");
+        } catch (error) {
+       setCoords({
+  lat,
+  lng,
+  country: geo.country,
+  state: geo.state,
+  city: geo.city,
+  area: geo.area,
+  address: geo.fullAddress
+});
+
+          message.warning("Location detected but address details unavailable");
+        } finally {
+          setLoading(prev => ({ ...prev, submitting: false, geocoding: false }));
+        }
+      },
+      () => {
+        message.error("Location access denied");
+        setLoading(prev => ({ ...prev, submitting: false, geocoding: false }));
+      }
+    );
+  };
+
+  const handleMapLocationChange = async ({ lat, lng }) => {
+    setLoading(prev => ({ ...prev, geocoding: true }));
     try {
-      await apiService.post("/estimates/submit", payload);
-      setActiveStep(5);
-      setTimeout(() => setActiveStep(6), 9000);
-    } catch (err) {
-      message.error(err.response?.data?.message || "Failed to submit. Please try again.");
+      const geo = await reverseGeocode(lat, lng);
+      setCoords({
+  lat,
+  lng,
+  country: geo.country,
+  state: geo.state,
+  city: geo.city,
+  area: geo.area,
+  address: geo.fullAddress
+});
+
+      message.success("Location updated!");
+    } catch (error) {
+      message.error("Could not fetch address details");
     } finally {
-      setSubmitting(false);
+      setLoading(prev => ({ ...prev, geocoding: false }));
     }
   };
 
-  const handleNext = () => setActiveStep(prev => prev + 1);
-  const handleBack = () => setActiveStep(prev => prev - 1);
-  const handleGetQuote = () => setActiveStep(4);
+  const fetchTypePreview = async (typeId) => {
+    setLoading(prev => ({ ...prev, gallery: true }));
+    try {
+      const res = await apiService.get(`/estimate/master/category/types/${typeId}/gallery`);
+      if (res.success) setTypeGallery(res.gallery);
+    } catch (err) {
+      setTypeGallery(null);
+    } finally {
+      setLoading(prev => ({ ...prev, gallery: false }));
+    }
+  };
 
-  const isStepValid = () => {
+  const handleGenerateMoodboard = async () => {
+    setLoading(prev => ({ ...prev, moodboard: true }));
+    try {
+      const res = await apiService.get(`/estimate/master/category/types/${selectedType}/gallery/moodboard/generate`);
+      if (res.success) {
+        setMoodboardData(res.moodboard || []);
+        setActiveStep(4);
+      }
+    } catch (err) {
+      message.error("Moodboard generation failed");
+    } finally {
+      setLoading(prev => ({ ...prev, moodboard: false }));
+    }
+  };
+
+  const onFinalSubmit = async (values) => {
+    setLoading(prev => ({ ...prev, submitting: true }));
+    const payload = {
+      service_type: "landscape",
+      customer_name: values.customer_name,
+      customer_email: values.customer_email,
+      customer_mobile: { number: values.mobileNumber },
+      coordinates: coords,
+      subcategory: selectedSubcategory,
+      type: selectedType,
+      area_sqft: areaSqFt,
+      package: selectedPackage
+    };
+    try {
+      await apiService.post("/estimates/submit", payload);
+      setActiveStep(8);
+      setTimeout(() => setActiveStep(9), 8000);
+    } catch (err) {
+      message.error("Submission failed");
+    } finally {
+      setLoading(prev => ({ ...prev, submitting: false }));
+    }
+  };
+
+  const handleNext = () => {
+    if (activeStep === 2) fetchTypePreview(selectedType);
+    setActiveStep(prev => prev + 1);
+  };
+
+  const handleBack = () => setActiveStep(prev => prev - 1);
+
+  const validateStep = () => {
     switch (activeStep) {
-      case 0: return !!selectedSubcategory;
-      case 1: return !!selectedType;
-      case 2: return length > 0 && width > 0 && areaSqFt >= 100;
-      case 3: return !!selectedPackage;
+      case 0: return !!coords.lat;
+      case 1: return !!selectedSubcategory;
+      case 2: return !!selectedType;
+      case 5: return areaSqFt >= 100;
+      case 6: return !!selectedPackage;
       default: return true;
     }
   };
 
-  // --- HELPER COMPONENT FOR UI ---
-  const SelectionCard = ({ item, isSelected, onClick, iconColor = "text-purple-600" }) => (
-    <div 
+  // --- UI COMPONENTS ---
+  const SelectionCard = ({ item, isSelected, onClick, colorClass }) => (
+    <motion.div
+      whileHover={{ y: -5 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`relative h-full p-6 rounded-2xl  cursor-pointer transition-all duration-300 border-2 group
-        ${isSelected 
-          ? 'border-purple-600 bg-purple-50 shadow-xl shadow-purple-100 transform -translate-y-1' 
-          : 'border-white bg-gray-200 hover:border-purple-300 hover:shadow-lg'
-        }`}
+      className={`relative h-full p-6 rounded-3xl cursor-pointer transition-all border-2 
+        ${isSelected ? `bg-purple-50 shadow-xl` : 'border-gray-100 bg-white hover:border-gray-200'}`}
+      style={{ borderColor: isSelected ? BRAND_PURPLE : 'transparent' }}
     >
-      {isSelected && (
-        <div className="absolute top-4 right-4 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
-          <CheckOutlined className="text-white text-xs" />
-        </div>
-      )}
-      
-      <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 transition-colors
-        ${isSelected ? 'bg-white shadow-sm' : 'bg-purple-50 group-hover:bg-purple-100'}`}>
-        <span className={iconColor}>{item.label[0]}</span>
+      {isSelected && <Badge.Ribbon text="Selected" color={BRAND_PURPLE} />}
+      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-4 ${colorClass}`}>
+        {item.label ? item.label[0] : 'G'}
       </div>
-      
-      <Title level={4} className={`text-center mb-2 ${isSelected ? 'text-purple-800' : 'text-gray-700'}`}>
-        {item.label}
-      </Title>
-      {item.description && (
-        <Text type="secondary" className="text-center block text-sm line-clamp-2">
-          {item.description}
-        </Text>
-      )}
-    </div>
+      <Title level={4} className="mb-1">{item.label}</Title>
+      <Text type="secondary" className="text-xs line-clamp-2">{item.description || 'Professional architectural landscaping.'}</Text>
+    </motion.div>
   );
 
-  const renderStepContent = (step) => {
-    const fadeIn = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } };
+  const StepRenderer = () => {
+    const variants = {
+      initial: { opacity: 0, y: 20 },
+      animate: { opacity: 1, y: 0 },
+      exit: { opacity: 0, y: -20 }
+    };
 
-    switch (step) {
-      case 0: // Subcategory
+    switch (activeStep) {
+      case 0:
         return (
-          <motion.div {...fadeIn} className="text-center">
-            <Title level={2} className="mb-2 text-purple-900 ">What are you creating?</Title>
-            <Text type="secondary" className="text-lg mb-10 block">Select the type of landscaping project</Text>
-            {loadingSubcat ? <Spin size="large" className="mt-10" /> : (
-              <Row gutter={[24, 24]}>
-                {subcategories.map((sub) => (
-                  <Col xs={24} sm={12} md={8} key={sub._id} >
-                    <SelectionCard 
-                      item={sub} 
-                      isSelected={selectedSubcategory === sub._id} 
-                      onClick={() => setSelectedSubcategory(sub._id)}
-                    />
-                  </Col>
-                ))}
-              </Row>
-            )}
-          </motion.div>
-        );
-
-      case 1: // Style
-        return (
-          <motion.div {...fadeIn} className="text-center">
-            <Title level={2} className="mb-2 text-purple-900">Choose your Style</Title>
-            <Text type="secondary" className="text-lg mb-10 block">Select the aesthetic that matches your home</Text>
-            {loadingTypes ? <Spin size="large" className="mt-10" /> : (
-              <Row gutter={[24, 24]}>
-                {types.map((type) => (
-                  <Col xs={24} sm={12} md={8} key={type._id}>
-                    <SelectionCard 
-                      item={type} 
-                      isSelected={selectedType === type._id} 
-                      onClick={() => setSelectedType(type._id)}
-                      iconColor="text-emerald-600"
-                    />
-                  </Col>
-                ))}
-              </Row>
-            )}
-          </motion.div>
-        );
-
-      case 2: // Area
-        return (
-          <motion.div {...fadeIn} className="text-center max-w-lg mx-auto">
-            <Title level={2} className="mb-2 text-purple-900">Dimensions</Title>
-            <Text type="secondary" className="text-lg mb-10 block">Enter the size of your garden area</Text>
+          <motion.div {...variants} className="text-center py-10">
+            <div className="mb-6 inline-block p-6 rounded-full bg-purple-50">
+              <CompassOutlined style={{ color: BRAND_PURPLE, fontSize: '3rem' }} />
+            </div>
+            <Title level={2}>Locate Your Property</Title>
+            <Text className="text-lg text-gray-400 block mb-10">
+              We use GPS coordinates for accurate site analysis. Click on the map to adjust your exact location.
+            </Text>
             
-            <Card className="shadow-2xl border-0 rounded-3xl overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-600 to-indigo-700 p-8 text-white">
-                <Text className="text-purple-100 uppercase tracking-widest text-xs font-bold">Total Area</Text>
-                <div className="text-5xl font-bold my-2">{areaSqFt.toLocaleString()}</div>
-                <Text className="text-purple-100">Square Feet</Text>
+            <Button 
+              size="large" 
+              type="primary" 
+              icon={<EnvironmentFilled />} 
+              onClick={handleGetLocation} 
+              loading={loading.submitting}
+              className="h-16 px-12 rounded-2xl text-lg shadow-lg mb-8"
+              style={{ backgroundColor: BRAND_PURPLE }}
+            >
+              {coords.lat ? "Update My Location" : "Auto-Detect My Location"}
+            </Button>
+            
+            {coords.lat && (
+              <div className="space-y-4">
+                <div className="mt-6">
+                  <Tag color="purple" className="px-4 py-1 rounded-full text-sm">
+                    Coordinates: {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}
+                  </Tag>
+                </div>
+                
+                <div className="space-y-2">
+                  {coords.country && (
+                    <Tag color="purple" className="px-4 py-1 rounded-full">
+                      <strong>Country:</strong> {coords.country}
+                    </Tag>
+                  )}
+                  {coords.state && (
+                    <Tag color="blue" className="px-4 py-1 rounded-full">
+                      <strong>State/Region:</strong> {coords.state}
+                    </Tag>
+                  )}
+                  {coords.city && (
+                    <Tag color="green" className="px-4 py-1 rounded-full">
+                      <strong>City:</strong> {coords.city}
+                    </Tag>
+                  )}
+                </div>
+                
+                {coords.address && (
+                  <Text type="secondary" className="block mt-4 max-w-xl mx-auto">
+                    <strong>Full Address:</strong> {coords.address}
+                  </Text>
+                )}
+                
+                <div className="mt-8 max-w-2xl mx-auto">
+                  {loading.geocoding ? (
+                    <div className="h-64 flex items-center justify-center rounded-2xl bg-gray-100">
+                      <Spin size="large" />
+                    </div>
+                  ) : (
+                    <MapPicker
+                      coords={coords}
+                      onChange={handleMapLocationChange}
+                    />
+                  )}
+                  <Text className="text-xs text-gray-400 mt-2 block">
+                    Click anywhere on the map to set your exact location
+                  </Text>
+                </div>
               </div>
-              <div className="p-8 bg-white">
-                <Row gutter={16}>
+            )}
+          </motion.div>
+        );
+
+      case 1:
+        return (
+          <motion.div {...variants}>
+            <Title level={2} className="text-center mb-10">What are we designing?</Title>
+            <Row gutter={[24, 24]}>
+              {subcategories.map(sub => (
+                <Col xs={24} sm={12} md={8} key={sub._id}>
+                  <SelectionCard 
+                    item={sub} 
+                    isSelected={selectedSubcategory === sub._id} 
+                    onClick={() => setSelectedSubcategory(sub._id)} 
+                    colorClass="bg-blue-50 text-blue-600"
+                  />
+                </Col>
+              ))}
+            </Row>
+          </motion.div>
+        );
+
+      case 2:
+        return (
+          <motion.div {...variants}>
+            <Title level={2} className="text-center mb-10">Select Your Aesthetic Style</Title>
+            {loading.types ? <div className="text-center py-20"><Spin size="large" /></div> : (
+              <Row gutter={[24, 24]}>
+                {types.map(t => (
+                  <Col xs={24} sm={12} md={8} key={t._id}>
+                    <SelectionCard 
+                      item={t} 
+                      isSelected={selectedType === t._id} 
+                      onClick={() => setSelectedType(t._id)} 
+                      colorClass="bg-emerald-50 text-emerald-600"
+                    />
+                  </Col>
+                ))}
+              </Row>
+            )}
+          </motion.div>
+        );
+
+      case 3:
+        return (
+          <motion.div {...variants} className="flex flex-col items-center">
+            <Title level={2} className="mb-2">Visual Direction</Title>
+            <Text type="secondary" className="block mb-10">Base concept for your selected style</Text>
+            {loading.gallery ? <Spin size="large" className="py-20" /> : typeGallery ? (
+              <Card className="max-w-2xl w-full rounded-[2.5rem] overflow-hidden shadow-2xl border-none">
+                <div className="relative">
+                  <Image 
+                    src={`${BASE_URL}${typeGallery.previewImage?.url}`} 
+                    className="w-full h-[400px] object-cover" 
+                    alt="Style preview"
+                  />
+                </div>
+                <div className="p-10 text-center">
+                  <Title level={3} style={{ color: BRAND_PURPLE }}>{typeGallery.type?.label}</Title>
+                  <Text className="text-gray-500 italic block mb-8">
+                    "Every detail curated to harmonize with your vision"
+                  </Text>
+                  <Button 
+                    type="primary" 
+                    size="large" 
+                    icon={<ExperimentOutlined />} 
+                    loading={loading.moodboard} 
+                    onClick={handleGenerateMoodboard}
+                    className="h-16 px-12 rounded-2xl text-lg border-none shadow-xl"
+                    style={{ backgroundColor: BRAND_PURPLE }}
+                  >
+                    Generate AI Moodboard
+                  </Button>
+                </div>
+              </Card>
+            ) : <Empty description="No preview available" />}
+          </motion.div>
+        );
+
+      case 4:
+        return (
+          <motion.div {...variants}>
+            <Title level={2} className="text-center mb-2">Style Moodboard</Title>
+            <Text type="secondary" className="text-center block mb-10">
+              Recommended textures, plants, and materials for your project.
+            </Text>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {moodboardData.map((img, i) => (
+                <motion.div 
+                  key={i} 
+                  initial={{ opacity: 0, scale: 0.9 }} 
+                  animate={{ opacity: 1, scale: 1 }} 
+                  transition={{ delay: i * 0.1 }}
+                  className="group relative"
+                >
+                  <Card 
+                    hoverable 
+                    className="overflow-hidden rounded-3xl border-none shadow-lg group-hover:shadow-2xl transition-all"
+                    cover={
+                      <Image 
+                        src={`${BASE_URL}${img.url}`} 
+                        className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                        alt={`Moodboard item ${i + 1}`}
+                      />
+                    }
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        );
+
+      case 5:
+        return (
+          <motion.div {...variants} className="max-w-lg mx-auto py-10">
+            <Title level={2} className="text-center mb-10">Project Area</Title>
+            <Card className="rounded-[3rem] shadow-2xl overflow-hidden border-none">
+              <div className="p-12 text-center text-white" style={{ background: BRAND_PURPLE }}>
+                <Text className="text-purple-200 uppercase tracking-widest text-xs font-bold">Total Footprint</Text>
+                <div className="text-7xl font-bold my-4">{areaSqFt.toLocaleString()}</div>
+                <Text className="text-lg opacity-80">Square Feet</Text>
+              </div>
+              <div className="p-12 bg-white">
+                <Row gutter={24}>
                   <Col span={12}>
-                    <Text strong className="block mb-2 text-gray-500">Length</Text>
-                    <Input type="number" size="large" value={length} onChange={(e) => setLength(e.target.value)} suffix="ft" className="rounded-lg" />
+                    <Text strong className="text-gray-400 text-xs uppercase">Length (ft)</Text>
+                    <Input 
+                      size="large" 
+                      type="number" 
+                      value={length} 
+                      onChange={e => setLength(e.target.value)} 
+                      className="mt-3 h-14 rounded-2xl border-gray-100" 
+                      placeholder="Enter length"
+                    />
                   </Col>
                   <Col span={12}>
-                    <Text strong className="block mb-2 text-gray-500">Width</Text>
-                    <Input type="number" size="large" value={width} onChange={(e) => setWidth(e.target.value)} suffix="ft" className="rounded-lg" />
+                    <Text strong className="text-gray-400 text-xs uppercase">Width (ft)</Text>
+                    <Input 
+                      size="large" 
+                      type="number" 
+                      value={width} 
+                      onChange={e => setWidth(e.target.value)} 
+                      className="mt-3 h-14 rounded-2xl border-gray-100" 
+                      placeholder="Enter width"
+                    />
                   </Col>
                 </Row>
               </div>
@@ -268,87 +589,105 @@ const Calculator = () => {
           </motion.div>
         );
 
-      case 3: // Package
+      case 6:
         return (
-          <motion.div {...fadeIn} className="text-center">
-            <Title level={2} className="mb-10 text-purple-900">Select a Package</Title>
-            {loadingPackages ? <Spin size="large" className="mt-20" /> : (
-              <Row gutter={[24, 24]}>
-                {packages.map((pkg) => {
-                  const isSel = selectedPackage === pkg._id;
-                  return (
-                    <Col xs={24} md={8} key={pkg._id}>
+          <motion.div {...variants}>
+            <Title level={2} className="text-center mb-10">Select Execution Package</Title>
+            <Row gutter={[24, 24]}>
+              {packages.map(pkg => (
+                <Col xs={24} md={8} key={pkg._id}>
+                  <div 
+                    onClick={() => setSelectedPackage(pkg._id)}
+                    className={`p-10 rounded-[2.5rem] border-2 h-full transition-all cursor-pointer relative
+                      ${selectedPackage === pkg._id ? 'bg-purple-50 shadow-xl' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                    style={{ borderColor: selectedPackage === pkg._id ? BRAND_PURPLE : 'transparent' }}
+                  >
+                    {pkg.popular && (
                       <div 
-                        onClick={() => setSelectedPackage(pkg._id)}
-                        className={`cursor-pointer h-full rounded-3xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col text-left
-                          ${isSel ? 'border-purple-600 shadow-2xl scale-105 z-10 bg-white' : 'border-transparent bg-white shadow-lg hover:shadow-xl'}`}
+                        className="absolute top-0 right-0 text-white px-5 py-2 rounded-bl-2xl text-xs font-bold" 
+                        style={{ background: BRAND_PURPLE }}
                       >
-                         {pkg.popular && <div className="absolute top-0 right-0 bg-gradient-to-l from-purple-600 to-indigo-600 text-white text-xs px-4 py-1 rounded-bl-xl font-bold">POPULAR</div>}
-                         <div className={`p-6 ${isSel ? 'bg-purple-50' : 'bg-white'}`}>
-                            <Title level={3} className={`m-0 ${isSel ? 'text-purple-700' : 'text-gray-800'}`}>{pkg.name}</Title>
-                            {/* <Text type="secondary" className="text-xs uppercase tracking-wide font-bold mt-2 block">{pkg.price} AED Est.</Text> */}
-                         </div>
-                         <div className="p-6 pt-2 flex-1">
-                            <Text type="secondary" className="block mb-4 text-sm min-h-[40px]">{pkg.description}</Text>
-                            {pkg.features.map((f, i) => (
-                              <div key={i} className="flex items-start mb-2 text-sm text-gray-600">
-                                <CheckCircleOutlined className="text-green-500 mr-2 mt-1 flex-shrink-0" /> {f}
-                              </div>
-                            ))}
-                         </div>
-                         <div className={`p-4 text-center border-t ${isSel ? 'bg-purple-600 text-white' : 'bg-gray-50 text-gray-400'}`}>
-                            {isSel ? 'Selected Package' : 'Click to Select'}
-                         </div>
+                        RECOMMENDED
                       </div>
-                    </Col>
-                  );
-                })}
-              </Row>
-            )}
+                    )}
+                    <Title level={3} style={{ color: selectedPackage === pkg._id ? BRAND_PURPLE : '#111' }}>
+                      {pkg.name}
+                    </Title>
+                    <div className="my-8 space-y-4">
+                      {pkg.features?.map((f, i) => (
+                        <div key={i} className="text-sm flex items-start">
+                          <CheckCircleOutlined className="text-green-500 mr-3 mt-1" /> {f}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Col>
+              ))}
+            </Row>
           </motion.div>
         );
 
-      case 4: // Contact
-        const pkg = packages.find(p => p._id === selectedPackage);
+      case 7:
         return (
-          <motion.div {...fadeIn} className="max-w-5xl mx-auto">
-            <Row gutter={[40, 40]}>
+          <motion.div {...variants} className="max-w-5xl mx-auto">
+            <Row gutter={48}>
               <Col xs={24} lg={10}>
-                <div className="bg-gradient-to-br from-purple-800 to-indigo-900 rounded-3xl p-8 text-white h-full shadow-2xl relative overflow-hidden">
-                  <div className="relative z-10">
-                    <Title level={3} className="text-white mb-6">Summary</Title>
-                    <div className="space-y-4">
-                        <div><div className="text-purple-300 text-xs uppercase">Type</div><div className="text-lg font-medium">{subcategories.find(s => s._id === selectedSubcategory)?.label}</div></div>
-                        <div><div className="text-purple-300 text-xs uppercase">Style</div><div className="text-lg font-medium">{types.find(t => t._id === selectedType)?.label}</div></div>
-                        <div><div className="text-purple-300 text-xs uppercase">Size</div><div className="text-lg font-medium">{areaSqFt.toLocaleString()} sq ft</div></div>
-                        <div className="pt-4 border-t border-purple-600/50">
-                            <div className="text-purple-300 text-xs uppercase">Package</div>
-                            <div className="text-2xl font-bold text-yellow-400">{pkg?.name}</div>
-                            {/* <div className="opacity-80">{pkg?.price} AED</div> */}
-                        </div>
+                <div className="rounded-[2.5rem] p-10 text-white h-full shadow-2xl" style={{ backgroundColor: BRAND_PURPLE }}>
+                  <Title level={3} className="text-white mb-10">Design Summary</Title>
+                  <div className="space-y-8">
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Service Type</Text>
+                      <Text strong className="text-white text-xl uppercase">
+                        {subcategories.find(s => s._id === selectedSubcategory)?.label}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Selected Style</Text>
+                      <Text strong className="text-white text-xl">
+                        {types.find(t => t._id === selectedType)?.label}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Location</Text>
+                      <Text strong className="text-white text-sm">
+                        {coords.city ? `${coords.city}, ${coords.country}` : 'Location set'}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Area Details</Text>
+                      <Text strong className="text-white text-xl">{areaSqFt} SQ FT</Text>
+                    </div>
+                    <Divider className="border-purple-400 opacity-30" />
+                    <div className="p-5 bg-white/10 rounded-2xl flex items-center justify-between border border-white/10">
+                      <Text className="text-white">Tier Selection</Text>
+                      <Tag color="gold" className="m-0 border-none font-bold px-3">
+                        {packages.find(p => p._id === selectedPackage)?.name}
+                      </Tag>
                     </div>
                   </div>
-                  {/* Decor elements */}
-                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500 rounded-full blur-3xl opacity-20"></div>
                 </div>
               </Col>
               <Col xs={24} lg={14}>
-                <Card className="rounded-3xl shadow-xl border-0">
-                  <Title level={3} className="mb-6">Final Step</Title>
-                  <Form form={form} layout="vertical" onFinish={onFinish} size="large">
-                    <Row gutter={16}>
-                      <Col span={12}><Form.Item name="customer_name" rules={[{ required: true }]}><Input prefix={<UserOutlined className="text-gray-400" />} placeholder="Full Name" className="rounded-xl" /></Form.Item></Col>
-                      <Col span={12}><Form.Item name="customer_email" rules={[{ required: true, type: 'email' }]}><Input prefix={<MailOutlined className="text-gray-400" />} placeholder="Email" className="rounded-xl" /></Form.Item></Col>
-                    </Row>
-                    <Form.Item>
-                      <Space.Compact className="w-full">
-                        <Select value={countryCode} onChange={setCountryCode} style={{ width: 120 }}>{countryCodes.map(c => <Select.Option key={c.value} value={c.value}>{c.label}</Select.Option>)}</Select>
-                        <Input value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ""))} placeholder="Mobile Number" className="rounded-r-xl" />
-                      </Space.Compact>
+                <Card className="rounded-[2.5rem] shadow-xl border-none p-6">
+                  <Form form={form} layout="vertical" onFinish={onFinalSubmit} size="large">
+                    <Form.Item name="customer_name" label="Full Name" rules={[{ required: true }]}>
+                      <Input prefix={<UserOutlined className="text-gray-300" />} className="rounded-xl h-14" />
                     </Form.Item>
-                    <Form.Item name="description"><TextArea rows={4} placeholder="Specific requirements..." className="rounded-xl" /></Form.Item>
-                    <Button type="primary" htmlType="submit" loading={submitting} block size="large" className="h-12 rounded-xl bg-purple-700 hover:bg-purple-800 border-none shadow-lg shadow-purple-200">
-                       Submit Request <ArrowRightOutlined />
+                    <Form.Item name="customer_email" label="Email Address" rules={[{ required: true, type: 'email' }]}>
+                      <Input prefix={<MailOutlined className="text-gray-300" />} className="rounded-xl h-14" />
+                    </Form.Item>
+                    <Form.Item name="mobileNumber" label="Contact Number" rules={[{ required: true }]}>
+                      <Input prefix={<PhoneFilled className="text-gray-300" />} placeholder="50xxxxxxx" className="rounded-xl h-14" />
+                    </Form.Item>
+                    <Button 
+                      type="primary" 
+                      htmlType="submit" 
+                      loading={loading.submitting} 
+                      block 
+                      className="h-16 rounded-2xl text-lg mt-4 border-none shadow-xl"
+                      style={{ backgroundColor: BRAND_PURPLE }}
+                    >
+                      Generate My Quotation
                     </Button>
                   </Form>
                 </Card>
@@ -357,204 +696,128 @@ const Calculator = () => {
           </motion.div>
         );
 
-      // --- STEP 5: REDESIGNED PREMIUM ESTIMATE SCREEN ---
-      case 5:
-        const selectedPkgObj = packages.find(p => p._id === selectedPackage);
-        const selectedStyleName = types.find(t => t._id === selectedType)?.label || "Premium Garden";
-        const selectedProjectName = subcategories.find(s => s._id === selectedSubcategory)?.label || "Landscaping";
-        const finalPrice = selectedPkgObj?.price || "25,000";
-
+      case 8:
+        const pkg = packages.find(p => p._id === selectedPackage);
         return (
-          <div className="min-h-[60vh] flex items-center justify-center py-10">
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }} 
-              animate={{ scale: 1, opacity: 1 }} 
-              transition={{ duration: 0.6, type: "spring" }} 
-              className="max-w-3xl w-full"
-            >
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-4 animate-bounce">
-                  <SmileOutlined className="text-4xl text-green-600" />
-                </div>
-                <Title level={2} className="text-purple-900 m-0">Estimate Generated Successfully!</Title>
-                <Text type="secondary">Here is the preliminary breakdown of your project</Text>
-              </div>
-
-              {/* TICKET STYLE CARD */}
-              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-                {/* Purple Header Part */}
-                <div className="bg-gradient-to-r from-indigo-900 via-purple-800 to-purple-900 p-10 text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                    <Text className="text-purple-200 uppercase tracking-widest text-sm font-semibold">Estimated Project Cost</Text>
-                    <h1 className="text-6xl md:text-7xl font-bold text-white m-0 mt-2 mb-4 drop-shadow-lg">
-                        {finalPrice} <span className="text-2xl font-normal text-purple-200">AED</span>
-                    </h1>
-                    <div className="inline-block px-4 py-1 bg-white/20 backdrop-blur-md rounded-full text-white text-sm">
-                        Includes VAT & Premium Features
-                    </div>
-                </div>
-
-                {/* White Details Part */}
-                <div className="p-8 md:p-10">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center border-b border-gray-100 pb-8 mb-8">
-                        <div>
-                            <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-2"><EnvironmentOutlined className="text-purple-600" /></div>
-                            <div className="text-xs text-gray-400 uppercase">Type</div>
-                            <div className="font-semibold text-gray-800">{selectedProjectName}</div>
-                        </div>
-                        <div>
-                            <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-2"><HomeOutlined className="text-purple-600" /></div>
-                            <div className="text-xs text-gray-400 uppercase">Style</div>
-                            <div className="font-semibold text-gray-800">{selectedStyleName}</div>
-                        </div>
-                        <div>
-                            <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-2"><CalculatorOutlined className="text-purple-600" /></div>
-                            <div className="text-xs text-gray-400 uppercase">Size</div>
-                            <div className="font-semibold text-gray-800">{areaSqFt.toLocaleString()} sq ft</div>
-                        </div>
-                        <div>
-                            <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-2"><BuildOutlined className="text-purple-600" /></div>
-                            <div className="text-xs text-gray-400 uppercase">Package</div>
-                            <div className="font-semibold text-gray-800">{selectedPkgObj?.name}</div>
-                        </div>
-                    </div>
-
-                    <div className="text-center">
-                        <Title level={4} className="text-gray-800 mb-6">What happens next?</Title>
-                        <div className="flex flex-col md:flex-row justify-center gap-4 text-sm text-gray-500">
-                             <span className="flex items-center"><CheckCircleOutlined className="text-green-500 mr-2" /> Expert review within 24 hours</span>
-                             <span className="flex items-center"><CheckCircleOutlined className="text-green-500 mr-2" /> Final Site Visit</span>
-                             <span className="flex items-center"><CheckCircleOutlined className="text-green-500 mr-2" /> Formal Proposal</span>
-                        </div>
-
-                        <div className="mt-10">
-                            <Button 
-                                type="primary" 
-                                size="large" 
-                                className="h-14 px-12 rounded-full text-lg shadow-xl shadow-purple-200 border-none bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-105 transition-transform"
-                                onClick={() => setActiveStep(6)}
-                            >
-                                Continue to Confirmation
-                            </Button>
-                        </div>
-                        <Text type="secondary" className="block mt-4 text-xs">Redirecting automatically in 9 seconds...</Text>
-                    </div>
+          <motion.div {...variants} className="text-center py-20">
+            <div className="bg-white p-16 rounded-[4rem] shadow-2xl inline-block border border-gray-50">
+              <SmileOutlined style={{ color: BRAND_PURPLE, fontSize: '5rem' }} className="mb-8" />
+              <Title level={1} style={{ color: BRAND_PURPLE }} className="m-0">Valuation Ready</Title>
+              <div className="my-12">
+                <Text className="text-gray-400 uppercase tracking-widest block mb-3">Estimated Investment Range</Text>
+                <div className="text-8xl font-black text-gray-900">
+                  {pkg?.price || '25,000'} <small className="text-3xl font-light">AED</small>
                 </div>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         );
 
-      case 6: // Thank You
+      case 9:
         return (
-          <div className="text-center max-w-2xl mx-auto py-20 bg-white rounded-3xl shadow-xl mt-10">
+          <motion.div {...variants} className="text-center py-20">
             <Result
               status="success"
-              title={<span className="text-3xl font-bold text-gray-800">Request Submitted Successfully!</span>}
-              subTitle={<span className="text-lg text-gray-500">Thank you for choosing us. Our landscaping team has received your details and will contact you shortly.</span>}
+              title={<Title level={1} style={{ color: BRAND_PURPLE }}>Request Processed!</Title>}
+              subTitle="Our architects are reviewing your coordinates and moodboard. We will contact you shortly."
               extra={[
-                <Button type="primary" size="large" key="new" onClick={() => window.location.reload()} className="bg-purple-600 border-none rounded-xl px-8 h-12">
-                  Start New Request
+                <Button key="home" size="large" className="rounded-xl h-12" onClick={() => window.location.reload()}>
+                  New Estimate
                 </Button>,
-                <Button size="large" key="home" onClick={() => window.location.href = '/'} className="rounded-xl px-8 h-12">
-                  Back to Home
+                <Button 
+                  key="site" 
+                  type="primary" 
+                  size="large" 
+                  className="h-12 px-10 rounded-xl border-none shadow-lg" 
+                  style={{ backgroundColor: BRAND_PURPLE }}
+                >
+                  Visit Our Gallery
                 </Button>
               ]}
             />
-          </div>
+          </motion.div>
         );
 
-      default: return null;
+      default: 
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F4F5] pb-32 font-sans   ">
-        {/* Background Gradients */}
-        <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-b from-purple-50/50 via-white to-white -z-10 pointer-events-none"></div>
-
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-purple-100 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <img src={logoNew} alt="Logo" className="h-10" />
-            
-            {/* Desktop Stepper */}
-            <div className="hidden md:flex space-x-12">
-                {steps.map((s, i) => (
-                    <div key={i} className={`flex items-center ${i <= activeStep ? 'text-purple-700' : 'text-gray-300'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 border-2 text-sm font-bold
-                            ${i === activeStep ? 'border-purple-600 bg-purple-600 text-white' : 
-                              i < activeStep ? 'border-purple-600 bg-white text-purple-600' : 'border-gray-200'}`}>
-                            {i < activeStep ? <CheckOutlined /> : i + 1}
-                        </div>
-                        <span className="font-medium">{s.title}</span>
-                    </div>
-                ))}
-            </div>
-            
-             {/* Mobile Indicator */}
-             <div className="md:hidden text-purple-700 font-bold">Step {activeStep + 1}/5</div>
+    <div className="min-h-screen bg-[#F8F9FD] pb-40">
+      {/* Step Indicator Header */}
+      <div className="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 px-6 py-6">
+        <div className="max-w-7xl mx-auto flex justify-center">
+          <div className="hidden lg:flex items-center space-x-8">
+            {steps.map((s, i) => (
+              <div key={i} className={`flex items-center gap-3 transition-colors ${i <= activeStep ? 'text-black' : 'text-gray-300'}`}>
+                <div 
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all
+                    ${i === activeStep ? 'text-white border-transparent' : 
+                      i < activeStep ? 'bg-green-50 text-green-600 border-green-100' : 'border-gray-100'}`}
+                  style={{ backgroundColor: i === activeStep ? BRAND_PURPLE : '' }}
+                >
+                  {i < activeStep ? <CheckOutlined /> : i + 1}
+                </div>
+                <span className={`text-xs font-bold uppercase tracking-tighter ${i === activeStep ? 'opacity-100' : 'opacity-50'}`}>
+                  {s.title}
+                </span>
+                {i < steps.length - 1 && <div className="w-4 h-[2px] bg-gray-100" />}
+              </div>
+            ))}
+          </div>
+          <div className="lg:hidden">
+            <Tag color="purple" style={{ backgroundColor: BRAND_PURPLE }}>Step {activeStep + 1} of 8</Tag>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-4xl bg-white mx-auto  mt-5 p-2">
+      <div className="max-w-7xl mx-auto mt-16 px-6">
         <AnimatePresence mode="wait">
-          <motion.div key={activeStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-            {renderStepContent(activeStep)}
-          </motion.div>
+          <div key={activeStep}>
+            {StepRenderer()}
+          </div>
         </AnimatePresence>
       </div>
 
-      {/* Floating Footer Navigation */}
-      {activeStep < 5 && (
-        <div className="fixed bottom-0 left-0 right-0 p-6 z-40 pointer-events-none">
-          <div className="max-w-4xl mx-auto pointer-events-auto">
-            <div className="bg-white/90 backdrop-blur-xl border border-purple-100 shadow-2xl rounded-2xl p-4 flex justify-between items-center">
-                
-                <Button 
-                    size="large" 
-                    type="text"
-                    icon={<ArrowLeftOutlined />} 
-                    onClick={handleBack} 
-                    disabled={activeStep === 0}
-                    className="text-gray-500 hover:bg-gray-100 rounded-xl"
-                >
-                    Back
-                </Button>
+      {/* Navigation Footer */}
+      {activeStep < 8 && (
+        <div className="fixed bottom-0 left-0 right-0 p-8 z-50 pointer-events-none">
+          <div className="max-w-4xl mx-auto flex justify-between items-center bg-white/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-2xl border border-white/50 pointer-events-auto">
+            <Button 
+              size="large" 
+              icon={<ArrowLeftOutlined />} 
+              onClick={handleBack} 
+              disabled={activeStep === 0}
+              className="h-14 px-8 rounded-2xl border-none bg-gray-50 text-gray-400 hover:bg-gray-100"
+            >
+              Back
+            </Button>
 
-                <div className="flex items-center gap-4">
-                    {/* {activeStep === 3 && (
-                        <div className="hidden sm:block text-right mr-2">
-                            <div className="text-xs text-gray-400 uppercase">Estimated Total</div>
-                            <div className="text-purple-700 font-bold text-lg">{packages.find(p => p._id === selectedPackage)?.price || 0} AED</div>
-                        </div>
-                    )} */}
-
-                    {activeStep === 4 ? (
-                       <span className="text-sm text-gray-400 italic mr-2">Fill the form to submit</span>
-                    ) : (
-                       <Button 
-  type="primary" 
-  size="large" 
-  onClick={activeStep === 3 ? handleGetQuote : handleNext} 
-  disabled={!isStepValid()} 
-  className={`
-    h-12 px-8 rounded-xl text-lg shadow-lg border-none transition-all
-    ${!isStepValid() 
-      ? 'bg-gray-300 cursor-not-allowed' 
-      : 'bg-[var(--color-primary)] hover:bg-purple-800 hover:scale-105 text-white'
-    }
-  `}
->
-  {activeStep === 3 ? "Get Quote" : "Next Step"} 
-  <ArrowRightOutlined className="ml-2" />
-</Button>
-
-                    )}
+            <div className="flex items-center gap-8">
+              {activeStep > 0 && (
+                <div className="hidden sm:block text-right">
+                  <Text className="text-[10px] text-gray-400 uppercase font-black block tracking-widest">Progress</Text>
+                  <Text strong style={{ color: BRAND_PURPLE }}>
+                    {Math.round(((activeStep + 1) / 8) * 100)}% Complete
+                  </Text>
                 </div>
+              )}
+              
+              <Button 
+                type="primary" 
+                size="large" 
+                onClick={handleNext} 
+                disabled={!validateStep()}
+                className="h-14 px-12 rounded-2xl border-none text-lg shadow-xl transition-all"
+                style={{ 
+                  backgroundColor: !validateStep() ? '#f5f5f5' : BRAND_PURPLE, 
+                  color: !validateStep() ? '#ccc' : 'white' 
+                }}
+              >
+                {activeStep === 7 ? 'Generate Quote' : 'Continue'} 
+                <ArrowRightOutlined className="ml-2" />
+              </Button>
             </div>
           </div>
         </div>

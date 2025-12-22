@@ -14,7 +14,7 @@ const Jobs = () => {
       posted: '4 minutes ago',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur.',
       skills: ['Adobe XD', 'Figma', 'Photoshop'],
-      salary: '$500',
+      salary: 'AED500',
       salaryPeriod: '/Hour',
     },
     {
@@ -28,7 +28,7 @@ const Jobs = () => {
       posted: '5 minutes ago',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur.',
       skills: ['React', 'NodeJS'],
-      salary: '$800',
+      salary: 'AED800',
       salaryPeriod: '/Hour',
     },
     {
@@ -42,7 +42,7 @@ const Jobs = () => {
       posted: '6 minutes ago',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur.',
       skills: ['Python', 'AWS', 'Photoshop'],
-      salary: '$250',
+      salary: 'AED250',
       salaryPeriod: '/Hour',
     },
     {
@@ -56,7 +56,7 @@ const Jobs = () => {
       posted: '6 minutes ago',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur.',
       skills: ['Typescript', 'Java'],
-      salary: '$250',
+      salary: 'AED250',
       salaryPeriod: '/Hour',
     },
     {
@@ -70,7 +70,7 @@ const Jobs = () => {
       posted: '4 minutes ago',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur.',
       skills: ['Angular'],
-      salary: '$500',
+      salary: 'AED500',
       salaryPeriod: '/Hour',
     },
     {
@@ -84,7 +84,7 @@ const Jobs = () => {
       posted: '5 minutes ago',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit elit. Recusandae architecto eveniet, dolor quo repellendus pariatur.',
       skills: ['javascript'],
-      salary: '$800',
+      salary: 'AED800',
       salaryPeriod: '/Hour',
     },
     {
@@ -98,7 +98,7 @@ const Jobs = () => {
       posted: '6 minutes ago',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur.',
       skills: ['ASP.Net', 'Figma'],
-      salary: '$250',
+      salary: 'AED250',
       salaryPeriod: '/Hour',
     },
     {
@@ -112,7 +112,7 @@ const Jobs = () => {
       posted: '6 minutes ago',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae architecto eveniet, dolor quo repellendus pariatur.',
       skills: ['iOS', 'Laravel', 'Golang'],
-      salary: '$250',
+      salary: 'AED250',
       salaryPeriod: '/Hour',
     },
   ];

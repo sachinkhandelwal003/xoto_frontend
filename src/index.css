@@ -3,6 +3,7 @@
 @import "swiper/css";
 @import "swiper/css/navigation";
 @import "tw-animate-css";
+
 /* ---- Custom Theme Variables ---- */
 @theme {
   --color-body: #F2EBF7;

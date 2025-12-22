@@ -282,16 +282,32 @@ const Freelancers = () => {
   };
 
   // --- HANDLE VIEW RATE CARD ---
-  const handleViewRateCard = (record) => {
-    setRateCardData(record.services_offered || []);
-    setRateCardFreelancerName(`${record.name?.first_name} ${record.name?.last_name}`);
-    
-    // ✅ Extract Currency Symbol
-    const symbol = record.payment?.preferred_currency?.symbol || ""; 
-    setRateCardCurrency(symbol);
-    
-    setShowRateCardModal(true);
-  };
+ const handleViewRateCard = (record) => {
+  const rows = [];
+
+  record.services_offered?.forEach(service => {
+    service.subcategories?.forEach(sub => {
+      rows.push({
+        _id: sub._id,
+        categoryLabel: service.category?.label,
+        subServiceLabel: sub.type?.label,
+        price_range: sub.price_range,
+        unit: sub.unit
+      });
+    });
+  });
+
+  setRateCardData(rows);
+  setRateCardFreelancerName(
+    `${record.name?.first_name} ${record.name?.last_name}`
+  );
+
+  // Currency symbol
+  setRateCardCurrency(record.payment?.preferred_currency?.symbol || "");
+
+  setShowRateCardModal(true);
+};
+
 
   const formatMobile = (freelancer) => {
     if (freelancer.mobile) {
@@ -519,46 +535,40 @@ const Freelancers = () => {
   ];
 
   // --- RATE CARD MODAL COLUMNS ---
-  const rateCardColumns = [
-    {
-        title: "Category",
-        key: "category",
-        render: (_, record) => (
-            <div className="flex items-center gap-2">
-                <Avatar src={record.category?.icon} shape="square" size="small" />
-                <Text strong>{record.category?.name}</Text>
-            </div>
-        )
-    },
-    {
-        title: "Subcategories",
-        key: "subcategories",
-        render: (_, record) => (
-            <div className="flex flex-wrap gap-1">
-                {record.subcategories?.length > 0 ? (
-                    record.subcategories.map(sub => <Tag key={sub._id}>{sub.name}</Tag>)
-                ) : <Text type="secondary">N/A</Text>}
-            </div>
-        )
-    },
-    {
-        title: "Price Range",
-        dataIndex: "price_range",
-        key: "price_range",
-        render: (text) => (
-            // ✅ Display Currency + Price
-            <Tag color="green" style={{ fontSize: '14px', padding: '4px 10px' }}>
-                {rateCardCurrency} {text || "N/A"}
-            </Tag>
-        )
-    },
-    {
-        title: "Unit",
-        dataIndex: "unit",
-        key: "unit",
-        render: (text) => <Text type="secondary">{text || "N/A"}</Text>
-    }
-  ];
+ const rateCardColumns = [
+  {
+    title: "Service",
+    dataIndex: "categoryLabel",
+    key: "category",
+    render: text => <Text strong>{text || "N/A"}</Text>
+  },
+  {
+    title: "Sub Service",
+    dataIndex: "subServiceLabel",
+    key: "subService",
+    render: text => <Tag color="blue">{text || "N/A"}</Tag>
+  },
+  {
+    title: "Price",
+    dataIndex: "price_range",
+    key: "price_range",
+    render: (text) =>
+      text ? (
+        <Tag color="green" style={{ fontSize: 14 }}>
+          {rateCardCurrency} {text}
+        </Tag>
+      ) : (
+        <Tag color="orange">Not Set</Tag>
+      )
+  },
+  {
+    title: "Unit",
+    dataIndex: "unit",
+    key: "unit",
+    render: text => <Text type="secondary">{text || "-"}</Text>
+  }
+];
+
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -696,33 +706,34 @@ const Freelancers = () => {
       </Modal>
 
       {/* 4. RATE CARD MODAL */}
-      <Modal
-        open={showRateCardModal}
-        title={
-            <div className="flex items-center gap-2 text-gray-700">
-                <CreditCardOutlined style={{ color: '#13c2c2' }} /> 
-                Rate Card: <span className="font-bold">{rateCardFreelancerName}</span>
-            </div>
-        }
-        onCancel={() => setShowRateCardModal(false)}
-        footer={[
-            <Button key="close" type="primary" onClick={() => setShowRateCardModal(false)}>
-                Close
-            </Button>
-        ]}
-        width={700}
-        centered
-      >
-        <Table 
-            dataSource={rateCardData}
-            columns={rateCardColumns}
-            pagination={false}
-            rowKey="_id"
-            bordered
-            size="small"
-            locale={{ emptyText: "No services found in rate card" }}
-        />
-      </Modal>
+    <Modal
+  open={showRateCardModal}
+  title={
+    <div className="flex items-center gap-2 text-gray-700">
+      <CreditCardOutlined style={{ color: '#13c2c2' }} />
+      Rate Card: <span className="font-bold">{rateCardFreelancerName}</span>
+    </div>
+  }
+  onCancel={() => setShowRateCardModal(false)}
+  footer={[
+    <Button key="close" type="primary" onClick={() => setShowRateCardModal(false)}>
+      Close
+    </Button>
+  ]}
+  width={700}
+  centered
+>
+  <Table
+    dataSource={rateCardData}
+    columns={rateCardColumns}
+    pagination={false}
+    rowKey="_id"
+    bordered
+    size="small"
+    locale={{ emptyText: "No services found in rate card" }}
+  />
+</Modal>
+
 
     </div>
   );

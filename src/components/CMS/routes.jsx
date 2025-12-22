@@ -58,6 +58,7 @@ import AddAttributes from "../ecommerce/B2C/products/AddAttributes";
 import AddTags from "../ecommerce/B2C/products/AddTags";
 import UpdateProduct from "../ecommerce/B2C/products/UpdateProduct";
 import ViewProject from "./pages/dashboardPages/managefreelancer/freelancer/Projects/ViewProjects";
+import TypesGallery from "./pages/estimateMaster/TypesGallery";
 
 const roleSlugMap = {
   0: "superadmin",
@@ -111,6 +112,8 @@ const componentMap = {
     "request/quatation":<QuatationLeadsList/>,
   "estimates/my":<Myestimates/>,
   "estimate/master/categories":<MasterCategory/>,
+    "master/types/gallery":<TypesGallery/>,
+
   deals: <Leads />,
 bookings:<Bookings/>,
 warehouse:<ManageWarehouses/>,

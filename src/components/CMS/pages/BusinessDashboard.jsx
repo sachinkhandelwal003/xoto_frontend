@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 
 // Placeholder data for business dashboard
 const businessStats = [
-  { label: 'Total Sales', value: '$5,000', change: '+10%', icon: FaShoppingCart, trend: 'up' },
+  { label: 'Total Sales', value: 'AED5,000', change: '+10%', icon: FaShoppingCart, trend: 'up' },
   { label: 'Pending Orders', value: '8', change: '+3', icon: FaClock, trend: 'up' },
   { label: 'Customer Reviews', value: '25', change: '+5', icon: FaHeart, trend: 'up' },
   { label: 'Active Listings', value: '15', change: '-2', icon: FaFileAlt, trend: 'down' },

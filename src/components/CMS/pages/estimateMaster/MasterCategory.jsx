@@ -1,15 +1,16 @@
 // components/CMS/pages/estimate/CategoryManager/MasterCategory.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Card, Button, Drawer, Switch, Space, Tag, Tooltip, Spin,
-  Typography, Popconfirm, Empty, Input, Form, Modal, message, Badge,
-  Row, Col, Statistic, Breadcrumb, Divider,Select
+  Card, Button, Space, Tag, Tooltip, Spin,
+  Typography, Popconfirm, Input, Form, Modal, message,
+  Row, Col, Statistic, Breadcrumb, Divider, Select, Switch
 } from 'antd';
 import {
   PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined,
   RestOutlined, ArrowLeftOutlined, FolderOutlined,
-  FolderOpenOutlined, TagsOutlined, HomeOutlined, DatabaseOutlined,
-  SearchOutlined, ReloadOutlined, AppstoreOutlined
+  FolderOpenOutlined, TagsOutlined, DatabaseOutlined,
+  SearchOutlined, ReloadOutlined, AppstoreOutlined,
+  HomeOutlined
 } from '@ant-design/icons';
 import CustomTable from '../../../../components/CMS/pages/custom/CustomTable';
 import { apiService } from '../../../../manageApi/utils/custom.apiservice';
@@ -25,13 +26,14 @@ const THEME = {
   warning: "#faad14",
   error: "#ff4d4f",
   bgLight: "#f9f0ff",
+  border: "#f0f0f0"
 };
 
 const API_BASE = '/estimate/master/category';
 
 const MasterCategory = () => {
   // Navigation State
-  const [level, setLevel] = useState('categories'); // 'categories' | 'subcategories' | 'types'
+  const [level, setLevel] = useState('categories'); 
   const [parentCategory, setParentCategory] = useState(null);
   const [parentSubcategory, setParentSubcategory] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -49,8 +51,9 @@ const MasterCategory = () => {
     totalItems: 0,
   });
 
-  // Modal State
+  // Modal States
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -59,7 +62,7 @@ const MasterCategory = () => {
     return {
       total: pagination.totalItems,
       active: data.filter(d => d.isActive !== false && !d.is_deleted).length,
-      trashed: data.filter(d => d.is_deleted).length
+      trashed: data.filter(d => d.is_deleted || d.isActive === false).length
     };
   }, [data, pagination.totalItems]);
 
@@ -68,10 +71,14 @@ const MasterCategory = () => {
     setLoading(true);
     try {
       let url = API_BASE;
-      const params = { page, limit, search: searchTerm || undefined };
+      const params = { 
+        page, 
+        limit, 
+        search: searchTerm || undefined,
+        active: showTrash ? 'false' : undefined // Basic trash filtering logic
+      };
 
       let response;
-
       if (level === 'subcategories') {
         url = `${API_BASE}/${parentCategory}/subcategories`;
         response = await apiService.get(url, params);
@@ -88,7 +95,7 @@ const MasterCategory = () => {
       setPagination({
         currentPage: response.pagination?.page || page,
         itemsPerPage: response.pagination?.limit || limit,
-        totalItems: response.pagination?.total || response.data?.length || 0,
+        totalItems: response.pagination?.total || response.data?.length || response.categories?.length || 0,
       });
     } catch (err) {
       message.error('Failed to load data');
@@ -106,6 +113,25 @@ const MasterCategory = () => {
   useEffect(() => {
     setPagination(prev => ({ ...prev, currentPage: 1 }));
   }, [level, parentCategory, parentSubcategory]);
+
+  const handleEditClick = (record) => {
+    setSelectedItem(record);
+    setEditModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      let url = `${API_BASE}/${id}`;
+      if (level === 'subcategories') url = `${API_BASE}/${parentCategory}/subcategories/${id}`;
+      if (level === 'types') url = `${API_BASE}/${parentCategory}/subcategories/${parentSubcategory}/types/${id}`;
+
+      await apiService.delete(url);
+      message.success('Deactivated successfully');
+      fetchData();
+    } catch (err) {
+      message.error('Operation failed');
+    }
+  };
 
   const goToSubcategories = (category) => {
     setParentCategory(category._id);
@@ -136,80 +162,64 @@ const MasterCategory = () => {
       {
         title: level === 'categories' ? 'Category Name' : level === 'subcategories' ? 'Subcategory' : 'Type',
         key: 'name',
-        width: 300,
+        width: 350,
         render: (_, record) => (
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: THEME.bgLight }}>
-                {level === 'categories' && <FolderOutlined style={{ fontSize: '20px', color: THEME.primary }} />}
-                {level === 'subcategories' && <FolderOpenOutlined style={{ fontSize: '20px', color: THEME.secondary }} />}
-                {level === 'types' && <TagsOutlined style={{ fontSize: '20px', color: THEME.warning }} />}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ 
+              width: '38px', height: '38px', borderRadius: '8px', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: THEME.bgLight 
+            }}>
+                {level === 'categories' && <FolderOutlined style={{ fontSize: '18px', color: THEME.primary }} />}
+                {level === 'subcategories' && <FolderOpenOutlined style={{ fontSize: '18px', color: THEME.secondary }} />}
+                {level === 'types' && <TagsOutlined style={{ fontSize: '18px', color: THEME.warning }} />}
             </div>
             <div>
-              <div className="font-semibold text-gray-800">{record.name || record.label}</div>
-              {record.description && <div className="text-xs text-gray-500 truncate w-48">{record.description}</div>}
+              <div style={{ fontWeight: 600, color: '#262626' }}>{record.name || record.label}</div>
+              {record.description && <Text type="secondary" style={{ fontSize: '12px' }}>{record.description}</Text>}
             </div>
           </div>
         ),
       },
       {
         title: 'Status',
+        key: 'status',
         width: 120,
         render: (_, record) => (
-          <Tag 
-            color={record.is_deleted ? 'red' : record.isActive !== false ? 'green' : 'orange'}
-            style={{ borderRadius: '12px', padding: '2px 10px' }}
-          >
-            {record.is_deleted ? 'Deleted' : record.isActive !== false ? 'Active' : 'Inactive'}
+          <Tag color={record.isActive !== false ? 'green' : 'orange'} style={{ borderRadius: '10px' }}>
+            {record.isActive !== false ? 'Active' : 'Inactive'}
           </Tag>
         ),
       },
       {
         title: 'Action',
-        width: 180,
+        key: 'action',
+        width: 220,
         align: 'right',
         render: (_, record) => (
-          <Space>
+          <Space size="small">
             {level !== 'types' && (
-              <Tooltip title={`View ${level === 'categories' ? 'Subcategories' : 'Types'}`}>
-                  <Button
-                    size="small"
-                    type="primary"
-                    ghost
-                    icon={<ArrowLeftOutlined rotate={180} />}
-                    onClick={() => level === 'categories' ? goToSubcategories(record) : goToTypes(record)}
-                  >
-                    Open
-                  </Button>
-              </Tooltip>
+              <Button size="small" type="primary" ghost onClick={() => level === 'categories' ? goToSubcategories(record) : goToTypes(record)}>
+                Open
+              </Button>
             )}
-            <Tooltip title="View Details">
-                <Button 
-                    size="small" 
-                    icon={<EyeOutlined />} 
-                    onClick={() => { setSelectedItem(record); setDetailsOpen(true); }} 
-                />
+            <Tooltip title="Edit">
+              <Button size="small" icon={<EditOutlined />} onClick={() => handleEditClick(record)} />
             </Tooltip>
+            <Tooltip title="Details">
+              <Button size="small" icon={<EyeOutlined />} onClick={() => { setSelectedItem(record); setDetailsOpen(true); }} />
+            </Tooltip>
+            <Popconfirm title="Deactivate this item?" onConfirm={() => handleDelete(record._id)}>
+               <Button size="small" danger icon={<DeleteOutlined />} />
+            </Popconfirm>
           </Space>
         ),
       },
     ];
-
-    if (level === 'categories') {
-      cols.splice(1, 0, {
-        title: 'Type',
-        width: 150,
-        render: (_, record) => (
-            <Tag color={record.name === 'Interior' ? 'blue' : 'geekblue'}>
-                {record.name?.toUpperCase()}
-            </Tag>
-        )
-      });
-    }
-
     return cols;
   }, [level]);
 
-  // --- CREATE MODAL COMPONENT ---
+  // --- CREATE MODAL ---
   const CreateModal = () => {
     const [form] = Form.useForm();
     const [saving, setSaving] = useState(false);
@@ -218,72 +228,86 @@ const MasterCategory = () => {
       setSaving(true);
       try {
         let url = API_BASE;
-        let payload = {};
+        let payload = values;
 
-        if (level === 'categories') {
-          payload = { name: values.name, description: values.description };
-        } else if (level === 'subcategories') {
-          url = `${API_BASE}/${parentCategory}/subcategories`;
-          payload = { label: values.label, description: values.description };
-        } else if (level === 'types') {
-          url = `${API_BASE}/${parentCategory}/subcategories/${parentSubcategory}/types`;
-          payload = { label: values.label, description: values.description };
-        }
+        if (level === 'subcategories') url = `${API_BASE}/${parentCategory}/subcategories`;
+        if (level === 'types') url = `${API_BASE}/${parentCategory}/subcategories/${parentSubcategory}/types`;
 
         await apiService.post(url, payload);
         message.success('Created successfully!');
         setCreateModalOpen(false);
         form.resetFields();
         fetchData(1);
-      } catch (err) {
-        message.error('Create failed');
-      } finally {
-        setSaving(false);
-      }
+      } catch (err) { message.error('Create failed'); } 
+      finally { setSaving(false); }
     };
 
     return (
-      <Modal
-        title={
-            <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
-                <PlusOutlined style={{ color: THEME.primary }} /> 
-                Add New {level === 'categories' ? 'Category' : level === 'subcategories' ? 'Subcategory' : 'Type'}
-            </div>
-        }
-        open={createModalOpen}
-        onCancel={() => setCreateModalOpen(false)}
-        footer={null}
-        destroyOnClose
-      >
-        <Divider className="my-4" />
-        <Form form={form} layout="vertical" onFinish={onSubmit}>
+      <Modal title={`Add New ${level.slice(0, -1)}`} open={createModalOpen} onCancel={() => setCreateModalOpen(false)} footer={null} centered destroyOnClose>
+        <Form form={form} layout="vertical" onFinish={onSubmit} style={{ marginTop: '16px' }}>
           {level === 'categories' ? (
-            <Form.Item name="name" label="Category Type" rules={[{ required: true }]}>
-              <Select placeholder="Select Type" size="large">
-                <Select.Option value="Interior">Interior</Select.Option>
-                <Select.Option value="Landscaping">Landscaping</Select.Option>
-              </Select>
-            </Form.Item>
+            <Form.Item name="name" label="Category Type" rules={[{ required: true }]}><Select placeholder="Select Type"><Select.Option value="Interior">Interior</Select.Option><Select.Option value="Landscaping">Landscaping</Select.Option></Select></Form.Item>
           ) : (
-            <Form.Item name="label" label="Name" rules={[{ required: true }]}>
-              <Input size="large" placeholder="Enter name" />
-            </Form.Item>
+            <Form.Item name="label" label="Name" rules={[{ required: true }]}><Input placeholder="Enter name" /></Form.Item>
           )}
-          <Form.Item name="description" label="Description">
-            <TextArea rows={3} placeholder="Optional description..." />
-          </Form.Item>
-          
-          <div className="flex justify-end gap-3 mt-6">
-            <Button size="large" onClick={() => setCreateModalOpen(false)}>Cancel</Button>
-            <Button 
-                type="primary" 
-                htmlType="submit" 
-                loading={saving} 
-                size="large"
-                style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
-            >
-              Create
-            </Button>
+          <Form.Item name="description" label="Description"><TextArea rows={3} placeholder="Enter details..." /></Form.Item>
+          <div style={{ display: 'flex', justifyContent: 'end', gap: '8px' }}>
+            <Button onClick={() => setCreateModalOpen(false)}>Cancel</Button>
+            <Button type="primary" htmlType="submit" loading={saving} style={{ background: THEME.primary }}>Create</Button>
+          </div>
+        </Form>
+      </Modal>
+    );
+  };
+
+  // --- EDIT MODAL ---
+  const EditModal = () => {
+    const [form] = Form.useForm();
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+      if (selectedItem) {
+        form.setFieldsValue({
+          name: selectedItem.name,
+          label: selectedItem.label,
+          description: selectedItem.description,
+          isActive: selectedItem.isActive !== false,
+          order: selectedItem.order || 0
+        });
+      }
+    }, [selectedItem]);
+
+    const onUpdate = async (values) => {
+      setSaving(true);
+      try {
+        let url = `${API_BASE}/${selectedItem._id}`;
+        if (level === 'subcategories') url = `${API_BASE}/${parentCategory}/subcategories/${selectedItem._id}`;
+        if (level === 'types') url = `${API_BASE}/${parentCategory}/subcategories/${parentSubcategory}/types/${selectedItem._id}`;
+
+        await apiService.put(url, values);
+        message.success('Updated successfully!');
+        setEditModalOpen(false);
+        fetchData();
+      } catch (err) { message.error('Update failed'); } 
+      finally { setSaving(false); }
+    };
+
+    return (
+      <Modal title={`Edit ${level.slice(0, -1)}`} open={editModalOpen} onCancel={() => setEditModalOpen(false)} footer={null} centered destroyOnClose>
+        <Form form={form} layout="vertical" onFinish={onUpdate} style={{ marginTop: '16px' }}>
+          {level === 'categories' ? (
+            <Form.Item name="name" label="Category Type" rules={[{ required: true }]}><Input /></Form.Item>
+          ) : (
+            <Form.Item name="label" label="Name" rules={[{ required: true }]}><Input /></Form.Item>
+          )}
+          <Form.Item name="description" label="Description"><TextArea rows={3} /></Form.Item>
+          <Row gutter={16}>
+             <Col span={12}><Form.Item name="isActive" label="Status" valuePropName="checked"><Switch checkedChildren="Active" unCheckedChildren="Inactive" /></Form.Item></Col>
+             <Col span={12}><Form.Item name="order" label="Sort Order"><Input type="number" /></Form.Item></Col>
+          </Row>
+          <div style={{ display: 'flex', justifyContent: 'end', gap: '8px' }}>
+            <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
+            <Button type="primary" htmlType="submit" loading={saving} style={{ background: THEME.primary }}>Save Changes</Button>
           </div>
         </Form>
       </Modal>
@@ -291,164 +315,60 @@ const MasterCategory = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      
-      {/* 1. Header & Breadcrumbs */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-4">
-             {level !== 'categories' && (
-                <Button 
-                    shape="circle" 
-                    icon={<ArrowLeftOutlined />} 
-                    onClick={goBack} 
-                />
-             )}
-             <div>
-                <Title level={3} style={{ margin: 0 }}>Category Manager</Title>
-                <Breadcrumb separator=">">
-                    <Breadcrumb.Item>
-                        <span 
-                            className={`cursor-pointer ${level === 'categories' ? 'font-bold text-purple-700' : 'text-gray-500'}`}
-                            onClick={() => { setLevel('categories'); setParentCategory(null); setSelectedCategory(null); }}
-                        >
-                            Categories
-                        </span>
-                    </Breadcrumb.Item>
-                    {selectedCategory && (
-                        <Breadcrumb.Item>
-                            <span 
-                                className={`cursor-pointer ${level === 'subcategories' ? 'font-bold text-purple-700' : 'text-gray-500'}`}
-                                onClick={() => { setLevel('subcategories'); setParentSubcategory(null); setSelectedSubcategory(null); }}
-                            >
-                                {selectedCategory.name}
-                            </span>
-                        </Breadcrumb.Item>
-                    )}
-                    {selectedSubcategory && (
-                        <Breadcrumb.Item>
-                            <span className="font-bold text-purple-700">
-                                {selectedSubcategory.label}
-                            </span>
-                        </Breadcrumb.Item>
-                    )}
-                </Breadcrumb>
-             </div>
-          </div>
-
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            size="large"
-            onClick={() => setCreateModalOpen(true)}
-            style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
-          >
-            Add {level === 'categories' ? 'Category' : level === 'subcategories' ? 'Subcategory' : 'Type'}
-          </Button>
-        </div>
-
-        {/* 2. Stats Row */}
-        <Row gutter={[16, 16]}>
-            <Col xs={24} sm={8}>
-                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
-                    <Statistic 
-                        title={`Total ${level === 'categories' ? 'Categories' : level === 'subcategories' ? 'Subcategories' : 'Types'}`}
-                        value={stats.total} 
-                        prefix={<AppstoreOutlined style={{ color: THEME.primary }} />} 
-                    />
-                </Card>
-            </Col>
-            <Col xs={24} sm={8}>
-                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.success }}>
-                    <Statistic 
-                        title="Active Items" 
-                        value={stats.active} 
-                        prefix={<DatabaseOutlined style={{ color: THEME.success }} />} 
-                    />
-                </Card>
-            </Col>
-            <Col xs={24} sm={8}>
-                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.error }}>
-                    <Statistic 
-                        title="Deleted Items" 
-                        value={stats.trashed} 
-                        prefix={<RestOutlined style={{ color: THEME.error }} />} 
-                    />
-                </Card>
-            </Col>
-        </Row>
+    <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100vh' }}>
+      {/* Header & Breadcrumb */}
+      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Space direction="vertical" size={4}>
+          <Title level={3} style={{ margin: 0 }}>Category Architecture</Title>
+          <Breadcrumb separator=">">
+            <Breadcrumb.Item onClick={() => { setLevel('categories'); setParentCategory(null); setSelectedCategory(null); }} style={{ cursor: 'pointer' }}><HomeOutlined /> Root</Breadcrumb.Item>
+            {selectedCategory && <Breadcrumb.Item onClick={() => { setLevel('subcategories'); setParentSubcategory(null); }} style={{ cursor: 'pointer' }}>{selectedCategory.name}</Breadcrumb.Item>}
+            {selectedSubcategory && <Breadcrumb.Item>{selectedSubcategory.label}</Breadcrumb.Item>}
+          </Breadcrumb>
+        </Space>
+        <Space>
+            {level !== 'categories' && <Button icon={<ArrowLeftOutlined />} onClick={goBack}>Back</Button>}
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)} style={{ background: THEME.primary, height: '40px', borderRadius: '8px' }}>Add {level.slice(0,-1)}</Button>
+        </Space>
       </div>
 
-      {/* 3. Main Content Card */}
-      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
-        
-        {/* Toolbar */}
-        <div className="p-4 border-b border-gray-100 bg-white rounded-t-lg flex justify-between items-center">
-            <Input 
-                prefix={<SearchOutlined className="text-gray-400" />}
-                placeholder="Search items..." 
-                size="large"
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ maxWidth: 400 }}
-                allowClear
-            />
-            <Space>
-                <Tooltip title="Toggle Trash View">
-                    <Button 
-                        type={showTrash ? 'primary' : 'default'} 
-                        danger={showTrash}
-                        icon={<RestOutlined />} 
-                        onClick={() => setShowTrash(!showTrash)}
-                    />
-                </Tooltip>
-                <Button icon={<ReloadOutlined />} onClick={() => fetchData()} />
-            </Space>
-        </div>
+      {/* Stats */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        {[{ t: 'Total', v: stats.total, c: THEME.primary, i: <AppstoreOutlined /> }, { t: 'Active', v: stats.active, c: THEME.success, i: <DatabaseOutlined /> }, { t: 'Trash/Inactive', v: stats.trashed, c: THEME.error, i: <RestOutlined /> }].map((s, idx) => (
+          <Col xs={24} sm={8} key={idx}>
+            <Card bordered={false} style={{ borderRadius: '12px', borderBottom: `3px solid ${s.c}` }}>
+              <Statistic title={s.t} value={s.v} prefix={s.i} valueStyle={{ color: '#262626' }} />
+            </Card>
+          </Col>
+        ))}
+      </Row>
 
-        {/* Table */}
-        <div className="p-0">
-            <CustomTable
-                columns={columns}
-                data={data}
-                loading={loading}
-                totalItems={pagination.totalItems}
-                currentPage={pagination.currentPage}
-                itemsPerPage={pagination.itemsPerPage}
-                onPageChange={(page, size) => fetchData(page, size)}
-            />
+      {/* Table Card */}
+      <Card bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} bodyStyle={{ padding: 0 }}>
+        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Input prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />} placeholder="Search entries..." style={{ width: 320, borderRadius: '8px' }} onChange={e => setSearchTerm(e.target.value)} allowClear />
+          <Space>
+            <Button type={showTrash ? 'primary' : 'default'} danger={showTrash} icon={<RestOutlined />} onClick={() => setShowTrash(!showTrash)}>{showTrash ? 'Hide Trash' : 'View Trash'}</Button>
+            <Button icon={<ReloadOutlined />} onClick={() => fetchData()} />
+          </Space>
         </div>
+        <CustomTable columns={columns} data={data} loading={loading} totalItems={pagination.totalItems} currentPage={pagination.currentPage} onPageChange={fetchData} />
       </Card>
 
-      {/* Modals */}
       <CreateModal />
-      
-      {/* Details View Modal */}
-      <Modal
-        title="Item Details"
-        open={detailsOpen}
-        onCancel={() => setDetailsOpen(false)}
-        footer={[<Button key="close" onClick={() => setDetailsOpen(false)}>Close</Button>]}
-      >
+      <EditModal />
+
+      {/* Details View */}
+      <Modal title="Detailed View" open={detailsOpen} onCancel={() => setDetailsOpen(false)} footer={<Button onClick={() => setDetailsOpen(false)}>Close</Button>} centered>
         {selectedItem && (
-            <div className="space-y-4">
-                <div>
-                    <Text type="secondary" className="block text-xs uppercase">Name</Text>
-                    <Text strong className="text-lg">{selectedItem.name || selectedItem.label}</Text>
-                </div>
-                <div>
-                    <Text type="secondary" className="block text-xs uppercase">Description</Text>
-                    <Text>{selectedItem.description || 'No description provided.'}</Text>
-                </div>
-                <div>
-                    <Text type="secondary" className="block text-xs uppercase">Status</Text>
-                    <Tag color={selectedItem.isActive !== false ? 'green' : 'orange'}>
-                        {selectedItem.isActive !== false ? 'Active' : 'Inactive'}
-                    </Tag>
-                </div>
-            </div>
+          <div style={{ padding: '8px 0' }}>
+            <p><Text type="secondary">ID:</Text> <br /> <Text strong>{selectedItem._id}</Text></p>
+            <p><Text type="secondary">Display Name:</Text> <br /> <Text strong>{selectedItem.name || selectedItem.label}</Text></p>
+            <p><Text type="secondary">Description:</Text> <br /> <Text>{selectedItem.description || 'N/A'}</Text></p>
+            <p><Text type="secondary">Current Level:</Text> <br /> <Tag color="purple">{level.toUpperCase()}</Tag></p>
+          </div>
         )}
       </Modal>
-
     </div>
   );
 };

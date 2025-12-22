@@ -1,848 +1,494 @@
-import React, { useState } from 'react';
-import { Sparkles, Upload, Sun, Sprout, Zap, X, Check, Loader, Image as ImageIcon, ArrowLeft, Download, RotateCcw, Trash2 } from 'lucide-react';
-import { Button, Modal, Progress, Card, Tag, Empty, notification } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { 
+  Sparkles, Upload, Sun, Sprout, Loader2, Image as ImageIcon, 
+  Download, RotateCcw, Trash2, CheckCircle2, Info, Check 
+} from 'lucide-react';
+import { 
+  Button, Modal, Progress, Card, Tag, Empty, 
+  notification, Typography, Divider, Tooltip 
+} from 'antd';
 import axios from 'axios';
 
-// Dummy Images (using Unsplash or placeholder)
+const { Paragraph, Title, Text } = Typography;
+
+// --- Mock Data ---
 const dummySpaceImages = [
-  'https://images.unsplash.com/photo-1589924691995-400dc9aa6447?w=800',
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
-  'https://images.unsplash.com/photo-1558618666-4178cb59b3d7?w=800',
-  'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800',
+  { id: 1, url: 'https://images.unsplash.com/photo-1558449028-b53a39d100fc?w=800' },
+  { id: 2, url: 'https://images.unsplash.com/photo-1598902108854-10e335adac99?w=800' },
+  { id: 3, url: 'https://images.unsplash.com/photo-1557429287-b2e26467fc2b?w=800' },
 ];
 
 const gardenStyles = [
   { value: 'modern', label: 'Modern Garden', img: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600' },
-  { value: 'japanese', label: 'Japanese Zen', img: 'https://images.unsplash.com/photo-1587502537104-aac4031028fe?w=600' },
+  { value: 'japanese', label: 'Japanese Zen', img: 'https://www.japan-experience.com/sites/default/files/styles/scale_crop_570x300/public/regiondo/big-ticket-image-5f7541324c6c4582000815-cropped600-400-dpl-65a78e47b9a57.jpg.webp?itok=-yBTm-IO' },
   { value: 'cottage', label: 'English Cottage', img: 'https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=600' },
-  { value: 'mediterranean', label: 'Mediterranean', img: 'https://images.unsplash.com/photo-1558618666-4178cb59b3d7?w=600' },
-  { value: 'tropical', label: 'Tropical Oasis', img: 'https://images.unsplash.com/photo-1583258292688-d0213dc5a3f8?w=600' },
+  { value: 'mediterranean', label: 'Urban Parks', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTg8fAUL2dlGy5ThADjNfnZK6FCt-PyxLRe8JOonNb8Tlje7dIJD6pNA0M&s' },
+  { value: 'tropical', label: 'Tropical Oasis', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSseHbxdOMINrtqNJ7vAph6i_ipKzK--QmDTQ&s' },
   { value: 'minimalist', label: 'Minimalist', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600' },
 ];
 
 const gardenElements = [
-  { value: 'fountain', label: 'Water Fountain', img: 'https://images.unsplash.com/photo-1572015099635-f6f9e54d3cae?w=400' },
-  { value: 'pond', label: 'Pond', img: 'https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400' },
-  { value: 'pathway', label: 'Stone Pathway', img: 'https://images.unsplash.com/photo-1519996529931-28324d5a630e?w=400' },
-  { value: 'gazebo', label: 'Gazebo', img: 'https://images.unsplash.com/photo-1592596617544-3d0d4e0ac483?w=400' },
-  { value: 'firepit', label: 'Fire Pit', img: 'https://images.unsplash.com/photo-1601919056610-2e3d2c1f33c0?w=400' },
-  { value: 'seating', label: 'Seating Area', img: 'https://images.unsplash.com/photo-1586023492125-27b2c0d58d9f?w=400' },
+  { value: 'fountain', label: 'Water Fountain', img: 'https://img.freepik.com/free-photo/nice-fountain-with-leafy-trees-background_1160-297.jpg?semt=ais_hybrid&w=740&q=80' },
+  { value: 'pond', label: 'Pond', img: 'https://media.istockphoto.com/id/165615108/photo/long-pond-maine-deep-blue-water-lake-lily-pads-grasses.jpg?s=612x612&w=0&k=20&c=vaW1nnSYFl-E45R3Bsna6wg9PNnwZUw0bEaWxR85BCw=' },
+  { value: 'pathway', label: 'Stone Pathway', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTg8fAUL2dlGy5ThADjNfnZK6FCt-PyxLRe8JOonNb8Tlje7dIJD6pNA0M&s' },
+  { value: 'gazebo', label: 'Gazebo', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7VzauykJs9jY1IjtMmQMgiPHS3MZ7ghhSwQ&s' },
+  { value: 'firepit', label: 'Fire Pit', img: 'https://irp.cdn-website.com/cea9e5b2/dms3rep/multi/Vakkas-paver-patio-fire-pit-5.jpg' },
+  { value: 'seating', label: 'Seating Area', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRN533r4zs2Vywi2quKHBlEqsrzpY4l_Mpbkg&s' },
 ];
+
+const BRAND_PURPLE = "#5C039B";
+const API_BASE_URL ='http://51.112.61.219/api'
 
 const AIPlanner = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
   const [selectedStyles, setSelectedStyles] = useState([]);
   const [selectedElements, setSelectedElements] = useState([]);
   const [specificRequirement, setSpecificRequirement] = useState('');
   const [designs, setDesigns] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
+  
+  // Modal states
   const [showGeneratedModal, setShowGeneratedModal] = useState(false);
-  const [currentGeneratedImages, setCurrentGeneratedImages] = useState([]);
-
-  // Modals
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showStyleModal, setShowStyleModal] = useState(false);
   const [showElementModal, setShowElementModal] = useState(false);
+  const [currentResult, setCurrentResult] = useState({ url: '', desc: '' });
 
-  // File upload state
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [dragOver, setDragOver] = useState(false);
-
-  // Reset function to clear all inputs and start fresh
   const resetDesign = () => {
     setSelectedImage(null);
+    setUploadedFile(null);
     setSelectedStyles([]);
     setSelectedElements([]);
     setSpecificRequirement('');
-    setUploadedFile(null);
-    notification.success({ 
-      message: 'Design Reset', 
-      description: 'All inputs have been cleared. Ready for a new design!' 
-    });
+    notification.info({ message: 'Form cleared' });
   };
 
-  // Handle file upload from PC
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    processUploadedFile(file);
-  };
-
-  // Handle drag and drop
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      processUploadedFile(files[0]);
-    }
-  };
-
-  // Process uploaded file
   const processUploadedFile = (file) => {
-    if (file) {
-      // Check file type
-      if (!file.type.startsWith('image/')) {
-        notification.error({
-          message: 'Invalid File Type',
-          description: 'Please upload an image file (JPEG, PNG, etc.)'
-        });
-        return;
-      }
-
-      // Check file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        notification.error({
-          message: 'File Too Large',
-          description: 'Please upload an image smaller than 10MB'
-        });
-        return;
-      }
-
+    if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
         setUploadedFile(file);
         setSelectedImage(e.target.result);
         setShowUploadModal(false);
-        notification.success({
-          message: 'Image Uploaded Successfully!',
-          description: 'Your photo is ready for design generation'
-        });
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Handle example image selection
-  const handleExampleImageSelect = (imageUrl) => {
-    setSelectedImage(imageUrl);
-    setUploadedFile(null); // Clear any uploaded file when selecting example
-    setShowUploadModal(false);
-    notification.success({ 
-      message: 'Example Image Selected', 
-      description: 'Your example image is ready for design generation!' 
-    });
-  };
-
-  // Remove selected image
-  const removeSelectedImage = () => {
-    setSelectedImage(null);
-    setUploadedFile(null);
-    notification.info({ 
-      message: 'Image Removed', 
-      description: 'You can upload a new image to continue' 
-    });
-  };
-
-  // Delete a design
-  const deleteDesign = (designId) => {
-    setDesigns(prev => prev.filter(design => design.id !== designId));
-    notification.success({
-      message: 'Design Deleted',
-      description: 'The design has been removed successfully'
-    });
-  };
-
-  // Function to convert data URL to File object
-  const dataURLtoFile = (dataurl, filename) => {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  };
-
-  // Function to call AI backend
-const generateAIDesigns = async () => {
-  try {
+  const generateAIDesigns = async () => {
     if (!selectedImage) {
-      notification.warning({ message: 'Please upload a photo first!' });
-      return;
+      return notification.warning({ message: 'Missing Canvas', description: 'Please upload or select a starting photo.' });
     }
 
     setIsGenerating(true);
     setGenerationProgress(0);
 
     const formData = new FormData();
-
+    
+    // Logic to handle both uploaded files and dummy URL selection
     if (uploadedFile) {
       formData.append('gardenImage', uploadedFile);
-    } else if (selectedImage) {
-      const response = await fetch(selectedImage);
-      const blob = await response.blob();
-      const file = new File([blob], 'garden-image.jpg', { type: 'image/jpeg' });
-      formData.append('gardenImage', file);
-    }
-
-    formData.append(
-      'styleName',
-      selectedStyles.length > 0
-        ? gardenStyles.find(s => s.value === selectedStyles[0])?.label
-        : 'Modern Garden'
-    );
-
-    const elementsText = selectedElements
-      .map(e => gardenElements.find(el => el.value === e)?.label)
-      .join(', ');
-
-    formData.append('elements', elementsText || 'beautiful plants');
-
-    formData.append(
-      'description',
-      specificRequirement || 'Create a beautiful garden design'
-    );
-
-    // ⭐ DEBUG SECTION — CHECK FORM DATA CONTENTS ⭐
-    console.log("----- FORM DATA DEBUG -----");
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
-    console.log("----- END FORM DATA -----");
-
-    // Simulated progress
-    const progressInterval = setInterval(() => {
-      setGenerationProgress(prev => {
-        const newProgress = prev + 2;
-        if (newProgress >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return newProgress;
-      });
-    }, 100);
-
-    const response = await axios.post(
-      'https://kotiboxglobaltech.online/api/ai/generate-garden',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 300000,
+    } else {
+      try {
+        const response = await fetch(selectedImage);
+        const blob = await response.blob();
+        const file = new File([blob], "input_image.jpg", { type: "image/jpeg" });
+        formData.append('gardenImage', file);
+      } catch (err) {
+        console.error("Blob conversion failed", err);
       }
-    );
-
-    clearInterval(progressInterval);
-    setGenerationProgress(100);
-
-    if (response.data.success) {
-      const generatedImages = response.data.designs.map(d => d.url);
-      setCurrentGeneratedImages(generatedImages);
-
-      const newDesigns = generatedImages.map((image, index) => ({
-        id: Date.now() + index,
-        image: image,
-        title: `AI Design ${designs.length + index + 1}`,
-        styles: selectedStyles,
-        elements: selectedElements,
-        requirement: specificRequirement,
-        timestamp: new Date().toLocaleString(),
-        isUploaded: !!uploadedFile,
-        originalImage: selectedImage,
-        isAIGenerated: true,
-      }));
-
-      setDesigns(prev => [...newDesigns, ...prev]);
-      setShowGeneratedModal(true);
-
-      notification.success({
-        message: 'AI Designs Generated Successfully!',
-        description: `${generatedImages.length} unique garden designs created by AI`,
-      });
-    } else {
-      throw new Error(response.data.message || 'Failed to generate designs');
-    }
-  } catch (error) {
-    console.error('Error generating AI designs:', error);
-
-    if (error.code === 'ECONNABORTED') {
-      notification.error({
-        message: 'Generation Timeout',
-        description: 'AI generation took too long. Try again.',
-      });
-    } else if (error.response) {
-      notification.error({
-        message: 'Generation Failed',
-        description: error.response.data.message || 'Failed to generate designs.',
-      });
-    } else {
-      notification.error({
-        message: 'Connection Error',
-        description: 'Backend not running at http://localhost:5000',
-      });
     }
 
-    generateFallbackDesigns();
-  } finally {
-    setIsGenerating(false);
-    setGenerationProgress(0);
-  }
-};
+    formData.append('styleName', selectedStyles.length > 0 ? gardenStyles.find(s => s.value === selectedStyles[0])?.label : 'Modern Garden');
+    formData.append('elements', selectedElements.map(e => gardenElements.find(el => el.value === e)?.label).join(', ') || 'Natural Landscaping');
+    formData.append('description', specificRequirement || 'A professional landscaping design');
 
+    const interval = setInterval(() => {
+      setGenerationProgress(prev => (prev < 95 ? prev + (95 - prev) * 0.1 : 95));
+    }, 500);
 
-  // Fallback function if AI fails
-  const generateFallbackDesigns = () => {
-    const fallbackImages = [
-      'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600',
-      'https://images.unsplash.com/photo-1558618666-4178cb59b3d7?w=600'
-    ];
+    try {
+      const response = await axios.post(`${API_BASE_URL}/ai/generate-garden`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 120000 
+      });
 
-    const newDesigns = fallbackImages.map((image, index) => ({
-      id: Date.now() + index,
-      image: image,
-      title: `Design ${designs.length + index + 1} (Demo)`,
-      styles: selectedStyles,
-      elements: selectedElements,
-      requirement: specificRequirement,
-      timestamp: new Date().toLocaleString(),
-      isUploaded: !!uploadedFile,
-      originalImage: selectedImage
-    }));
+      console.log(response.data)
+      if (response.data.imageUrl && response.data.imageUrl!="") {
+        const aiUrl = response.data.imageUrl;
+        const aiDesc = "";
+        
+        const newDesign = {
+          id: Date.now(),
+          image: aiUrl,
+          title: `Vision ${designs.length + 1}`,
+          styles: [...selectedStyles],
+          elements: [...selectedElements],
+          timestamp: new Date().toLocaleTimeString(),
+          aiAnalysis: aiDesc
+        };
 
-    setDesigns(prev => [...newDesigns, ...prev]);
-    setCurrentGeneratedImages(fallbackImages);
-    setShowGeneratedModal(true);
-
-    notification.info({
-      message: 'Demo Designs Generated',
-      description: 'Using example designs. AI service is currently unavailable.'
-    });
+        setDesigns(prev => [newDesign, ...prev]);
+        setCurrentResult({ url: aiUrl, desc: aiDesc });
+        setGenerationProgress(100);
+        setTimeout(() => {
+          setIsGenerating(false);
+          setShowGeneratedModal(true);
+        }, 500);
+      }
+    } catch (error) {
+      console.error(error);
+      notification.error({ message: 'Generation failed', description: 'The AI service is currently busy. Please try again.' });
+      setIsGenerating(false);
+    } finally {
+      clearInterval(interval);
+    }
   };
 
-  // Download image function
-  const downloadImage = (imageUrl, designName) => {
+  const downloadImage = (url, name) => {
     const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = `${designName.replace(/\s+/g, '-').toLowerCase()}.jpg`;
+    link.href = url;
+    link.download = `${name}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    notification.success({
-      message: 'Download Started',
-      description: `${designName} is being downloaded`
-    });
-  };
-
-  // Download all designs
-  const downloadAllDesigns = () => {
-    designs.forEach((design, index) => {
-      setTimeout(() => {
-        downloadImage(design.image, design.title);
-      }, index * 500); // Stagger downloads
-    });
-    
-    notification.success({
-      message: 'Download All',
-      description: `${designs.length} designs are being downloaded`
-    });
   };
 
   return (
-    <>
-      <style jsx global>{`
-        :root {
-          --color-primary: #5C039B;
-          --color-blue: #03A4F4;
-          --color-green: #64EF0A;
-        }
-        
-        .ant-modal-content {
-          border-radius: 20px !important;
-        }
-        
-        .ant-modal-header {
-          border-radius: 20px 20px 0 0 !important;
-        }
-        
-        .ant-card {
-          transition: all 0.3s ease !important;
-        }
-        
-        .ant-card:hover {
-          transform: translateY(-5px);
-        }
-      `}</style>
-
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex">
-        {/* Fixed Left Sidebar */}
-        <div className="w-96 bg-white shadow-2xl flex flex-col fixed left-0 top-0 bottom-0 z-10 border-r-2 border-purple-200">
-          <div className="p-8 border-b border-purple-100 bg-gradient-to-r from-purple-600 to-blue-500">
-            <div className="flex items-center gap-4">
-              <Sparkles className="w-10 h-10 text-white" />
-              <h1 className="text-3xl font-bold text-white">
-                Landscaping AI
-              </h1>
+    <div className="flex min-h-screen bg-[#FBFBFE]">
+      {/* --- SIDEBAR --- */}
+      <aside className="w-[400px] h-screen sticky top-0 bg-white border-r border-gray-100 flex flex-col shadow-sm z-20">
+        <div className="p-8 border-b" style={{ background: BRAND_PURPLE }}>
+          <div className="flex items-center gap-3 text-white">
+            <div className="bg-white/20 p-2 rounded-xl">
+              <Sparkles className="w-6 h-6 fill-white/20" />
             </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-white">
-            {/* Reset Button */}
-            {(selectedImage || selectedStyles.length > 0 || selectedElements.length > 0 || specificRequirement) && (
-              <div className="mb-4">
-                <button
-                  onClick={resetDesign}
-                  className="w-full py-3 bg-gradient-to-r from-gray-100 to-gray-200 border-2 border-dashed border-gray-300 text-gray-600 rounded-xl hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50 transition-all flex items-center justify-center gap-2 font-semibold"
-                >
-                  <RotateCcw className="w-5 h-5" />
-                  Reset New Design
-                </button>
-              </div>
-            )}
-
-            {/* Upload Photo */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-purple-700">
-                <Upload className="w-5 h-5" /> Your Space
-              </h3>
-              {!selectedImage ? (
-                <button
-                  onClick={() => setShowUploadModal(true)}
-                  className="w-full h-64 bg-purple-50 border-4 border-dashed border-purple-300 rounded-2xl flex flex-col items-center justify-center hover:border-purple-500 transition-all group"
-                >
-                  <ImageIcon className="w-16 h-16 text-purple-400 group-hover:text-purple-500" />
-                  <p className="mt-4 text-xl font-medium text-purple-600">Add Photo</p>
-                  <p className="text-sm text-purple-500">Click to upload or choose example</p>
-                </button>
-              ) : (
-                <div className="relative">
-                  <img src={selectedImage} alt="Space" className="w-full h-64 object-cover rounded-2xl border-4 border-purple-500" />
-                  <div className="absolute top-3 right-3 flex gap-2">
-                    <button
-                      onClick={removeSelectedImage}
-                      className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-all"
-                      title="Remove Image"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-green-500">
-                      <Check className="w-6 h-6" />
-                      <span className="font-medium">Ready!</span>
-                    </div>
-                    {uploadedFile && (
-                      <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">
-                        Uploaded: {uploadedFile.name}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
+              <h1 className="text-xl font-bold leading-none">Xoto AI</h1>
+              <span className="text-[10px] uppercase tracking-[0.2em] opacity-70">Landscape Architect</span>
             </div>
-
-            {/* Garden Style */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-purple-700">
-                <Sun className="w-5 h-5 text-yellow-500" /> Garden Style
-              </h3>
-              <button
-                onClick={() => setShowStyleModal(true)}
-                className="w-full p-4 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-dashed border-purple-300 rounded-xl text-left hover:border-purple-500 transition-all"
-              >
-                {selectedStyles.length === 0 ? (
-                  <span className="text-purple-500">Choose style...</span>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedStyles.map(s => (
-                      <Tag key={s} color="purple" className="bg-purple-100 text-purple-700 border-purple-300">
-                        {gardenStyles.find(st => st.value === s)?.label}
-                      </Tag>
-                    ))}
-                  </div>
-                )}
-              </button>
-            </div>
-
-            {/* Elements */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-purple-700">
-                <Sprout className="w-5 h-5 text-green-500" /> Add Elements
-              </h3>
-              <button
-                onClick={() => setShowElementModal(true)}
-                className="w-full p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-dashed border-green-300 rounded-xl text-left hover:border-green-500 transition-all"
-              >
-                {selectedElements.length === 0 ? (
-                  <span className="text-green-600">Add fountain, pond, etc...</span>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedElements.map(e => (
-                      <Tag key={e} color="green" className="bg-green-100 text-green-700 border-green-300">
-                        {gardenElements.find(el => el.value === e)?.label}
-                      </Tag>
-                    ))}
-                  </div>
-                )}
-              </button>
-            </div>
-
-            {/* Special Request */}
-            <div>
-              <h3 className="text-lg font-semibold mb-3 text-purple-700">Special Request</h3>
-              <textarea
-                rows={3}
-                placeholder="e.g., Low maintenance, family-friendly, drought-resistant..."
-                value={specificRequirement}
-                onChange={(e) => setSpecificRequirement(e.target.value)}
-                className="w-full p-4 border border-purple-300 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none transition-all text-purple-700 placeholder-purple-400"
-              />
-            </div>
-
-            {/* Generate Button */}
-            <button
-              onClick={generateAIDesigns}
-              disabled={!selectedImage || isGenerating}
-              className="w-full h-16 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xl font-bold rounded-2xl hover:from-purple-700 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl transform hover:scale-105 transition-all"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader className="w-8 h-8 animate-spin" />
-                  AI Generating...
-                </>
-              ) : (
-                <>
-                  Generate 3 AI Designs
-                  <span className="ml-3 bg-white text-purple-600 px-4 py-1 rounded-full text-sm font-bold">AI</span>
-                </>
-              )}
-            </button>
           </div>
         </div>
 
-        {/* Scrollable Right Area - Designs */}
-        <div className="flex-1 ml-96 p-10 bg-gradient-to-br from-purple-50 to-blue-50">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-4xl font-bold text-purple-800">Your Designs</h2>
-              {designs.length > 0 && (
-                <div className="flex gap-3">
-                  <button
-                    onClick={resetDesign}
-                    className="flex items-center gap-2 px-6 py-3 bg-white text-purple-600 border-2 border-purple-300 rounded-xl hover:bg-purple-50 hover:border-purple-500 transition-all font-semibold"
-                  >
-                    <RotateCcw className="w-5 h-5" />
-                    New Design
-                  </button>
-                  {designs.length > 0 && (
-                    <button
-                      onClick={downloadAllDesigns}
-                      className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white border-2 border-green-500 rounded-xl hover:bg-green-600 transition-all font-semibold"
-                    >
-                      <Download className="w-5 h-5" />
-                      Download All
-                    </button>
-                  )}
-                  {designs.length > 0 && (
-                    <button
-                      onClick={() => setDesigns([])}
-                      className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white border-2 border-red-500 rounded-xl hover:bg-red-600 transition-all font-semibold"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                      Clear All
-                    </button>
-                  )}
-                </div>
+        <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+          {/* Step 1: Upload */}
+          <section>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">01. Site Canvas</h3>
+              {selectedImage && (
+                <button onClick={() => setSelectedImage(null)} className="text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors">
+                  <Trash2 size={14} />
+                </button>
               )}
             </div>
-            {designs.length === 0 ? (
-              <div className="flex items-center justify-center min-h-96">
-                <Empty description="No designs yet. Upload a photo and generate your first design!" />
+
+            {!selectedImage ? (
+              <div 
+                onClick={() => setShowUploadModal(true)}
+                className="group h-48 rounded-3xl border-2 border-dashed border-gray-200 hover:border-purple-400 hover:bg-purple-50/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-3"
+              >
+                <div className="w-12 h-12 rounded-full bg-gray-50 group-hover:bg-white flex items-center justify-center text-gray-400 group-hover:text-purple-600 transition-colors shadow-sm">
+                  <Upload size={20} />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-gray-600">Upload Photo</p>
+                  <p className="text-[11px] text-gray-400">or choose from gallery</p>
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {designs.map(design => (
-                  <Card
-                    key={design.id}
-                    hoverable
-                    cover={
-                      <div className="relative">
-                        <img src={design.image} alt={design.title} className="h-64 w-full object-cover" />
-                        <div className="absolute top-3 right-3 bg-purple-600 text-white px-2 py-1 rounded text-sm">
-                          {design.timestamp}
-                        </div>
-                        {design.isAIGenerated && (
-                          <div className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">
-                            AI Generated
-                          </div>
-                        )}
-                      </div>
-                    }
-                    className="rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all border-2 border-purple-100"
-                    actions={[
-                      <Button 
-                        type="text" 
-                        icon={<Download size={16} />} 
-                        className="text-purple-600"
-                        onClick={() => downloadImage(design.image, design.title)}
-                      >
-                        Download
-                      </Button>,
-                      <Button type="text" className="text-blue-500">Edit</Button>,
-                      <Button 
-                        type="text" 
-                        danger 
-                        icon={<Trash2 size={16} />}
-                        onClick={() => deleteDesign(design.id)}
-                      >
-                        Delete
-                      </Button>,
-                    ]}
-                  >
-                    <div className="p-4">
-                      <h3 className="text-xl font-bold mb-3 text-purple-700">{design.title}</h3>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {design.styles.map(s => (
-                          <Tag key={s} color="purple" className="bg-purple-100 text-purple-700 border-purple-300">
-                            {gardenStyles.find(st => st.value === s)?.label}
-                          </Tag>
-                        ))}
-                        {design.elements.map(e => (
-                          <Tag key={e} color="green" className="bg-green-100 text-green-700 border-green-300">
-                            {gardenElements.find(el => el.value === e)?.label}
-                          </Tag>
-                        ))}
-                      </div>
-                      {design.requirement && (
-                        <p className="text-sm text-purple-600 italic border-l-4 border-purple-400 pl-3">
-                          "{design.requirement}"
-                        </p>
-                      )}
-                      {design.isUploaded && (
-                        <div className="mt-2 flex items-center gap-1 text-xs text-purple-500">
-                          <Upload className="w-3 h-3" />
-                          Custom Upload
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-                ))}
+              <div className="relative rounded-3xl overflow-hidden shadow-md border-2 border-white">
+                <img src={selectedImage} alt="Input" className="w-full h-48 object-cover" />
+                <div className="absolute inset-0 bg-black/20" />
               </div>
             )}
-          </div>
-        </div>
-      </div>
+          </section>
 
-      {/* Upload Modal with Both Options */}
-      <Modal open={showUploadModal} footer={null} onCancel={() => setShowUploadModal(false)} width={800}>
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6 text-purple-700">Choose Your Space</h2>
-          
-          {/* Upload from PC Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-4 text-purple-600">Upload from Your Computer</h3>
-            <div 
-              className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
-                dragOver ? 'border-purple-500 bg-purple-50' : 'border-purple-300 hover:border-purple-500'
-              }`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
+          {/* Step 2: Theme */}
+          <section>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">02. Aesthetic Theme</h3>
+            <button 
+              onClick={() => setShowStyleModal(true)}
+              className="w-full p-4 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white hover:shadow-md transition-all flex items-center justify-between"
             >
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-                id="file-upload"
-              />
-              <label
-                htmlFor="file-upload"
-                className="cursor-pointer flex flex-col items-center justify-center"
-              >
-                <Upload className="w-16 h-16 text-purple-400 mb-4" />
-                <p className="text-xl font-medium text-purple-600 mb-2">
-                  {dragOver ? 'Drop your image here' : 'Click to Upload or Drag & Drop'}
-                </p>
-                <p className="text-sm text-purple-500 mb-4">JPG, PNG, WEBP (Max 10MB)</p>
-                <button 
-                  type="button"
-                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all"
-                >
-                  Browse Files
-                </button>
-              </label>
+              <div className="flex items-center gap-3">
+                <Sun size={18} className="text-orange-400" />
+                <span className="text-sm font-medium text-gray-700">
+                  {selectedStyles.length ? gardenStyles.find(s => s.value === selectedStyles[0])?.label : "Select Style"}
+                </span>
+              </div>
+              <div className="bg-white p-1 rounded-md border text-gray-400"><Check size={14} /></div>
+            </button>
+          </section>
+
+          {/* Step 3: Elements */}
+          <section>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">03. Key Features</h3>
+            <button 
+              onClick={() => setShowElementModal(true)}
+              className="w-full p-4 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white hover:shadow-md transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <Sprout size={18} className="text-green-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  {selectedElements.length ? `${selectedElements.length} Elements` : "Add Features"}
+                </span>
+              </div>
+              <div className="bg-white p-1 rounded-md border text-gray-400"><Check size={14} /></div>
+            </button>
+          </section>
+
+          {/* Step 4: Notes */}
+          <section>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">04. Custom Instructions</h3>
+            <textarea 
+              className="w-full p-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm resize-none"
+              placeholder="e.g. Add more lavender, make the pathway curved..."
+              rows={3}
+              value={specificRequirement}
+              onChange={(e) => setSpecificRequirement(e.target.value)}
+            />
+          </section>
+        </div>
+
+        <div className="p-6 border-t bg-gray-50/50 space-y-3">
+          <Button 
+            type="primary" 
+            size="large" 
+            block 
+            disabled={!selectedImage || isGenerating}
+            onClick={generateAIDesigns}
+            style={{ background: BRAND_PURPLE, height: '56px', borderRadius: '16px' }}
+            className="flex items-center justify-center gap-2 font-bold shadow-lg shadow-purple-200"
+          >
+            {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
+            {isGenerating ? 'Designing Space...' : 'Generate Vision'}
+          </Button>
+          <Button type="text" block onClick={resetDesign} className="text-gray-400 hover:text-gray-600">
+            Reset Everything
+          </Button>
+        </div>
+      </aside>
+
+      {/* --- MAIN DISPLAY --- */}
+      <main className="flex-1 p-12 overflow-y-auto">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <Title level={1} className="!mb-2">Design Gallery</Title>
+              <Text className="text-gray-400">Your AI-generated landscaping transformations</Text>
             </div>
           </div>
 
-          <div className="relative flex items-center mb-8">
-            <div className="flex-grow border-t border-purple-200"></div>
-            <span className="mx-4 text-purple-500 font-medium">OR</span>
-            <div className="flex-grow border-t border-purple-200"></div>
-          </div>
-
-          {/* Example Images Section */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-purple-600">Choose from Example Spaces</h3>
-            <div className="grid grid-cols-2 gap-6">
-              {dummySpaceImages.map((img, i) => (
-                <div
-                  key={i}
-                  onClick={() => handleExampleImageSelect(img)}
-                  className="cursor-pointer group"
+          {designs.length === 0 ? (
+            <div className="bg-white rounded-[40px] py-32 flex flex-col items-center border border-gray-50 shadow-sm">
+              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                <ImageIcon className="text-gray-200" size={40} />
+              </div>
+              <Empty description={<span className="text-gray-400 font-medium">Ready to see your dream garden? <br/>Configure the sidebar to begin.</span>} />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              {designs.map(design => (
+                <Card
+                  key={design.id}
+                  hoverable
+                  className="rounded-[32px] overflow-hidden border-none shadow-sm hover:shadow-xl transition-all"
+                  cover={
+                    <div className="relative h-80 group">
+                      <img src={design.image} alt="AI" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                        <Button 
+                          shape="round" 
+                          icon={<Download size={16} />} 
+                          onClick={() => downloadImage(design.image, design.title)}
+                        >
+                          Download
+                        </Button>
+                      </div>
+                      <div className="absolute top-4 left-4">
+                        <Tag color="purple" className="rounded-full px-3 py-1 font-bold border-none backdrop-blur-md bg-white/90">
+                          AI GENERATED
+                        </Tag>
+                      </div>
+                    </div>
+                  }
                 >
-                  <img 
-                    src={img} 
-                    className="w-full h-64 object-cover rounded-xl group-hover:scale-105 transition-all border-4 border-purple-200 group-hover:border-purple-500" 
-                    alt={`Example Space ${i + 1}`}
-                  />
-                  <p className="text-center mt-3 font-medium text-purple-600">Example Space {i + 1}</p>
-                </div>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-800">{design.title}</h3>
+                      <p className="text-xs text-gray-400 mb-4">{design.timestamp}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {design.styles.map(s => <Tag key={s} className="rounded-full bg-purple-50 text-purple-600 border-none px-3 capitalize">{s}</Tag>)}
+                        {design.elements.length > 0 && <Tag className="rounded-full bg-green-50 text-green-600 border-none px-3">{design.elements.length} Elements</Tag>}
+                      </div>
+                    </div>
+                    <Button 
+                      icon={<Info size={18} />} 
+                      type="text" 
+                      onClick={() => {
+                        setCurrentResult({ url: design.image, desc: design.aiAnalysis });
+                        setShowGeneratedModal(true);
+                      }}
+                    />
+                  </div>
+                </Card>
               ))}
             </div>
+          )}
+        </div>
+      </main>
+
+      {/* --- MODALS --- */}
+
+      {/* Result Modal */}
+      <Modal
+        open={showGeneratedModal}
+        footer={null}
+        onCancel={() => setShowGeneratedModal(false)}
+        width={1000}
+        centered
+        bodyStyle={{ padding: 0, borderRadius: '32px', overflow: 'hidden' }}
+      >
+        <div className="flex flex-col md:flex-row">
+          <div className="md:w-3/5 h-[500px]">
+            <img src={currentResult.url} className="w-full h-full object-cover" alt="Final Design" />
+          </div>
+          <div className="md:w-2/5 p-10 bg-white flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-purple-600 font-bold mb-4">
+                <Sparkles size={20} />
+                <span>AI SCENE ANALYSIS</span>
+              </div>
+              <Paragraph className="text-gray-600 leading-relaxed max-h-[250px] overflow-y-auto pr-4">
+                {currentResult.desc || "No description provided."}
+              </Paragraph>
+            </div>
+            <div className="space-y-3 pt-6">
+              <Button 
+                type="primary" block size="large" className="h-14 rounded-2xl font-bold"
+                style={{ background: BRAND_PURPLE }}
+                onClick={() => downloadImage(currentResult.url, 'Xoto-Vision')}
+              >
+                Download Render
+              </Button>
+              <Button block size="large" className="h-14 rounded-2xl font-bold" onClick={() => setShowGeneratedModal(false)}>
+                Back to Gallery
+              </Button>
+            </div>
           </div>
         </div>
       </Modal>
 
-      {/* Style Modal */}
-      <Modal open={showStyleModal} footer={null} onCancel={() => setShowStyleModal(false)} width={900}>
-        <h2 className="text-2xl font-bold mb-6 text-purple-700">Choose Garden Style</h2>
-        <div className="grid grid-cols-3 gap-6">
-          {gardenStyles.map(style => (
-            <div
-              key={style.value}
-              onClick={() => {
-                setSelectedStyles(prev =>
-                  prev.includes(style.value)
-                    ? prev.filter(s => s !== style.value)
-                    : [...prev, style.value]
-                );
-              }}
-              className={`cursor-pointer rounded-xl overflow-hidden border-4 transition-all ${
-                selectedStyles.includes(style.value) ? 'border-purple-500 shadow-xl bg-purple-50' : 'border-purple-200 hover:border-purple-300'
-              }`}
-            >
-              <img src={style.img} className="w-full h-48 object-cover" alt={style.label} />
-              <div className="p-4 bg-white">
-                <p className="font-semibold text-center text-purple-700">{style.label}</p>
-                {selectedStyles.includes(style.value) && (
-                  <Check className="w-8 h-8 text-purple-500 mx-auto mt-2" />
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Modal>
-
-      {/* Elements Modal */}
-      <Modal open={showElementModal} footer={null} onCancel={() => setShowElementModal(false)} width={900}>
-        <h2 className="text-2xl font-bold mb-6 text-purple-700">Add Garden Elements</h2>
-        <div className="grid grid-cols-3 gap-6">
-          {gardenElements.map(el => (
-            <div
-              key={el.value}
-              onClick={() => {
-                setSelectedElements(prev =>
-                  prev.includes(el.value)
-                    ? prev.filter(e => e !== el.value)
-                    : [...prev, el.value]
-                );
-              }}
-              className={`cursor-pointer rounded-xl overflow-hidden border-4 transition-all ${
-                selectedElements.includes(el.value) ? 'border-green-500 shadow-xl bg-green-50' : 'border-green-200 hover:border-green-300'
-              }`}
-            >
-              <img src={el.img} className="w-full h-48 object-cover" alt={el.label} />
-              <div className="p-4 bg-white">
-                <p className="font-semibold text-center text-green-700">{el.label}</p>
-                {selectedElements.includes(el.value) && (
-                  <Check className="w-8 h-8 text-green-500 mx-auto mt-2" />
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Modal>
-
-      {/* Generated Result Modal */}
-      <Modal 
-        open={showGeneratedModal} 
-        footer={null} 
-        onCancel={() => setShowGeneratedModal(false)} 
-        width={1000}
-        className="purple-modal"
-      >
-        <div className="text-center py-8">
-          <Check className="w-20 h-20 text-green-500 mx-auto mb-6 animate-bounce" />
-          <h2 className="text-4xl font-bold mb-8 text-purple-700">
-            Your AI Garden Designs Are Ready!
-          </h2>
-          <div className="grid grid-cols-3 gap-6 mb-8">
-            {currentGeneratedImages.map((image, index) => (
-              <div key={index} className="text-center">
-                <img 
-                  src={image} 
-                  alt={`AI Design ${index + 1}`}
-                  className="w-full h-64 object-cover rounded-2xl shadow-lg mb-4 border-4 border-purple-200" 
-                />
-                <p className="font-semibold text-lg text-purple-600">
-                  AI Design {index + 1}
-                </p>
+      {/* Upload/Gallery Modal */}
+      <Modal open={showUploadModal} footer={null} onCancel={() => setShowUploadModal(false)} centered title="Select Source Canvas">
+        <div className="p-2">
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            {dummySpaceImages.map((img) => (
+              <div 
+                key={img.id} 
+                onClick={() => { setSelectedImage(img.url); setShowUploadModal(false); }}
+                className="aspect-square rounded-xl overflow-hidden cursor-pointer hover:ring-4 ring-purple-100 transition-all"
+              >
+                <img src={img.url} className="w-full h-full object-cover" />
               </div>
             ))}
           </div>
-          <div className="flex justify-center gap-4">
-            <Button 
-              type="primary" 
-              size="large" 
-              className="bg-purple-600 h-12 px-8 border-purple-600 hover:bg-purple-700"
-              onClick={downloadAllDesigns}
-            >
-              Download All HD
-            </Button>
-            <Button 
-              size="large" 
-              className="h-12 px-8 border-purple-600 text-purple-600 hover:bg-purple-50" 
-              onClick={() => {
-                setShowGeneratedModal(false);
-                resetDesign();
-              }}
-            >
-              Create New Design
-            </Button>
-          </div>
+          <Divider>OR UPLOAD YOUR OWN</Divider>
+          <input type="file" id="file-up" className="hidden" accept="image/*" onChange={(e) => processUploadedFile(e.target.files[0])} />
+          <Button 
+            block 
+            icon={<Upload size={18} />} 
+            className="h-14 rounded-xl font-semibold border-dashed"
+            onClick={() => document.getElementById('file-up').click()}
+          >
+            Browse Local Files
+          </Button>
         </div>
       </Modal>
 
-      {/* Progress Modal */}
-      {isGenerating && (
-        <Modal open={true} footer={null} closable={false} width={500}>
-          <div className="text-center py-10">
-            <Sparkles className="w-20 h-20 text-purple-500 mx-auto animate-pulse" />
-            <h3 className="text-2xl font-bold mt-6 text-purple-700">AI is Creating Your Dream Garden...</h3>
-            <Progress 
-              percent={generationProgress} 
-              type="circle" 
-              className="mt-8"
-              strokeColor={{
-                '0%': '#5C039B',
-                '100%': '#03A4F4',
+      {/* Style Selection Modal */}
+      <Modal open={showStyleModal} footer={null} onCancel={() => setShowStyleModal(false)} width={800} centered title="Choose Landscape Style">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-2">
+          {gardenStyles.map(s => (
+            <div 
+              key={s.value} 
+              onClick={() => { setSelectedStyles([s.value]); setShowStyleModal(false); }}
+              className={`relative cursor-pointer rounded-2xl overflow-hidden group border-4 transition-all ${selectedStyles.includes(s.value) ? 'border-purple-600' : 'border-transparent hover:border-purple-100'}`}
+            >
+              <img src={s.img} className="h-40 w-full object-cover transition-transform group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
+                <p className="text-white font-bold m-0">{s.label}</p>
+              </div>
+              {selectedStyles.includes(s.value) && (
+                <div className="absolute top-2 right-2 bg-purple-600 text-white p-1 rounded-full shadow-lg">
+                  <CheckCircle2 size={16} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </Modal>
+
+      {/* Element Selection Modal */}
+      <Modal open={showElementModal} footer={null} onCancel={() => setShowElementModal(false)} width={800} centered title="Add Landscape Features">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-2">
+          {gardenElements.map(el => (
+            <div 
+              key={el.value} 
+              onClick={() => {
+                setSelectedElements(prev => prev.includes(el.value) ? prev.filter(x => x !== el.value) : [...prev, el.value])
               }}
-            />
-            <p className="mt-6 text-lg text-purple-600">
-              {generationProgress < 30 && "Analyzing your space and preferences..."}
-              {generationProgress >= 30 && generationProgress < 60 && "Designing layout with AI..."}
-              {generationProgress >= 60 && generationProgress < 90 && "Adding garden elements with AI..."}
-              {generationProgress >= 90 && "Finalizing AI-generated designs..."}
-            </p>
+              className={`relative cursor-pointer rounded-2xl overflow-hidden group border-4 transition-all ${selectedElements.includes(el.value) ? 'border-green-500 bg-green-50' : 'border-transparent'}`}
+            >
+              <img src={el.img} className="h-32 w-full object-cover transition-transform group-hover:scale-110" />
+              <div className="p-3 text-center">
+                <p className="font-bold text-sm m-0">{el.label}</p>
+              </div>
+              {selectedElements.includes(el.value) && (
+                <div className="absolute top-2 right-2 bg-green-500 text-white p-1 rounded-full shadow-lg">
+                  <Check size={16} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 flex justify-end">
+            <Button type="primary" size="large" onClick={() => setShowElementModal(false)} className="rounded-xl px-10" style={{ background: BRAND_PURPLE }}>
+                Apply Selections
+            </Button>
+        </div>
+      </Modal>
+
+      {/* --- GENERATION LOADING OVERLAY --- */}
+      {isGenerating && (
+        <div className="fixed inset-0 z-[100] bg-white/80 backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in duration-500">
+          <div className="relative mb-12">
+             <div className="absolute -inset-4 bg-purple-500/20 blur-2xl rounded-full animate-pulse" />
+             <Sparkles className="w-20 h-20 text-purple-600 animate-bounce relative" />
           </div>
-        </Modal>
+          
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Xoto AI is Sculpting</h2>
+            <p className="text-gray-500 mt-2 font-medium">Reimagining your outdoor space with premium flora...</p>
+          </div>
+
+          <div className="w-80">
+            <Progress 
+              percent={Math.floor(generationProgress)} 
+              strokeColor={{ '0%': '#8E2DE2', '100%': BRAND_PURPLE }}
+              status="active" 
+              strokeWidth={10}
+            />
+            <div className="flex justify-between mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <span>Analyzing Geometry</span>
+                <span>{Math.floor(generationProgress)}%</span>
+            </div>
+          </div>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 

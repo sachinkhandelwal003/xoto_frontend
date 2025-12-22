@@ -54,7 +54,7 @@ const Dashboard = () => {
 
   // === QUICK STATS ===
   const stats = [
-    { label: 'Total Revenue', value: '$48,921', change: 18.2, icon: <DollarOutlined />, color: '#722ed1', bg: '#f9f0ff' },
+    { label: 'Total Revenue', value: 'AED48,921', change: 18.2, icon: <DollarOutlined />, color: '#722ed1', bg: '#f9f0ff' },
     { label: 'Active Freelancers', value: '68', change: 12, icon: <TeamOutlined />, color: '#1890ff', bg: '#e6f7ff' },
     { label: 'Orders', value: '1,234', change: 22, icon: <ShoppingCartOutlined />, color: '#52c41a', bg: '#f6ffed' },
     { label: 'Projects', value: '342', change: 28, icon: <EnvironmentOutlined />, color: '#faad14', bg: '#fff7e6' },
@@ -136,7 +136,7 @@ const Dashboard = () => {
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
                 <Legend verticalAlign="top" height={36} iconType="circle" />
-                <Area type="monotone" dataKey="sales" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" name="Revenue ($)" />
+                <Area type="monotone" dataKey="sales" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" name="Revenue (AED)" />
                 <Area type="monotone" dataKey="orders" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorOrders)" name="Orders" />
               </AreaChart>
             </ResponsiveContainer>

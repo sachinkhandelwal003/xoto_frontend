@@ -13,18 +13,18 @@ import { useEffect } from "react";
 
 const Home = () => {
   const [isModuleOpen, setIsModuleOpen] = useState(false);
-    const [showLocationModal, setShowLocationModal] = useState(false);
+    // const [showLocationModal, setShowLocationModal] = useState(false);
 
-  useEffect(() => {
-    setShowLocationModal(true);
-  }, []);
+  // useEffect(() => {
+  //   setShowLocationModal(true);
+  // }, []);
   return (
     <>
 
-
+{/* 
          {showLocationModal && (
         <LocationCategoryModal />
-      )}
+      )} */}
 
       <HeroSection />
       <HomeDesign />
