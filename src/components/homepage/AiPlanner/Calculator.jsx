@@ -29,7 +29,7 @@ L.Icon.Default.mergeOptions({
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://xoto.ae/api';
 const BRAND_PURPLE = '#5C039B';
 
 const steps = [
@@ -591,32 +591,43 @@ const Calculator = () => {
             <Title level={2} className="mb-2">Visual Direction</Title>
             <Text type="secondary" className="block mb-10">Base concept for your selected style</Text>
             {loading.gallery ? <Spin size="large" className="py-20" /> : typeGallery ? (
-              <Card className="max-w-2xl w-full rounded-[2.5rem] overflow-hidden shadow-2xl border-none">
-                <div className="relative">
-                  <Image 
-                    src={`${BASE_URL}${typeGallery.previewImage?.url}`} 
-                    className="w-full h-[400px] object-cover" 
-                    alt="Style preview"
-                  />
-                </div>
-                <div className="p-10 text-center">
-                  <Title level={3} style={{ color: BRAND_PURPLE }}>{typeGallery.type?.label}</Title>
-                  <Text className="text-gray-500 italic block mb-8">
-                    "Every detail curated to harmonize with your vision"
-                  </Text>
-                  <Button 
-                    type="primary" 
-                    size="large" 
-                    icon={<ExperimentOutlined />} 
-                    loading={loading.moodboard} 
-                    onClick={handleGenerateMoodboard}
-                    className="h-16 px-12 rounded-2xl text-lg border-none shadow-xl"
-                    style={{ backgroundColor: BRAND_PURPLE }}
-                  >
-                    Generate AI Moodboard
-                  </Button>
-                </div>
-              </Card>
+             <Card className="max-w-2xl w-full rounded-[2.5rem] overflow-hidden shadow-2xl border-none">
+  <div className="relative flex items-center justify-center bg-black/5">
+    <Image 
+      src={`${BASE_URL}${typeGallery.previewImage?.url}`} 
+      alt="Style preview"
+      className="
+        w-full
+        h-[240px] sm:h-[360px] md:h-[450px] lg:h-[600px]
+        object-cover
+        object-center
+      "
+    />
+  </div>
+
+  <div className="p-6 sm:p-8 md:p-10 text-center">
+    <Title level={3} style={{ color: BRAND_PURPLE }}>
+      {typeGallery.type?.label}
+    </Title>
+
+    <Text className="text-gray-500 italic block mb-6 sm:mb-8">
+      "Every detail curated to harmonize with your vision"
+    </Text>
+
+    <Button 
+      type="primary" 
+      size="large" 
+      icon={<ExperimentOutlined />} 
+      loading={loading.moodboard} 
+      onClick={handleGenerateMoodboard}
+      className="h-12 sm:h-14 md:h-16 px-6 sm:px-10 md:px-12 rounded-2xl text-base sm:text-lg border-none shadow-xl"
+      style={{ backgroundColor: BRAND_PURPLE }}
+    >
+      Generate AI Moodboard
+    </Button>
+  </div>
+</Card>
+
             ) : <Empty description="No preview available" />}
           </motion.div>
         );

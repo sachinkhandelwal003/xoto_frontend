@@ -76,7 +76,7 @@ const PURPLE_THEME = {
   light: '#f8fafc'
 };
 
- const BASE_URL="http://localhost:5000"
+ const BASE_URL="https://xoto.ae/api"
 
 const LeadsList = () => {
   const [leads, setLeads] = useState([]);

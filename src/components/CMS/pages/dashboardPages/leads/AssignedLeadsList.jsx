@@ -151,7 +151,7 @@ const AssignedLeadsList = () => {
         if (!path) return null;
         if (path.startsWith('http')) return path;
         // Assuming your API base URL is stored somewhere, or use relative path
-        return path.startsWith('/') ? `https://your-api-domain.com${path}` : path;
+        return path.startsWith('/') ? `https://xoto.ae/api${path}` : path;
     };
 
     // Get customer name

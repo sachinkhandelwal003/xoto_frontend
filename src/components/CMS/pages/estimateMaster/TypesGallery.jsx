@@ -19,7 +19,7 @@ const THEME = {
   border: "#efdbff"
 };
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://xoto.ae/api';
 const API_PREFIX = '/estimate/master/category';
 
 const TypesGallery = () => {

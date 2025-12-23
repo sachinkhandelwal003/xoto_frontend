@@ -115,7 +115,7 @@ const Leads = () => {
   const getFullImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
-    return path.startsWith('/') ? `http://localhost:5000${path}` : path;
+    return path.startsWith('/') ? `https://xoto.ae/api${path}` : path;
   };
 
   // Get customer name
