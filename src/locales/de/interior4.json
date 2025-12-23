@@ -1,0 +1,11 @@
+{
+  "title": "Unser Serviceportfolio",
+  "services": {
+    "kitchen": "Modulare Küchen",
+    "wardrobe": "Modulare Kleiderschränke",
+    "electrical": "Elektrik",
+    "civil": "Bauarbeiten",
+    "lighting": "Beleuchtung",
+    "wall": "Wanddekoration"
+  }
+}

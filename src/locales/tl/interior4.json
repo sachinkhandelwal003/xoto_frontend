@@ -1,0 +1,11 @@
+{
+  "title": "Aming Mga Serbisyo",
+  "services": {
+    "kitchen": "Modular na Kusina",
+    "wardrobe": "Modular na Aparador",
+    "electrical": "Elektrikal",
+    "civil": "Gawaing Sibil",
+    "lighting": "Ilaw",
+    "wall": "Dekorasyon sa Pader"
+  }
+}

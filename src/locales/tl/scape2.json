@@ -1,0 +1,45 @@
+{
+  "heading": "Aming Portfolio ng Serbisyo",
+  "services": {
+    "hardscape": {
+      "title": "Hardscape",
+      "items": [
+        "Paving at bato",
+        "Pergola at gazebo",
+        "Decking",
+        "Mga pader at bakod",
+        "Outdoor kitchen at BBQ",
+        "Water features"
+      ]
+    },
+    "softscape": {
+      "title": "Softscape",
+      "items": [
+        "Paghahanda ng lupa",
+        "Pagtatanim",
+        "Pag-install ng damuhan",
+        "Mulching",
+        "Seasonal planting"
+      ]
+    },
+    "pool": {
+      "title": "Swimming Pools",
+      "items": [
+        "Disenyo at konstruksyon ng pool",
+        "Jacuzzi at filtration system"
+      ]
+    },
+    "other": {
+      "title": "Iba pang Solusyon",
+      "items": [
+        "Payong",
+        "Decking",
+        "Gazebo",
+        "Planters",
+        "Flooring",
+        "BBQ",
+        "Paso at fountain"
+      ]
+    }
+  }
+}

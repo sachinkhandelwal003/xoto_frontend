@@ -1,0 +1,15 @@
+{
+  "showcase": {
+    "title": "Explore our curated",
+    "subtitle": "dream spaces",
+    "description": "Our portfolio showcases our passion for crafting extraordinary spaces that redefine sustainable living."
+  },
+  "projects": {
+    "kitchen": "Modern Modular Kitchen",
+    "kitchenLocation": "California, Seaside",
+    "penthouse": "Minimalist Penthouse",
+    "penthouseLocation": "Dubai Marina, UAE",
+    "villa": "Tuscan Villa Living",
+    "villaLocation": "Beverly Hills, USA"
+  }
+}

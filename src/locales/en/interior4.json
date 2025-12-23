@@ -1,0 +1,11 @@
+{
+  "title": "Our Services Portfolio",
+  "services": {
+    "kitchen": "Modular Kitchens",
+    "wardrobe": "Modular Wardrobes",
+    "electrical": "Electrical",
+    "civil": "Civil Work",
+    "lighting": "Lighting",
+    "wall": "Wall Decor"
+  }
+}

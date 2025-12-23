@@ -1,0 +1,31 @@
+{
+  "heading": "EcoSmart Pamumuhay",
+  "description": "Sa XOTO, ang EcoSmart Living ay pinagsasama ang ganda, sustainability, at teknolohiya.",
+  "subheading": "Paano Namin Ito Isinasagawa",
+  "features": {
+    "smartClimate": {
+      "title": "Smart Climate Control",
+      "text": "Automated systems para makatipid sa enerhiya."
+    },
+    "lighting": {
+      "title": "LED at Solar Lighting",
+      "text": "Mababang konsumo ng enerhiya."
+    },
+    "materials": {
+      "title": "Sustainable Materials",
+      "text": "Eco-friendly na materyales."
+    },
+    "water": {
+      "title": "Water-Efficient Fixtures",
+      "text": "Dinisenyo para sa mas kaunting paggamit ng tubig."
+    },
+    "automation": {
+      "title": "Automated Home Management",
+      "text": "Kontrolin gamit ang app o boses."
+    },
+    "future": {
+      "title": "Future-Ready Interiors",
+      "text": "Handa para sa green technologies."
+    }
+  }
+}
