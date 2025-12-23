@@ -2,16 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import {
   Card, Button, Typography, Form, Input, Select, Space, Row, Col, 
-  message, Spin, Result, Divider, Image, Badge, Empty, Tag, Checkbox,
-  Modal, Radio
+  message, Spin, Result, Divider, Image, Badge, Empty, Tag, Checkbox
 } from 'antd';
 import {
   UserOutlined, MailOutlined, CheckCircleOutlined,
   SmileOutlined, HomeOutlined, BuildOutlined,
   EnvironmentOutlined, CalculatorOutlined, PhoneFilled, 
   ArrowRightOutlined, ArrowLeftOutlined, CheckOutlined,
-  CompassOutlined, PictureOutlined, ExperimentOutlined ,
-  EnvironmentFilled, StarFilled, SelectOutlined
+  CompassOutlined, PictureOutlined, ExperimentOutlined,
+  EnvironmentFilled, SelectOutlined
 } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiService } from '../../../manageApi/utils/custom.apiservice';
@@ -38,7 +37,7 @@ const steps = [
   { title: 'Service', icon: <EnvironmentOutlined /> },
   { title: 'Style', icon: <HomeOutlined /> },
   { title: 'Preview', icon: <PictureOutlined /> },
-  { title: 'Moodboard', icon: <ExperimentOutlined  /> },
+  { title: 'Moodboard', icon: <ExperimentOutlined /> },
   { title: 'Dimensions', icon: <CalculatorOutlined /> },
   { title: 'Packages', icon: <BuildOutlined /> },
   { title: 'Contact', icon: <PhoneFilled /> },
@@ -141,7 +140,10 @@ const Calculator = () => {
   const [length, setLength] = useState('');
   const [width, setWidth] = useState('');
   const [countryCode, setCountryCode] = useState('+971');
-  const [splitName, setSplitName] = useState({ firstName: '', lastName: '' });
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   
   const [loading, setLoading] = useState({
     subcat: true,
@@ -324,33 +326,52 @@ const Calculator = () => {
     });
   };
 
-  const onFinalSubmit = async (values) => {
+  const onFinalSubmit = async () => {
+    // Validate form fields
+    if (!firstName.trim() || !lastName.trim()) {
+      message.error("Please enter both first and last name");
+      return;
+    }
+    
+    if (!email.trim()) {
+      message.error("Please enter your email");
+      return;
+    }
+    
+    if (!phone.trim()) {
+      message.error("Please enter your phone number");
+      return;
+    }
+    
+    if (!selectedPackage) {
+      message.error("Please select a package");
+      return;
+    }
+
     setLoading(prev => ({ ...prev, submitting: true }));
     
     // Get selected moodboard images data
     const selectedMoodboardData = moodboardData.filter(img => 
       selectedMoodboardImages.includes(img._id || img.id)
     ).map(img => ({
-      id: img._id || img.id,
-      url: img.url || img.imageUrl
+      id: img._id || img.id
     }));
 
-    // Split full name into first and last
-    const fullName = values.customer_name || "";
-    const nameParts = fullName.trim().split(/\s+/);
-    const firstName = nameParts[0] || "";
-    const lastName = nameParts.slice(1).join(" ") || "";
+    // Get selected type and subcategory details
+    const selectedTypeData = types.find(t => t._id === selectedType);
+    const selectedSubcat = subcategories.find(s => s._id === selectedSubcategory);
 
+    // Prepare payload according to the example
     const payload = {
       service_type: "landscape",
       customer_name: {
-        first_name: firstName,
-        last_name: lastName
+        first_name: firstName.trim(),
+        last_name: lastName.trim()
       },
-      customer_email: values.customer_email,
+      customer_email: email.trim(),
       customer_mobile: {
         country_code: countryCode,
-        number: values.mobileNumber
+        number: phone.trim()
       },
       type: selectedType,
       type_gallery_snapshot: {
@@ -361,7 +382,7 @@ const Calculator = () => {
       area_length: parseFloat(length),
       area_width: parseFloat(width),
       area_sqft: areaSqFt,
-      description: `Landscaping project for ${areaSqFt} sqft area with ${types.find(t => t._id === selectedType)?.label} style`,
+      description: `Landscaping project for ${areaSqFt} sqft area with ${selectedTypeData?.label || 'selected'} style`,
       location: {
         lat: coords.lat,
         lng: coords.lng,
@@ -373,15 +394,21 @@ const Calculator = () => {
       }
     };
 
-    console.log("Submitting payload:", payload); // For debugging
+    console.log("Submitting payload:", JSON.stringify(payload, null, 2)); // For debugging
 
     try {
-      await apiService.post("/estimates/submit", payload);
-      setActiveStep(8);
-      message.success("Estimate submitted successfully!");
+      const response = await apiService.post("/estimates/submit", payload);
+      console.log("API Response:", response);
+      
+      if (response.success) {
+        setActiveStep(8);
+        message.success("Estimate submitted successfully!");
+      } else {
+        message.error(response.message || "Submission failed");
+      }
     } catch (err) {
       console.error("Submission error:", err);
-      message.error("Submission failed. Please try again.");
+      message.error(err.response?.data?.message || "Submission failed. Please try again.");
     } finally {
       setLoading(prev => ({ ...prev, submitting: false }));
     }
@@ -391,6 +418,13 @@ const Calculator = () => {
     if (activeStep === 2 && selectedType) {
       fetchTypePreview(selectedType);
     }
+    
+    // If moving to contact step (step 7), validate all previous steps
+    if (activeStep === 7) {
+      onFinalSubmit();
+      return;
+    }
+    
     setActiveStep(prev => prev + 1);
   };
 
@@ -404,6 +438,7 @@ const Calculator = () => {
       case 4: return selectedMoodboardImages.length > 0;
       case 5: return areaSqFt >= 100;
       case 6: return !!selectedPackage;
+      case 7: return firstName.trim() && lastName.trim() && email.trim() && phone.trim();
       default: return true;
     }
   };
@@ -800,38 +835,46 @@ const Calculator = () => {
               </Col>
               <Col xs={24} lg={14}>
                 <Card className="rounded-[2.5rem] shadow-xl border-none p-6">
-                  <Form form={form} layout="vertical" onFinish={onFinalSubmit} size="large">
-                    <Form.Item 
-                      name="customer_name" 
-                      label="Full Name" 
-                      rules={[{ required: true, message: 'Please enter your full name' }]}
-                    >
+                  <div className="space-y-6">
+                    <div>
+                      <Text strong className="block mb-2">First Name *</Text>
                       <Input 
+                        size="large" 
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
                         prefix={<UserOutlined className="text-gray-300" />} 
                         className="rounded-xl h-14" 
-                        placeholder="John Doe"
+                        placeholder="John"
                       />
-                    </Form.Item>
+                    </div>
                     
-                    <Form.Item 
-                      name="customer_email" 
-                      label="Email Address" 
-                      rules={[
-                        { required: true, message: 'Please enter your email' },
-                        { type: 'email', message: 'Please enter a valid email' }
-                      ]}
-                    >
+                    <div>
+                      <Text strong className="block mb-2">Last Name *</Text>
                       <Input 
+                        size="large" 
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        prefix={<UserOutlined className="text-gray-300" />} 
+                        className="rounded-xl h-14" 
+                        placeholder="Doe"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Text strong className="block mb-2">Email Address *</Text>
+                      <Input 
+                        size="large" 
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
                         prefix={<MailOutlined className="text-gray-300" />} 
                         className="rounded-xl h-14" 
                         placeholder="john@example.com"
+                        type="email"
                       />
-                    </Form.Item>
+                    </div>
                     
-                    <Form.Item 
-                      label="Contact Number" 
-                      required
-                    >
+                    <div>
+                      <Text strong className="block mb-2">Contact Number *</Text>
                       <Row gutter={8}>
                         <Col span={8}>
                           <Select
@@ -848,35 +891,30 @@ const Calculator = () => {
                           </Select>
                         </Col>
                         <Col span={16}>
-                          <Form.Item 
-                            name="mobileNumber"
-                            noStyle
-                            rules={[
-                              { required: true, message: 'Please enter your phone number' },
-                              { pattern: /^[0-9]{7,15}$/, message: 'Please enter a valid phone number' }
-                            ]}
-                          >
-                            <Input 
-                              prefix={<PhoneFilled className="text-gray-300" />} 
-                              className="rounded-xl h-14" 
-                              placeholder="Phone number"
-                            />
-                          </Form.Item>
+                          <Input 
+                            size="large" 
+                            value={phone}
+                            onChange={e => setPhone(e.target.value)}
+                            prefix={<PhoneFilled className="text-gray-300" />} 
+                            className="rounded-xl h-14" 
+                            placeholder="Phone number"
+                          />
                         </Col>
                       </Row>
-                    </Form.Item>
+                    </div>
                     
                     <Button 
                       type="primary" 
-                      htmlType="submit" 
+                      onClick={onFinalSubmit} 
                       loading={loading.submitting} 
                       block 
                       className="h-16 rounded-2xl text-lg mt-4 border-none shadow-xl"
                       style={{ backgroundColor: BRAND_PURPLE }}
+                      disabled={!firstName || !lastName || !email || !phone}
                     >
                       Generate My Quotation
                     </Button>
-                  </Form>
+                  </div>
                 </Card>
               </Col>
             </Row>
@@ -897,32 +935,6 @@ const Calculator = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
-        );
-
-      case 9:
-        return (
-          <motion.div {...variants} className="text-center py-20">
-            <Result
-              status="success"
-              title={<Title level={1} style={{ color: BRAND_PURPLE }}>Request Processed!</Title>}
-              subTitle="Our architects are reviewing your coordinates and moodboard. We will contact you shortly."
-              extra={[
-                <Button key="home" size="large" className="rounded-xl h-12" onClick={() => window.location.reload()}>
-                  New Estimate
-                </Button>,
-                <Button 
-                  key="site" 
-                  type="primary" 
-                  size="large" 
-                  className="h-12 px-10 rounded-xl border-none shadow-lg" 
-                  style={{ backgroundColor: BRAND_PURPLE }}
-                  onClick={() => window.open('/', '_blank')}
-                >
-                  Go to Home
-                </Button>
-              ]}
-            />
           </motion.div>
         );
 
@@ -955,7 +967,7 @@ const Calculator = () => {
             ))}
           </div>
           <div className="lg:hidden">
-            <Tag color="purple" style={{ backgroundColor: BRAND_PURPLE }}>Step {activeStep + 1} of 8</Tag>
+            <Tag color="purple" style={{ backgroundColor: BRAND_PURPLE }}>Step {activeStep + 1} of {steps.length}</Tag>
           </div>
         </div>
       </div>
@@ -969,7 +981,7 @@ const Calculator = () => {
       </div>
 
       {/* Navigation Footer */}
-      {activeStep < 8 && (
+      {activeStep < 8 && activeStep !== 7 && (
         <div className="fixed bottom-0 left-0 right-0 p-8 z-50 pointer-events-none">
           <div className="max-w-4xl mx-auto flex justify-between items-center bg-white/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-2xl border border-white/50 pointer-events-auto">
             <Button 
@@ -987,7 +999,7 @@ const Calculator = () => {
                 <div className="hidden sm:block text-right">
                   <Text className="text-[10px] text-gray-400 uppercase font-black block tracking-widest">Progress</Text>
                   <Text strong style={{ color: BRAND_PURPLE }}>
-                    {Math.round(((activeStep + 1) / 8) * 100)}% Complete
+                    {Math.round(((activeStep + 1) / steps.length) * 100)}% Complete
                   </Text>
                 </div>
               )}
@@ -1003,7 +1015,7 @@ const Calculator = () => {
                   color: !validateStep() ? '#ccc' : 'white' 
                 }}
               >
-                {activeStep === 7 ? 'Generate Quote' : 'Continue'} 
+                {activeStep === 6 ? 'Continue to Contact' : 'Continue'} 
                 <ArrowRightOutlined className="ml-2" />
               </Button>
             </div>
