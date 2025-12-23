@@ -4,8 +4,10 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
 // Set base URL globally
-const API_BASE = 'https://kotiboxglobaltech.online/api';
+// const API_BASE = 'https://kotiboxglobaltech.online/api';
 // const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://xoto.ae/api';
+
 
 // Load from localStorage
 const loadInitialState = () => {
@@ -122,7 +124,7 @@ export const fetchMyPermissions = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      const res = await axios.get(`${API_BASE}/permission/my/get`, {
+      const res = await axios.get(`${API_BASE}/permission`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

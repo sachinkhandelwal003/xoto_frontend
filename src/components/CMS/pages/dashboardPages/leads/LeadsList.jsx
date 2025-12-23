@@ -27,7 +27,9 @@ import {
   Input,
   Collapse,
   Timeline,
-  Empty
+  Empty,
+  Image,
+  Carousel
 } from 'antd';
 import {
   UserOutlined,
@@ -46,13 +48,18 @@ import {
   TeamOutlined,
   CheckOutlined,
   CloseOutlined,
-  PrinterOutlined
+  PrinterOutlined,
+  EnvironmentOutlined,
+  PictureOutlined,
+  ExpandOutlined,
+  CompassOutlined
 } from '@ant-design/icons';
 import { showSuccessAlert, showErrorAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 const { Search } = Input;
+const { Panel } = Collapse;
 
 // Purple Theme Colors
 const PURPLE_THEME = {
@@ -69,6 +76,8 @@ const PURPLE_THEME = {
   light: '#f8fafc'
 };
 
+ const BASE_URL="http://localhost:5000"
+
 const LeadsList = () => {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -81,6 +90,7 @@ const LeadsList = () => {
   const [searchText, setSearchText] = useState('');
   const [viewDetailsModal, setViewDetailsModal] = useState({ visible: false, data: null });
   const [quotationModal, setQuotationModal] = useState({ visible: false, data: null, estimateStatus: null });
+  const [imageViewer, setImageViewer] = useState({ visible: false, images: [], currentIndex: 0 });
 
   // Stats & Pagination
   const [stats, setStats] = useState({
@@ -88,7 +98,11 @@ const LeadsList = () => {
     pending: 0,
     assigned: 0,
     final_created: 0,
-    superadmin_approved: 0
+    superadmin_approved: 0,
+    customer_accepted: 0,
+    customer_rejected: 0,
+    cancelled: 0,
+    deal: 0
   });
 
   const [pagination, setPagination] = useState({
@@ -115,8 +129,7 @@ const LeadsList = () => {
     request_completed: { label: 'Request Completed', color: 'blue' },
     final_quotation_created: { label: 'Final Created', color: 'purple' },
     sent_to_customer: { label: 'Sent to Customer', color: 'orange' },
-    customer_responded: { label: 'Customer Responded', color: 'cyan' },
-    deal_created: { label: 'Deal Created', color: 'green' }
+    
   };
 
   // --- API CALLS ---
@@ -205,37 +218,86 @@ const LeadsList = () => {
   // --- HELPERS ---
 
   const calculateStats = (data) => {
-    setStats({
+    const statCounts = {
       total: data.length,
-      pending: data.filter(l => l.status === 'pending').length,
-      assigned: data.filter(l => l.status === 'assigned').length,
-      final_created: data.filter(l => l.status === 'final_created').length,
-      superadmin_approved: data.filter(l => l.status === 'superadmin_approved').length
+      pending: 0,
+      assigned: 0,
+      final_created: 0,
+      superadmin_approved: 0,
+      
+    };
+    
+    data.forEach(item => {
+      if (item.status in statCounts) {
+        statCounts[item.status]++;
+      }
     });
+    
+    setStats(statCounts);
   };
 
-  const formatCurrency = (amount) => amount ? `AED ${amount.toLocaleString()}` : 'AED 0';
+  const formatCurrency = (amount) => amount ? `AED ${amount?.toLocaleString()}` : 'AED 0';
   const formatDate = (date) => date ? new Date(date).toLocaleString() : 'N/A';
+
+  const getLocationString = (location) => {
+    if (!location) return 'N/A';
+    const parts = [
+      location.area,
+      location.city,
+      location.state,
+      location.country
+    ].filter(Boolean);
+    return parts.join(', ') || location.address || 'N/A';
+  };
+
+  const openImageGallery = (previewImage, moodboardImages) => {
+    const images = [];
+    if (previewImage?.url) {
+      images.push({
+        src: previewImage.url,
+        title: previewImage.title || 'Preview Image'
+      });
+    }
+    
+    if (moodboardImages?.length > 0) {
+      moodboardImages.forEach(img => {
+        images.push({
+          src: img.url,
+          title: img.title || 'Moodboard Image'
+        });
+      });
+    }
+    
+    if (images.length > 0) {
+      setImageViewer({
+        visible: true,
+        images,
+        currentIndex: 0
+      });
+    }
+  };
 
   // --- COLUMNS ---
 
   const columns = useMemo(() => [
     {
       title: 'Customer',
-      width: 220,
+      width: 240,
       render: (_, r) => (
         <div className="flex items-center gap-3">
           <Avatar 
             size={40} 
             style={{ background: PURPLE_THEME.primaryBg, color: PURPLE_THEME.primary }}
           >
-            {r.customer_name?.charAt(0).toUpperCase()}
+            {r.customer?.name?.first_name?.charAt(0)?.toUpperCase() || r.customer_name?.charAt(0)?.toUpperCase() || 'C'}
           </Avatar>
           <div>
-            <div className="font-semibold text-gray-900">{r.customer_name}</div>
-            <div className="text-xs text-gray-500">{r.customer_email}</div>
+            <div className="font-semibold text-gray-900">
+              {r.customer?.name?.first_name} {r.customer?.name?.last_name || r.customer_name}
+            </div>
+            <div className="text-xs text-gray-500">{r.customer?.email || r.customer_email}</div>
             <div className="text-xs text-gray-400">
-               {r.customer_mobile?.country_code} {r.customer_mobile?.number}
+              {r.customer?.mobile?.country_code || r.customer_mobile?.country_code} {r.customer?.mobile?.number || r.customer_mobile?.number}
             </div>
           </div>
         </div>
@@ -249,6 +311,29 @@ const LeadsList = () => {
            <Tag color="purple">{r.service_type?.toUpperCase()}</Tag>
            <div className="text-sm font-medium mt-1">{r.subcategory?.label}</div>
            <div className="text-xs text-gray-500">{r.type?.label}</div>
+        </div>
+      )
+    },
+    {
+      title: 'Location',
+      width: 180,
+      render: (_, r) => (
+        <div className="text-xs">
+          {r.customer?.location ? (
+            <>
+              <div className="font-medium flex items-center gap-1">
+                <EnvironmentOutlined />
+                {getLocationString(r.customer.location)}
+              </div>
+              {r.customer.location.lat && r.customer.location.lng && (
+                <div className="text-gray-400 mt-1">
+                  📍 {r.customer.location.lat.toFixed(4)}, {r.customer.location.lng.toFixed(4)}
+                </div>
+              )}
+            </>
+          ) : (
+            <span className="text-gray-400">No location data</span>
+          )}
         </div>
       )
     },
@@ -309,20 +394,63 @@ const LeadsList = () => {
 
   // --- SUB-COMPONENTS FOR DETAILS ---
 
-  const DetailSection = ({ title, icon, children }) => (
+  const DetailSection = ({ title, icon, children, extra }) => (
     <Card 
       size="small" 
       title={<span className="flex items-center gap-2 text-purple-700">{icon} {title}</span>}
       className="mb-4 shadow-sm"
       headStyle={{ background: '#fafafa', borderBottom: '1px solid #f0f0f0' }}
+      extra={extra}
     >
       {children}
     </Card>
   );
 
+  const MapDisplay = ({ location }) => {
+    if (!location || !location.lat || !location.lng) {
+      return (
+        <div className="flex items-center justify-center h-40 bg-gray-100 rounded border">
+          <Text type="secondary">No location coordinates available</Text>
+        </div>
+      );
+    }
+
+    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.lat},${location.lng}&zoom=15&size=600x300&markers=color:red%7Clabel:L%7C${location.lat},${location.lng}&key=YOUR_GOOGLE_MAPS_API_KEY`;
+
+    const googleMapsUrl = `https://www.google.com/maps?q=${location.lat},${location.lng}`;
+
+    return (
+      <div className="relative">
+        <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
+          <img 
+            src={staticMapUrl} 
+            alt="Location Map" 
+            className="w-full h-auto rounded border"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `https://via.placeholder.com/600x300/cccccc/666666?text=${encodeURIComponent(`Map: ${location.lat}, ${location.lng}`)}`;
+            }}
+          />
+        </a>
+        <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs p-1 rounded">
+          📍 {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+        </div>
+        <Button 
+          type="link" 
+          size="small"
+          icon={<CompassOutlined />}
+          className="absolute top-2 right-2 bg-white"
+          href={googleMapsUrl}
+          target="_blank"
+        >
+          Open in Maps
+        </Button>
+      </div>
+    );
+  };
+
   // --- INITIAL FETCH ---
   useEffect(() => {
-    // Pass 'filters' (which defaults to {status: 'pending'}) to ensure pending data loads first
     fetchLeads(1, 10, filters);
   }, []);
 
@@ -333,10 +461,14 @@ const LeadsList = () => {
       <div className="mb-6">
         <Title level={3}>Leads Management</Title>
         <Row gutter={[16, 16]}>
-            {Object.keys(stats).map((key) => (
-                <Col key={key} xs={12} sm={8} md={4}>
+            {Object.entries(stats).map(([key, value]) => (
+                <Col key={key} xs={12} sm={6} md={4} lg={3}>
                     <Card size="small" hoverable className="text-center border-t-4 border-purple-500">
-                        <Statistic title={key.replace('_', ' ').toUpperCase()} value={stats[key]} valueStyle={{ color: PURPLE_THEME.primary }} />
+                        <Statistic 
+                          title={key.replace(/_/g, ' ').toUpperCase()} 
+                          value={value} 
+                          valueStyle={{ color: PURPLE_THEME.primary }} 
+                        />
                     </Card>
                 </Col>
             ))}
@@ -387,7 +519,7 @@ const LeadsList = () => {
         title={null}
         open={viewDetailsModal.visible}
         onCancel={() => setViewDetailsModal({ visible: false, data: null })}
-        width={1200}
+        width={1400}
         footer={null}
         style={{ top: 20 }}
       >
@@ -414,18 +546,20 @@ const LeadsList = () => {
                 <Row gutter={[24, 24]}>
                     
                     {/* LEFT COLUMN: INFO & DETAILS */}
-                    <Col span={14}>
+                    <Col span={16}>
                         {/* CUSTOMER PROFILE CARD */}
                         <DetailSection title="Customer Profile" icon={<IdcardOutlined />}>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 mb-4">
                                 <Avatar size={64} icon={<UserOutlined />} style={{ background: PURPLE_THEME.primaryLight }} />
                                 <div className="flex-1">
-                                    <h4 className="text-lg font-bold m-0">{viewDetailsModal.data.customer?.name || viewDetailsModal.data.customer_name}</h4>
+                                    <h4 className="text-lg font-bold m-0">
+                                        {viewDetailsModal.data.customer?.name?.first_name} {viewDetailsModal.data.customer?.name?.last_name || viewDetailsModal.data.customer_name}
+                                    </h4>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-gray-600"><MailOutlined /> {viewDetailsModal.data.customer?.email || viewDetailsModal.data.customer_email}</div>
                                         <div className="text-gray-600">
                                             <PhoneOutlined /> {viewDetailsModal.data.customer?.mobile ? 
-                                                `${viewDetailsModal.data.customer.mobile}` : 
+                                                `${viewDetailsModal.data.customer.mobile.country_code} ${viewDetailsModal.data.customer.mobile.number}` : 
                                                 `${viewDetailsModal.data.customer_mobile?.country_code} ${viewDetailsModal.data.customer_mobile?.number}`}
                                         </div>
                                     </div>
@@ -438,6 +572,26 @@ const LeadsList = () => {
                                     )}
                                 </div>
                             </div>
+
+                            {/* CUSTOMER LOCATION WITH MAP */}
+                            {viewDetailsModal.data.customer?.location && (
+                                <div className="mt-4">
+                                    <Divider orientation="left" orientationMargin="0">
+                                        <EnvironmentOutlined /> Location Details
+                                    </Divider>
+                                    <Descriptions bordered size="small" column={2} className="mb-3">
+                                        <Descriptions.Item label="Address">{viewDetailsModal.data.customer.location.address}</Descriptions.Item>
+                                        <Descriptions.Item label="Area">{viewDetailsModal.data.customer.location.area}</Descriptions.Item>
+                                        <Descriptions.Item label="City">{viewDetailsModal.data.customer.location.city}</Descriptions.Item>
+                                        <Descriptions.Item label="State">{viewDetailsModal.data.customer.location.state}</Descriptions.Item>
+                                        <Descriptions.Item label="Country">{viewDetailsModal.data.customer.location.country}</Descriptions.Item>
+                                        <Descriptions.Item label="Coordinates">
+                                            {viewDetailsModal.data.customer.location.lat}, {viewDetailsModal.data.customer.location.lng}
+                                        </Descriptions.Item>
+                                    </Descriptions>
+                                    <MapDisplay location={viewDetailsModal.data.customer.location} />
+                                </div>
+                            )}
                         </DetailSection>
 
                         {/* SERVICE & AREA DETAILS */}
@@ -490,6 +644,84 @@ const LeadsList = () => {
                             )}
                         </DetailSection>
 
+                        {/* TYPE GALLERY IMAGES */}
+                        {viewDetailsModal.data.type_gallery_snapshot && (
+                            <DetailSection 
+                                title="Type Gallery Images" 
+                                icon={<PictureOutlined />}
+                                extra={
+                                    <Button 
+                                        type="link" 
+                                        size="small"
+                                        icon={<ExpandOutlined />}
+                                        onClick={() => openImageGallery(
+                                            viewDetailsModal.data.type_gallery_snapshot.previewImage,
+                                            viewDetailsModal.data.type_gallery_snapshot.moodboardImages
+                                        )}
+                                    >
+                                        View All
+                                    </Button>
+                                }
+                            >
+                                <Row gutter={[16, 16]}>
+                                    {/* PREVIEW IMAGE */}
+                                    {viewDetailsModal.data.type_gallery_snapshot.previewImage?.url && (
+                                        <Col span={24} md={12}>
+                                            <Card
+                                                hoverable
+                                                cover={
+                                                    <Image
+  src={`${BASE_URL}${viewDetailsModal.data.type_gallery_snapshot.previewImage.url}`}
+                                                        alt={viewDetailsModal.data.type_gallery_snapshot.previewImage.title}
+                                                        height={200}
+                                                        style={{ objectFit: 'cover' }}
+                                                       preview={{
+    src: `${BASE_URL}${viewDetailsModal.data.type_gallery_snapshot.previewImage.url}`,
+  }}
+                                                    />
+                                                }
+                                                size="small"
+                                            >
+                                                <Card.Meta 
+                                                    title="Preview Image" 
+                                                    description={viewDetailsModal.data.type_gallery_snapshot.previewImage.title}
+                                                />
+                                            </Card>
+                                        </Col>
+                                    )}
+
+                                    {/* MOODBOARD IMAGES CAROUSEL */}
+                                    {viewDetailsModal.data.type_gallery_snapshot.moodboardImages?.length > 0 && (
+                                        <Col span={24} md={12}>
+                                            <Card size="small" title="Moodboard Images">
+                                                <Carousel autoplay dots={{ className: 'custom-dots' }}>
+                                                    {viewDetailsModal.data.type_gallery_snapshot.moodboardImages.map((img, index) => (
+                                                        <div key={index} className="p-1">
+                                                          <Image
+  src={`${BASE_URL}${img.url}`}
+  alt={img.title}
+  height={180}
+  style={{ objectFit: 'cover', width: '100%' }}
+  preview={{
+    src: `${BASE_URL}${img.url}`,
+  }}
+/>
+                                                            <div className="text-center text-xs mt-2 text-gray-500">
+                                                                {img.title}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </Carousel>
+                                                <div className="text-center text-xs text-gray-400 mt-2">
+                                                    {viewDetailsModal.data.type_gallery_snapshot.moodboardImages.length} moodboard images
+                                                </div>
+                                            </Card>
+                                        </Col>
+                                    )}
+                                </Row>
+                            </DetailSection>
+                        )}
+
                         {/* ASSIGNED SUPERVISOR */}
                         {viewDetailsModal.data.assigned_supervisor && (
                             <DetailSection title="Assigned Supervisor" icon={<SafetyOutlined />}>
@@ -510,7 +742,7 @@ const LeadsList = () => {
                     </Col>
 
                     {/* RIGHT COLUMN: WORKFLOW & QUOTATIONS */}
-                    <Col span={10}>
+                    <Col span={8}>
                         
                         {/* 1. PROGRESS TIMELINE */}
                         <Card size="small" title="Workflow Progress" className="mb-4">
@@ -616,7 +848,7 @@ const LeadsList = () => {
                         <div className="text-right">
                             <Title level={2} style={{ color: PURPLE_THEME.primary, margin: 0 }}>QUOTATION</Title>
                             <div className="mt-2 text-gray-600">
-                                <div><strong>Quotation #:</strong> {quotationModal.data._id.substring(0,8).toUpperCase()}</div>
+                                <div><strong>Quotation #:</strong> {quotationModal.data._id?.substring(0,8).toUpperCase()}</div>
                                 <div><strong>Date:</strong> {new Date(quotationModal.data.createdAt).toLocaleDateString()}</div>
                                 <div><strong>Status:</strong> <Tag color="blue">GENERATED</Tag></div>
                             </div>
@@ -727,6 +959,37 @@ const LeadsList = () => {
                 </div>
             </div>
         )}
+      </Modal>
+
+      {/* IMAGE GALLERY MODAL */}
+      <Modal
+        open={imageViewer.visible}
+        onCancel={() => setImageViewer({ visible: false, images: [], currentIndex: 0 })}
+        footer={null}
+        width={800}
+        centered
+      >
+        <Carousel 
+          arrows
+          dots
+          initialSlide={imageViewer.currentIndex}
+          afterChange={(current) => setImageViewer(prev => ({ ...prev, currentIndex: current }))}
+        >
+          {imageViewer.images.map((img, index) => (
+            <div key={index} className="text-center">
+              <Image
+                src={img.src}
+                alt={img.title}
+                style={{ maxHeight: '500px', objectFit: 'contain' }}
+                preview={false}
+              />
+              <div className="mt-4 text-gray-600">{img.title}</div>
+            </div>
+          ))}
+        </Carousel>
+        <div className="text-center mt-4 text-gray-400">
+          Image {imageViewer.currentIndex + 1} of {imageViewer.images.length}
+        </div>
       </Modal>
 
       {/* ASSIGN SUPERVISOR DRAWER */}

@@ -23,7 +23,10 @@ import {
   Badge,
   Tooltip,
   Table,
-  Empty
+  Empty,
+  Image,
+  List,
+  Collapse
 } from 'antd';
 import {
   UserOutlined,
@@ -40,12 +43,20 @@ import {
   IdcardOutlined,
   ToolOutlined,
   SafetyOutlined,
-  GoldOutlined
+  GoldOutlined,
+  PictureOutlined,
+  EnvironmentOutlined,
+  CalculatorOutlined,
+  TeamOutlined,
+  HistoryOutlined,
+  DollarOutlined,
+  CheckOutlined
 } from '@ant-design/icons';
 import { showSuccessAlert, showErrorAlert } from '../../../../../manageApi/utils/sweetAlert';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
+const { Panel } = Collapse;
 
 // Purple Theme Colors (Same as LeadsList)
 const PURPLE_THEME = {
@@ -95,6 +106,27 @@ const Leads = () => {
     deal: { label: 'Deal Created', color: 'purple', icon: <RocketOutlined />, bgColor: '#f9f0ff', textColor: '#722ed1' }
   };
 
+  // --- HELPERS ---
+  const formatCurrency = (amount, currency = 'AED') => amount ? `${currency} ${parseFloat(amount).toLocaleString()}` : `${currency} 0`;
+  const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
+  const formatMobileNumber = (mobileObj) => mobileObj ? `${mobileObj.country_code || ''} ${mobileObj.number || ''}`.trim() : 'N/A';
+  
+  // Get full image URL
+  const getFullImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    return path.startsWith('/') ? `http://localhost:5000${path}` : path;
+  };
+
+  // Get customer name
+  const getCustomerName = (customer) => {
+    if (!customer) return 'N/A';
+    if (customer.name) {
+      return `${customer.name.first_name || ''} ${customer.name.last_name || ''}`.trim();
+    }
+    return customer.full_name || customer.email || 'N/A';
+  };
+
   // --- API CALLS ---
 
   const fetchLeads = async (status) => {
@@ -103,10 +135,11 @@ const Leads = () => {
       const response = await apiService.get('/estimates', {
         status: status === 'accepted' ? 'customer_accepted' : 'customer_rejected',
         page: 1,
-        limit: 100 // Adjust limit as needed or add pagination state
+        limit: 100
       });
 
       if (response.success) {
+        console.log(`${status} Leads Response:`, response.data); // Debug log
         if (status === 'accepted') {
           setAcceptedLeads(response.data || []);
         } else {
@@ -132,6 +165,7 @@ const Leads = () => {
       });
 
       if (response.success) {
+        console.log('Deals Response:', response.data); // Debug log
         setDeals(response.data || []);
         updateDealStats(response.data || []);
       }
@@ -149,10 +183,9 @@ const Leads = () => {
       const response = await apiService.post(`/estimates/${estimateId}/convert-to-deal`);
       if (response.success) {
         showSuccessAlert('Success', 'Converted to deal successfully');
-        setViewDetailsModal({ visible: false, data: null }); // Close modal if open
-        // Refresh data
+        setViewDetailsModal({ visible: false, data: null });
         fetchLeads('accepted');
-        fetchDeals(); // Background fetch to update deal count
+        fetchDeals();
       }
     } catch (error) {
       showErrorAlert('Error', 'Failed to convert to deal');
@@ -161,7 +194,7 @@ const Leads = () => {
     }
   };
 
-  // --- HELPERS ---
+  // --- STATS HELPERS ---
 
   const updateStats = (data, type) => {
     setStats(prev => {
@@ -185,9 +218,6 @@ const Leads = () => {
     }));
   };
 
-  const formatCurrency = (amount) => amount ? `AED ${amount.toLocaleString()}` : 'AED 0';
-  const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';
-
   // --- EFFECTS ---
 
   useEffect(() => {
@@ -204,22 +234,28 @@ const Leads = () => {
     {
       title: 'Customer',
       width: 220,
-      render: (_, r) => (
-        <div className="flex items-center gap-3">
-          <Avatar 
-            size={40} 
-            style={{ 
-              background: activeTab === 'rejected' ? '#fff1f0' : PURPLE_THEME.primaryBg, 
-              color: activeTab === 'rejected' ? '#ff4d4f' : PURPLE_THEME.primary 
-            }}
-            icon={activeTab === 'deals' ? <RocketOutlined /> : <UserOutlined />}
-          />
-          <div>
-            <div className="font-semibold text-gray-900">{r.customer_name}</div>
-            <div className="text-xs text-gray-500">{r.customer_email}</div>
+      render: (_, r) => {
+        const customerName = getCustomerName(r.customer);
+        const customerEmail = r.customer?.email || r.customer_email || 'N/A';
+        
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar 
+              size={40} 
+              style={{ 
+                background: activeTab === 'rejected' ? '#fff1f0' : PURPLE_THEME.primaryBg, 
+                color: activeTab === 'rejected' ? '#ff4d4f' : PURPLE_THEME.primary 
+              }}
+              icon={activeTab === 'deals' ? <RocketOutlined /> : <UserOutlined />}
+            />
+            <div>
+              <div className="font-semibold text-gray-900">{customerName}</div>
+              <div className="text-xs text-gray-500">{customerEmail}</div>
+              <div className="text-xs text-gray-400">{formatMobileNumber(r.customer?.mobile || r.customer_mobile)}</div>
+            </div>
           </div>
-        </div>
-      )
+        );
+      }
     },
     {
       title: 'Service Info',
@@ -228,7 +264,8 @@ const Leads = () => {
         <div>
            <Tag color={activeTab === 'deals' ? 'purple' : 'blue'}>{r.service_type?.toUpperCase()}</Tag>
            <div className="text-sm font-medium mt-1">{r.subcategory?.label}</div>
-           <div className="text-xs text-gray-500">{r.area_sqft} sq.ft</div>
+           <div className="text-xs text-gray-500">{r.type?.label}</div>
+           <div className="text-xs text-gray-400">{r.area_sqft} sq.ft</div>
         </div>
       )
     },
@@ -329,7 +366,7 @@ const Leads = () => {
   }, [activeTab, acceptedLeads, rejectedLeads, deals]);
 
   // --- SUB-COMPONENTS ---
-  const DetailSection = ({ title, icon, children, className }) => (
+  const DetailCard = ({ title, icon, children, className }) => (
     <Card 
       size="small" 
       title={<span className="flex items-center gap-2 text-purple-700">{icon} {title}</span>}
@@ -439,11 +476,9 @@ const Leads = () => {
             columns={getColumns()}
             data={currentData}
             loading={loading}
-            // Add pagination props if your API supports it, passed from parent
             pagination={false} 
           />
       </Card>
-
 
       {/* ========================================================= */}
       {/* VIEW DETAILS MODAL (FULL PROFILE)                         */}
@@ -463,7 +498,7 @@ const Leads = () => {
                     <div>
                         <div className="flex items-center gap-3">
                            <Title level={3} style={{ margin: 0, color: PURPLE_THEME.primary }}>
-                               {viewDetailsModal.data.customer_name}
+                               {getCustomerName(viewDetailsModal.data.customer)}
                            </Title>
                            {viewDetailsModal.data.project_reference && (
                              <Tag color="purple">PROJECT #{viewDetailsModal.data.project_reference.substring(0,6)}</Tag>
@@ -484,63 +519,152 @@ const Leads = () => {
                 <Row gutter={[24, 24]}>
                     {/* LEFT COL */}
                     <Col span={14}>
-                        <DetailSection title="Customer Details" icon={<IdcardOutlined />}>
+                        {/* Customer Details */}
+                        <DetailCard title="Customer Details" icon={<IdcardOutlined />}>
                             <div className="flex items-center gap-4">
                                 <Avatar size={54} icon={<UserOutlined />} style={{ background: PURPLE_THEME.primaryLight }} />
                                 <div>
-                                    <div className="font-bold text-lg">{viewDetailsModal.data.customer_name}</div>
-                                    <div className="text-gray-600"><MailOutlined /> {viewDetailsModal.data.customer_email}</div>
-                                    <div className="text-gray-600"><PhoneOutlined /> {viewDetailsModal.data.customer_mobile?.country_code} {viewDetailsModal.data.customer_mobile?.number}</div>
+                                    <div className="font-bold text-lg">{getCustomerName(viewDetailsModal.data.customer)}</div>
+                                    <div className="text-gray-600"><MailOutlined /> {viewDetailsModal.data.customer?.email || viewDetailsModal.data.customer_email}</div>
+                                    <div className="text-gray-600"><PhoneOutlined /> {formatMobileNumber(viewDetailsModal.data.customer?.mobile || viewDetailsModal.data.customer_mobile)}</div>
+                                    {viewDetailsModal.data.customer?.location && (
+                                      <div className="text-gray-600"><EnvironmentOutlined /> {viewDetailsModal.data.customer.location.address}</div>
+                                    )}
                                 </div>
                             </div>
-                        </DetailSection>
+                        </DetailCard>
 
-                        <DetailSection title="Service & Requirements" icon={<ToolOutlined />}>
+                        {/* Project Images */}
+                        {(viewDetailsModal.data.type_gallery_snapshot?.previewImage?.url || 
+                          viewDetailsModal.data.type_gallery_snapshot?.moodboardImages?.length > 0) && (
+                          <DetailCard title="Project Images" icon={<PictureOutlined />}>
+                            <div className="space-y-4">
+                              {viewDetailsModal.data.type_gallery_snapshot?.previewImage?.url && (
+                                <div>
+                                  <Text strong>Preview Image:</Text>
+                                  <div className="mt-2">
+                                    <Image
+                                      width="100%"
+                                      src={getFullImageUrl(viewDetailsModal.data.type_gallery_snapshot.previewImage.url)}
+                                      alt={viewDetailsModal.data.type_gallery_snapshot.previewImage.title || 'Preview'}
+                                      className="rounded-md"
+                                      fallback="https://via.placeholder.com/300x200?text=No+Image"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {viewDetailsModal.data.type_gallery_snapshot?.moodboardImages?.length > 0 && (
+                                <div>
+                                  <Text strong>Moodboard Images ({viewDetailsModal.data.type_gallery_snapshot.moodboardImages.length}):</Text>
+                                  <div className="mt-2 grid grid-cols-2 gap-3">
+                                    {viewDetailsModal.data.type_gallery_snapshot.moodboardImages.map((img, idx) => (
+                                      <div key={idx} className="relative">
+                                        <Image
+                                          width="100%"
+                                          height={120}
+                                          src={getFullImageUrl(img.url)}
+                                          alt={img.title || `Moodboard ${idx + 1}`}
+                                          className="rounded-md object-cover"
+                                          fallback="https://via.placeholder.com/150x120?text=Image"
+                                        />
+                                        <div className="text-xs text-gray-500 mt-1 truncate">{img.title}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </DetailCard>
+                        )}
+
+                        {/* Service & Requirements */}
+                        <DetailCard title="Service & Requirements" icon={<ToolOutlined />}>
                            <Descriptions bordered size="small" column={2}>
-                                <Descriptions.Item label="Category">{viewDetailsModal.data.subcategory?.label}</Descriptions.Item>
-                                <Descriptions.Item label="Package"><Tag color="gold">{viewDetailsModal.data.package?.name}</Tag></Descriptions.Item>
+                                <Descriptions.Item label="Service Type">
+                                  <Tag color="purple">{viewDetailsModal.data.service_type}</Tag>
+                                </Descriptions.Item>
+                                <Descriptions.Item label="Package">
+                                  <Tag color="gold">{viewDetailsModal.data.package?.name}</Tag>
+                                </Descriptions.Item>
+                                <Descriptions.Item label="Subcategory">{viewDetailsModal.data.subcategory?.label}</Descriptions.Item>
+                                <Descriptions.Item label="Type">{viewDetailsModal.data.type?.label}</Descriptions.Item>
                                 <Descriptions.Item label="Area">{viewDetailsModal.data.area_sqft} sq.ft</Descriptions.Item>
-                                <Descriptions.Item label="Dims">{viewDetailsModal.data.area_length} x {viewDetailsModal.data.area_width}</Descriptions.Item>
+                                <Descriptions.Item label="Dimensions">{viewDetailsModal.data.area_length} x {viewDetailsModal.data.area_width}</Descriptions.Item>
                            </Descriptions>
                            <div className="mt-3">
                               <Text strong>Description:</Text>
                               <p className="text-gray-500 text-sm mt-1">{viewDetailsModal.data.description || 'No description provided.'}</p>
                            </div>
-                        </DetailSection>
+                        </DetailCard>
+
 
                         {/* If Rejected, show reason prominently */}
                         {viewDetailsModal.data.status === 'customer_rejected' && (
                             <div className="bg-red-50 border border-red-200 p-4 rounded-md">
                                 <div className="text-red-700 font-bold mb-1"><CloseCircleOutlined /> Rejection Reason</div>
-                                <p className="text-red-600 m-0">{viewDetailsModal.data.customer_response?.reason}</p>
+                                <p className="text-red-600 m-0">{viewDetailsModal.data.customer_response?.reason || 'No reason provided'}</p>
                             </div>
                         )}
                     </Col>
 
                     {/* RIGHT COL */}
                     <Col span={10}>
-                         <Card size="small" title="Status Timeline" className="mb-4">
+                         {/* Status Timeline */}
+                         <DetailCard title="Status Timeline" icon={<HistoryOutlined />}>
                              <Timeline className="mt-2">
-                                <Timeline.Item color="green">Quotation Created: {formatDate(viewDetailsModal.data.createdAt)}</Timeline.Item>
-                                <Timeline.Item color="green">Sent to Customer: {formatDate(viewDetailsModal.data.submitted_at)}</Timeline.Item>
-                                <Timeline.Item 
-                                  color={viewDetailsModal.data.status === 'customer_rejected' ? 'red' : 'green'}
-                                  dot={viewDetailsModal.data.status === 'customer_rejected' ? <CloseCircleOutlined /> : <CheckCircleOutlined />}
-                                >
-                                   Customer Response: {formatDate(viewDetailsModal.data.customer_response?.responded_at)}
+                                <Timeline.Item color="green">
+                                  Estimate Created: {formatDate(viewDetailsModal.data.createdAt)}
                                 </Timeline.Item>
+                                <Timeline.Item color="blue">
+                                  Submitted: {formatDate(viewDetailsModal.data.submitted_at)}
+                                </Timeline.Item>
+                                <Timeline.Item color="purple">
+                                  Assigned to Supervisor: {formatDate(viewDetailsModal.data.assigned_at)}
+                                </Timeline.Item>
+                                <Timeline.Item color="orange">
+                                  Supervisor Progress: {viewDetailsModal.data.supervisor_progress}
+                                </Timeline.Item>
+                                {viewDetailsModal.data.customer_response?.responded_at && (
+                                  <Timeline.Item 
+                                    color={viewDetailsModal.data.status === 'customer_rejected' ? 'red' : 'green'}
+                                    dot={viewDetailsModal.data.status === 'customer_rejected' ? <CloseCircleOutlined /> : <CheckCircleOutlined />}
+                                  >
+                                     Customer Response: {formatDate(viewDetailsModal.data.customer_response.responded_at)}
+                                  </Timeline.Item>
+                                )}
                                 {viewDetailsModal.data.status === 'deal' && (
                                    <Timeline.Item dot={<RocketOutlined />} color="purple">
                                       Converted to Deal: {formatDate(viewDetailsModal.data.deal_converted_at)}
                                    </Timeline.Item>
                                 )}
                              </Timeline>
-                         </Card>
+                         </DetailCard>
+
+                         {/* Supervisor Information */}
+                         {viewDetailsModal.data.assigned_supervisor && (
+                           <DetailCard title="Supervisor Information" icon={<TeamOutlined />}>
+                             <div className="space-y-2">
+                               <div className="flex items-center gap-2">
+                                 <Avatar size={32} icon={<UserOutlined />} />
+                                 <div>
+                                   <Text strong>
+                                     {viewDetailsModal.data.assigned_supervisor.name?.first_name} {viewDetailsModal.data.assigned_supervisor.name?.last_name}
+                                   </Text>
+                                   <div className="text-xs text-gray-500">{viewDetailsModal.data.assigned_supervisor.email}</div>
+                                 </div>
+                               </div>
+                               <div className="text-xs text-gray-500">
+                                 Assigned by: {formatDate(viewDetailsModal.data.assigned_at)}
+                               </div>
+                             </div>
+                           </DetailCard>
+                         )}
 
                          {/* FINANCIAL SUMMARY CARD */}
                          {viewDetailsModal.data.final_quotation ? (
                              <Card 
-                               title={<span className="text-green-700"><FileTextOutlined /> Quotation Summary</span>}
+                               title={<span className="text-green-700"><FileTextOutlined /> Final Quotation Summary</span>}
                                className="border-green-200 bg-green-50"
                                size="small"
                              >
@@ -549,6 +673,24 @@ const Leads = () => {
                                          {formatCurrency(viewDetailsModal.data.final_quotation.grand_total)}
                                      </div>
                                      <div className="text-xs text-gray-500 mb-4">Approved Amount</div>
+                                     
+                                     <div className="text-left text-sm space-y-1 mb-4">
+                                       <div className="flex justify-between">
+                                         <span>Subtotal:</span>
+                                         <span>{formatCurrency(viewDetailsModal.data.final_quotation.subtotal)}</span>
+                                       </div>
+                                       {viewDetailsModal.data.final_quotation.discount_amount > 0 && (
+                                         <div className="flex justify-between text-red-500">
+                                           <span>Discount ({viewDetailsModal.data.final_quotation.discount_percent}%):</span>
+                                           <span>-{formatCurrency(viewDetailsModal.data.final_quotation.discount_amount)}</span>
+                                         </div>
+                                       )}
+                                       <Divider className="my-2" />
+                                       <div className="flex justify-between font-bold">
+                                         <span>Grand Total:</span>
+                                         <span>{formatCurrency(viewDetailsModal.data.final_quotation.grand_total)}</span>
+                                       </div>
+                                     </div>
                                      
                                      <Button 
                                        block 
@@ -562,10 +704,18 @@ const Leads = () => {
                                         <div className="mt-4 pt-4 border-t border-green-200">
                                             <Popconfirm 
                                               title="Convert to Deal" 
+                                              description="Create a project from this accepted quotation?"
                                               onConfirm={() => handleConvertToDeal(viewDetailsModal.data._id)}
-                                              okText="Yes"
+                                              okText="Yes, Convert"
+                                              okButtonProps={{ loading: convertingDeal === viewDetailsModal.data._id }}
                                             >
-                                                <Button type="primary" block className="bg-purple-600 hover:bg-purple-500 border-purple-600" icon={<RocketOutlined />}>
+                                                <Button 
+                                                  type="primary" 
+                                                  block 
+                                                  className="bg-purple-600 hover:bg-purple-500 border-purple-600" 
+                                                  icon={<RocketOutlined />}
+                                                  loading={convertingDeal === viewDetailsModal.data._id}
+                                                >
                                                     Convert to Deal Now
                                                 </Button>
                                             </Popconfirm>
@@ -576,6 +726,29 @@ const Leads = () => {
                          ) : (
                             <Empty description="No Quotation Data" />
                          )}
+
+                         {/* Package Details */}
+                         {viewDetailsModal.data.package && (
+                           <DetailCard title="Package Details" icon={<GoldOutlined />}>
+                             <div>
+                               <Text strong>{viewDetailsModal.data.package.name}</Text>
+                               <div className="text-sm text-gray-600 mt-1">{viewDetailsModal.data.package.description}</div>
+                               <div className="text-green-600 font-bold mt-2">
+                                 Price: {formatCurrency(viewDetailsModal.data.package.price, viewDetailsModal.data.package.currency)}
+                               </div>
+                               {viewDetailsModal.data.package.features && (
+                                 <div className="mt-2">
+                                   <Text strong className="text-xs">Features:</Text>
+                                   <ul className="text-xs text-gray-600 pl-4 mt-1 space-y-1">
+                                     {viewDetailsModal.data.package.features.slice(0, 3).map((f, i) => (
+                                       <li key={i}>{f}</li>
+                                     ))}
+                                   </ul>
+                                 </div>
+                               )}
+                             </div>
+                           </DetailCard>
+                         )}
                     </Col>
                 </Row>
             </div>
@@ -583,14 +756,14 @@ const Leads = () => {
       </Modal>
 
       {/* ========================================================= */}
-      {/* INVOICE MODAL (Reused logic from LeadsList)               */}
+      {/* INVOICE MODAL (Final Quotation View)                       */}
       {/* ========================================================= */}
       <Modal
         title={null}
         footer={null}
         open={quotationModal.visible}
         onCancel={() => setQuotationModal({ visible: false, data: null })}
-        width={800}
+        width={900}
         bodyStyle={{ padding: 0 }}
         centered
       >
@@ -602,15 +775,17 @@ const Leads = () => {
                         <div>
                             <img src={logo} alt="Company Logo" style={{ height: 60, marginBottom: 10 }} />
                             <div className="text-gray-500 text-sm">
+                                Clean & Green Services<br/>
                                 123 Landscape Avenue, Dubai, UAE<br/>
                                 contact@company.com
                             </div>
                         </div>
                         <div className="text-right">
-                            <Title level={2} style={{ color: PURPLE_THEME.primary, margin: 0 }}>QUOTATION</Title>
+                            <Title level={2} style={{ color: PURPLE_THEME.primary, margin: 0 }}>FINAL QUOTATION</Title>
                             <div className="mt-2 text-gray-600">
-                                <div><strong>Date:</strong> {formatDate(quotationModal.data.createdAt)}</div>
-                                <div><strong>Status:</strong> <Tag color="blue">APPROVED</Tag></div>
+                                <div><strong>Date:</strong> {formatDate(quotationModal.data.createdAt || quotationModal.data.created_at)}</div>
+                                <div><strong>Status:</strong> <Tag color="green">APPROVED</Tag></div>
+                                <div><strong>Quotation ID:</strong> {quotationModal.data._id?.substring(0,8).toUpperCase()}</div>
                             </div>
                         </div>
                     </div>
@@ -623,9 +798,11 @@ const Leads = () => {
                         rowKey={(r, i) => i}
                         pagination={false}
                         bordered
+                        size="small"
                         columns={[
-                            { title: '#', render: (_,__,i) => i+1, width: 50, align: 'center' },
+                            { title: '#', dataIndex: 'sno', width: 50, align: 'center' },
                             { title: 'Item', dataIndex: 'item', render: (t, r) => <div><div className="font-bold">{t}</div><div className="text-xs text-gray-500">{r.description}</div></div> },
+                            { title: 'Unit', dataIndex: 'unit', width: 80, align: 'center' },
                             { title: 'Qty', dataIndex: 'quantity', width: 80, align: 'center' },
                             { title: 'Price', dataIndex: 'unit_price', width: 120, align: 'right', render: (v) => formatCurrency(v) },
                             { title: 'Total', dataIndex: 'total', width: 120, align: 'right', render: (v) => <strong>{formatCurrency(v)}</strong> }
@@ -640,7 +817,7 @@ const Leads = () => {
                             </div>
                             {quotationModal.data.discount_amount > 0 && (
                                 <div className="flex justify-between text-red-500">
-                                    <span>Discount:</span>
+                                    <span>Discount ({quotationModal.data.discount_percent}%):</span>
                                     <span>- {formatCurrency(quotationModal.data.discount_amount)}</span>
                                 </div>
                             )}

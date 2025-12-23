@@ -130,7 +130,12 @@ const Sidebar = () => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-purple-800/50">
           <div className="flex flex-col items-center gap-3 flex-1">
-            <img src={logoNew} alt="Logo" className="h-12" />
+            
+            <div className="flex flex-col items-center flex-shrink-0">
+                        <img src={logoNew} alt="Logo" className="h-10 sm:h-12 lg:h-14 w-auto" />
+                        <span className="text-white text-[8px] sm:text-[10px] whitespace-nowrap">
+Powered by AI. Inspired by you.                        </span>
+                      </div>
             {!sidebarCollapsed && (
               <div className="text-center">
                 <div className="text-xs uppercase tracking-widest text-purple-300/80">Welcome</div>

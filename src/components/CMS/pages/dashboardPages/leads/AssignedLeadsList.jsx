@@ -32,7 +32,10 @@ import {
   Collapse,
   Timeline,
   Typography,
-  Tooltip
+  Tooltip,
+  Image,
+  Rate,
+  Popover
 } from 'antd';
 
 import { 
@@ -55,7 +58,12 @@ import {
   HistoryOutlined,
   ToolOutlined,
   CheckOutlined,
-  CloseOutlined
+  CloseOutlined,
+  PictureOutlined,
+  EnvironmentOutlined,
+  StarOutlined,
+  WalletOutlined,
+  CheckCircleFilled
 } from '@ant-design/icons';
 
 import { showSuccessAlert, showErrorAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
@@ -136,7 +144,52 @@ const AssignedLeadsList = () => {
     // --- HELPERS ---
     const formatMobileNumber = (mobileObj) => mobileObj ? `${mobileObj.country_code || ''} ${mobileObj.number || ''}`.trim() : 'N/A';
     const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
-    const formatCurrency = (amount, currency = 'AED') => amount ? `${currency} ${amount.toLocaleString()}` : `${currency} 0`;
+    const formatCurrency = (amount, currency = 'AED') => amount ? `${currency} ${parseFloat(amount).toLocaleString()}` : `${currency} 0`;
+    
+    // Get full image URL
+    const getFullImageUrl = (path) => {
+        if (!path) return null;
+        if (path.startsWith('http')) return path;
+        // Assuming your API base URL is stored somewhere, or use relative path
+        return path.startsWith('/') ? `https://your-api-domain.com${path}` : path;
+    };
+
+    // Get customer name
+    const getCustomerName = (customer) => {
+        if (!customer) return 'N/A';
+        if (customer.name) {
+            return `${customer.name.first_name || ''} ${customer.name.last_name || ''}`.trim();
+        }
+        return customer.full_name || customer.email || 'N/A';
+    };
+
+    // Get freelancer rate for specific service
+    const getFreelancerRate = (freelancer, serviceCategoryId, serviceTypeId) => {
+        if (!freelancer.services_offered || !serviceCategoryId) return null;
+        
+        const service = freelancer.services_offered.find(s => 
+            s.category && s.category._id === serviceCategoryId
+        );
+        
+        if (!service || !service.subcategories) return null;
+        
+        // If specific service type is provided, find that
+        if (serviceTypeId) {
+            const subcategory = service.subcategories.find(sub => 
+                sub.type && sub.type._id === serviceTypeId
+            );
+            return subcategory || null;
+        }
+        
+        // Return first available subcategory if no specific type
+        return service.subcategories.length > 0 ? service.subcategories[0] : null;
+    };
+
+    // Format rate display
+    const formatRateDisplay = (rateData) => {
+        if (!rateData) return 'Not specified';
+        return `${formatCurrency(rateData.price_range)} ${rateData.unit || ''}`.trim();
+    };
 
     // --- API CALLS ---
     const fetchLeads = async (page = 1, limit = 10, filterParams = {}) => {
@@ -144,24 +197,43 @@ const AssignedLeadsList = () => {
         try {
             const params = { page, limit, supervisor: user?.id, ...filterParams };
             const response = await apiService.get('/estimates', params);
-            console.log(response.data)
+            console.log('API Response:', response.data); // Debug log
+            
             if (response.success) {
-                setLeads(response.data);
-                setPagination(prev => ({ ...prev, currentPage: response.pagination?.page || page, itemsPerPage: response.pagination?.limit || limit, totalItems: response.pagination?.total || 0 }));
+                setLeads(response.data || []);
+                setPagination(prev => ({ 
+                    ...prev, 
+                    currentPage: response.pagination?.page || page, 
+                    itemsPerPage: response.pagination?.limit || limit, 
+                    totalItems: response.pagination?.total || 0 
+                }));
             }
         } catch (error) {
+            console.error('Error fetching leads:', error);
             showErrorAlert('Error', 'Failed to fetch leads');
         } finally {
             setLoading(false);
         }
     };
 
-    const fetchFreelancers = async () => {
+    const fetchFreelancers = async (serviceCategoryId) => {
         setFreelancersLoading(true);
         try {
-            const response = await apiService.get('/freelancer', { isActive: true });
-            if (response.success) setFreelancers(response.freelancers || []);
+            const params = { 
+                isActive: true,
+                serviceCategory: serviceCategoryId 
+            };
+            const response = await apiService.get('/freelancer', params);
+            console.log('Freelancers API Response:', response);
+            
+            if (response.success) {
+                setFreelancers(response.freelancers || []);
+                if (response.freelancers && response.freelancers.length > 0) {
+                    message.success(`Found ${response.freelancers.length} freelancers for this service`);
+                }
+            }
         } catch (error) {
+            console.error('Error fetching freelancers:', error);
             showErrorAlert('Error', 'Failed to fetch freelancers');
         } finally {
             setFreelancersLoading(false);
@@ -226,7 +298,15 @@ const AssignedLeadsList = () => {
         setSelectedLead(lead);
         setSelectedFreelancers([]);
         setFreelancerDrawerVisible(true);
-        if (freelancers.length === 0) fetchFreelancers();
+        
+        // Fetch freelancers based on service category
+        const serviceCategoryId = lead.subcategory?._id;
+        if (serviceCategoryId) {
+            fetchFreelancers(serviceCategoryId);
+        } else {
+            message.warning('Service category not found for this lead');
+            setFreelancers([]);
+        }
     };
 
     const openReviewModal = async (lead) => {
@@ -337,16 +417,22 @@ const AssignedLeadsList = () => {
         {
             title: 'Customer Info',
             width: 250,
-            render: (_, r) => (
-                <div className="flex items-center gap-3">
-                    <Avatar size={40} icon={<UserOutlined />} style={{ background: PURPLE_THEME.primaryBg, color: PURPLE_THEME.primary }} />
-                    <div>
-                        <div className="font-semibold">{r.customer_name}</div>
-                        <div className="text-xs text-gray-500">{r.customer_email}</div>
-                        <div className="text-xs text-gray-400">{formatMobileNumber(r.customer_mobile)}</div>
+            render: (_, r) => {
+                const customerName = getCustomerName(r.customer);
+                const customerEmail = r.customer?.email || r.customer_email || 'N/A';
+                const customerMobile = r.customer?.mobile || r.customer_mobile;
+                
+                return (
+                    <div className="flex items-center gap-3">
+                        <Avatar size={40} icon={<UserOutlined />} style={{ background: PURPLE_THEME.primaryBg, color: PURPLE_THEME.primary }} />
+                        <div>
+                            <div className="font-semibold">{customerName}</div>
+                            <div className="text-xs text-gray-500">{customerEmail}</div>
+                            <div className="text-xs text-gray-400">{formatMobileNumber(customerMobile)}</div>
+                        </div>
                     </div>
-                </div>
-            )
+                );
+            }
         },
         {
             title: 'Service',
@@ -375,7 +461,13 @@ const AssignedLeadsList = () => {
                 return <Tag color={cfg.color}>{cfg.label}</Tag>;
             }
         },
-        
+        {
+            title: 'Status',
+            render: (_, r) => {
+                const cfg = statusConfig[r.status] || statusConfig.pending;
+                return <Tag color={cfg.color} icon={cfg.icon}>{cfg.label}</Tag>;
+            }
+        },
         {
             title: 'Actions',
             fixed: 'right',
@@ -408,6 +500,70 @@ const AssignedLeadsList = () => {
         <Card size="small" title={<span className="flex items-center gap-2 text-purple-700">{icon} {title}</span>} className="mb-4 shadow-sm" headStyle={{ background: '#fafafa' }}>{children}</Card>
     );
 
+    // Freelancer Rate Card Component
+    const FreelancerRateCard = ({ freelancer, lead }) => {
+        const serviceCategoryId = lead?.subcategory?._id;
+        const serviceTypeId = lead?.type?._id;
+        const rateData = getFreelancerRate(freelancer, serviceCategoryId, serviceTypeId);
+        
+        const content = (
+            <div className="p-3 max-w-xs">
+                <div className="font-semibold mb-2 text-purple-700">Rate Information</div>
+                {rateData ? (
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">Service:</span>
+                            <span className="font-medium">{rateData.type?.label || 'General'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">Rate:</span>
+                            <span className="font-bold text-green-600">
+                                {formatCurrency(rateData.price_range)}
+                            </span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">Unit:</span>
+                            <span className="font-medium">{rateData.unit || 'Per service'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">Status:</span>
+                            <Tag color={rateData.is_active ? "success" : "error"} size="small">
+                                {rateData.is_active ? "Active" : "Inactive"}
+                            </Tag>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-gray-500 text-sm">
+                        No specific rate found for this service
+                    </div>
+                )}
+                
+                {freelancer.professional?.experience_years && (
+                    <div className="mt-3 pt-2 border-t">
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">Experience:</span>
+                            <span className="font-medium">{freelancer.professional.experience_years} years</span>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+
+        return (
+            <Popover content={content} title="Service Rate Details">
+                <div className="cursor-pointer hover:bg-purple-50 p-1 rounded">
+                    {rateData ? (
+                        <Tag color="green" icon={<DollarOutlined />} className="font-bold">
+                            {formatRateDisplay(rateData)}
+                        </Tag>
+                    ) : (
+                        <Tag color="default">No Rate</Tag>
+                    )}
+                </div>
+            </Popover>
+        );
+    };
+
     useEffect(() => {
         if (user?.id) fetchLeads(1, 10, { status: 'assigned', supervisor_progress: 'none' });
     }, [user]);
@@ -415,7 +571,7 @@ const AssignedLeadsList = () => {
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             <div className="max-w-screen-2xl mx-auto">
-                <Title level={2} className="mb-6" style={{ color: PURPLE_THEME.dark }}>Supervisor Dashboard</Title>
+                <Title level={2} className="mb-6" style={{ color: PURPLE_THEME.dark }}>My Estimates</Title>
 
                 {/* TABS */}
                 <Card bodyStyle={{ padding: 0 }} className="mb-6 overflow-hidden rounded-lg shadow-sm">
@@ -429,143 +585,384 @@ const AssignedLeadsList = () => {
 
                 {/* TABLE */}
                 <Card bodyStyle={{ padding: 0 }}>
-                    <CustomTable columns={columns} data={leads} totalItems={pagination.totalItems} currentPage={pagination.currentPage} itemsPerPage={pagination.itemsPerPage} onPageChange={(p, l) => fetchLeads(p, l, filters)} loading={loading} />
+                    <CustomTable 
+                        columns={columns} 
+                        data={leads} 
+                        totalItems={pagination.totalItems} 
+                        currentPage={pagination.currentPage} 
+                        itemsPerPage={pagination.itemsPerPage} 
+                        onPageChange={(p, l) => fetchLeads(p, l, filters)} 
+                        loading={loading} 
+                    />
                 </Card>
             </div>
 
             {/* --- DRAWER: FULL DETAILS (LEFT SIDE) --- */}
-     {/* --- DRAWER: FULL DETAILS (LEFT SIDE) --- */}
-<Drawer 
-    title={<span className="text-purple-700"><FileTextOutlined /> Lead Full Information</span>} 
-    width={850} 
-    onClose={() => setDrawerVisible(false)} 
-    open={drawerVisible}
->
-    {selectedLead && (
-        <div className="p-2">
-            {/* Lead Status Header */}
-            <div className="flex justify-between items-center mb-6 p-5 bg-purple-50 rounded-xl border border-purple-100 shadow-sm">
-                <div>
-                    <h3 className="text-xl font-bold text-purple-800 m-0">
-                        {selectedLead.service_type} - {selectedLead.subcategory?.label}
-                    </h3>
-                    <Text type="secondary">ID: {selectedLead._id}</Text>
-                </div>
-                <Badge status={statusConfig[selectedLead.status]?.color} text={statusConfig[selectedLead.status]?.label} />
-            </div>
-
-            <Row gutter={16}>
-                <Col span={14}>
-                    <DetailCard title="Customer Details" icon={<IdcardOutlined />}>
-                        <Descriptions column={1} size="small" bordered={false}>
-                            <Descriptions.Item label={<Text strong><UserOutlined /> Name</Text>}>{selectedLead.customer_name}</Descriptions.Item>
-                            <Descriptions.Item label={<Text strong><MailOutlined /> Email</Text>}>{selectedLead.customer_email}</Descriptions.Item>
-                            <Descriptions.Item label={<Text strong><PhoneOutlined /> Mobile</Text>}>{formatMobileNumber(selectedLead.customer_mobile)}</Descriptions.Item>
-                        </Descriptions>
-                    </DetailCard>
-
-                    {/* --- NEW SECTION: SHOW ASSIGNED FREELANCERS HERE --- */}
-                    <DetailCard title="Assigned Freelancers" icon={<TeamOutlined />}>
-                        {selectedLead.sent_to_freelancers && selectedLead.sent_to_freelancers.length > 0 ? (
-                            <List
-                                itemLayout="horizontal"
-                                dataSource={selectedLead.sent_to_freelancers}
-                                renderItem={(f) => (
-                                    <List.Item className="px-0">
-                                        <List.Item.Meta
-                                            avatar={<Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />}
-                                            title={<Text strong>{f.full_name || `${f.name?.first_name} ${f.name?.last_name}`}</Text>}
-                                            description={
-                                                <Space direction="vertical" size={0}>
-                                                    <Text type="secondary" style={{ fontSize: '12px' }}><MailOutlined /> {f.email}</Text>
-                                                    <Text type="secondary" style={{ fontSize: '12px' }}><PhoneOutlined /> {formatMobileNumber(f.mobile)}</Text>
-                                                </Space>
-                                            }
-                                        />
-                                        <Tag color="green">Notified</Tag>
-                                    </List.Item>
-                                )}
-                            />
-                        ) : (
-                            <Alert 
-                                message="No Freelancers Assigned" 
-                                description="This lead has not been sent to any freelancers yet." 
-                                type="info" 
-                                showIcon 
-                                action={
-                                    <Button size="small" type="primary" onClick={() => { setDrawerVisible(false); openFreelancerDrawer(selectedLead); }}>
-                                        Assign Now
-                                    </Button>
-                                }
-                            />
-                        )}
-                    </DetailCard>
-                </Col>
-
-                <Col span={10}>
-                    <DetailCard title="Area Specifications" icon={<CalculatorOutlined />}>
-                        <div className="flex justify-around bg-gray-50 p-3 rounded-lg border mb-3">
-                            <div className="text-center">
-                                <Title level={4} className="m-0" style={{ color: PURPLE_THEME.primary }}>{selectedLead.area_sqft}</Title>
-                                <Text size="small" type="secondary">Sq.Ft</Text>
+            <Drawer 
+                title={<span className="text-purple-700"><FileTextOutlined /> Lead Full Information</span>} 
+                width={1100} 
+                onClose={() => setDrawerVisible(false)} 
+                open={drawerVisible}
+            >
+                {selectedLead && (
+                    <div className="p-2">
+                        {/* Lead Status Header */}
+                        <div className="flex justify-between items-center mb-6 p-5 bg-purple-50 rounded-xl border border-purple-100 shadow-sm">
+                            <div>
+                                <h3 className="text-xl font-bold text-purple-800 m-0">
+                                    {selectedLead.service_type} - {selectedLead.subcategory?.label}
+                                </h3>
                             </div>
-                            <Divider type="vertical" style={{ height: '40px' }} />
-                            <div className="text-center">
-                                <Title level={4} className="m-0">{selectedLead.area_length}x{selectedLead.area_width}</Title>
-                                <Text size="small" type="secondary">Dimensions</Text>
+                            <div className="flex flex-col items-end gap-2">
+                                <Tag color={statusConfig[selectedLead.status]?.color} style={{ fontSize: '14px', padding: '4px 12px' }}>
+                                    {statusConfig[selectedLead.status]?.icon} {statusConfig[selectedLead.status]?.label}
+                                </Tag>
+                                <Tag color={supervisorProgressConfig[selectedLead.supervisor_progress]?.color}>
+                                    Supervisor: {supervisorProgressConfig[selectedLead.supervisor_progress]?.label}
+                                </Tag>
                             </div>
                         </div>
-                        <Text strong>Description:</Text>
-                        <p className="text-gray-600 mt-1" style={{ fontSize: '13px' }}>{selectedLead.description}</p>
-                    </DetailCard>
 
-                    <DetailCard title="Process Timeline" icon={<HistoryOutlined />}>
-                        <Timeline mode="left" className="mt-2" size="small">
-                            <Timeline.Item color="green" label="Created">{formatDate(selectedLead.createdAt)}</Timeline.Item>
-                            <Timeline.Item color="blue" label="Assigned">Lead assigned to you</Timeline.Item>
-                            <Timeline.Item 
-                                color={selectedLead.sent_to_freelancers?.length > 0 ? 'purple' : 'gray'} 
-                                label="Freelancers"
-                            >
-                                {selectedLead.sent_to_freelancers?.length || 0} notified
-                            </Timeline.Item>
-                        </Timeline>
-                    </DetailCard>
-                </Col>
-            </Row>
-        </div>
-    )}
-</Drawer>
+                        <Row gutter={16}>
+                            <Col span={14}>
+                                {/* Customer Details */}
+                                <DetailCard title="Customer Details" icon={<IdcardOutlined />}>
+                                    <Row gutter={16}>
+                                        <Col span={12}>
+                                            <Descriptions column={1} size="small" bordered={false}>
+                                                <Descriptions.Item label={<Text strong><UserOutlined /> Name</Text>}>
+                                                    {getCustomerName(selectedLead.customer)}
+                                                </Descriptions.Item>
+                                                <Descriptions.Item label={<Text strong><MailOutlined /> Email</Text>}>
+                                                    {selectedLead.customer?.email || selectedLead.customer_email || 'N/A'}
+                                                </Descriptions.Item>
+                                                <Descriptions.Item label={<Text strong><PhoneOutlined /> Mobile</Text>}>
+                                                    {formatMobileNumber(selectedLead.customer?.mobile || selectedLead.customer_mobile)}
+                                                </Descriptions.Item>
+                                            </Descriptions>
+                                        </Col>
+                                        <Col span={12}>
+                                            {selectedLead.customer?.location && (
+                                                <div>
+                                                    <Text strong><EnvironmentOutlined /> Location</Text>
+                                                    <div className="text-gray-600 mt-1" style={{ fontSize: '13px' }}>
+                                                        <div>{selectedLead.customer.location.address}</div>
+                                                        <div>{selectedLead.customer.location.city}, {selectedLead.customer.location.state}</div>
+                                                        <div>{selectedLead.customer.location.country}</div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </Col>
+                                    </Row>
+                                </DetailCard>
+
+                                {/* Project Images */}
+                                {(selectedLead.type_gallery_snapshot?.previewImage?.url || 
+                                  selectedLead.type_gallery_snapshot?.moodboardImages?.length > 0) && (
+                                    <DetailCard title="Project Images" icon={<PictureOutlined />}>
+                                        <div className="space-y-4">
+                                            {selectedLead.type_gallery_snapshot?.previewImage?.url && (
+                                                <div>
+                                                    <Text strong>Preview Image:</Text>
+                                                    <div className="mt-2">
+                                                        <Image
+                                                            width="100%"
+                                                            src={getFullImageUrl(selectedLead.type_gallery_snapshot.previewImage.url)}
+                                                            alt={selectedLead.type_gallery_snapshot.previewImage.title || 'Preview'}
+                                                            className="rounded-md"
+                                                            fallback="https://via.placeholder.com/300x200?text=No+Image"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
+                                            {selectedLead.type_gallery_snapshot?.moodboardImages?.length > 0 && (
+                                                <div>
+                                                    <Text strong>Moodboard Images ({selectedLead.type_gallery_snapshot.moodboardImages.length}):</Text>
+                                                    <div className="mt-2 grid grid-cols-2 gap-3">
+                                                        {selectedLead.type_gallery_snapshot.moodboardImages.map((img, idx) => (
+                                                            <div key={idx} className="relative">
+                                                                <Image
+                                                                    width="100%"
+                                                                    height={120}
+                                                                    src={getFullImageUrl(img.url)}
+                                                                    alt={img.title || `Moodboard ${idx + 1}`}
+                                                                    className="rounded-md object-cover"
+                                                                    fallback="https://via.placeholder.com/150x120?text=Image"
+                                                                />
+                                                                <div className="text-xs text-gray-500 mt-1 truncate">{img.title}</div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </DetailCard>
+                                )}
+
+                                {/* Attachments */}
+                                {selectedLead.attachments?.length > 0 && (
+                                    <DetailCard title="Attachments" icon={<PaperClipOutlined />}>
+                                        <List
+                                            size="small"
+                                            dataSource={selectedLead.attachments}
+                                            renderItem={(item, index) => (
+                                                <List.Item>
+                                                    <List.Item.Meta
+                                                        avatar={<FileOutlined style={{ color: PURPLE_THEME.primary }} />}
+                                                        title={<a href={getFullImageUrl(item.url)} target="_blank" rel="noopener noreferrer">{item.title || `Attachment ${index + 1}`}</a>}
+                                                        description={item.description || 'No description'}
+                                                    />
+                                                </List.Item>
+                                            )}
+                                        />
+                                    </DetailCard>
+                                )}
+                            </Col>
+
+                            <Col span={10}>
+                                {/* Service & Package Details */}
+                                <DetailCard title="Service Details" icon={<ToolOutlined />}>
+                                    <Descriptions column={1} size="small" bordered={false}>
+                                        <Descriptions.Item label="Service Type">
+                                            <Tag color="purple">{selectedLead.service_type}</Tag>
+                                        </Descriptions.Item>
+                                        <Descriptions.Item label="Subcategory">
+                                            <Text strong>{selectedLead.subcategory?.label}</Text>
+                                            <div className="text-xs text-gray-500 mt-1">{selectedLead.subcategory?.description}</div>
+                                        </Descriptions.Item>
+                                        <Descriptions.Item label="Service Type">
+                                            <Text strong>{selectedLead.type?.label}</Text>
+                                            <div className="text-xs text-gray-500 mt-1">{selectedLead.type?.description}</div>
+                                        </Descriptions.Item>
+                                        <Descriptions.Item label="Package">
+                                            <div>
+                                                <Text strong>{selectedLead.package?.name}</Text>
+                                                <div className="text-xs text-gray-500 mt-1">{selectedLead.package?.description}</div>
+                                            </div>
+                                        </Descriptions.Item>
+                                        <Descriptions.Item label="Package Price">
+                                            <Text strong style={{ color: PURPLE_THEME.primary }}>
+                                                {formatCurrency(selectedLead.package?.price, selectedLead.package?.currency || 'AED')}
+                                            </Text>
+                                        </Descriptions.Item>
+                                    </Descriptions>
+                                </DetailCard>
+
+                                {/* Area Specifications */}
+                                <DetailCard title="Area Specifications" icon={<CalculatorOutlined />}>
+                                    <div className="flex justify-around bg-gray-50 p-3 rounded-lg border mb-3">
+                                        <div className="text-center">
+                                            <Title level={4} className="m-0" style={{ color: PURPLE_THEME.primary }}>{selectedLead.area_sqft}</Title>
+                                            <Text size="small" type="secondary">Sq.Ft</Text>
+                                        </div>
+                                        <Divider type="vertical" style={{ height: '40px' }} />
+                                        <div className="text-center">
+                                            <Title level={4} className="m-0">{selectedLead.area_length}x{selectedLead.area_width}</Title>
+                                            <Text size="small" type="secondary">Dimensions</Text>
+                                        </div>
+                                    </div>
+                                    <Text strong>Description:</Text>
+                                    <p className="text-gray-600 mt-1" style={{ fontSize: '13px' }}>{selectedLead.description}</p>
+                                </DetailCard>
+
+                                {/* Assigned Freelancers */}
+                                <DetailCard title="Assigned Freelancers" icon={<TeamOutlined />}>
+                                    {selectedLead.sent_to_freelancers && selectedLead.sent_to_freelancers.length > 0 ? (
+                                        <List
+                                            itemLayout="horizontal"
+                                            dataSource={selectedLead.sent_to_freelancers}
+                                            renderItem={(f) => (
+                                                <List.Item className="px-0">
+                                                    <List.Item.Meta
+                                                        avatar={<Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />}
+                                                        title={<Text strong>{f.full_name || `${f.name?.first_name} ${f.name?.last_name}`}</Text>}
+                                                        description={
+                                                            <Space direction="vertical" size={0}>
+                                                                <Text type="secondary" style={{ fontSize: '12px' }}><MailOutlined /> {f.email}</Text>
+                                                                <Text type="secondary" style={{ fontSize: '12px' }}><PhoneOutlined /> {formatMobileNumber(f.mobile)}</Text>
+                                                            </Space>
+                                                        }
+                                                    />
+                                                    <Tag color="green">Notified</Tag>
+                                                </List.Item>
+                                            )}
+                                        />
+                                    ) : (
+                                        <Alert 
+                                            message="No Freelancers Assigned" 
+                                            description="This lead has not been sent to any freelancers yet." 
+                                            type="info" 
+                                            showIcon 
+                                            action={
+                                                <Button size="small" type="primary" onClick={() => { setDrawerVisible(false); openFreelancerDrawer(selectedLead); }}>
+                                                    Assign Now
+                                                </Button>
+                                            }
+                                        />
+                                    )}
+                                </DetailCard>
+
+                                {/* Process Timeline */}
+                                <DetailCard title="Process Timeline" icon={<HistoryOutlined />}>
+                                    <Timeline mode="left" className="mt-2" size="small">
+                                        <Timeline.Item color="green" label="Created">{formatDate(selectedLead.createdAt)}</Timeline.Item>
+                                        <Timeline.Item color="blue" label="Assigned">{formatDate(selectedLead.assigned_at)}</Timeline.Item>
+                                        <Timeline.Item 
+                                            color={selectedLead.sent_to_freelancers?.length > 0 ? 'purple' : 'gray'} 
+                                            label="Freelancers"
+                                        >
+                                            {selectedLead.sent_to_freelancers?.length || 0} notified
+                                        </Timeline.Item>
+                                        {selectedLead.submitted_at && (
+                                            <Timeline.Item color="orange" label="Submitted">{formatDate(selectedLead.submitted_at)}</Timeline.Item>
+                                        )}
+                                    </Timeline>
+                                </DetailCard>
+                            </Col>
+                        </Row>
+                    </div>
+                )}
+            </Drawer>
 
             {/* --- DRAWER: SELECT FREELANCERS --- */}
-            <Drawer title="Select Freelancers" width={500} onClose={() => setFreelancerDrawerVisible(false)} open={freelancerDrawerVisible}>
-                {freelancersLoading ? <Spin /> : (
+            <Drawer 
+                title={
+                    <div className="flex items-center justify-between">
+                        <span>Select Freelancers for: <strong>{selectedLead?.subcategory?.label}</strong></span>
+                    </div>
+                } 
+                width={600} 
+                onClose={() => setFreelancerDrawerVisible(false)} 
+                open={freelancerDrawerVisible}
+            >
+                {freelancersLoading ? (
+                    <div className="text-center py-10">
+                        <Spin size="large" />
+                        <div className="mt-4 text-gray-500">Fetching freelancers for this service...</div>
+                    </div>
+                ) : (
                     <>
+                        <Alert 
+                            message={`Found ${freelancers.length} freelancers for "${selectedLead?.subcategory?.label}"`}
+                            type="info"
+                            showIcon
+                            className="mb-4"
+                        />
+                        
                         <List
                             dataSource={freelancers}
-                            renderItem={item => (
-                                <List.Item actions={[
-                                    <Button 
-                                        type={selectedFreelancers.includes(item._id) ? 'primary' : 'default'} 
-                                        onClick={() => {
-                                            setSelectedFreelancers(prev => prev.includes(item._id) ? prev.filter(id => id !== item._id) : [...prev, item._id]);
-                                        }}
+                            renderItem={item => {
+                                const rateData = getFreelancerRate(item, selectedLead?.subcategory?._id, selectedLead?.type?._id);
+                                
+                                return (
+                                    <List.Item 
+                                        className="hover:bg-gray-50 p-3 rounded-lg border mb-2"
+                                        actions={[
+                                            <Button 
+                                                type={selectedFreelancers.includes(item._id) ? 'primary' : 'default'} 
+                                                onClick={() => {
+                                                    setSelectedFreelancers(prev => 
+                                                        prev.includes(item._id) 
+                                                            ? prev.filter(id => id !== item._id) 
+                                                            : [...prev, item._id]
+                                                    );
+                                                }}
+                                            >
+                                                {selectedFreelancers.includes(item._id) ? 'Selected' : 'Select'}
+                                            </Button>
+                                        ]}
                                     >
-                                        {selectedFreelancers.includes(item._id) ? 'Selected' : 'Select'}
-                                    </Button>
-                                ]}>
-                                    <List.Item.Meta
-                                        avatar={<Avatar src={item.avatar} icon={<UserOutlined />} />}
-                                        title={`${item.name?.first_name} ${item.name?.last_name}`}
-                                        description={item.email}
-                                    />
-                                </List.Item>
-                            )}
+                                        <List.Item.Meta
+                                            avatar={<Avatar src={item.avatar} icon={<UserOutlined />} />}
+                                            title={
+                                                <div className="flex items-center gap-2">
+                                                    <Text strong>{`${item.name?.first_name} ${item.name?.last_name}`}</Text>
+                                                    {item.onboarding_status === 'approved' && (
+                                                        <Tag color="green" icon={<CheckCircleFilled />} size="small">Approved</Tag>
+                                                    )}
+                                                </div>
+                                            }
+                                            description={
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <MailOutlined className="text-gray-400" />
+                                                        <Text type="secondary">{item.email}</Text>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <PhoneOutlined className="text-gray-400" />
+                                                        <Text type="secondary">{formatMobileNumber(item.mobile)}</Text>
+                                                    </div>
+                                                    
+                                                    {/* Rate Information */}
+                                                    <div className="mt-2 flex items-center gap-2">
+                                                        <WalletOutlined className="text-green-500" />
+                                                        {rateData ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <Tag color="green" className="font-bold">
+                                                                    {formatCurrency(rateData.price_range)} {rateData.unit}
+                                                                </Tag>
+                                                                {rateData.type?.label && (
+                                                                    <Tag color="blue" size="small">{rateData.type.label}</Tag>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <Tag color="default">Rate not specified</Tag>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {/* Experience */}
+                                                    {item.professional?.experience_years && (
+                                                        <div className="flex items-center gap-2">
+                                                            <StarOutlined className="text-yellow-500" />
+                                                            <Text type="secondary">{item.professional.experience_years} years experience</Text>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {/* Location */}
+                                                    {item.location?.city && (
+                                                        <div className="flex items-center gap-2">
+                                                            <EnvironmentOutlined className="text-blue-500" />
+                                                            <Text type="secondary">
+                                                                {item.location.city}, {item.location.state}
+                                                            </Text>
+                                                        </div>
+                                                    )}
+
+
+                                                     <div>
+                                    <Text type="secondary">Service: </Text>
+                                    <Tag color="purple">{selectedLead?.subcategory?.label}</Tag>
+                                    {selectedLead?.type?.label && (
+                                        <>
+                                            <Text type="secondary"> Sub-Service: </Text>
+                                            <Tag color="blue">{selectedLead.type.label}</Tag>
+                                        </>
+                                    )}
+                                </div>
+                                                </div>
+                                            }
+                                        />
+                                    </List.Item>
+                                );
+                            }}
                         />
-                        <div className="mt-4 pt-4 border-t text-right">
-                             <Button type="primary" disabled={selectedFreelancers.length === 0} onClick={handleSendToFreelancers}>
-                                 Send Request ({selectedFreelancers.length})
-                             </Button>
+                        
+                        <div className="mt-6 pt-4 border-t">
+                         
+                            
+                            <div className="flex justify-between items-center">
+                               
+                                <Button 
+                                    type="primary" 
+                                    disabled={selectedFreelancers.length === 0}
+                                    onClick={handleSendToFreelancers}
+                                    size="large"
+                                    style={{ background: PURPLE_THEME.primary }}
+                                >
+                                    Send to {selectedFreelancers.length} Freelancer(s)
+                                </Button>
+                            </div>
                         </div>
                     </>
                 )}
@@ -698,7 +1095,7 @@ const AssignedLeadsList = () => {
                                 <div className="mt-2 text-gray-600">
                                     <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
                                     <div><strong>Ref:</strong> {selectedLead?._id?.substring(0,8).toUpperCase()}</div>
-                                    <div><strong>Customer:</strong> {selectedLead?.customer_name}</div>
+                                    <div><strong>Customer:</strong> {getCustomerName(selectedLead?.customer)}</div>
                                 </div>
                             </div>
                         </div>

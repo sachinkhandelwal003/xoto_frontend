@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../../../../../manageApi/utils/custom.apiservice';
+import { useSelector } from "react-redux";
 // 1. IMPORT LOGO
 import logo from "../../../../../assets/img/logoNew.png";
 
 import { 
   Tabs, Card, Button, Modal, Table, Tag, Input, Spin, Empty, 
-  Row, Col, Divider, Badge, Avatar, Space, Alert, Typography
+  Row, Col, Divider, Badge, Avatar, Space, Alert, Typography,
+  Image, Descriptions, Timeline
 } from 'antd';
 import { 
   CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, 
   ClockCircleOutlined, DollarOutlined, CalendarOutlined,
   UserOutlined, FileTextOutlined, MailOutlined,
   PhoneOutlined, EnvironmentOutlined, ToolOutlined,
-  PrinterOutlined
+  PrinterOutlined, PictureOutlined, IdcardOutlined,
+  CalculatorOutlined, TeamOutlined, HistoryOutlined
 } from '@ant-design/icons';
 import { showSuccessAlert, showErrorAlert, showConfirmDialog } from '../../../../../manageApi/utils/sweetAlert';
 
@@ -35,24 +38,47 @@ const PURPLE_THEME = {
 };
 
 const MyEstimates = () => {
+  const user = useSelector((s) => s.auth?.user);
   const [allEstimates, setAllEstimates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
   
   // Modal States
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedEstimate, setSelectedEstimate] = useState(null); // Stores full estimate object
+  const [selectedEstimate, setSelectedEstimate] = useState(null);
   
   // Action States
   const [rejectReason, setRejectReason] = useState('');
   const [respondingId, setRespondingId] = useState(null);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
 
+  // Helpers
+  const formatCurrency = (amount, currency = 'AED') => amount ? `${currency} ${parseFloat(amount).toLocaleString()}` : `${currency} 0`;
+  const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
+  const formatMobileNumber = (mobileObj) => mobileObj ? `${mobileObj.country_code || ''} ${mobileObj.number || ''}`.trim() : 'N/A';
+  
+  // Get full image URL
+  const getFullImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    return path.startsWith('/') ? `http://localhost:5000${path}` : path;
+  };
+
+  // Get customer name
+  const getCustomerName = (customer) => {
+    if (!customer) return 'N/A';
+    if (customer.name) {
+      return `${customer.name.first_name || ''} ${customer.name.last_name || ''}`.trim();
+    }
+    return customer.full_name || customer.email || 'N/A';
+  };
+
   // Fetch All Customer Estimates
   const fetchMyEstimates = async () => {
     setLoading(true);
     try {
       const res = await apiService.get('/estimates/customer/my-estimates');
+      console.log('My Estimates API Response:', res.data); // Debug log
       if (res.success) {
         setAllEstimates(res.data || []);
       }
@@ -83,11 +109,6 @@ const MyEstimates = () => {
     rejected: respondedEstimates.filter(e => e.customer_response?.status === 'rejected').length,
   };
 
-  // Helpers
-  const formatCurrency = (amount) => amount ? `AED ${amount.toLocaleString()}` : 'AED 0';
-  const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
-  const formatMobileNumber = (mobileObj) => mobileObj ? `${mobileObj.country_code || ''} ${mobileObj.number || ''}`.trim() : 'N/A';
-
   // View Quotation Modal
   const openQuotationModal = (estimate) => {
     setSelectedEstimate(estimate);
@@ -103,7 +124,7 @@ const MyEstimates = () => {
     try {
       await apiService.put(`/estimates/${estimate._id}/response`, { status: 'accepted' });
       showSuccessAlert('Success', 'Quotation accepted successfully!');
-      setModalVisible(false); // Close modal if open
+      setModalVisible(false);
       fetchMyEstimates();
     } catch (err) {
       showErrorAlert('Error', 'Failed to accept quotation');
@@ -114,10 +135,7 @@ const MyEstimates = () => {
 
   // Open Reject Modal
   const openRejectModal = (estimate) => {
-    // If opening from the main list, set selected estimate first
-    if (!selectedEstimate || selectedEstimate._id !== estimate._id) {
-        setSelectedEstimate(estimate);
-    }
+    setSelectedEstimate(estimate);
     setRejectReason('');
     setRejectModalVisible(true);
   };
@@ -128,10 +146,13 @@ const MyEstimates = () => {
 
     setRespondingId(selectedEstimate._id);
     try {
-      await apiService.put(`/estimates/${selectedEstimate._id}/response`, { status: 'rejected', reason: rejectReason });
+      await apiService.put(`/estimates/${selectedEstimate._id}/response`, { 
+        status: 'rejected', 
+        reason: rejectReason 
+      });
       showSuccessAlert('Success', 'Quotation rejected');
       setRejectModalVisible(false);
-      setModalVisible(false); // Close details modal if open
+      setModalVisible(false);
       setRejectReason('');
       fetchMyEstimates();
     } catch (err) {
@@ -140,6 +161,22 @@ const MyEstimates = () => {
       setRespondingId(null);
     }
   };
+
+  // Detail Card Component
+  const DetailCard = ({ title, icon, children }) => (
+    <Card 
+      size="small" 
+      title={
+        <div className="flex items-center gap-2" style={{ color: PURPLE_THEME.primary }}>
+          {icon} <span className="font-semibold">{title}</span>
+        </div>
+      }
+      style={{ borderLeft: `4px solid ${PURPLE_THEME.primary}`, marginBottom: '16px' }}
+      headStyle={{ background: PURPLE_THEME.primaryBg }}
+    >
+      {children}
+    </Card>
+  );
 
   // --- COMPONENT: CARD VIEW FOR LIST ---
   const EstimateCard = ({ est, isPending }) => {
@@ -311,7 +348,7 @@ const MyEstimates = () => {
           style={{ top: 20 }}
           bodyStyle={{ padding: 0 }}
         >
-          {selectedEstimate && selectedEstimate.final_quotation && (
+          {selectedEstimate && selectedEstimate.final_quotation ? (
             <div className="bg-white rounded-lg overflow-hidden">
                 
                 {/* 1. Invoice Header with Logo */}
@@ -340,17 +377,36 @@ const MyEstimates = () => {
                 {/* 2. Bill To & Project Info */}
                 <div className="p-8 bg-gray-50 border-b">
                     <Row gutter={24}>
-                        <Col span={12}>
-                            <h4 className="font-bold text-gray-700 uppercase text-xs mb-2">Bill To:</h4>
-                            <div className="text-sm text-gray-800 font-medium">{selectedEstimate.customer_name}</div>
-                            <div className="text-sm text-gray-500">{selectedEstimate.customer_email}</div>
-                            <div className="text-sm text-gray-500">{formatMobileNumber(selectedEstimate.customer_mobile)}</div>
-                        </Col>
+                       <Col span={12}>
+  <h4 className="font-bold text-gray-700 uppercase text-xs mb-2">
+    Bill To:
+  </h4>
+
+  {/* Customer Name */}
+  <div className="text-sm text-gray-800 font-medium">
+    {selectedEstimate.customer?.name
+      ? `${selectedEstimate.customer.name.first_name} ${selectedEstimate.customer.name.last_name}`
+      : selectedEstimate.customer_name}
+  </div>
+
+  {/* Customer Email */}
+  <div className="text-sm text-gray-500">
+    {selectedEstimate.customer?.email || selectedEstimate.customer_email}
+  </div>
+
+  {/* Customer Mobile */}
+  <div className="text-sm text-gray-500">
+    {selectedEstimate.customer?.mobile
+      ? `${selectedEstimate.customer.mobile.country_code} ${selectedEstimate.customer.mobile.number}`
+      : formatMobileNumber(selectedEstimate.customer_mobile)}
+  </div>
+</Col>
+
                         <Col span={12} className="text-right">
                             <h4 className="font-bold text-gray-700 uppercase text-xs mb-2">Project Details:</h4>
                             <div className="text-sm text-gray-800 font-medium">{selectedEstimate.service_type} - {selectedEstimate.subcategory?.label}</div>
                             <div className="text-sm text-gray-500">Package: {selectedEstimate.package?.name}</div>
-                            <div className="text-sm text-gray-500">Area: {selectedEstimate.area_sqft} sq.ft</div>
+                            <div className="text-sm text-gray-500">Area: {selectedEstimate.area_sqft} sq.ft ({selectedEstimate.area_length}x{selectedEstimate.area_width})</div>
                         </Col>
                     </Row>
                 </div>
@@ -431,6 +487,146 @@ const MyEstimates = () => {
                     </Space>
                 </div>
             </div>
+          ) : selectedEstimate && (
+            // Show detailed estimate view if no final_quotation yet
+            <div className="p-6">
+              <div className="text-center mb-8">
+                <Alert 
+                  message="Quotation Pending" 
+                  description="The final quotation is being prepared by our team. You'll be notified when it's ready for review." 
+                  type="info" 
+                  showIcon 
+                />
+              </div>
+              
+              {/* Estimate Details */}
+              <div className="flex justify-between items-center mb-6 p-5 bg-purple-50 rounded-xl border border-purple-100">
+                <div>
+                  <h3 className="text-xl font-bold text-purple-800 m-0">
+                    {selectedEstimate.service_type} - {selectedEstimate.subcategory?.label}
+                  </h3>
+                  <Text type="secondary">ID: {selectedEstimate._id}</Text>
+                </div>
+                <Tag color="blue">Status: {selectedEstimate.status}</Tag>
+              </div>
+
+              <Row gutter={16}>
+                <Col span={14}>
+                  {/* Customer Details */}
+                  <DetailCard title="Customer Details" icon={<IdcardOutlined />}>
+                    <Descriptions column={1} size="small" bordered={false}>
+                      <Descriptions.Item label={<Text strong><UserOutlined /> Name</Text>}>
+                        {getCustomerName(selectedEstimate.customer)}
+                      </Descriptions.Item>
+                      <Descriptions.Item label={<Text strong><MailOutlined /> Email</Text>}>
+                        {selectedEstimate.customer?.email || selectedEstimate.customer_email || 'N/A'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label={<Text strong><PhoneOutlined /> Mobile</Text>}>
+                        {formatMobileNumber(selectedEstimate.customer?.mobile || selectedEstimate.customer_mobile)}
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </DetailCard>
+
+                  {/* Project Images */}
+                  {(selectedEstimate.type_gallery_snapshot?.previewImage?.url || 
+                    selectedEstimate.type_gallery_snapshot?.moodboardImages?.length > 0) && (
+                    <DetailCard title="Project Images" icon={<PictureOutlined />}>
+                      <div className="space-y-4">
+                        {selectedEstimate.type_gallery_snapshot?.previewImage?.url && (
+                          <div>
+                            <Text strong>Preview Image:</Text>
+                            <div className="mt-2">
+                              <Image
+                                width="100%"
+                                src={getFullImageUrl(selectedEstimate.type_gallery_snapshot.previewImage.url)}
+                                alt={selectedEstimate.type_gallery_snapshot.previewImage.title || 'Preview'}
+                                className="rounded-md"
+                                fallback="https://via.placeholder.com/300x200?text=No+Image"
+                              />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedEstimate.type_gallery_snapshot?.moodboardImages?.length > 0 && (
+                          <div>
+                            <Text strong>Moodboard Images ({selectedEstimate.type_gallery_snapshot.moodboardImages.length}):</Text>
+                            <div className="mt-2 grid grid-cols-2 gap-3">
+                              {selectedEstimate.type_gallery_snapshot.moodboardImages.map((img, idx) => (
+                                <div key={idx} className="relative">
+                                  <Image
+                                    width="100%"
+                                    height={120}
+                                    src={getFullImageUrl(img.url)}
+                                    alt={img.title || `Moodboard ${idx + 1}`}
+                                    className="rounded-md object-cover"
+                                    fallback="https://via.placeholder.com/150x120?text=Image"
+                                  />
+                                  <div className="text-xs text-gray-500 mt-1 truncate">{img.title}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </DetailCard>
+                  )}
+                </Col>
+
+                <Col span={10}>
+                  {/* Service & Package Details */}
+                  <DetailCard title="Service Details" icon={<ToolOutlined />}>
+                    <Descriptions column={1} size="small" bordered={false}>
+                      <Descriptions.Item label="Service Type">
+                        <Tag color="purple">{selectedEstimate.service_type}</Tag>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Subcategory">
+                        <Text strong>{selectedEstimate.subcategory?.label}</Text>
+                        <div className="text-xs text-gray-500 mt-1">{selectedEstimate.subcategory?.description}</div>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Package">
+                        <div>
+                          <Text strong>{selectedEstimate.package?.name}</Text>
+                          <div className="text-xs text-gray-500 mt-1">{selectedEstimate.package?.description}</div>
+                          <div className="text-xs text-green-600 mt-1">
+                            Price: {formatCurrency(selectedEstimate.package?.price, selectedEstimate.package?.currency || 'AED')}
+                          </div>
+                        </div>
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </DetailCard>
+
+                  {/* Area Specifications */}
+                  <DetailCard title="Area Specifications" icon={<CalculatorOutlined />}>
+                    <div className="flex justify-around bg-gray-50 p-3 rounded-lg border mb-3">
+                      <div className="text-center">
+                        <Title level={4} className="m-0" style={{ color: PURPLE_THEME.primary }}>{selectedEstimate.area_sqft}</Title>
+                        <Text size="small" type="secondary">Sq.Ft</Text>
+                      </div>
+                      <Divider type="vertical" style={{ height: '40px' }} />
+                      <div className="text-center">
+                        <Title level={4} className="m-0">{selectedEstimate.area_length}x{selectedEstimate.area_width}</Title>
+                        <Text size="small" type="secondary">Dimensions</Text>
+                      </div>
+                    </div>
+                    <Text strong>Description:</Text>
+                    <p className="text-gray-600 mt-1" style={{ fontSize: '13px' }}>{selectedEstimate.description}</p>
+                  </DetailCard>
+
+                  {/* Process Timeline */}
+                  <DetailCard title="Process Timeline" icon={<HistoryOutlined />}>
+                    <Timeline mode="left" className="mt-2" size="small">
+                      <Timeline.Item color="green" label="Created">{formatDate(selectedEstimate.createdAt)}</Timeline.Item>
+                      <Timeline.Item color="blue" label="Submitted">{formatDate(selectedEstimate.submitted_at)}</Timeline.Item>
+                      <Timeline.Item color="orange" label="Status">{selectedEstimate.status}</Timeline.Item>
+                    </Timeline>
+                  </DetailCard>
+                </Col>
+              </Row>
+              
+              <div className="text-right mt-6 pt-4 border-t">
+                <Button onClick={() => setModalVisible(false)}>Close</Button>
+              </div>
+            </div>
           )}
         </Modal>
 
@@ -441,12 +637,32 @@ const MyEstimates = () => {
           onCancel={() => setRejectModalVisible(false)}
           footer={[
             <Button key="cancel" onClick={() => setRejectModalVisible(false)}>Cancel</Button>,
-            <Button key="reject" type="primary" danger loading={respondingId === selectedEstimate?._id} onClick={reject} icon={<CloseCircleOutlined />}>Reject Quotation</Button>,
+            <Button 
+              key="reject" 
+              type="primary" 
+              danger 
+              loading={respondingId === selectedEstimate?._id} 
+              onClick={reject} 
+              icon={<CloseCircleOutlined />}
+            >
+              Reject Quotation
+            </Button>,
           ]}
           width={500}
         >
-          <Alert message="We value your feedback" description="Please let us know why you are rejecting this quotation so we can improve." type="info" showIcon className="mb-4" />
-          <TextArea rows={4} placeholder="E.g. Price is too high, timeline doesn't work..." value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} />
+          <Alert 
+            message="We value your feedback" 
+            description="Please let us know why you are rejecting this quotation so we can improve." 
+            type="info" 
+            showIcon 
+            className="mb-4" 
+          />
+          <TextArea 
+            rows={4} 
+            placeholder="E.g. Price is too high, timeline doesn't work..." 
+            value={rejectReason} 
+            onChange={(e) => setRejectReason(e.target.value)} 
+          />
         </Modal>
 
       </div>

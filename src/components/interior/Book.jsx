@@ -41,56 +41,56 @@ export default function ConsultationSection() {
     setFormData(prev => ({ ...prev, number: value }));
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+ const onSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!formData.first_name.trim()) return alert("First name is required");
-    if (!formData.last_name.trim()) return alert("Last name is required");
-    if (!formData.email.includes("@")) return alert("Valid email is required");
-    if (formData.number.length < 8) return alert("Mobile number must be at least 8 digits");
-    if (!formData.message.trim()) return alert("Message is required");
+  if (!formData.first_name.trim()) return alert("First name is required");
+  if (!formData.last_name.trim()) return alert("Last name is required");
+  if (!formData.email.includes("@")) return alert("Valid email is required");
+  if (formData.number.length < 8) return alert("Mobile number must be at least 8 digits");
+  if (!formData.message.trim()) return alert("Message is required");
 
-    setLoading(true);
+  setLoading(true);
 
-    const payload = {
-      type:"interior",
-      name: {
-        first_name: formData.first_name.trim(),
-        last_name: formData.last_name.trim()
-      },
-      mobile: {
-        country_code: formData.country_code,
-        number: formData.number
-      },
-      email: formData.email.trim().toLowerCase(),
-      message: formData.message.trim(),
-      status: "submitted"
-    };
+  const payload = {
+    type: "consultation",
+    consultant_type: "interior",
 
-    try {
-      await apiService.post("/consult/", payload);
-
-      showSuccessAlert(
-        "Thank You!",
-        "Your consultation request has been submitted successfully. We'll contact you within 24 hours!"
-      );
-
-      setFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        country_code: "+971",
-        number: "",
-        message: ""
-      });
-
-    } catch (err) {
-      const errorMsg = err.response?.data?.message || "Submission failed. Please try again.";
-      alert(errorMsg);
-    } finally {
-      setLoading(false);
-    }
+    name: {
+      first_name: formData.first_name.trim(),
+      last_name: formData.last_name.trim()
+    },
+    mobile: {
+      country_code: formData.country_code,
+      number: formData.number
+    },
+    email: formData.email.trim().toLowerCase(),
+    message: formData.message.trim()
   };
+
+  try {
+    await apiService.post("/property/lead", payload);
+
+    showSuccessAlert(
+      "Thank You!",
+      "Your consultation request has been submitted successfully. We'll contact you within 24 hours!"
+    );
+
+    setFormData({
+      first_name: "",
+      last_name: "",
+      email: "",
+      country_code: "+971",
+      number: "",
+      message: ""
+    });
+
+  } catch (err) {
+    alert(err.response?.data?.message || "Submission failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <section className="relative w-full overflow-hidden bg-gray-900">

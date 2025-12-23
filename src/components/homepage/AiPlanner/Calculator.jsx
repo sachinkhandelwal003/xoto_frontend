@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   Card, Button, Typography, Form, Input, Select, Space, Row, Col, 
-  message, Spin, Result, Divider, Image, Badge, Empty, Tag
+  message, Spin, Result, Divider, Image, Badge, Empty, Tag, Checkbox,
+  Modal, Radio
 } from 'antd';
 import {
   UserOutlined, MailOutlined, CheckCircleOutlined,
@@ -10,7 +11,7 @@ import {
   EnvironmentOutlined, CalculatorOutlined, PhoneFilled, 
   ArrowRightOutlined, ArrowLeftOutlined, CheckOutlined,
   CompassOutlined, PictureOutlined, ExperimentOutlined ,
-  EnvironmentFilled, StarFilled
+  EnvironmentFilled, StarFilled, SelectOutlined
 } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiService } from '../../../manageApi/utils/custom.apiservice';
@@ -27,6 +28,7 @@ L.Icon.Default.mergeOptions({
 });
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 const BASE_URL = 'http://localhost:5000';
 const BRAND_PURPLE = '#5C039B';
@@ -55,7 +57,7 @@ const reverseGeocode = async (lat, lng) => {
     a.town ||
     a.municipality ||
     a.county ||
-    ""; // REAL city only
+    "";
 
   const area =
     a.suburb ||
@@ -72,11 +74,9 @@ const reverseGeocode = async (lat, lng) => {
   };
 };
 
-
-
 // Map Picker Component
 const MapPicker = ({ coords, onChange }) => {
-  const [position, setPosition] = useState(coords.lat && coords.lng ? [coords.lat, coords.lng] : [25.2048, 55.2708]); // Default to Dubai
+  const [position, setPosition] = useState(coords.lat && coords.lng ? [coords.lat, coords.lng] : [25.2048, 55.2708]);
   
   useEffect(() => {
     if (coords.lat && coords.lng) {
@@ -122,23 +122,26 @@ const Calculator = () => {
   const [packages, setPackages] = useState([]);
   const [typeGallery, setTypeGallery] = useState(null);
   const [moodboardData, setMoodboardData] = useState([]);
+  const [selectedMoodboardImages, setSelectedMoodboardImages] = useState([]);
 
   // User Selections
-const [coords, setCoords] = useState({
-  lat: null,
-  lng: null,
-  country: "",
-  state: "",
-  city: "",
-  area: "",
-  address: ""
-});
+  const [coords, setCoords] = useState({
+    lat: null,
+    lng: null,
+    country: "",
+    state: "",
+    city: "",
+    area: "",
+    address: ""
+  });
 
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [selectedPackage, setSelectedPackage] = useState('');
   const [length, setLength] = useState('');
   const [width, setWidth] = useState('');
+  const [countryCode, setCountryCode] = useState('+971');
+  const [splitName, setSplitName] = useState({ firstName: '', lastName: '' });
   
   const [loading, setLoading] = useState({
     subcat: true,
@@ -151,6 +154,20 @@ const [coords, setCoords] = useState({
   });
 
   const areaSqFt = length && width ? Math.round(parseFloat(length) * parseFloat(width)) : 0;
+
+  // Country codes for dropdown
+  const countryCodes = [
+    { value: '+971', label: 'UAE (+971)' },
+    { value: '+966', label: 'KSA (+966)' },
+    { value: '+974', label: 'Qatar (+974)' },
+    { value: '+968', label: 'Oman (+968)' },
+    { value: '+973', label: 'Bahrain (+973)' },
+    { value: '+965', label: 'Kuwait (+965)' },
+    { value: '+91', label: 'India (+91)' },
+    { value: '+92', label: 'Pakistan (+92)' },
+    { value: '+44', label: 'UK (+44)' },
+    { value: '+1', label: 'USA/Canada (+1)' },
+  ];
 
   // --- API FETCHING ---
   useEffect(() => {
@@ -211,30 +228,27 @@ const [coords, setCoords] = useState({
         try {
           const geo = await reverseGeocode(lat, lng);
           
-      setCoords({
-  lat,
-  lng,
-  country: geo.country,
-  state: geo.state,
-  city: geo.city,
-  area: geo.area,
-  address: geo.fullAddress
-});
-
-
+          setCoords({
+            lat,
+            lng,
+            country: geo.country,
+            state: geo.state,
+            city: geo.city,
+            area: geo.area,
+            address: geo.fullAddress
+          });
           
           message.success("Location synchronized!");
         } catch (error) {
-       setCoords({
-  lat,
-  lng,
-  country: geo.country,
-  state: geo.state,
-  city: geo.city,
-  area: geo.area,
-  address: geo.fullAddress
-});
-
+          setCoords({
+            lat,
+            lng,
+            country: "",
+            state: "",
+            city: "",
+            area: "",
+            address: ""
+          });
           message.warning("Location detected but address details unavailable");
         } finally {
           setLoading(prev => ({ ...prev, submitting: false, geocoding: false }));
@@ -252,15 +266,14 @@ const [coords, setCoords] = useState({
     try {
       const geo = await reverseGeocode(lat, lng);
       setCoords({
-  lat,
-  lng,
-  country: geo.country,
-  state: geo.state,
-  city: geo.city,
-  area: geo.area,
-  address: geo.fullAddress
-});
-
+        lat,
+        lng,
+        country: geo.country,
+        state: geo.state,
+        city: geo.city,
+        area: geo.area,
+        address: geo.fullAddress
+      });
       message.success("Location updated!");
     } catch (error) {
       message.error("Could not fetch address details");
@@ -286,8 +299,13 @@ const [coords, setCoords] = useState({
     try {
       const res = await apiService.get(`/estimate/master/category/types/${selectedType}/gallery/moodboard/generate`);
       if (res.success) {
-        setMoodboardData(res.moodboard || []);
+        const moodboard = res.moodboard || [];
+        setMoodboardData(moodboard);
+        // Auto-select first 4 images or all if less than 4
+        const autoSelected = moodboard.slice(0, Math.min(4, moodboard.length)).map(img => img._id || img.id);
+        setSelectedMoodboardImages(autoSelected);
         setActiveStep(4);
+        message.success("Moodboard generated! Select your favorite images.");
       }
     } catch (err) {
       message.error("Moodboard generation failed");
@@ -296,32 +314,84 @@ const [coords, setCoords] = useState({
     }
   };
 
+  const handleMoodboardImageToggle = (imageId) => {
+    setSelectedMoodboardImages(prev => {
+      if (prev.includes(imageId)) {
+        return prev.filter(id => id !== imageId);
+      } else {
+        return [...prev, imageId];
+      }
+    });
+  };
+
   const onFinalSubmit = async (values) => {
     setLoading(prev => ({ ...prev, submitting: true }));
+    
+    // Get selected moodboard images data
+    const selectedMoodboardData = moodboardData.filter(img => 
+      selectedMoodboardImages.includes(img._id || img.id)
+    ).map(img => ({
+      id: img._id || img.id,
+      url: img.url || img.imageUrl
+    }));
+
+    // Split full name into first and last
+    const fullName = values.customer_name || "";
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
     const payload = {
       service_type: "landscape",
-      customer_name: values.customer_name,
+      customer_name: {
+        first_name: firstName,
+        last_name: lastName
+      },
       customer_email: values.customer_email,
-      customer_mobile: { number: values.mobileNumber },
-      coordinates: coords,
-      subcategory: selectedSubcategory,
+      customer_mobile: {
+        country_code: countryCode,
+        number: values.mobileNumber
+      },
       type: selectedType,
+      type_gallery_snapshot: {
+        moodboardImages: selectedMoodboardData
+      },
+      subcategory: selectedSubcategory,
+      package: selectedPackage,
+      area_length: parseFloat(length),
+      area_width: parseFloat(width),
       area_sqft: areaSqFt,
-      package: selectedPackage
+      description: `Landscaping project for ${areaSqFt} sqft area with ${types.find(t => t._id === selectedType)?.label} style`,
+      location: {
+        lat: coords.lat,
+        lng: coords.lng,
+        country: coords.country,
+        state: coords.state,
+        city: coords.city,
+        area: coords.area,
+        address: coords.address
+      }
     };
+
+    console.log("Submitting payload:", payload); // For debugging
+
     try {
       await apiService.post("/estimates/submit", payload);
       setActiveStep(8);
       setTimeout(() => setActiveStep(9), 8000);
+      message.success("Estimate submitted successfully!");
     } catch (err) {
-      message.error("Submission failed");
+      console.error("Submission error:", err);
+      message.error("Submission failed. Please try again.");
     } finally {
       setLoading(prev => ({ ...prev, submitting: false }));
     }
   };
 
   const handleNext = () => {
-    if (activeStep === 2) fetchTypePreview(selectedType);
+    if (activeStep === 2 && selectedType) {
+      fetchTypePreview(selectedType);
+    }
     setActiveStep(prev => prev + 1);
   };
 
@@ -332,6 +402,7 @@ const [coords, setCoords] = useState({
       case 0: return !!coords.lat;
       case 1: return !!selectedSubcategory;
       case 2: return !!selectedType;
+      case 4: return selectedMoodboardImages.length > 0;
       case 5: return areaSqFt >= 100;
       case 6: return !!selectedPackage;
       default: return true;
@@ -371,7 +442,7 @@ const [coords, setCoords] = useState({
             <div className="mb-6 inline-block p-6 rounded-full bg-purple-50">
               <CompassOutlined style={{ color: BRAND_PURPLE, fontSize: '3rem' }} />
             </div>
-            <Title level={2}>Locate Your Property</Title>
+            <Title level={2}>Locate Your Address</Title>
             <Text className="text-lg text-gray-400 block mb-10">
               We use GPS coordinates for accurate site analysis. Click on the map to adjust your exact location.
             </Text>
@@ -446,7 +517,7 @@ const [coords, setCoords] = useState({
             <Title level={2} className="text-center mb-10">What are we designing?</Title>
             <Row gutter={[24, 24]}>
               {subcategories.map(sub => (
-                <Col xs={24} sm={12} md={8} key={sub._id}>
+                <Col xs={24} sm={12} md={8} key={sub._id} className='p-10'>
                   <SelectionCard 
                     item={sub} 
                     isSelected={selectedSubcategory === sub._id} 
@@ -519,33 +590,72 @@ const [coords, setCoords] = useState({
       case 4:
         return (
           <motion.div {...variants}>
-            <Title level={2} className="text-center mb-2">Style Moodboard</Title>
+            <Title level={2} className="text-center mb-2">Select Your Favorite Moodboard Images</Title>
             <Text type="secondary" className="text-center block mb-10">
-              Recommended textures, plants, and materials for your project.
+              Choose the images that best represent your vision ({selectedMoodboardImages.length} selected)
             </Text>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {moodboardData.map((img, i) => (
-                <motion.div 
-                  key={i} 
-                  initial={{ opacity: 0, scale: 0.9 }} 
-                  animate={{ opacity: 1, scale: 1 }} 
-                  transition={{ delay: i * 0.1 }}
-                  className="group relative"
-                >
-                  <Card 
-                    hoverable 
-                    className="overflow-hidden rounded-3xl border-none shadow-lg group-hover:shadow-2xl transition-all"
-                    cover={
-                      <Image 
-                        src={`${BASE_URL}${img.url}`} 
-                        className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                        alt={`Moodboard item ${i + 1}`}
-                      />
-                    }
-                  />
-                </motion.div>
-              ))}
+            
+            <div className="mb-8 flex justify-center">
+              <Tag color="purple" className="px-6 py-2 rounded-full text-lg">
+                <SelectOutlined /> Select at least 1 image to continue
+              </Tag>
             </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {moodboardData.map((img, i) => {
+                const isSelected = selectedMoodboardImages.includes(img._id || img.id);
+                return (
+                  <motion.div 
+                    key={i} 
+                    initial={{ opacity: 0, scale: 0.9 }} 
+                    animate={{ opacity: 1, scale: 1 }} 
+                    transition={{ delay: i * 0.1 }}
+                    className="group relative"
+                    onClick={() => handleMoodboardImageToggle(img._id || img.id)}
+                  >
+                    <Card 
+                      hoverable 
+                      className={`overflow-hidden rounded-3xl border-2 transition-all cursor-pointer
+                        ${isSelected ? 'border-purple-500 shadow-2xl' : 'border-gray-100 hover:border-gray-300'}`}
+                      cover={
+                        <div className="relative">
+                          <Image 
+                            src={`${BASE_URL}${img.url || img.imageUrl}`} 
+                            className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                            alt={`Moodboard item ${i + 1}`}
+                          />
+                          {isSelected && (
+                            <div className="absolute top-4 right-4">
+                              <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center">
+                                <CheckOutlined className="text-white text-lg" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      }
+                    >
+                      <div className="text-center">
+                        <Checkbox 
+                          checked={isSelected}
+                          onChange={() => handleMoodboardImageToggle(img._id || img.id)}
+                          className="mr-2"
+                        >
+                          Select
+                        </Checkbox>
+                      </div>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+            
+            {selectedMoodboardImages.length > 0 && (
+              <div className="mt-10 text-center">
+                <Text type="secondary">
+                  Selected {selectedMoodboardImages.length} image(s) for your project
+                </Text>
+              </div>
+            )}
           </motion.div>
         );
 
@@ -570,6 +680,7 @@ const [coords, setCoords] = useState({
                       onChange={e => setLength(e.target.value)} 
                       className="mt-3 h-14 rounded-2xl border-gray-100" 
                       placeholder="Enter length"
+                      min="1"
                     />
                   </Col>
                   <Col span={12}>
@@ -581,9 +692,17 @@ const [coords, setCoords] = useState({
                       onChange={e => setWidth(e.target.value)} 
                       className="mt-3 h-14 rounded-2xl border-gray-100" 
                       placeholder="Enter width"
+                      min="1"
                     />
                   </Col>
                 </Row>
+                {areaSqFt > 0 && (
+                  <div className="mt-6 text-center">
+                    <Text type={areaSqFt < 100 ? "danger" : "success"}>
+                      Minimum area required: 100 sqft (Current: {areaSqFt} sqft)
+                    </Text>
+                  </div>
+                )}
               </div>
             </Card>
           </motion.div>
@@ -628,6 +747,10 @@ const [coords, setCoords] = useState({
         );
 
       case 7:
+        const selectedPkg = packages.find(p => p._id === selectedPackage);
+        const selectedTypeData = types.find(t => t._id === selectedType);
+        const selectedSubcat = subcategories.find(s => s._id === selectedSubcategory);
+
         return (
           <motion.div {...variants} className="max-w-5xl mx-auto">
             <Row gutter={48}>
@@ -638,13 +761,13 @@ const [coords, setCoords] = useState({
                     <div>
                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Service Type</Text>
                       <Text strong className="text-white text-xl uppercase">
-                        {subcategories.find(s => s._id === selectedSubcategory)?.label}
+                        {selectedSubcat?.label || 'Landscaping'}
                       </Text>
                     </div>
                     <div>
                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Selected Style</Text>
                       <Text strong className="text-white text-xl">
-                        {types.find(t => t._id === selectedType)?.label}
+                        {selectedTypeData?.label || 'Not selected'}
                       </Text>
                     </div>
                     <div>
@@ -656,12 +779,21 @@ const [coords, setCoords] = useState({
                     <div>
                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Area Details</Text>
                       <Text strong className="text-white text-xl">{areaSqFt} SQ FT</Text>
+                      <Text className="text-purple-300 text-xs">
+                        ({length}ft × {width}ft)
+                      </Text>
+                    </div>
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Moodboard Images</Text>
+                      <Text strong className="text-white text-xl">
+                        {selectedMoodboardImages.length} selected
+                      </Text>
                     </div>
                     <Divider className="border-purple-400 opacity-30" />
                     <div className="p-5 bg-white/10 rounded-2xl flex items-center justify-between border border-white/10">
                       <Text className="text-white">Tier Selection</Text>
                       <Tag color="gold" className="m-0 border-none font-bold px-3">
-                        {packages.find(p => p._id === selectedPackage)?.name}
+                        {selectedPkg?.name || 'Not selected'}
                       </Tag>
                     </div>
                   </div>
@@ -670,15 +802,71 @@ const [coords, setCoords] = useState({
               <Col xs={24} lg={14}>
                 <Card className="rounded-[2.5rem] shadow-xl border-none p-6">
                   <Form form={form} layout="vertical" onFinish={onFinalSubmit} size="large">
-                    <Form.Item name="customer_name" label="Full Name" rules={[{ required: true }]}>
-                      <Input prefix={<UserOutlined className="text-gray-300" />} className="rounded-xl h-14" />
+                    <Form.Item 
+                      name="customer_name" 
+                      label="Full Name" 
+                      rules={[{ required: true, message: 'Please enter your full name' }]}
+                    >
+                      <Input 
+                        prefix={<UserOutlined className="text-gray-300" />} 
+                        className="rounded-xl h-14" 
+                        placeholder="John Doe"
+                      />
                     </Form.Item>
-                    <Form.Item name="customer_email" label="Email Address" rules={[{ required: true, type: 'email' }]}>
-                      <Input prefix={<MailOutlined className="text-gray-300" />} className="rounded-xl h-14" />
+                    
+                    <Form.Item 
+                      name="customer_email" 
+                      label="Email Address" 
+                      rules={[
+                        { required: true, message: 'Please enter your email' },
+                        { type: 'email', message: 'Please enter a valid email' }
+                      ]}
+                    >
+                      <Input 
+                        prefix={<MailOutlined className="text-gray-300" />} 
+                        className="rounded-xl h-14" 
+                        placeholder="john@example.com"
+                      />
                     </Form.Item>
-                    <Form.Item name="mobileNumber" label="Contact Number" rules={[{ required: true }]}>
-                      <Input prefix={<PhoneFilled className="text-gray-300" />} placeholder="50xxxxxxx" className="rounded-xl h-14" />
+                    
+                    <Form.Item 
+                      label="Contact Number" 
+                      required
+                    >
+                      <Row gutter={8}>
+                        <Col span={8}>
+                          <Select
+                            value={countryCode}
+                            onChange={setCountryCode}
+                            className="w-full rounded-xl h-14"
+                            size="large"
+                          >
+                            {countryCodes.map(code => (
+                              <Option key={code.value} value={code.value}>
+                                {code.label}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Col>
+                        <Col span={16}>
+                          <Form.Item 
+                            name="mobileNumber"
+                            noStyle
+                            rules={[
+                              { required: true, message: 'Please enter your phone number' },
+                              { pattern: /^[0-9]{7,15}$/, message: 'Please enter a valid phone number' }
+                            ]}
+                          >
+                            <Input 
+                              prefix={<PhoneFilled className="text-gray-300" />} 
+                              className="rounded-xl h-14" 
+                              placeholder="Phone number"
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
                     </Form.Item>
+                    
                     <Button 
                       type="primary" 
                       htmlType="submit" 
@@ -706,7 +894,7 @@ const [coords, setCoords] = useState({
               <div className="my-12">
                 <Text className="text-gray-400 uppercase tracking-widest block mb-3">Estimated Investment Range</Text>
                 <div className="text-8xl font-black text-gray-900">
-                  {pkg?.price || '25,000'} <small className="text-3xl font-light">AED</small>
+                  {pkg?.price ? pkg.price.toLocaleString() : '25,000'} <small className="text-3xl font-light">AED</small>
                 </div>
               </div>
             </div>
@@ -730,8 +918,9 @@ const [coords, setCoords] = useState({
                   size="large" 
                   className="h-12 px-10 rounded-xl border-none shadow-lg" 
                   style={{ backgroundColor: BRAND_PURPLE }}
+                  onClick={() => window.open('/', '_blank')}
                 >
-                  Visit Our Gallery
+                  Go to Home
                 </Button>
               ]}
             />
