@@ -1,0 +1,45 @@
+{
+  "heading": "Unser Serviceportfolio",
+  "services": {
+    "hardscape": {
+      "title": "Hardscape",
+      "items": [
+        "Pflasterarbeiten (Stein, Fliesen)",
+        "Pergolen und Pavillons",
+        "Terrassenbeläge (Holz, WPC, Verbund)",
+        "Grenz- und Stützmauern",
+        "Outdoor-Küchen & BBQ-Stationen",
+        "Wasserelemente (Brunnen, Wasserfälle)"
+      ]
+    },
+    "softscape": {
+      "title": "Softscape",
+      "items": [
+        "Bodenvorbereitung und Nivellierung",
+        "Bepflanzung (Bäume, Sträucher)",
+        "Raseninstallation",
+        "Mulchen und Bodenverbesserung",
+        "Saisonale Bepflanzung & Farbkonzepte"
+      ]
+    },
+    "pool": {
+      "title": "Swimmingpools",
+      "items": [
+        "Pooldesign und Bau",
+        "Whirlpools, Spas & Filtersysteme"
+      ]
+    },
+    "other": {
+      "title": "Weitere Lösungen",
+      "items": [
+        "Sonnenschirme",
+        "Terrassenbeläge",
+        "Pavillons",
+        "Pflanzgefäße",
+        "Bodenbeläge",
+        "BBQ",
+        "Töpfe & Brunnen"
+      ]
+    }
+  }
+}

@@ -1,15 +1,21 @@
 {
   "nav": {
     "home": "Home",
+    "homeUpgrade": "Pag-upgrade ng Bahay",
     "landscaping": "Landscaping",
-    "interiors": "Interiors",
-    "mortgages": "Mga Serbisyong Pautang",
-    "ecosystem": "Partner Ecosystem",
+    "interiors": "Interyor",
+    "homeOwnership": "Pagmamay-ari ng Bahay",
+    "mortgages": "Mortgage",
+    "properties": "Mga Ari-arian",
     "store": "Xoto Store",
-    "properties": "Mga Property",
-    "blogs": "Mga Blog",
+    "knowledgeHub": "Sentro ng Kaalaman",
+    "blogs": "Blogs",
+    "caseStudies": "Mga Case Study",
+    "training": "Pagsasanay",
+    "ecosystem": "Partner Ecosystem",
+    "about": "Tungkol sa Amin",
     "contact": "Makipag-ugnayan",
     "login": "Mag-login",
-    "tagline": "Pinapagana ng AI. Inspirado ng Iyo."
+    "tagline": "Pinapagana ng AI. Inspirado para sa iyo."
   }
 }

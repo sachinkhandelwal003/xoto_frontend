@@ -1,0 +1,45 @@
+{
+  "heading": "Hizmet Portföyümüz",
+  "services": {
+    "hardscape": {
+      "title": "Sert Zemin",
+      "items": [
+        "Döşeme (taş, karo)",
+        "Pergola ve çardaklar",
+        "Deck kaplamaları",
+        "Duvarlar ve çitler",
+        "Açık hava mutfakları ve BBQ",
+        "Su özellikleri"
+      ]
+    },
+    "softscape": {
+      "title": "Peyzaj",
+      "items": [
+        "Toprak hazırlığı",
+        "Bitkilendirme",
+        "Çim kurulumu",
+        "Malçlama",
+        "Mevsimlik bitkiler"
+      ]
+    },
+    "pool": {
+      "title": "Yüzme Havuzları",
+      "items": [
+        "Havuz tasarımı ve yapımı",
+        "Jakuzi ve filtrasyon"
+      ]
+    },
+    "other": {
+      "title": "Diğer Çözümler",
+      "items": [
+        "Şemsiyeler",
+        "Deck",
+        "Gazebolar",
+        "Saksılar",
+        "Zemin kaplamaları",
+        "BBQ",
+        "Saksı ve fıskiyeler"
+      ]
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "heading": "EcoSmart Wohnen",
+  "description": "Bei XOTO bedeutet EcoSmart Living die perfekte Balance aus Schönheit, Nachhaltigkeit und Technologie.",
+  "subheading": "So erwecken wir es zum Leben",
+  "features": {
+    "smartClimate": {
+      "title": "Intelligente Klimasteuerung",
+      "text": "Automatisierte Temperatur- und Belüftungssysteme zur Energieeinsparung."
+    },
+    "lighting": {
+      "title": "LED- & Solarbeleuchtung",
+      "text": "Energiesparende, stimmungsvolle Beleuchtung für Ihr Zuhause."
+    },
+    "materials": {
+      "title": "Nachhaltige Materialien",
+      "text": "Umweltfreundliches Holz, Stein und Oberflächen."
+    },
+    "water": {
+      "title": "Wassersparende Armaturen",
+      "text": "Moderne Armaturen zur Reduzierung des Wasserverbrauchs."
+    },
+    "automation": {
+      "title": "Automatisiertes Hausmanagement",
+      "text": "Steuern Sie Licht, Klima und Geräte per App oder Sprache."
+    },
+    "future": {
+      "title": "Zukunftsfähige Innenräume",
+      "text": "Flexible Designs für kommende grüne Technologien."
+    }
+  }
+}

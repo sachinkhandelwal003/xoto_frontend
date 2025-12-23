@@ -1,0 +1,45 @@
+{
+  "heading": "Nuestro Portafolio de Servicios",
+  "services": {
+    "hardscape": {
+      "title": "Hardscape",
+      "items": [
+        "Pavimentación (adoquines, baldosas, piedra)",
+        "Pérgolas y cenadores",
+        "Tarimas (madera, WPC, compuestos)",
+        "Muros perimetrales y de contención",
+        "Cocinas exteriores y BBQ",
+        "Fuentes y cascadas"
+      ]
+    },
+    "softscape": {
+      "title": "Softscape",
+      "items": [
+        "Preparación y nivelación del suelo",
+        "Plantación (árboles y arbustos)",
+        "Instalación de césped",
+        "Acolchado y mejora del suelo",
+        "Plantación estacional y colores"
+      ]
+    },
+    "pool": {
+      "title": "Piscinas",
+      "items": [
+        "Diseño y construcción de piscinas",
+        "Jacuzzis, spas y filtración"
+      ]
+    },
+    "other": {
+      "title": "Otras Soluciones",
+      "items": [
+        "Sombrillas",
+        "Tarimas",
+        "Gazebos",
+        "Maceteros",
+        "Pavimentos",
+        "BBQ",
+        "Macetas y fuentes"
+      ]
+    }
+  }
+}

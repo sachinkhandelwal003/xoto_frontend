@@ -1,42 +1,45 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import waveBg from "../../assets/img/wave/wave2.png";
 
-// ✅ Local image imports
+// Local image imports
 import solarLighting from "../../assets/img/solar.png";
 import lowWaterPlant from "../../assets/img/jungle.png";
 import ecoMaterials from "../../assets/img/wooden.png";
 import automatedControl from "../../assets/img/mobile.png";
 import futureReady from "../../assets/img/something.png";
 
-const features = [
-  {
-    title: "Smart Irrigation",
-    text: "Sensor-based watering systems that conserve water.",
-    gradient: true,
-  },
-  {
-    title: "Solar Lighting",
-    image: solarLighting,
-  },
-  {
-    title: "Low Water Plant",
-    image: lowWaterPlant,
-  },
-  {
-    title: "Eco Materials",
-    image: ecoMaterials,
-  },
-  {
-    title: "Automated Control",
-    image: automatedControl,
-  },
-  {
-    title: "Future-Ready Design",
-    image: futureReady,
-  },
-];
-
 export default function EcoSmartLiving() {
+  // 🔥 scape1 namespace
+  const { t } = useTranslation("scape1");
+
+  const features = [
+    {
+      key: "smartIrrigation",
+      gradient: true,
+    },
+    {
+      key: "solarLighting",
+      image: solarLighting,
+    },
+    {
+      key: "lowWaterPlant",
+      image: lowWaterPlant,
+    },
+    {
+      key: "ecoMaterials",
+      image: ecoMaterials,
+    },
+    {
+      key: "automatedControl",
+      image: automatedControl,
+    },
+    {
+      key: "futureReady",
+      image: futureReady,
+    },
+  ];
+
   return (
     <section className="relative w-full overflow-hidden pb-20 bg-white min-h-screen">
       {/* Wave Background */}
@@ -50,36 +53,38 @@ export default function EcoSmartLiving() {
 
       {/* Content */}
       <div className="relative z-10 text-center mt-16 px-6">
+        {/* MAIN HEADING */}
         <h1 className="text-4xl md:text-5xl card-heading-1 text-black">
-          EcoSmart Living
+          {t("heading")}
         </h1>
 
+        {/* DESCRIPTION */}
         <p className="mt-4 text-[#547593] paragraph-light-1 max-w-3xl mx-auto text-lg">
-          At XOTO, EcoSmart Living means creating landscapes that balance
-          beauty, sustainability, and technology. Our designs use smart
-          automation and eco-friendly solutions to make outdoor spaces
-          efficient, self-sustaining, and effortlessly modern.
+          {t("description")}
         </p>
 
+        {/* SUB HEADING */}
         <h2 className="text-3xl font-semibold mt-10 text-black leading-tight">
-          How We Bring It to Life
+          {t("subheading")}
         </h2>
 
-        {/* Features Grid */}
+        {/* FEATURES GRID */}
         <div className="mt-14 flex flex-col items-center gap-10">
-          {/* Row 1 */}
+          {/* ROW 1 */}
           <div className="flex flex-wrap justify-center gap-20">
-            {/* Smart Irrigation (gradient card) */}
+            {/* GRADIENT CARD */}
             <div className="rounded-full p-[12px] ring-4 ring-transparent hover:ring-[#5C039B] transition-all duration-300">
-              <div className="w-[200px] h-[200px] rounded-full flex flex-col items-center justify-center text-center text-white font-semibold shadow-xl bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400 hover:scale-105 hover:shadow-2xl transition-all duration-300">
-                <span className="text-lg font-bold">Smart Irrigation</span>
+              <div className="w-[200px] h-[200px] rounded-full flex flex-col items-center justify-center text-center text-white shadow-xl bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400 hover:scale-105 hover:shadow-2xl transition-all duration-300">
+                <span className="text-lg font-bold">
+                  {t("features.smartIrrigation.title")}
+                </span>
                 <p className="text-xs mt-1 px-3 opacity-90">
-                  Sensor-based watering systems that conserve water.
+                  {t("features.smartIrrigation.text")}
                 </p>
               </div>
             </div>
 
-            {/* Solar Lighting + Low Water Plant */}
+            {/* NEXT TWO */}
             {features.slice(1, 3).map((item, i) => (
               <div
                 key={i}
@@ -90,14 +95,14 @@ export default function EcoSmartLiving() {
                   style={{ backgroundImage: `url(${item.image})` }}
                 >
                   <div className="bg-black/40 w-full h-full rounded-full flex items-center justify-center px-2 text-center text-white font-semibold">
-                    {item.title}
+                    {t(`features.${item.key}`)}
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Row 2 */}
+          {/* ROW 2 */}
           <div className="flex flex-wrap justify-center gap-20">
             {features.slice(3).map((item, i) => (
               <div
@@ -109,7 +114,7 @@ export default function EcoSmartLiving() {
                   style={{ backgroundImage: `url(${item.image})` }}
                 >
                   <div className="bg-black/40 w-full h-full rounded-full flex items-center justify-center px-2 text-center text-white font-semibold">
-                    {item.title}
+                    {t(`features.${item.key}`)}
                   </div>
                 </div>
               </div>

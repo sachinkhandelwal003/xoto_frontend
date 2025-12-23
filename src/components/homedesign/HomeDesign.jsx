@@ -117,8 +117,7 @@ const hotspots = [
           <div className="relative flex  lg:justify-center md:justify-center sm:justify-center px-10 mt-10">
             <div>
           <img
-  src="https://xoto.ae/api/uploads/1766498155933.jpg
-"
+  src={houseimage}
   alt={t("homeDesign.title2")}
   className="
     h-[300px] sm:h-[400px] lg:h-[500px]

@@ -1,15 +1,21 @@
 {
   "nav": {
     "home": "Ana Sayfa",
+    "homeUpgrade": "Ev Yenileme",
     "landscaping": "Peyzaj",
     "interiors": "İç Mekan",
+    "homeOwnership": "Ev Sahipliği",
     "mortgages": "Konut Kredileri",
-    "ecosystem": "Partner Ekosistemi",
+    "properties": "Emlaklar",
     "store": "Xoto Mağaza",
-    "properties": "İlanlar",
+    "knowledgeHub": "Bilgi Merkezi",
     "blogs": "Bloglar",
+    "caseStudies": "Vaka Çalışmaları",
+    "training": "Eğitim",
+    "ecosystem": "Ortak Ekosistemi",
+    "about": "Hakkımızda",
     "contact": "İletişim",
     "login": "Giriş Yap",
-    "tagline": "Yapay zeka ile güçlendirilmiş, sizden ilham alan."
+    "tagline": "Yapay Zeka ile Güçlendirildi. Sizin için ilham aldı."
   }
 }

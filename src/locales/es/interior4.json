@@ -1,0 +1,11 @@
+{
+  "title": "Nuestro Portafolio de Servicios",
+  "services": {
+    "kitchen": "Cocinas Modulares",
+    "wardrobe": "Armarios Modulares",
+    "electrical": "Eléctrico",
+    "civil": "Trabajo Civil",
+    "lighting": "Iluminación",
+    "wall": "Decoración de Pared"
+  }
+}

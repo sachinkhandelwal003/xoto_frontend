@@ -1,0 +1,16 @@
+{
+  "title": "Book Consultation",
+  "description": "One simple form to connect with XOTO experts for tailored interior design advice and project planning.",
+  "form": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email Address",
+    "mobile": "Mobile Number",
+    "message": "Your Message"
+  },
+  "buttons": {
+    "submit": "Book Free Consultation",
+    "submitting": "Submitting Request..."
+  },
+  "privacy": "We respect your privacy. Your information is safe with us."
+}

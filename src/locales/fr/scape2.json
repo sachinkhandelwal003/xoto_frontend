@@ -1,0 +1,45 @@
+{
+  "heading": "Notre Portefeuille de Services",
+  "services": {
+    "hardscape": {
+      "title": "Aménagement Minéral",
+      "items": [
+        "Pavage (dalles, pierres)",
+        "Pergolas et kiosques",
+        "Terrasses (bois, composite)",
+        "Murs et clôtures",
+        "Cuisines extérieures et BBQ",
+        "Fontaines et cascades"
+      ]
+    },
+    "softscape": {
+      "title": "Aménagement Végétal",
+      "items": [
+        "Préparation et nivellement du sol",
+        "Plantation d’arbres et arbustes",
+        "Installation de pelouse",
+        "Paillage et amélioration du sol",
+        "Plantation saisonnière"
+      ]
+    },
+    "pool": {
+      "title": "Piscines",
+      "items": [
+        "Conception et construction de piscines",
+        "Spas, jacuzzis et filtration"
+      ]
+    },
+    "other": {
+      "title": "Autres Solutions",
+      "items": [
+        "Parasols",
+        "Terrasses",
+        "Gazebos",
+        "Jardinières",
+        "Revêtements",
+        "BBQ",
+        "Pots et fontaines"
+      ]
+    }
+  }
+}
