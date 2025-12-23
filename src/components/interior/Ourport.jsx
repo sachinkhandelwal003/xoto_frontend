@@ -1,5 +1,6 @@
 import waveint2 from "../../assets/img/service/wave4.png";
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import construction from "../../assets/img/service/construction-worker.png";
 import electrical from "../../assets/img/service/electrical.png";
@@ -11,47 +12,54 @@ import wardrobe from "../../assets/img/service/wardrobe123.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ServicesPortfolio() {
-  const scrollRef = useRef(null);
+  // 🔥 IMPORTANT: interior4 namespace
+  const { t } = useTranslation("interior4");
 
-  // ⭐ ADD THIS → active button state
+  const scrollRef = useRef(null);
   const [activeBtn, setActiveBtn] = useState("right");
 
   const scrollLeft = () => {
     if (scrollRef.current) {
       const cardWidth = scrollRef.current.firstChild?.offsetWidth || 280;
-      scrollRef.current.scrollBy({ left: -(cardWidth + 25), behavior: "smooth" });
+      scrollRef.current.scrollBy({
+        left: -(cardWidth + 25),
+        behavior: "smooth",
+      });
     }
   };
 
   const scrollRight = () => {
     if (scrollRef.current) {
       const cardWidth = scrollRef.current.firstChild?.offsetWidth || 280;
-      scrollRef.current.scrollBy({ left: cardWidth + 25, behavior: "smooth" });
+      scrollRef.current.scrollBy({
+        left: cardWidth + 25,
+        behavior: "smooth",
+      });
     }
   };
 
+  // ❌ UI change नहीं, सिर्फ keys
   const services = [
-    { title: "Modular Kitchens", icon: kitchen },
-    { title: "Modular Wardrobes", icon: wardrobe },
-    { title: "Electrical", icon: electrical },
-    { title: "Civil Work", icon: construction },
-    { title: "Lighting", icon: lamp },
-    { title: "Wall Decor", icon: wall },
+    { title: "services.kitchen", icon: kitchen },
+    { title: "services.wardrobe", icon: wardrobe },
+    { title: "services.electrical", icon: electrical },
+    { title: "services.civil", icon: construction },
+    { title: "services.lighting", icon: lamp },
+    { title: "services.wall", icon: wall },
   ];
 
   return (
     <section className="relative w-full overflow-hidden bg-[var(--color-body)] py-20 sm:py-24">
-
       {/* Heading */}
       <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="heading-dark-1 sm:text-4xl md:text-5xl text-center text-black">
-          Our Services Portfolio
+          {/* 🔥 interior4.json → title */}
+          {t("title")}
         </h2>
       </div>
 
       {/* Horizontal Scroller */}
       <div className="relative w-full px-4 sm:pl-16 z-20 mt-16 flex flex-col gap-4">
-
         <div
           ref={scrollRef}
           className="flex gap-5 sm:gap-8 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pb-10"
@@ -66,53 +74,51 @@ export default function ServicesPortfolio() {
               style={{ boxShadow: "0 12px 28px rgba(92,3,155,0.5)" }}
             >
               <div className="w-20 h-20 rounded-full bg-[#5C039B] flex items-center justify-center mb-6 shadow-lg">
-                <img src={service.icon} alt={service.title} className="w-12 h-12" />
+                <img
+                  src={service.icon}
+                  alt={t(service.title)}
+                  className="w-12 h-12"
+                />
               </div>
 
               <h3 className="text-lg sm:text-xl font-bold text-gray-800">
-                {service.title}
+                {t(service.title)}
+                
               </h3>
             </div>
           ))}
         </div>
 
-        {/* Scroll Buttons (FIXED VERSION) */}
+        {/* Scroll Buttons */}
         <div className="flex gap-3 mt-8">
-          {/* LEFT */}
           <button
             onClick={() => {
               scrollLeft();
               setActiveBtn("left");
             }}
-            className={`p-3 rounded-sm border transition 
-              ${
-                activeBtn === "left"
-                  ? "bg-[var(--color-primary)] text-white border-transparent"
-                  : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-              }
-            `}
+            className={`p-3 rounded-sm border transition ${
+              activeBtn === "left"
+                ? "bg-[var(--color-primary)] text-white border-transparent"
+                : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+            }`}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
 
-          {/* RIGHT */}
           <button
             onClick={() => {
               scrollRight();
               setActiveBtn("right");
             }}
-            className={`p-3 rounded-sm border transition 
-              ${
-                activeBtn === "right"
-                  ? "bg-[var(--color-primary)] text-white border-transparent"
-                  : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-              }
-            `}
+            className={`p-3 rounded-sm border transition ${
+              activeBtn === "right"
+                ? "bg-[var(--color-primary)] text-white border-transparent"
+                : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+            }`}
           >
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-
       </div>
 
       {/* Wave */}

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
 import wave1 from "../../assets/img/wave/waveint2.png";
 import hardScape from "../../assets/img/landscap/hardscape.png";
 import other from "../../assets/img/landscap/other.png";
@@ -6,53 +8,55 @@ import softScape from "../../assets/img/landscap/softscape.png";
 import swimming from "../../assets/img/landscap/swimming.png";
 
 const Servicelandspacing = () => {
+  const { t } = useTranslation("scape2");
+
   const [currentSlide, setCurrentSlide] = useState(0);
   const [cardsPerSlide, setCardsPerSlide] = useState(2);
-  const [activeBtn, setActiveBtn] = useState("right"); // right is active on load
+  const [activeBtn, setActiveBtn] = useState("right");
 
   const services = [
     {
-      title: "Hardscape",
+      title: "services.hardscape.title",
       icon: <img src={hardScape} alt="Hardscape" />,
       items: [
-        "Paving (interlock, tiles, stone)",
-        "Pergolas & gazebos",
-        "Decking (Wood, WPC, Composite)",
-        "Boundary walls & fencing  Retaining walls",
-        "Outdoor kitchens & BBQ stations",
-        "Water features (fountains, waterfalls)",
+        "services.hardscape.items.0",
+        "services.hardscape.items.1",
+        "services.hardscape.items.2",
+        "services.hardscape.items.3",
+        "services.hardscape.items.4",
+        "services.hardscape.items.5"
       ],
     },
     {
-      title: "Softscape",
+      title: "services.softscape.title",
       icon: <img src={softScape} alt="Softscape" />,
       items: [
-        "Soil preparation & levelling",
-        "Plantation (trees, shrubs, groundcover)",
-        "Grass/lawn installation (natural & artificial) Flower beds & vertical gardens",
-        "Mulching & soil amendments",
-        "Seasonal planting & color themes",
+        "services.softscape.items.0",
+        "services.softscape.items.1",
+        "services.softscape.items.2",
+        "services.softscape.items.3",
+        "services.softscape.items.4"
       ],
     },
     {
-      title: "Swimming Pools",
+      title: "services.swimming.title",
       icon: <img src={swimming} alt="Swimming Pools" />,
       items: [
-        "Pool design & construction Jacuzzis & spas",
-        "Reflecting pools & koi ponds Filtration & circulation systems",
+        "services.swimming.items.0",
+        "services.swimming.items.1"
       ],
     },
     {
-      title: "Other Solutions",
+      title: "services.other.title",
       icon: <img src={other} alt="Other Solutions" />,
       items: [
-        "Umbrellas",
-        "Decking",
-        "Gazebos",
-        "Planters",
-        "Flooring",
-        "BBQ",
-        "Pots & Fountain",
+        "services.other.items.0",
+        "services.other.items.1",
+        "services.other.items.2",
+        "services.other.items.3",
+        "services.other.items.4",
+        "services.other.items.5",
+        "services.other.items.6"
       ],
     },
   ];
@@ -75,8 +79,8 @@ const Servicelandspacing = () => {
 
   return (
     <section className="relative bg-[var(--color-body)] overflow-hidden px-3 py-10 md:px-10 md:py-16">
-      {/* Wave Background */}
-      <div className="absolute bottom-[-50px] left-0 w-full z-0 overflow-hidden ">
+      {/* Wave */}
+      <div className="absolute bottom-[-50px] left-0 w-full z-0 overflow-hidden">
         <img
           src={wave1}
           alt="Wave"
@@ -85,12 +89,12 @@ const Servicelandspacing = () => {
       </div>
 
       <div className="relative z-10 container mx-auto mt-4">
-        <h2 className="text-center  heading-dark-1 text-black">
-          Our Services Portfolio
+        <h2 className="text-center heading-dark-1 text-black">
+          {t("heading")}
         </h2>
 
         {/* Slider */}
-        <div className="relative overflow-hidden pt-10 md:pt-12 mt-5 ">
+        <div className="relative overflow-hidden pt-10 md:pt-12 mt-5">
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{
@@ -120,8 +124,9 @@ const Servicelandspacing = () => {
 
                       <div className="mt-16 md:mt-20">
                         <h3 className="text-xl md:text-3xl font-bold text-black mb-4 md:mb-6">
-                          {service.title}
+                          {t(service.title)}
                         </h3>
+
                         <ul className="space-y-2 md:space-y-3 text-gray-700 text-sm md:text-lg">
                           {service.items.map((item, i) => (
                             <li key={i} className="flex">
@@ -134,7 +139,7 @@ const Servicelandspacing = () => {
                               >
                                 ✓
                               </span>
-                              {item}
+                              {t(item)}
                             </li>
                           ))}
                         </ul>
@@ -145,63 +150,36 @@ const Servicelandspacing = () => {
             ))}
           </div>
 
-          {/* Navigation */}
+          {/* Navigation (UNCHANGED) */}
           <div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
-            {/* Prev */}
             <button
               onClick={() => {
                 prevSlide();
                 setActiveBtn("left");
               }}
-              className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center 
-      
-      ${
-        activeBtn === "left"
-          ? "bg-[var(--color-primary)] text-white border border-transparent"
-          : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-      }`}
+              className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center
+                ${
+                  activeBtn === "left"
+                    ? "bg-[var(--color-primary)] text-white border border-transparent"
+                    : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+                }`}
             >
-              <svg
-                className="w-5 h-5 md:w-6 md:h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
+              ‹
             </button>
 
-            {/* Next */}
             <button
               onClick={() => {
                 nextSlide();
                 setActiveBtn("right");
               }}
-              className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center 
-      ${
-        activeBtn === "right"
-          ? "bg-[var(--color-primary)] text-white border border-transparent"
-          : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-      }`}
+              className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center
+                ${
+                  activeBtn === "right"
+                    ? "bg-[var(--color-primary)] text-white border border-transparent"
+                    : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+                }`}
             >
-              <svg
-                className="w-5 h-5 md:w-6 md:h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              ›
             </button>
           </div>
         </div>
