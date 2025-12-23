@@ -124,7 +124,7 @@ export const fetchMyPermissions = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      const res = await axios.get(`${API_BASE}/permission`, {
+      const res = await axios.get(`${API_BASE}/permission/my/get`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

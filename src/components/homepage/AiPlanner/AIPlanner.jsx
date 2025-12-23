@@ -37,7 +37,7 @@ const gardenElements = [
 ];
 
 const BRAND_PURPLE = "#5C039B";
-const API_BASE_URL ='http://51.112.61.219/api'
+const API_BASE_URL ='https://xoto.ae/api'
 
 const AIPlanner = () => {
   const [selectedImage, setSelectedImage] = useState(null);

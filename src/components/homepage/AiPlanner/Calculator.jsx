@@ -378,7 +378,6 @@ const Calculator = () => {
     try {
       await apiService.post("/estimates/submit", payload);
       setActiveStep(8);
-      setTimeout(() => setActiveStep(9), 8000);
       message.success("Estimate submitted successfully!");
     } catch (err) {
       console.error("Submission error:", err);
