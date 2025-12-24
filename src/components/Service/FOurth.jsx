@@ -1,11 +1,11 @@
 import React from "react";
 
 // Icons + Loop Image
-import iconAI from "../../assets/img/icons123/icon1.png";
-import iconCost from "../../assets/img/icons123/icon2.png";
-import iconGuide from "../../assets/img/icons123/icon3.png";
-import iconFast from "../../assets/img/icons123/icon4.png";
-import loopImg from "../../assets/img/icons123/loop.png";
+// import iconAI from "../../assets/img/icons123/icon1.png";
+// import iconCost from "../../assets/img/icons123/icon2.png";
+// import iconGuide from "../../assets/img/icons123/icon3.png";
+// import iconFast from "../../assets/img/icons123/icon4.png";
+import loopImg from "../../assets/img/loopimgg.png";
 import Testimonialpage from "./Testimonialpage";
 
 // Apply DM Sans only inside this component
@@ -57,110 +57,51 @@ export default function OurPartners() {
         />
 
         {/* ================= TITLE ================= */}
-        <div
-          className=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-10 sm:gap-6 mb-24 text-center md:text-left"
-          style={dmSans}
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-6xl heading-dark-1 leading-tight text-[#0b1739]">
-            We Make Lenders <br /> Work for You
-          </h2>
+       {/* ================= TEXT SECTION ================= */}
+<div
+  className="
+    mx-auto
+    max-w-7xl
+    grid grid-cols-1 md:grid-cols-2
+    gap-6 lg:gap-10
+    mb-20 md:mb-28
+    text-center md:text-left
+    px-4 sm:px-6
+  "
+  style={dmSans}
+>
+  <h2 className="text-3xl sm:text-4xl md:text-6xl leading-tight text-[#0b1739]">
+    We Make Lenders <br className="hidden md:block" /> Work for You
+  </h2>
 
-          <p className="text-[#547593] text-xl md:text-2xl paragraph-light-1 mt-5 leading-relaxed  mx-auto md:mx-1 text-center md:text-left">
-            Xoto partners with leading banks and institutions so you get access
-            to exclusive mortgage offers — faster, easier, and with full
-            transparency.
-          </p>
-        </div>
+  <p className="text-[#547593] text-lg sm:text-xl md:text-2xl leading-relaxed max-w-xl mx-auto md:mx-0 mt-4">
+    Xoto partners with leading banks and institutions so you get access
+    to exclusive mortgage offers — faster, easier, and with full
+    transparency.
+  </p>
+</div>
 
-        {/* ================= INFINITY LOOP ================= */}
-        <div className="relative  ">
+{/* ================= INFINITY LOOP ================= */}
+<div className="relative w-full flex justify-center px-4">
 
-          {/* ⭐ SCALE WRAPPER (ONLY REAL CHANGE) ⭐ */}
-          <div className="
-            scale-[0.55]        /* mobile */
-            sm:scale-[0.80]     /* small screen */
-            md:scale-100        /* desktop: original size */
-            origin-top
-            
-          ">
+  <img
+    src={loopImg}
+    alt="Infinity Loop"
+    className="
+      w-full
+      max-w-[320px]     /* mobile */
+      sm:max-w-[540px] /* small */
+      md:max-w-[820px] /* tablet */
+      lg:max-w-[980px] /* desktop */
+      xl:max-w-[1180px]
+      h-auto
+      pointer-events-none
+      select-none
+    "
+  />
 
-            {/* LOOP IMAGE */}
-            <img
-              src={loopImg}
-              alt="Infinity Loop"
-              className="w-140 max-w-6xl mx-auto pointer-events-none select-none"
-            />
+</div>
 
-            {/* ---- TOP LEFT ---- */}
-            <div
-              className="absolute flex items-start gap-4"
-              style={{ top: "-10px", left: "11%", ...dmSans }}
-            >
-              <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-60 -mt-5">
-                <img src={iconAI} className="w-8 h-8" alt="AI" />
-              </div>
-
-              <div className="absolute -mx-50 lg:-mx-31 ">
-                <LoopLabel
-                  title="AI Matched Offers"
-                  text="We match you to mortgage plans suited to your income, property, and goals."
-                />
-              </div>
-            </div>
-
-            {/* ---- TOP RIGHT ---- */}
-            <div
-              className="absolute flex items-start gap-4 mx-60 mb-10 "
-              style={{ top: "-10px", right: "11%", ...dmSans }}
-            >
-              <div className="absolute mx-96 sm:mx-96 lg:mx-80 ">
-                <LoopLabel
-                  title="Transparent Cost"
-                  text="All fees, interest, and charges are shown upfront — no last-minute surprises."
-                />
-              </div>
-
-              <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-10 -mt-5">
-                <img src={iconCost} className="w-8 h-8" alt="Cost" />
-              </div>
-            </div>
-
-            {/* ---- BOTTOM LEFT ---- */}
-            <div
-              className="absolute flex items-start gap-4"
-              style={{ bottom: "-15px", left: "11%", ...dmSans }}
-            >
-              <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-60 -mt-5">
-                <img src={iconGuide} className="w-8 h-8" alt="Guide" />
-              </div>
-
-              <div className="absolute -mx-50 lg:-mx-31">
-                <LoopLabel
-                  title="Personal Guidance"
-                  text="Our mortgage experts help guide you through every step, including paperwork."
-                />
-              </div>
-            </div>
-
-            {/* ---- BOTTOM RIGHT ---- */}
-            <div
-              className="absolute flex items-start gap-4"
-              style={{ bottom: "-15px", right: "11%", ...dmSans }}
-            >
-              <div className="absolute mx-160 lg:mx-140">
-                <LoopLabel
-                  title="Fast Process"
-                  text="Fastest Pre approval to disbursement."
-                />
-              </div>
-
-              <div className="w-16 h-16 rounded-full bg-[#5B0EB0] flex items-center justify-center shadow-lg mx-70 -mt-5">
-                <img src={iconFast} className="w-8 h-8" alt="Fast" />
-              </div>
-            </div>
-
-          </div>
-        </div>
       </section>
 
       <Testimonialpage />

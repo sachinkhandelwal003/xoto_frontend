@@ -51,6 +51,8 @@ import Packages from "./pages/packages/Packages";
 import MasterCategory from "./pages/estimateMaster/MasterCategory";
 import Enquiry from "./pages/dashboardPages/consult/Enquiry";
 import PropertyLeads from "./pages/dashboardPages/consult/PropertyLeads";
+import Meta from "./pages/dashboardPages/consult/MetaLeads";
+
 import UpdateProfilePage from "./pages/dashboardPages/updates/UpdateProfilepage";
 import Inventory from "../ecommerce/B2C/products/Inventory";
 import ManageWarehouses from "../ecommerce/setting/ManageWareHouses";
@@ -119,7 +121,7 @@ bookings:<Bookings/>,
 warehouse:<ManageWarehouses/>,
 
   "property/leads":<PropertyLeads/>,
-
+"meta/leads":<Meta/>,
 enquiries:<Enquiry/>,
 packages:<Packages/>};
 
