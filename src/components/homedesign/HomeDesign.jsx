@@ -21,10 +21,10 @@ const hotspots = [
     icon: exterior,
     link: "/exterior",
     style: `
-      top-[8%] left-[50%] -translate-x-1/2
+      top-[20%] left-[50%] -translate-x-1/2
       sm:top-[10%] sm:left-[60%]
-      md:top-[12%] md:left-[65%]
-      lg:top-[10%] lg:left-[75%]
+      md:top-[1%] md:left-[55%]
+      lg:top-[12%] lg:left-[75%]
     `,
   },
   {
@@ -32,10 +32,10 @@ const hotspots = [
     icon: interior,
     link: "/interior",
     style: `
-      top-[30%] right-[10%]
+      top-[35%] right-[5%]
       sm:top-[32%] sm:right-[8%]
-      md:top-[34%] md:right-[6%]
-      lg:top-[33%] lg:right-[3%]
+      md:top-[27%] md:right-[14%]
+      lg:top-[33%] lg:right-[0%]
     `,
   },
   {
@@ -43,10 +43,10 @@ const hotspots = [
     icon: smart,
     link: "/furniture",
     style: `
-      bottom-[35%] right-[12%]
+      bottom-[35%] right-[8%]
       sm:bottom-[33%] sm:right-[10%]
-      md:bottom-[32%] md:right-[7%]
-      lg:bottom-[31%] lg:right-[5%]
+      md:bottom-[27%] md:right-[18%]
+      lg:bottom-[33%] lg:right-[1%]
     `,
   },
   {
@@ -54,10 +54,10 @@ const hotspots = [
     icon: landscaping,
     link: "/landscaping",
     style: `
-      bottom-[0%] left-[50%] -translate-x-1/2
+      bottom-[11%] left-[50%] -translate-x-1/2
       sm:bottom-[2%] sm:left-[60%]
-      md:bottom-[3%] md:left-[65%]
-      lg:bottom-[-1%] lg:left-[70%]
+      md:bottom-[-6%] md:left-[55%]
+      lg:bottom-[5%] lg:left-[65%]
     `,
   },
   {
@@ -65,10 +65,10 @@ const hotspots = [
     icon: image,
     link: "/image-perfection",
     style: `
-      bottom-[20%] left-[20%]
+      bottom-[33%] left-[7%]
       sm:bottom-[22%] sm:left-[24%]
-      md:bottom-[23%] md:left-[26%]
-      lg:bottom-[24%] lg:left-[29%]
+      md:bottom-[23%] md:left-[15%]
+      lg:bottom-[30%] lg:left-[33%]
     `,
   },
   {
@@ -76,10 +76,10 @@ const hotspots = [
     icon: virtual,
     link: "/landscaping",
     style: `
-      top-[38%] left-[20%]
+      top-[38%] left-[5%]
       sm:top-[36%] sm:left-[25%]
-      md:top-[35%] md:left-[28%]
-      lg:top-[35%] lg:left-[32%]
+      md:top-[30%] md:left-[16%]
+      lg:top-[37%] lg:left-[34%]
     `,
   },
 ];
@@ -124,7 +124,7 @@ const hotspots = [
     object-contain
     drop-shadow-2xl
     mx-auto
-    lg:translate-x-[170px]
+    lg:translate-x-[110px]
   "
 />
 

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import logoNew from "../../assets/img/logoNew.png";
+import logoNew from "../../assets/img/logonew2.png";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -84,13 +84,13 @@ const Navbar = () => {
       <div className="max-w-[1440px] mx-auto px-6 py-1">
 
         {/* TOP BAR */}
-        <div className="flex items-center justify-between h-17">
+        <div className="flex items-center justify-between h-20">
 
           {/* LOGO */}
           <Link to="/" className="flex flex-col">
-            <img src={logoNew} alt="Logo" className="h-10" />
+            <img src={logoNew} alt="Logo" className="h-30 w-35" />
             <span className="text-[10px] text-gray-600">
-              {t("nav.tagline")}
+              {/* {t("nav.tagline")} */}
             </span>
           </Link>
 
