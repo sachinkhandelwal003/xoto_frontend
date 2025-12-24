@@ -1,4 +1,4 @@
-import{c as H,m as y,a as W,e as Q,s as F,b as Z,d as M,u as S,j as s,L,f as $,S as T,N as _,A as O,g as q,h as ee,w as X,i as se,k as V,l as G,n as P,r as j,o as te,p as ae,v as le,q as ie,t as ne,x as re,y as oe,C as ce,z as de,T as me,B as pe,D as Ae}from"./index-DaInZOja.js";/**
+import{c as H,m as y,a as W,e as Q,s as F,b as Z,d as M,u as S,j as s,L,f as $,S as T,N as _,A as O,g as q,h as ee,w as X,i as se,k as V,l as G,n as P,r as j,o as te,p as ae,v as le,q as ie,t as ne,x as re,y as oe,C as ce,z as de,T as me,B as pe,D as Ae}from"./index-zjG-9iqY.js";/**
  * @license lucide-react v0.503.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -28,41 +28,41 @@ import{c as H,m as y,a as W,e as Q,s as F,b as Z,d as M,u as S,j as s,L,f as $,S
                         lg:w-[205px] lg:h-[122px]
                         ${b?"scale-110":"scale-100"}
                       `})}),s.jsx("div",{className:"flex flex-col flex-1 mt-4 sm:mt-0 px-2 sm:px-4",children:s.jsx("p",{className:"leading-relaxed font-semibold text-[14px] sm:text-[15px] md:text-[16px]",children:i(`descriptions.${o.key}`)})})]})},n))}),s.jsx("div",{className:"swiper-pagination !static !bottom-0 !mt-4"})]})]})},Le="/assets/houseimage1-BdiDsnia.png",Ye="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEISURBVHgBzZSBDYMgEACfpgO0E9QRHMFNdARHcIPaSToCblA3cIS6AeWTN8UPr6CY9hIiAf4PPgLAv2KMybDBkVhBab6UcARMcoxMkKSVeSQvaulkguRCLY1Mkjjz+2VrkiSyUMkuWaxkk2zDSfCF0LS2DpJREEevSAa+1iNCbjh3ApmMgnNKep8k9qOneeJBX18FFN9lYVvr7GSgce2MPdlJkMrJ4c5hrgIWSsJFtZGpWPzASxYsovFmTZJE5JFVQrwoOkMgSikUdbY72n4PkQSLSNbBRk6QFvGCKz5gy/N2AjqIk+TUx/JeF1cLf1gsDYRg5hc3ltaXUy3IMpg/MyH0tmQj/JIPRANVoZTonqEAAAAASUVORK5CYII=",ze="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFGSURBVHgBxZSBUcMwDEVlLgNkA8wEDRMQNmCDdoQyAd2A6wSFCWCDlA26QbIB2cBIPemqurbjcNS8u39RLCmyLTsABTAOgStzAwUIFdmi7lEDzGOPekR9XnjciW/UGtWgWn5uXB6UZ1Xemr93BFQBCep4bId64qQU5F+i3vi94+9YKVTxgmrUB2r0FvoaGPPZcf6XGntBWR4/60kT+UhsfMpvxagCznee1QHVQj7U8IG11I4i96SC+Ud1NkYMOhHw94zGmIMUsO460Mn7n9/KHnXH2ip7Col7VvYgzosjjHt4dOJSR2VDiqkcvwj1ZsP2g7KTqLgF9Zft2g+SxneBRJjqropbKbuXxlcwj8F7t5BBaLtWbC/0zKgA7vfZIaDZejlttH+Z29UH8vrfbFftTjf/1mX+BVRco+xo41NEV5Kg3I0vwg+ObCALbVmU2QAAAABJRU5ErkJggg==",Ke="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAXCAYAAADgKtSgAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFLSURBVHgBrZXRccIwDIbtXt+bEbxB2aDuBhmBEbJBswHtBHQDukG6AWzgbAAbCCmRDyHsJBf83+lsgaT7bCRjzIwAYItWmdLCol8wql0Y79FqNJcLcHFFC1z8PEVP36Ed4SbK2+igLX/ZCGo/R8/xWp0OCoKU9nv+/DfSExFBqLxDojikqEEdL3DhgV4AeJHbJnKPKeql6ibunGA2U9RL5NX1eNCtu4L6gT73S6+lTtLnOmStsvQv5nllh8syvTMrZa3tTUnB2Hqe996UFIwTO9w3r+GZ0+viqXGnwWlyCfT4VLynY7fK3/HazHRPowvvZFvhumf/T5FGP6iC3zBOZ5B1X3mNb2988aL/zr5j/03kXtB+0D54X+WupINl6gR54L18Ee/I9RD1aJ9oJ/ZPyqc7dwLKqdPEf7AhxuKmxvVgyuvfckfUprz6Kzt2ayCm/wRXAAAAAElFTkSuQmCC",Ve="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEQSURBVHgB3ZXhDYIwEIWvxgEcoaM4gm7ACGygTmCcgLgBG8AGugFsABvUd6QxzYUjFig//JJH4Xq9a+lRjHOuISJL6Wh3uDyhmtJQQ4/hDqvJXBoyjr9XZnCGeornABW+/TKWpDXGlJjFIXSGrZU2QQ+fHj536bMjnRxqAjEnYQuVa4GmkqzGJkn2kf4l6eXer5WEsYq91RLFJuGNL5S+G3Qd6/ifjR8Qx0pDC+DxvxwrFp38Yc05Vobx0qBt/J1WxGDWF7QZpfmnvKGak7xIP/TWYO5rTwhWbX0lWkpFUOpZzLjtPsYp+G8IHaEC6vxKOv98oqWIwEwFXX3rRML4CvUr6HzAXAYJiqDyflaL9QFDvC/t/mGFGwAAAABJRU5ErkJggg==",Ge="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAE4SURBVHgBtZaBdYIwEIYvvA7ACIxAJyhu4Ah0AzcgnaB2grYT6AY4ghugE+gG552QZzyDEA++9/4nBpKPXKIAQCBiRTnhtPB4FXiCObGGjeRKYT7OSUCwpSwo75RPygF0pCCm9sut9JlSiu44RyVSUlAyvG0C24lqVJCIqTXQls+V8MPVFTQI6aprW1M2lLz73qACKeEyZeImvlGJuZoe2UG7q5Ywwfbuk0xKAtPAG4N/V//Bs6iH1zH3xvuTF2gld4I+kUYSFIREQ5LmFYEnqvniZwu/hdufpA8v8sIYs4dhjs4WYi3uqPTOLWEkrmQhie3pUHolzDSS1UCnKJGU8EKWMIIYkZRYiGCsyJfwLGqIZIwI28fF6Y2OfygVN0D8w+lAySg19d+Jc9xeUL6c0eI8712Wx78AlWG1aWaenGgAAAAASUVORK5CYII=",Pe="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEpSURBVHgB5ZaBbcIwEEV/ogzgTlCPkA1KRmADOkHVCcoG7QbNBoxQRugGwASwQfgnLigK2DlbCCHxpFOs4+zznX1nCpCu62b8/CLOuiiKd2RQ6ddR/IRtjUzKhAU8MikTFnBMq0MGvZNXo71HBr0T6w49Mkg5k2wnlea5GelnlA/KfKTf4lbQ8YKywY0ocQcqZMAo/RX1gR3hgIRFgumi/rsL8wUrE05iXJ1zlzN5IifMc01ZyYHDgBS3Xo6//hZarvAK2k44aWewX+LULQR5CBtLulxgbLa3RNLojvom2kZspRhfdLymfAYtx3Ui/wG0DpZTdUJpdXx+ox62d7WR34bpCqNXdq8h/wx0qelysUhq3ZHImyjYXf85SR4wj8sHbhzJgjIfduQjUTcWBzd0PYUAAAAASUVORK5CYII=",Xe=()=>{const i=ee(),{t:e}=S("home1"),o=[{key:"exterior",icon:ze,link:"/exterior",style:`
-      top-[8%] left-[50%] -translate-x-1/2
+      top-[20%] left-[50%] -translate-x-1/2
       sm:top-[10%] sm:left-[60%]
-      md:top-[12%] md:left-[65%]
-      lg:top-[10%] lg:left-[75%]
+      md:top-[1%] md:left-[55%]
+      lg:top-[12%] lg:left-[75%]
     `},{key:"interior",icon:Ye,link:"/interior",style:`
-      top-[30%] right-[10%]
+      top-[35%] right-[5%]
       sm:top-[32%] sm:right-[8%]
-      md:top-[34%] md:right-[6%]
-      lg:top-[33%] lg:right-[3%]
+      md:top-[27%] md:right-[14%]
+      lg:top-[33%] lg:right-[0%]
     `},{key:"furniture",icon:Pe,link:"/furniture",style:`
-      bottom-[35%] right-[12%]
+      bottom-[35%] right-[8%]
       sm:bottom-[33%] sm:right-[10%]
-      md:bottom-[32%] md:right-[7%]
-      lg:bottom-[31%] lg:right-[5%]
+      md:bottom-[27%] md:right-[18%]
+      lg:bottom-[33%] lg:right-[1%]
     `},{key:"landscaping",icon:Ke,link:"/landscaping",style:`
-      bottom-[0%] left-[50%] -translate-x-1/2
+      bottom-[11%] left-[50%] -translate-x-1/2
       sm:bottom-[2%] sm:left-[60%]
-      md:bottom-[3%] md:left-[65%]
-      lg:bottom-[-1%] lg:left-[70%]
+      md:bottom-[-6%] md:left-[55%]
+      lg:bottom-[5%] lg:left-[65%]
     `},{key:"image",icon:Ge,link:"/image-perfection",style:`
-      bottom-[20%] left-[20%]
+      bottom-[33%] left-[7%]
       sm:bottom-[22%] sm:left-[24%]
-      md:bottom-[23%] md:left-[26%]
-      lg:bottom-[24%] lg:left-[29%]
+      md:bottom-[23%] md:left-[15%]
+      lg:bottom-[30%] lg:left-[33%]
     `},{key:"virtual",icon:Ve,link:"/landscaping",style:`
-      top-[38%] left-[20%]
+      top-[38%] left-[5%]
       sm:top-[36%] sm:left-[25%]
-      md:top-[35%] md:left-[28%]
-      lg:top-[35%] lg:left-[32%]
+      md:top-[30%] md:left-[16%]
+      lg:top-[37%] lg:left-[34%]
     `}];return s.jsx("section",{className:"relative bg-[var(--color-body)] overflow-hidden pb-10 sm:pt-24 sm:pb-12 lg:pt-32 lg:pb-20",children:s.jsxs("div",{className:"relative w-full",children:[s.jsx("div",{className:"absolute bottom-[-180px] left-0 w-full z-0",children:s.jsx("img",{src:X,alt:"",className:"w-full scale-[1.3]"})}),s.jsxs("div",{className:"grid grid-cols-1 lg:grid-cols-2 items-center relative z-10",children:[s.jsxs("div",{className:"space-y-8 flex flex-col items-center lg:items-start text-center  lg:text-left px-20",children:[s.jsxs("h2",{className:"heading-light text-black ",children:[e("homeDesign.title1")," ",s.jsx("br",{}),s.jsx("span",{children:e("homeDesign.title2")})]}),s.jsx("p",{className:"paragraph-light-1 text-gray-600",children:e("homeDesign.description")}),s.jsx(L,{to:"/schedule/estimate",className:"bg-[var(--color-primary)] text-white px-14 py-3 rounded-lg font-semibold",children:e("homeDesign.cta")})]}),s.jsx("div",{className:"relative flex  lg:justify-center md:justify-center sm:justify-center px-10 mt-10",children:s.jsxs("div",{children:[s.jsx("img",{src:Le,alt:e("homeDesign.title2"),className:`\r
     h-[300px] sm:h-[400px] lg:h-[500px]\r
     object-contain\r
     drop-shadow-2xl\r
     mx-auto\r
-    lg:translate-x-[170px]\r
+    lg:translate-x-[110px]\r
   `}),o.map(n=>s.jsxs("button",{onClick:()=>i(n.link),className:`
       absolute ${n.style}
       flex items-center gap-1 sm:gap-2
