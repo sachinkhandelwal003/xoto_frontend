@@ -1,0 +1,25 @@
+{
+    "hero": {
+      "title": "Bereit, Ihre Baufinanzierung zu starten?",
+      "subtitle": "Starten Sie Ihre Anfrage noch heute und erhalten Sie innerhalb von 48 Stunden eine Vorabgenehmigung.",
+      "primaryCta": "Jetzt vorab genehmigen",
+      "secondaryCta": "Mit einem Experten sprechen"
+    },
+    "form": {
+      "heading": "Entdecken, entscheiden und abschließen – alles an einem Ort.",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail",
+      "phone": "Telefonnummer",
+      "lookingFor": "Ich suche",
+      "city": "Bevorzugte Stadt",
+      "budget": "Budget",
+      "submit": "Jetzt vorab genehmigen",
+      "options": {
+        "homeLoan": "Immobiliendarlehen",
+        "refinance": "Refinanzierung",
+        "personalLoan": "Privatkredit"
+      }
+    }
+  }
+  

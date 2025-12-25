@@ -1,5 +1,13 @@
 {
-  "title": "Mas Matalinong Home Loans, Mas Pinadali",
-  "descriptionLine1": "Ihambing ang mga nagpapautang, makakuha ng pre-approval, at makuha ang iyong pangarap na bahay",
-  "descriptionLine2": "nang mas mabilis — lahat sa isang lugar."
+  "title": "Mas Matalinong Home Loan, Mas Pinadali",
+  "description": {
+    "line1": "Ihambing ang mga nagpapautang, kumuha ng pre-approval at",
+    "line2": "mas mabilis makuha ang pangarap mong bahay — lahat sa isang lugar."
+  },
+  "cta": {
+    "preApproved": "Kumuha ng Pre-Approval",
+    "calculate": "Kalkulahin ang Iyong Home Loan",
+    "preApprovedAlert": "Na-click ang pre-approval",
+    "calculateAlert": "Na-click ang home loan calculator"
+  }
 }

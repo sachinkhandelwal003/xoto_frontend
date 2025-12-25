@@ -1,0 +1,30 @@
+{
+    "heading": "Ano ang Sinasabi ng Aming Mga Kliyente",
+    "cards": {
+      "1": {
+        "title": "Napakahusay na Serbisyo",
+        "text": "Pinadali ng XOTO ang aming karanasan.",
+        "name": "Shubham",
+        "location": "Pune, India"
+      },
+      "2": {
+        "title": "Lubos na Propesyonal",
+        "text": "Magandang kalidad at tamang oras ng delivery.",
+        "name": "Punit",
+        "location": "Pune, India"
+      },
+      "3": {
+        "title": "Magagandang Disenyo",
+        "text": "Mukhang premium na ngayon ang aming espasyo.",
+        "name": "Harsh",
+        "location": "Bangalore, India"
+      },
+      "4": {
+        "title": "Sulit na Sulit",
+        "text": "Malinaw ang presyo at mahusay ang execution.",
+        "name": "Jai Mathur",
+        "location": "India"
+      }
+    }
+  }
+  

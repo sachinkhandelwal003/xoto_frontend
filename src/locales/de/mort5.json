@@ -1,0 +1,30 @@
+{
+    "heading": "Was unsere Kunden sagen",
+    "cards": {
+      "1": {
+        "title": "Exzellenter Service",
+        "text": "XOTO machte den gesamten Prozess stressfrei.",
+        "name": "Shubham",
+        "location": "Pune, Indien"
+      },
+      "2": {
+        "title": "Sehr professionell",
+        "text": "Hohe Qualität und pünktliche Lieferung.",
+        "name": "Punit",
+        "location": "Pune, Indien"
+      },
+      "3": {
+        "title": "Wunderschöne Designs",
+        "text": "Unser Raum wirkt jetzt sehr hochwertig.",
+        "name": "Harsh",
+        "location": "Bangalore, Indien"
+      },
+      "4": {
+        "title": "Jeden Cent wert",
+        "text": "Transparente Preise und perfekte Umsetzung.",
+        "name": "Jai Mathur",
+        "location": "Indien"
+      }
+    }
+  }
+  

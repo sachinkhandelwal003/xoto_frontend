@@ -1,0 +1,25 @@
+{
+    "hero": {
+      "title": "准备开始您的房屋贷款了吗？",
+      "subtitle": "今天提交申请，48小时内获得预批准。",
+      "primaryCta": "立即获得预批准",
+      "secondaryCta": "咨询专家"
+    },
+    "form": {
+      "heading": "发现、决定并完成 —— 一站式服务。",
+      "firstName": "名",
+      "lastName": "姓",
+      "email": "电子邮箱",
+      "phone": "电话号码",
+      "lookingFor": "我正在寻找",
+      "city": "首选城市",
+      "budget": "预算",
+      "submit": "立即获得预批准",
+      "options": {
+        "homeLoan": "住房贷款",
+        "refinance": "再融资",
+        "personalLoan": "个人贷款"
+      }
+    }
+  }
+  

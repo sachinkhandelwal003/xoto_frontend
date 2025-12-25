@@ -1,0 +1,25 @@
+{
+    "hero": {
+      "title": "Handa ka na bang simulan ang iyong mortgage?",
+      "subtitle": "Simulan ang iyong aplikasyon ngayon at makakuha ng pre-approval sa loob ng 48 oras.",
+      "primaryCta": "Kumuha ng Pre-Approval",
+      "secondaryCta": "Makipag-usap sa Eksperto"
+    },
+    "form": {
+      "heading": "Tuklasin, magpasya, at tapusin — lahat sa isang lugar.",
+      "firstName": "Pangalan",
+      "lastName": "Apelyido",
+      "email": "Email",
+      "phone": "Numero ng Telepono",
+      "lookingFor": "Ako ay naghahanap ng",
+      "city": "Mas Gustong Lungsod",
+      "budget": "Badyet",
+      "submit": "Kumuha ng Pre-Approval",
+      "options": {
+        "homeLoan": "Home Loan",
+        "refinance": "Refinance",
+        "personalLoan": "Personal Loan"
+      }
+    }
+  }
+  

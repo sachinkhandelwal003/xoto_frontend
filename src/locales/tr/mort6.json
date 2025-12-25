@@ -1,0 +1,25 @@
+{
+    "hero": {
+      "title": "Konut kredinize başlamaya hazır mısınız?",
+      "subtitle": "Bugün başvurun ve 48 saat içinde ön onay alın.",
+      "primaryCta": "Hemen Ön Onay Al",
+      "secondaryCta": "Uzmanla Konuş"
+    },
+    "form": {
+      "heading": "Keşfedin, karar verin ve tamamlayın — hepsi tek yerde.",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon Numarası",
+      "lookingFor": "Aradığım",
+      "city": "Tercih Edilen Şehir",
+      "budget": "Bütçe",
+      "submit": "Hemen Ön Onay Al",
+      "options": {
+        "homeLoan": "Konut Kredisi",
+        "refinance": "Yeniden Finansman",
+        "personalLoan": "Bireysel Kredi"
+      }
+    }
+  }
+  

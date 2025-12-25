@@ -1,0 +1,25 @@
+{
+    "hero": {
+      "title": "¿Listo para comenzar tu hipoteca?",
+      "subtitle": "Comienza tu solicitud hoy y obtén la preaprobación en 48 horas.",
+      "primaryCta": "Obtener preaprobación",
+      "secondaryCta": "Hablar con un experto"
+    },
+    "form": {
+      "heading": "Descubre, decide y concreta — todo en un solo lugar.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "phone": "Número de teléfono",
+      "lookingFor": "Estoy buscando",
+      "city": "Ciudad preferida",
+      "budget": "Presupuesto",
+      "submit": "Obtener preaprobación",
+      "options": {
+        "homeLoan": "Préstamo hipotecario",
+        "refinance": "Refinanciar",
+        "personalLoan": "Préstamo personal"
+      }
+    }
+  }
+  

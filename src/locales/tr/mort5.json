@@ -1,0 +1,30 @@
+{
+    "heading": "Müşterilerimiz Ne Diyor",
+    "cards": {
+      "1": {
+        "title": "Mükemmel Hizmet",
+        "text": "XOTO süreci bizim için çok kolaylaştırdı.",
+        "name": "Shubham",
+        "location": "Pune, Hindistan"
+      },
+      "2": {
+        "title": "Çok Profesyonel",
+        "text": "Yüksek kalite ve zamanında teslimat.",
+        "name": "Punit",
+        "location": "Pune, Hindistan"
+      },
+      "3": {
+        "title": "Harika Tasarımlar",
+        "text": "Alanımız artık çok premium görünüyor.",
+        "name": "Harsh",
+        "location": "Bangalore, Hindistan"
+      },
+      "4": {
+        "title": "Her Kuruşuna Değer",
+        "text": "Şeffaf fiyatlandırma ve kusursuz uygulama.",
+        "name": "Jai Mathur",
+        "location": "Hindistan"
+      }
+    }
+  }
+  

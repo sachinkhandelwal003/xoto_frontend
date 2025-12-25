@@ -1,0 +1,30 @@
+{
+    "heading": "What Our Clients Say",
+    "cards": {
+      "1": {
+        "title": "Excellent Service",
+        "text": "XOTO made our journey smooth and stress-free.",
+        "name": "Shubham",
+        "location": "Pune, Maharashtra"
+      },
+      "2": {
+        "title": "Highly Professional",
+        "text": "Great quality and timely delivery.",
+        "name": "Punit",
+        "location": "Pune, Maharashtra"
+      },
+      "3": {
+        "title": "Beautiful Designs",
+        "text": "Our space looks premium and elegant.",
+        "name": "Harsh",
+        "location": "Bangalore, India"
+      },
+      "4": {
+        "title": "Worth Every Penny",
+        "text": "Transparent pricing and amazing execution.",
+        "name": "Jai Mathur",
+        "location": "India"
+      }
+    }
+  }
+  
