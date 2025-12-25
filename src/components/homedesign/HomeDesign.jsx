@@ -19,7 +19,7 @@ const hotspots = [
   {
     key: "exterior",
     icon: exterior,
-    link: "/exterior",
+    link: "/",
     style: `
       top-[20%] left-[50%] -translate-x-1/2
       sm:top-[10%] sm:left-[60%]
@@ -30,7 +30,7 @@ const hotspots = [
   {
     key: "interior",
     icon: interior,
-    link: "/interior",
+    link: "/services/interior",
     style: `
       top-[35%] right-[5%]
       sm:top-[32%] sm:right-[8%]
@@ -41,7 +41,7 @@ const hotspots = [
   {
     key: "furniture",
     icon: smart,
-    link: "/furniture",
+    link: "/",
     style: `
       bottom-[35%] right-[8%]
       sm:bottom-[33%] sm:right-[10%]
@@ -63,18 +63,18 @@ const hotspots = [
   {
     key: "image",
     icon: image,
-    link: "/image-perfection",
+    link: "/",
     style: `
       bottom-[33%] left-[7%]
       sm:bottom-[22%] sm:left-[24%]
       md:bottom-[23%] md:left-[15%]
-      lg:bottom-[30%] lg:left-[33%]
+      lg:bottom-[30%] lg:left-[24%]
     `,
   },
   {
     key: "virtual",
     icon: virtual,
-    link: "/landscaping",
+    link: "/",
     style: `
       top-[38%] left-[5%]
       sm:top-[36%] sm:left-[25%]

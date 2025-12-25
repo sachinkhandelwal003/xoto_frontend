@@ -88,10 +88,8 @@ const Navbar = () => {
 
           {/* LOGO */}
           <Link to="/" className="flex flex-col">
-            <img src={logoNew} alt="Logo" className="h-30 w-35" />
-            <span className="text-[10px] text-gray-600">
-              {/* {t("nav.tagline")} */}
-            </span>
+            <img src={logoNew} alt="Logo" className="h-40 " />
+         
           </Link>
 
           {/* DESKTOP NAV */}
@@ -229,19 +227,20 @@ const Navbar = () => {
             )}
 
             {/* MOBILE LOGIN & CONTACT */}
-            <div className="pt-4 border-t space-y-3">
-              <Link to="/contact">
-                <button className="w-full px-4 py-2 bg-[#5C039B] text-white rounded-lg">
-                  {t("nav.contact")}
-                </button>
-              </Link>
+    <div className="pt-5 border-t space-y-3">
+  <Link to="/contact" className="block">
+    <button className="w-full px-4 py-2 bg-[#5C039B] text-white rounded-lg">
+      {t("nav.contact")}
+    </button>
+  </Link>
 
-              <Link to="/login">
-                <button className="w-full px-4 py-2 border border-[#5C039B] text-[#5C039B] rounded-lg">
-                  {t("nav.login")}
-                </button>
-              </Link>
-            </div>
+  <Link to="/login" className="block">
+    <button className="w-full px-4 py-2 border border-[#5C039B] text-[#5C039B] rounded-lg">
+      {t("nav.login")}
+    </button>
+  </Link>
+</div>
+
           </div>
         )}
       </div>

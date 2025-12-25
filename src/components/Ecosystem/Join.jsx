@@ -93,15 +93,24 @@ const PartnerEcosystemSection = () => {
       <Toaster position="top-center" />
 
       <section className="w-full relative bg-[var(--color-body)] py-16 md:py-20 px-6 md:px-12 z-10">
-        <div className="absolute top-[-20px] lg:top-[-150px] left-0 w-full z-0">
-          <img
-            src={wave1}
-            alt=""
-            className="w-full min-w-[140%] -ml-[20%] scale-[1.8] 
-            lg:scale-100 lg:min-w-full lg:ml-0 
-            pointer-events-none select-none"
-          />
-        </div>
+       <div className="absolute top-[-40px] sm:top-[-80px] lg:top-[-150px] left-0 w-full z-0 overflow-hidden">
+  <img
+    src={wave1}
+    alt=""
+    className="
+      w-full
+      h-auto
+      object-cover
+
+      scale-[1.6] sm:scale-[1.3] lg:scale-100
+      -ml-[30%] sm:-ml-[15%] lg:ml-0
+
+      pointer-events-none
+      select-none
+    "
+  />
+</div>
+
 
         <div className="relative z-20 max-w-7xl mx-auto grid md:grid-cols-2 items-center">
           {/* LEFT */}
