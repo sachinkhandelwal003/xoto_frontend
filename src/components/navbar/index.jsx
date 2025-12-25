@@ -88,10 +88,8 @@ const Navbar = () => {
 
           {/* LOGO */}
           <Link to="/" className="flex flex-col">
-            <img src={logoNew} alt="Logo" className="h-30 w-35" />
-            <span className="text-[10px] text-gray-600">
-              {/* {t("nav.tagline")} */}
-            </span>
+            <img src={logoNew} alt="Logo" className="h-40 " />
+         
           </Link>
 
           {/* DESKTOP NAV */}
