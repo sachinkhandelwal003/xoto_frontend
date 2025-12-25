@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Imagemain from "../../assets/img/buy.jpg";
 import toast, { Toaster } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { apiService } from "../../manageApi/utils/custom.apiservice";
 import {
   X,
@@ -14,6 +15,8 @@ import {
 } from "lucide-react";
 
 export default function HeroSection() {
+  
+    const { t } = useTranslation("buy1");
   const [openModal, setOpenModal] = useState(false);
   const [actionType, setActionType] = useState("Buy");
   const [loading, setLoading] = useState(false);
@@ -42,10 +45,11 @@ export default function HeroSection() {
     preferred_contact: "call",
   });
 
-  const handleOpenModal = (type) => {
-    setActionType(type === "Sell a Home" ? "Sell" : "Buy");
-    setOpenModal(true);
-  };
+ const handleOpenModal = (type) => {
+  setActionType(type); // "Buy" | "Sell"
+  setOpenModal(true);
+};
+
 
   const handleBuyChange = (e) => {
     const { name, value } = e.target;
@@ -96,9 +100,15 @@ export default function HeroSection() {
       const response = await apiService.post("/property/lead", payload);
 
       if (response.success) {
-        toast.success(
-          `Thank you, ${actionType === "Buy" ? buyForm.first_name : sellForm.first_name}! We'll contact you soon.`
-        );
+      toast.success(
+  t("toast.success", {
+    name:
+      actionType === "Buy"
+        ? buyForm.first_name
+        : sellForm.first_name,
+  })
+);
+
         setOpenModal(false);
 
         if (actionType === "Buy") {
@@ -161,27 +171,39 @@ export default function HeroSection() {
         </div>
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
-          <h1 className="mx-auto mb-8 max-w-5xl heading-light">
-            Transforming the Way You <br /> Rent, Buy, & Sell Your Home.
-          </h1>
+   <h1 className="mx-auto mb-8 max-w-5xl heading-light">
+  {t("hero.title.line1")} <br />
+  {t("hero.title.line2")}
+</h1>
 
-          <div className="flex items-center gap-3 flex-wrap justify-center">
-            <button className="px-10 py-4 bg-[#5C039B] text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:scale-105 transition-all">
-              Rent a Home
-            </button>
-            <button
-              onClick={() => handleOpenModal("Find a Home")}
-              className="px-10 py-4 bg-transparent border-2 border-white text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:border-[#5C039B] hover:scale-105 transition-all"
-            >
-              Find a Home
-            </button>
-            <button
-              onClick={() => handleOpenModal("Sell a Home")}
-              className="px-10 py-4 bg-transparent border-2 border-white text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:border-[#5C039B] hover:scale-105 transition-all"
-            >
-              Sell a Home
-            </button>
-          </div>
+
+         <div className="flex items-center gap-3 flex-wrap justify-center">
+
+  {/* RENT */}
+  <button
+    className="px-10 py-4 bg-[#5C039B] text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:scale-105 transition-all"
+  >
+    {t("hero.buttons.rent")}
+  </button>
+
+  {/* FIND */}
+  <button
+    onClick={() => handleOpenModal("Buy")}
+    className="px-10 py-4 bg-transparent border-2 border-white text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:border-[#5C039B] hover:scale-105 transition-all"
+  >
+    {t("hero.buttons.find")}
+  </button>
+
+  {/* SELL */}
+  <button
+    onClick={() => handleOpenModal("Sell")}
+    className="px-10 py-4 bg-transparent border-2 border-white text-white font-extrabold rounded-lg shadow-md hover:bg-[#5C039B] hover:border-[#5C039B] hover:scale-105 transition-all"
+  >
+    {t("hero.buttons.sell")}
+  </button>
+
+</div>
+
         </div>
 
         <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
@@ -228,15 +250,17 @@ export default function HeroSection() {
                 </div>
 
                 <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-purple-700 bg-clip-text text-transparent mb-2">
-                  {actionType === "Sell"
-                    ? "SELL YOUR PROPERTY"
-                    : "FIND YOUR DREAM HOME"}
+               {actionType === "Sell"
+  ? t("modal.sell.title")
+  : t("modal.buy.title")}
+
                 </h2>
-                <p className="text-gray-600 text-center text-lg font-medium max-w-2xl">
-                  {actionType === "Sell"
-                    ? "Connect with serious buyers and get the best value for your property"
-                    : "Tell us what you're looking for and we'll find the perfect match"}
-                </p>
+             <p className="text-gray-600 text-center text-lg font-medium max-w-2xl">
+  {actionType === "Sell"
+    ? t("modal.sell.desc")
+    : t("modal.buy.desc")}
+</p>
+
               </div>
             </div>
 
@@ -258,7 +282,8 @@ export default function HeroSection() {
                           ? handleBuyChange
                           : handleSellChange
                       }
-                      placeholder="First Name"
+                   placeholder={t("form.firstName")}
+
                       required
                       className="premium-input pl-12"
                     />
@@ -279,7 +304,8 @@ export default function HeroSection() {
                           ? handleBuyChange
                           : handleSellChange
                       }
-                      placeholder="Last Name"
+                    placeholder={t("form.lastName")}
+
                       required
                       className="premium-input pl-12"
                     />
@@ -299,7 +325,8 @@ export default function HeroSection() {
                     onChange={
                       actionType === "Buy" ? handleBuyChange : handleSellChange
                     }
-                    placeholder="Your Email Address"
+                    placeholder={t("form.email")}
+
                     required
                     className="premium-input pl-12"
                   />
@@ -317,7 +344,8 @@ export default function HeroSection() {
                     onChange={
                       actionType === "Buy" ? handleBuyChange : handleSellChange
                     }
-                    placeholder="Phone Number (e.g. 501234567)"
+                    placeholder={t("form.phone")}
+
                     required
                     className="premium-input pl-12"
                   />
@@ -333,7 +361,8 @@ export default function HeroSection() {
                         name="desired_bedrooms"
                         value={buyForm.desired_bedrooms}
                         onChange={handleBuyChange}
-                        placeholder="No. of bedrooms you're looking for"
+                        placeholder={t("form.bedrooms")}
+
                         required
                         className="premium-input pl-12"
                       />
@@ -478,9 +507,10 @@ export default function HeroSection() {
                     </>
                   ) : (
                     <>
-                      {actionType === "Buy"
-                        ? "FIND MY DREAM HOME"
-                        : "SELL MY PROPERTY"}
+                     {actionType === "Buy"
+  ? t("form.submit.buy")
+  : t("form.submit.sell")}
+
                       <ArrowRight
                         className="group-hover:translate-x-2 transition-transform"
                         size={20}

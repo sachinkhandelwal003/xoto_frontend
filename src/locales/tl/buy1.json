@@ -1,0 +1,69 @@
+{
+  "hero": {
+    "title": {
+      "line1": "Binabago namin ang paraan kung paano ka",
+      "line2": "umuupa, bumibili, at nagbebenta ng iyong tahanan."
+    },
+    "buttons": {
+      "rent": "Umupa ng Bahay",
+      "find": "Maghanap ng Bahay",
+      "sell": "Magbenta ng Bahay"
+    }
+  },
+
+  "modal": {
+    "buy": {
+      "title": "HANAPIN ANG IYONG PANGARAP NA BAHAY",
+      "desc": "Sabihin sa amin kung ano ang hinahanap mo at hahanapin namin ang perpektong tugma para sa iyo"
+    },
+    "sell": {
+      "title": "IBENTA ANG IYONG ARI-ARIAN",
+      "desc": "Makipag-ugnayan sa mga seryosong mamimili at makuha ang pinakamainam na halaga para sa iyong ari-arian"
+    }
+  },
+
+  "form": {
+    "firstName": "Unang Pangalan",
+    "lastName": "Apelyido",
+    "email": "Email Address",
+    "phone": "Numero ng Telepono",
+    "bedrooms": "Bilang ng mga kuwartong gusto mo",
+
+    "preferredContact": "Mas gustong paraan ng pakikipag-ugnayan",
+
+    "contact": {
+      "call": "Tawag sa Telepono",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    },
+
+    "sell": {
+      "listingType": "Uri ng Ari-arian (hal. apartment)",
+      "city": "Lungsod",
+      "area": "Lugar",
+      "project": "Pangalan ng Proyekto",
+      "bedroomConfig": "Ayos ng mga kuwarto (hal. 2 kuwarto)",
+      "price": "Presyo (AED)",
+      "description": "Sabihin pa sa amin ang tungkol sa iyong ari-arian (opsyonal)"
+    },
+
+    "submit": {
+      "buy": "HANAPIN ANG AKING PANGARAP NA BAHAY",
+      "sell": "IBENTA ANG AKING ARI-ARIAN"
+    }
+  },
+
+  "checkbox": {
+    "marketing": "Sumasang-ayon akong makatanggap ng mga newsletter at marketing na komunikasyon sa pamamagitan ng digital media at nauunawaan kong maaari akong mag-unsubscribe anumang oras.",
+    "terms": "Nabasa ko, naunawaan, at tinatanggap ko ang Mga Tuntunin at Kundisyon at Patakaran sa Privacy ng Xoto."
+  },
+
+  "toast": {
+    "success": "Salamat {{name}}! Makikipag-ugnayan kami sa iyo sa lalong madaling panahon.",
+    "error": "Nabigo ang pagpapadala. Pakisubukang muli."
+  },
+
+  "loading": {
+    "processing": "Pinoproseso..."
+  }
+}

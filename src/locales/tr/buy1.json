@@ -1,0 +1,69 @@
+    {
+  "hero": {
+    "title": {
+      "line1": "Evinizi kiralama, satın alma ve satma",
+      "line2": "şeklinizi değiştiriyoruz."
+    },
+    "buttons": {
+      "rent": "Ev Kirala",
+      "find": "Ev Bul",
+      "sell": "Ev Sat"
+    }
+  },
+
+  "modal": {
+    "buy": {
+      "title": "HAYALİNİZDEKİ EVİ BULUN",
+      "desc": "Ne aradığınızı bize söyleyin, sizin için en uygun seçeneği bulalım"
+    },
+    "sell": {
+      "title": "MÜLKÜNÜZÜ SATIN",
+      "desc": "Ciddi alıcılarla bağlantı kurun ve mülkünüz için en iyi değeri elde edin"
+    }
+  },
+
+  "form": {
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "email": "E-posta Adresi",
+    "phone": "Telefon Numarası",
+    "bedrooms": "İstediğiniz yatak odası sayısı",
+
+    "preferredContact": "Tercih edilen iletişim yöntemi",
+
+    "contact": {
+      "call": "Telefon Araması",
+      "whatsapp": "WhatsApp",
+      "email": "E-posta"
+    },
+
+    "sell": {
+      "listingType": "Mülk Türü (örn. daire)",
+      "city": "Şehir",
+      "area": "Bölge",
+      "project": "Proje Adı",
+      "bedroomConfig": "Yatak Odası Düzeni (örn. 2 oda)",
+      "price": "Fiyat (AED)",
+      "description": "Mülkünüz hakkında daha fazla bilgi verin (isteğe bağlı)"
+    },
+
+    "submit": {
+      "buy": "HAYALİMDEKİ EVİ BUL",
+      "sell": "MÜLKÜMÜ SAT"
+    }
+  },
+
+  "checkbox": {
+    "marketing": "Dijital medya aracılığıyla bültenler ve pazarlama iletişimleri almayı kabul ediyorum ve istediğim zaman abonelikten çıkabileceğimi anlıyorum.",
+    "terms": "Xoto’nun Şartlar ve Koşullarını ve Gizlilik Politikasını okudum, anladım ve kabul ediyorum."
+  },
+
+  "toast": {
+    "success": "Teşekkürler {{name}}! Yakında sizinle iletişime geçeceğiz.",
+    "error": "Gönderim başarısız oldu. Lütfen tekrar deneyin."
+  },
+
+  "loading": {
+    "processing": "İşleniyor..."
+  }
+}

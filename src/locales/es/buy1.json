@@ -1,0 +1,69 @@
+{
+  "hero": {
+    "title": {
+      "line1": "Transformando la forma en que",
+      "line2": "alquila, compra y vende su hogar."
+    },
+    "buttons": {
+      "rent": "Alquilar una casa",
+      "find": "Buscar una casa",
+      "sell": "Vender una casa"
+    }
+  },
+
+  "modal": {
+    "buy": {
+      "title": "ENCUENTRA LA CASA DE TUS SUEÑOS",
+      "desc": "Dinos qué estás buscando y encontraremos la opción perfecta para ti"
+    },
+    "sell": {
+      "title": "VENDE TU PROPIEDAD",
+      "desc": "Conéctate con compradores serios y obtén el mejor valor por tu propiedad"
+    }
+  },
+
+  "form": {
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "phone": "Número de teléfono",
+    "bedrooms": "Número de dormitorios que buscas",
+
+    "preferredContact": "Método de contacto preferido",
+
+    "contact": {
+      "call": "Llamada telefónica",
+      "whatsapp": "WhatsApp",
+      "email": "Correo electrónico"
+    },
+
+    "sell": {
+      "listingType": "Tipo de propiedad (por ejemplo, apartamento)",
+      "city": "Ciudad",
+      "area": "Zona",
+      "project": "Nombre del proyecto",
+      "bedroomConfig": "Configuración de dormitorios (por ejemplo, 2 habitaciones)",
+      "price": "Precio (AED)",
+      "description": "Cuéntanos más sobre tu propiedad (opcional)"
+    },
+
+    "submit": {
+      "buy": "ENCONTRAR MI CASA IDEAL",
+      "sell": "VENDER MI PROPIEDAD"
+    }
+  },
+
+  "checkbox": {
+    "marketing": "Acepto recibir boletines y comunicaciones de marketing a través de medios digitales y entiendo que puedo cancelar la suscripción en cualquier momento.",
+    "terms": "He leído, comprendido y acepto los Términos y Condiciones y la Política de Privacidad de Xoto."
+  },
+
+  "toast": {
+    "success": "¡Gracias {{name}}! Nos pondremos en contacto contigo pronto.",
+    "error": "El envío falló. Por favor, inténtalo de nuevo."
+  },
+
+  "loading": {
+    "processing": "Procesando..."
+  }
+}

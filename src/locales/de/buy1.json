@@ -1,0 +1,69 @@
+{
+  "hero": {
+    "title": {
+      "line1": "Die Art und Weise verändern, wie Sie",
+      "line2": "Ihr Zuhause mieten, kaufen und verkaufen."
+    },
+    "buttons": {
+      "rent": "Haus mieten",
+      "find": "Haus finden",
+      "sell": "Haus verkaufen"
+    }
+  },
+
+  "modal": {
+    "buy": {
+      "title": "IHR TRAUMHAUS FINDEN",
+      "desc": "Sagen Sie uns, wonach Sie suchen, und wir finden die perfekte Lösung für Sie"
+    },
+    "sell": {
+      "title": "IHRE IMMOBILIE VERKAUFEN",
+      "desc": "Verbinden Sie sich mit seriösen Käufern und erzielen Sie den besten Wert für Ihre Immobilie"
+    }
+  },
+
+  "form": {
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "email": "E-Mail-Adresse",
+    "phone": "Telefonnummer",
+    "bedrooms": "Anzahl der gewünschten Schlafzimmer",
+
+    "preferredContact": "Bevorzugte Kontaktmethode",
+
+    "contact": {
+      "call": "Telefonanruf",
+      "whatsapp": "WhatsApp",
+      "email": "E-Mail"
+    },
+
+    "sell": {
+      "listingType": "Art der Immobilie (z. B. Wohnung)",
+      "city": "Stadt",
+      "area": "Gebiet",
+      "project": "Projektname",
+      "bedroomConfig": "Schlafzimmer-Konfiguration (z. B. 2 Zimmer)",
+      "price": "Preis (AED)",
+      "description": "Erzählen Sie uns mehr über Ihre Immobilie (optional)"
+    },
+
+    "submit": {
+      "buy": "MEIN TRAUMHAUS FINDEN",
+      "sell": "MEINE IMMOBILIE VERKAUFEN"
+    }
+  },
+
+  "checkbox": {
+    "marketing": "Ich stimme zu, Newsletter und Marketingkommunikation über digitale Medien zu erhalten und weiß, dass ich mich jederzeit abmelden kann.",
+    "terms": "Ich habe die Allgemeinen Geschäftsbedingungen und die Datenschutzrichtlinie von Xoto gelesen, verstanden und akzeptiert."
+  },
+
+  "toast": {
+    "success": "Danke {{name}}! Wir werden Sie bald kontaktieren.",
+    "error": "Übermittlung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+
+  "loading": {
+    "processing": "Wird verarbeitet..."
+  }
+}

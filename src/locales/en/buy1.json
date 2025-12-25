@@ -1,0 +1,37 @@
+{
+  "hero": {
+    "title": {
+      "line1": "Transforming the Way You",
+      "line2": "Rent, Buy, & Sell Your Home."
+    },
+    "buttons": {
+      "rent": "Rent a Home",
+      "find": "Find a Home",
+      "sell": "Sell a Home"
+    }
+  },
+  "modal": {
+    "buy": {
+      "title": "FIND YOUR DREAM HOME",
+      "desc": "Tell us what you're looking for and we'll find the perfect match"
+    },
+    "sell": {
+      "title": "SELL YOUR PROPERTY",
+      "desc": "Connect with serious buyers and get the best value for your property"
+    }
+  },
+  "form": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "bedrooms": "No. of bedrooms",
+    "submit": {
+      "buy": "FIND MY DREAM HOME",
+      "sell": "SELL MY PROPERTY"
+    }
+  },
+  "toast": {
+    "success": "Thank you, {{name}}! We'll contact you soon."
+  }
+}
