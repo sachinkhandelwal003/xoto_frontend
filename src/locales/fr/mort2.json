@@ -1,0 +1,16 @@
+{
+  "title": "Planifiez votre prêt immobilier en toute confiance",
+  "modes": {
+    "borrow": "Combien puis-je emprunter ?",
+    "estimate": "Estimation des paiements mensuels",
+    "check": "Vérification de l’accessibilité"
+  },
+  "features": {
+    "1": { "label": "Fonction 1", "title": "Valeur du bien" },
+    "2": { "label": "Fonction 2", "title": "Acompte" },
+    "3": { "label": "Fonction 3", "title": "Durée" },
+    "4": { "label": "Fonction 4", "title": "Montant maximal du prêt" }
+  },
+  "cta": "Obtenir une pré-approbation",
+  "disclaimer": "Les estimations sont indicatives. Les conditions finales dépendent de l’approbation du crédit."
+}

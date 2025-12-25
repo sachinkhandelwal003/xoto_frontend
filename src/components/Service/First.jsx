@@ -1,6 +1,7 @@
-import React from 'react';
-import CTAButtons from './CTAButtons.jsx';
-import herobg from '../../assets/img/serviceimg1.png';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import CTAButtons from "./CTAButtons.jsx";
+import herobg from "../../assets/img/serviceimg1.png";
 
 /* Inject DM Sans font inside component */
 const dmSans = {
@@ -8,13 +9,15 @@ const dmSans = {
 };
 
 export default function HomeLoanHero() {
+  const { t } = useTranslation("mort1");
+
   return (
     <section
-      className=" relative bg-cover bg-center w-full h-140"
+      className="relative bg-cover bg-center w-full h-140"
       style={{ backgroundImage: `url(${herobg})`, ...dmSans }}
     >
-   
-      <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape "></div>
+      {/* Bottom shapes */}
+      <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape"></div>
       <div className="absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape"></div>
 
       {/* Custom clip paths */}
@@ -28,29 +31,33 @@ export default function HomeLoanHero() {
       `}</style>
 
       <div className="hero-overlay p-8 md:p-16" style={dmSans}>
-        <div className="max-w-6xl mx-auto text-center text-white py-20 md:py-28" style={dmSans}>
-          
+        <div className="max-w-6xl mx-auto text-center text-white py-20 md:py-28">
+
+          {/* TITLE */}
           <h1
             className="text-3xl md:text-6xl heading-light font-extrabold"
             style={{ lineHeight: "1.4", ...dmSans }}
           >
-            Smarter Home Loans, Simplified
+            {t("title")}
           </h1>
 
+          {/* DESCRIPTION */}
           <p
             className="mt-4 md:w-3/4 mx-auto text-sm md:text-2xl paragraph-light font-semibold"
             style={dmSans}
           >
-            Compare lenders, get pre-approved, and secure your dream <br />
-            home faster — all in one place.
+            {t("descriptionLine1")}
+            <br />
+            {t("descriptionLine2")}
           </p>
 
-          <div className="mt-8 flex justify-center gap-4 flex-wrap" style={dmSans}>
+          {/* CTA */}
+          <div className="mt-8 flex justify-center gap-4 flex-wrap">
             <CTAButtons />
           </div>
+
         </div>
       </div>
-
     </section>
   );
 }

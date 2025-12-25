@@ -1,0 +1,16 @@
+{
+  "title": "Konut Kredinizi Güvenle Planlayın",
+  "modes": {
+    "borrow": "Ne Kadar Kredi Alabilirim?",
+    "estimate": "Aylık Ödeme Tahmini",
+    "check": "Uygunluk Kontrolü"
+  },
+  "features": {
+    "1": { "label": "Özellik 1", "title": "Gayrimenkul Değeri" },
+    "2": { "label": "Özellik 2", "title": "Peşinat" },
+    "3": { "label": "Özellik 3", "title": "Vade" },
+    "4": { "label": "Özellik 4", "title": "Maksimum Kredi Tutarı" }
+  },
+  "cta": "Ön Onay Al",
+  "disclaimer": "Tahminler bilgilendirme amaçlıdır. Nihai şartlar kredi onayına tabidir."
+}

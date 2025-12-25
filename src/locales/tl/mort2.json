@@ -1,0 +1,16 @@
+{
+  "title": "Planuhin ang Iyong Mortgage nang may Kumpiyansa",
+  "modes": {
+    "borrow": "Magkano ang Maaari Kong Hiramin?",
+    "estimate": "Tantya ng Buwanang Bayad",
+    "check": "Pagsusuri ng Kakayahang Bayaran"
+  },
+  "features": {
+    "1": { "label": "Tampok 1", "title": "Halaga ng Ari-arian" },
+    "2": { "label": "Tampok 2", "title": "Paunang Bayad" },
+    "3": { "label": "Tampok 3", "title": "Tagal" },
+    "4": { "label": "Tampok 4", "title": "Pinakamataas na Halaga ng Loan" }
+  },
+  "cta": "Kumuha ng Pre-Approval",
+  "disclaimer": "Ang mga pagtatantya ay gabay lamang. Ang huling kondisyon ay depende sa credit approval."
+}

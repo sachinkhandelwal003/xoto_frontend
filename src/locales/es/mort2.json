@@ -1,0 +1,16 @@
+{
+  "title": "Planifique su hipoteca con confianza",
+  "modes": {
+    "borrow": "¿Cuánto puedo pedir prestado?",
+    "estimate": "Estimación de pago mensual",
+    "check": "Verificación de asequibilidad"
+  },
+  "features": {
+    "1": { "label": "Característica 1", "title": "Valor de la propiedad" },
+    "2": { "label": "Característica 2", "title": "Pago inicial" },
+    "3": { "label": "Característica 3", "title": "Plazo" },
+    "4": { "label": "Característica 4", "title": "Monto máximo del préstamo" }
+  },
+  "cta": "Obtener preaprobación",
+  "disclaimer": "Las estimaciones son indicativas. Los términos finales están sujetos a aprobación crediticia."
+}

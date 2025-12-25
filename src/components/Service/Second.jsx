@@ -1,23 +1,25 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import HouseChart from "../../assets/img/mortgage.png";
 
 const MortgageCalculator = () => {
+  const { t } = useTranslation("mort2");
+
   const [active, setActive] = useState("borrow");
-
-  // NEW: Feature progress + active feature highlight
   const [feature, setFeature] = useState(1);
-  const progress = feature * 25; // 4 steps → 25% each
 
+  const progress = feature * 25; // 4 steps → 25% each
   const dmSans = { fontFamily: "'DM Sans', sans-serif" };
 
   return (
     <section className="relative z-20 w-full py-12 bg-[var(--color-body)] overflow-hidden">
+
       {/* TITLE */}
       <h2
         className="text-center text-3xl md:text-5xl font-bold text-black mb-10 px-4"
         style={dmSans}
       >
-        Plan Your Mortgage with Confidence
+        {t("title")}
       </h2>
 
       {/* MODE BUTTONS */}
@@ -41,7 +43,7 @@ const MortgageCalculator = () => {
             }
           `}
         >
-          How Much Can I Borrow?
+          {t("modes.borrow")}
         </button>
 
         <button
@@ -56,7 +58,7 @@ const MortgageCalculator = () => {
             }
           `}
         >
-          Monthly Payment Estimate
+          {t("modes.estimate")}
         </button>
 
         <button
@@ -71,12 +73,12 @@ const MortgageCalculator = () => {
             }
           `}
         >
-          Affordability Check
+          {t("modes.check")}
         </button>
       </div>
 
       {/* IMAGE & PROGRESS */}
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-col gap-6 lg:gap-10 mt-10 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto flex flex-col gap-6 mt-10 px-4 sm:px-6">
 
         {/* IMAGE */}
         <div className="w-full flex justify-center mb-6">
@@ -87,133 +89,70 @@ const MortgageCalculator = () => {
           />
         </div>
 
-        {/* Desktop Horizontal Progress */}
+        {/* Desktop Progress */}
         <div className="hidden lg:block w-full max-w-4xl mx-auto h-2 bg-gray-200 rounded-full overflow-hidden mb-6">
           <div
             className="h-2 bg-green-500 rounded-full transition-all duration-500"
             style={{ width: `${progress}%` }}
-          ></div>
+          />
         </div>
 
         <div className="flex flex-row sm:flex-col lg:flex-row gap-6 justify-center">
 
-          {/* Mobile Vertical Progress */}
-          <div className="flex justify-center sm:justify-start mb-6 sm:mb-0 lg:hidden">
+          {/* Mobile Progress */}
+          <div className="flex justify-center lg:hidden">
             <div className="w-3 h-60 bg-gray-200 rounded-full overflow-hidden">
               <div
                 className="bg-green-500 w-full transition-all duration-500"
                 style={{ height: `${progress}%` }}
-              ></div>
+              />
             </div>
           </div>
 
           {/* FEATURES */}
-          <div className="flex w-full px-20 flex-col sm:items-start gap-4 text-center lg:flex-row lg:justify-between lg:text-left">
+          <div className="flex w-full px-20 flex-col gap-4 text-center lg:flex-row lg:justify-between lg:text-left">
 
-            {/* Feature 1 */}
-            <div
-              onClick={() => setFeature(1)}
-              className={`cursor-pointer transition-all duration-300 ${
-                feature === 1 ? "scale-[1.05]" : ""
-              }`}
-            >
-              <p
-                className={`text-xs mb-1 ${
-                  feature === 1 ? "text-[var(--color-primary)] " : "text-gray-400"
+            {[1, 2, 3, 4].map((num) => (
+              <div
+                key={num}
+                onClick={() => setFeature(num)}
+                className={`cursor-pointer transition-all duration-300 ${
+                  feature === num ? "scale-[1.05]" : ""
                 }`}
               >
-                Feature 1
-              </p>
-              <h3
-                className={`text-lg font-semibold leading-tight ${
-                  feature === 1 ? "text-[var(--color-primary)] " : "text-black"
-                }`}
-              >
-                Property Value
-              </h3>
-            </div>
+                <p
+                  className={`text-xs mb-1 ${
+                    feature === num
+                      ? "text-[var(--color-primary)]"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {t(`features.${num}.label`)}
+                </p>
 
-            {/* Feature 2 */}
-            <div
-              onClick={() => setFeature(2)}
-              className={`cursor-pointer transition-all duration-300 ${
-                feature === 2 ? "scale-[1.05]" : ""
-              }`}
-            >
-              <p
-                className={`text-xs mb-1 ${
-                  feature === 2 ? "text-[var(--color-primary)] " : "text-gray-400"
-                }`}
-              >
-                Feature 2
-              </p>
-              <h3
-                className={`text-lg font-semibold leading-tight ${
-                  feature === 2 ? "text-[var(--color-primary)] " : "text-black"
-                }`}
-              >
-                Down Payment
-              </h3>
-            </div>
-
-            {/* Feature 3 */}
-            <div
-              onClick={() => setFeature(3)}
-              className={`cursor-pointer transition-all duration-300 ${
-                feature === 3 ? "scale-[1.05]" : ""
-              }`}
-            >
-              <p
-                className={`text-xs mb-1 ${
-                  feature === 3 ? "text-[var(--color-primary)] " : "text-gray-400"
-                }`}
-              >
-                Feature 3
-              </p>
-              <h3
-                className={`text-lg font-semibold leading-tight ${
-                  feature === 3 ? "text-[var(--color-primary)] " : "text-black"
-                }`}
-              >
-                Term
-              </h3>
-            </div>
-
-            {/* Feature 4 */}
-            <div
-              onClick={() => setFeature(4)}
-              className={`cursor-pointer transition-all duration-300 ${
-                feature === 4 ? "scale-[1.05]" : ""
-              }`}
-            >
-              <p
-                className={`text-xs mb-1 ${
-                  feature === 4 ? "text-[var(--color-primary)] " : "text-gray-400"
-                }`}
-              >
-                Feature 4
-              </p>
-              <h3
-                className={`text-lg font-semibold leading-tight ${
-                  feature === 4 ? "text-[var(--color-primary)] " : "text-black"
-                }`}
-              >
-                Max Loan <br /> Output
-              </h3>
-            </div>
+                <h3
+                  className={`text-lg font-semibold leading-tight ${
+                    feature === num
+                      ? "text-[var(--color-primary)]"
+                      : "text-black"
+                  }`}
+                >
+                  {t(`features.${num}.title`)}
+                </h3>
+              </div>
+            ))}
 
           </div>
-
         </div>
       </div>
 
-      {/* CTA BUTTON */}
+      {/* CTA */}
       <div className="flex justify-center mt-12 px-4">
         <button
           className="w-full sm:w-auto max-w-xs px-10 py-3 bg-[var(--color-primary)] text-white font-semibold rounded-lg hover:bg-purple-800 transition-all"
           style={dmSans}
         >
-          Get Pre-Approved
+          {t("cta")}
         </button>
       </div>
 
@@ -222,7 +161,7 @@ const MortgageCalculator = () => {
         className="text-center mt-4 text-sm sm:text-md text-[var(--color-primary)]"
         style={dmSans}
       >
-        Estimates are indicative. Final terms subject to credit approval.
+        {t("disclaimer")}
       </p>
     </section>
   );
