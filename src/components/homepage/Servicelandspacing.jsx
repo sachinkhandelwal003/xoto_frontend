@@ -14,52 +14,53 @@ const Servicelandspacing = () => {
   const [cardsPerSlide, setCardsPerSlide] = useState(2);
   const [activeBtn, setActiveBtn] = useState("right");
 
-  const services = [
-    {
-      title: "services.hardscape.title",
-      icon: <img src={hardScape} alt="Hardscape" />,
-      items: [
-        "services.hardscape.items.0",
-        "services.hardscape.items.1",
-        "services.hardscape.items.2",
-        "services.hardscape.items.3",
-        "services.hardscape.items.4",
-        "services.hardscape.items.5"
-      ],
-    },
-    {
-      title: "services.softscape.title",
-      icon: <img src={softScape} alt="Softscape" />,
-      items: [
-        "services.softscape.items.0",
-        "services.softscape.items.1",
-        "services.softscape.items.2",
-        "services.softscape.items.3",
-        "services.softscape.items.4"
-      ],
-    },
-    {
-      title: "services.swimming.title",
-      icon: <img src={swimming} alt="Swimming Pools" />,
-      items: [
-        "services.swimming.items.0",
-        "services.swimming.items.1"
-      ],
-    },
-    {
-      title: "services.other.title",
-      icon: <img src={other} alt="Other Solutions" />,
-      items: [
-        "services.other.items.0",
-        "services.other.items.1",
-        "services.other.items.2",
-        "services.other.items.3",
-        "services.other.items.4",
-        "services.other.items.5",
-        "services.other.items.6"
-      ],
-    },
-  ];
+ const services = [
+  {
+    title: "services.hardscape.title",
+    icon: <img src={hardScape} alt="Hardscape" />,
+    items: [
+      "services.hardscape.items.0",
+      "services.hardscape.items.1",
+      "services.hardscape.items.2",
+      "services.hardscape.items.3",
+      "services.hardscape.items.4",
+      "services.hardscape.items.5"
+    ],
+  },
+  {
+    title: "services.softscape.title",
+    icon: <img src={softScape} alt="Softscape" />,
+    items: [
+      "services.softscape.items.0",
+      "services.softscape.items.1",
+      "services.softscape.items.2",
+      "services.softscape.items.3",
+      "services.softscape.items.4"
+    ],
+  },
+  {
+    title: "services.pool.title",
+    icon: <img src={swimming} alt="Swimming Pools" />,
+    items: [
+      "services.pool.items.0",
+      "services.pool.items.1"
+    ],
+  },
+  {
+    title: "services.other.title",
+    icon: <img src={other} alt="Other Solutions" />,
+    items: [
+      "services.other.items.0",
+      "services.other.items.1",
+      "services.other.items.2",
+      "services.other.items.3",
+      "services.other.items.4",
+      "services.other.items.5",
+      "services.other.items.6"
+    ],
+  },
+];
+
 
   /* Responsive cards per slide */
   useEffect(() => {

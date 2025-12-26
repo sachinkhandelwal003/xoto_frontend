@@ -132,8 +132,8 @@ const TypesGallery = () => {
               <PictureOutlined className="text-white text-2xl" />
             </div>
             <div>
-              <Title level={3} className="m-0">Gallery & Assets</Title>
-              <Text className="text-gray-400">Manage high-quality images for your master types</Text>
+              <Title level={3} className="m-0">Questions</Title>
+              <Text className="text-gray-400">Stunning property visuals powered by intelligent master image management.</Text>
             </div>
           </Space>
         </div>
