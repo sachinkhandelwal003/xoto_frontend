@@ -1,8 +1,8 @@
 {
   "hero": {
     "title": {
-      "line1": "Die Art und Weise verändern, wie Sie",
-      "line2": "Ihr Zuhause mieten, kaufen und verkaufen."
+      "line1": "Die Art, wie Sie mieten, kaufen",
+      "line2": "und Immobilien verkaufen, verändert sich"
     },
     "buttons": {
       "rent": "Haus mieten",
@@ -12,13 +12,17 @@
   },
 
   "modal": {
+    "tabs": {
+      "buy": "Kaufen",
+      "sell": "Verkaufen"
+    },
     "buy": {
-      "title": "IHR TRAUMHAUS FINDEN",
-      "desc": "Sagen Sie uns, wonach Sie suchen, und wir finden die perfekte Lösung für Sie"
+      "title": "Finden Sie Ihr Traumhaus",
+      "desc": "Sagen Sie uns, wonach Sie suchen, und unsere Experten werden Sie kontaktieren."
     },
     "sell": {
-      "title": "IHRE IMMOBILIE VERKAUFEN",
-      "desc": "Verbinden Sie sich mit seriösen Käufern und erzielen Sie den besten Wert für Ihre Immobilie"
+      "title": "Verkaufen Sie Ihre Immobilie",
+      "desc": "Teilen Sie Ihre Immobiliendetails und erhalten Sie den besten Marktpreis."
     }
   },
 
@@ -26,10 +30,10 @@
     "firstName": "Vorname",
     "lastName": "Nachname",
     "email": "E-Mail-Adresse",
-    "phone": "Telefonnummer",
-    "bedrooms": "Anzahl der gewünschten Schlafzimmer",
+    "phone": "Mobilnummer",
+    "bedrooms": "Anzahl der Schlafzimmer",
 
-    "preferredContact": "Bevorzugte Kontaktmethode",
+    "preferredContactTitle": "Bevorzugte Kontaktmethode",
 
     "contact": {
       "call": "Telefonanruf",
@@ -38,32 +42,30 @@
     },
 
     "sell": {
-      "listingType": "Art der Immobilie (z. B. Wohnung)",
+      "listingType": "Art der Anzeige (z. B. Wohnung)",
       "city": "Stadt",
       "area": "Gebiet",
-      "project": "Projektname",
-      "bedroomConfig": "Schlafzimmer-Konfiguration (z. B. 2 Zimmer)",
+      "project_name": "Projektname",
+      "bedroom_config": "Schlafzimmer-Konfiguration (z. B. 2 BHK)",
       "price": "Preis (AED)",
       "description": "Erzählen Sie uns mehr über Ihre Immobilie (optional)"
     },
 
     "submit": {
-      "buy": "MEIN TRAUMHAUS FINDEN",
-      "sell": "MEINE IMMOBILIE VERKAUFEN"
-    }
+      "buy": "Kaufanfrage senden",
+      "sell": "Verkaufsanfrage senden"
+    },
+
+    "processing": "Wird verarbeitet..."
   },
 
   "checkbox": {
-    "marketing": "Ich stimme zu, Newsletter und Marketingkommunikation über digitale Medien zu erhalten und weiß, dass ich mich jederzeit abmelden kann.",
-    "terms": "Ich habe die Allgemeinen Geschäftsbedingungen und die Datenschutzrichtlinie von Xoto gelesen, verstanden und akzeptiert."
+    "marketing": "Ich stimme zu, Newsletter und Marketingmitteilungen über digitale Medien zu erhalten, und verstehe, dass ich mich jederzeit abmelden kann.",
+    "terms": "Ich habe die Allgemeinen Geschäftsbedingungen und die Datenschutzrichtlinie von Xoto gelesen, verstanden und akzeptiert. *"
   },
 
   "toast": {
-    "success": "Danke {{name}}! Wir werden Sie bald kontaktieren.",
-    "error": "Übermittlung fehlgeschlagen. Bitte versuchen Sie es erneut."
-  },
-
-  "loading": {
-    "processing": "Wird verarbeitet..."
+    "success": "Vielen Dank {{name}}! Ihre Informationen wurden erfolgreich übermittelt.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   }
 }

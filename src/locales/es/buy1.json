@@ -1,8 +1,8 @@
 {
   "hero": {
     "title": {
-      "line1": "Transformando la forma en que",
-      "line2": "alquila, compra y vende su hogar."
+      "line1": "La forma en que alquilas, compras",
+      "line2": "y vendes viviendas está cambiando"
     },
     "buttons": {
       "rent": "Alquilar una casa",
@@ -12,24 +12,28 @@
   },
 
   "modal": {
+    "tabs": {
+      "buy": "Comprar",
+      "sell": "Vender"
+    },
     "buy": {
-      "title": "ENCUENTRA LA CASA DE TUS SUEÑOS",
-      "desc": "Dinos qué estás buscando y encontraremos la opción perfecta para ti"
+      "title": "Encuentra la casa de tus sueños",
+      "desc": "Dinos qué estás buscando y nuestros expertos se pondrán en contacto contigo."
     },
     "sell": {
-      "title": "VENDE TU PROPIEDAD",
-      "desc": "Conéctate con compradores serios y obtén el mejor valor por tu propiedad"
+      "title": "Vende tu propiedad",
+      "desc": "Comparte los detalles de tu propiedad y obtén el mejor valor de mercado."
     }
   },
 
   "form": {
     "firstName": "Nombre",
     "lastName": "Apellido",
-    "email": "Correo electrónico",
-    "phone": "Número de teléfono",
-    "bedrooms": "Número de dormitorios que buscas",
+    "email": "Dirección de correo electrónico",
+    "phone": "Número de móvil",
+    "bedrooms": "Número de dormitorios",
 
-    "preferredContact": "Método de contacto preferido",
+    "preferredContactTitle": "Método de contacto preferido",
 
     "contact": {
       "call": "Llamada telefónica",
@@ -38,32 +42,30 @@
     },
 
     "sell": {
-      "listingType": "Tipo de propiedad (por ejemplo, apartamento)",
+      "listingType": "Tipo de anuncio (por ejemplo: Apartamento)",
       "city": "Ciudad",
       "area": "Zona",
-      "project": "Nombre del proyecto",
-      "bedroomConfig": "Configuración de dormitorios (por ejemplo, 2 habitaciones)",
+      "project_name": "Nombre del proyecto",
+      "bedroom_config": "Configuración de dormitorios (por ejemplo: 2 BHK)",
       "price": "Precio (AED)",
       "description": "Cuéntanos más sobre tu propiedad (opcional)"
     },
 
     "submit": {
-      "buy": "ENCONTRAR MI CASA IDEAL",
-      "sell": "VENDER MI PROPIEDAD"
-    }
+      "buy": "Enviar solicitud de compra",
+      "sell": "Enviar solicitud de venta"
+    },
+
+    "processing": "Procesando..."
   },
 
   "checkbox": {
-    "marketing": "Acepto recibir boletines y comunicaciones de marketing a través de medios digitales y entiendo que puedo cancelar la suscripción en cualquier momento.",
-    "terms": "He leído, comprendido y acepto los Términos y Condiciones y la Política de Privacidad de Xoto."
+    "marketing": "Acepto recibir boletines y comunicaciones de marketing a través de medios digitales y entiendo que puedo darme de baja en cualquier momento.",
+    "terms": "He leído, comprendido y acepto los Términos y Condiciones y la Política de Privacidad de Xoto. *"
   },
 
   "toast": {
-    "success": "¡Gracias {{name}}! Nos pondremos en contacto contigo pronto.",
-    "error": "El envío falló. Por favor, inténtalo de nuevo."
-  },
-
-  "loading": {
-    "processing": "Procesando..."
+    "success": "¡Gracias {{name}}! Tu información se ha enviado correctamente.",
+    "error": "Algo salió mal. Por favor, inténtalo de nuevo."
   }
 }

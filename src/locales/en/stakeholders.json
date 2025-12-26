@@ -1,0 +1,29 @@
+{
+  "title": "Built for Every Stakeholder",
+  "subtitle": "Our platform serves diverse stakeholders in the home ecosystem, each with tailored solutions",
+  "cta": "Sign Up",
+
+  "tabs": {
+    "businessAssociates": {
+      "heading": "Business Associates",
+      "qa": [
+        {
+          "question": "Who?",
+          "answer": "Real estate agents, brokers, and network partners."
+        },
+        {
+          "question": "What's in it for them?",
+          "answer": [
+            "Simplified client management",
+            "AI-driven insights",
+            "Faster deal closures"
+          ]
+        },
+        {
+          "question": "Why XOTO?",
+          "answer": "Maximize conversions and revenue by leveraging a full property ecosystem."
+        }
+      ]
+    }
+  }
+}

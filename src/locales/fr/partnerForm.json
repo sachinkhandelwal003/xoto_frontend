@@ -1,0 +1,28 @@
+{
+  "hero": {
+    "titleDesktop": "Rejoignez dès aujourd’hui\nl’écosystème de\npartenaires XOTO",
+    "titleMobile": "Rejoignez l’écosystème\nde partenaires XOTO"
+  },
+  "form": {
+    "firstName": "Entrez le prénom",
+    "lastName": "Entrez le nom",
+    "email": "Entrez l’email",
+    "company": "Entrez le nom de l’entreprise",
+    "phone": "Entrez le numéro",
+    "message": "Entrez votre message",
+    "submit": "Soumettre",
+    "submitting": "Envoi en cours...",
+    "stakeholder": {
+      "select": "Sélectionner",
+      "business": "Associé Commercial",
+      "execution": "Partenaire d’Exécution",
+      "developer": "Développeur",
+      "investor": "Investisseur"
+    }
+  },
+  "toast": {
+    "success": "Merci ! Votre demande de partenariat a été envoyée.",
+    "error": "Échec de l’envoi. Veuillez réessayer.",
+    "invalid": "Veuillez remplir correctement tous les champs"
+  }
+}

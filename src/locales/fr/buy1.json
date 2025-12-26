@@ -1,35 +1,39 @@
 {
   "hero": {
     "title": {
-      "line1": "Transformer la façon dont vous",
-      "line2": "louez, achetez et vendez votre maison."
+      "line1": "La façon dont vous louez, achetez",
+      "line2": "et vendez des logements évolue"
     },
     "buttons": {
-      "rent": "Louer une maison",
-      "find": "Trouver une maison",
-      "sell": "Vendre une maison"
+      "rent": "Louer un logement",
+      "find": "Trouver un logement",
+      "sell": "Vendre un logement"
     }
   },
 
   "modal": {
+    "tabs": {
+      "buy": "Acheter",
+      "sell": "Vendre"
+    },
     "buy": {
-      "title": "TROUVEZ LA MAISON DE VOS RÊVES",
-      "desc": "Dites-nous ce que vous recherchez et nous trouverons la solution idéale pour vous"
+      "title": "Trouvez la maison de vos rêves",
+      "desc": "Dites-nous ce que vous recherchez et nos experts vous contacteront."
     },
     "sell": {
-      "title": "VENDEZ VOTRE BIEN",
-      "desc": "Entrez en contact avec des acheteurs sérieux et obtenez la meilleure valeur pour votre propriété"
+      "title": "Vendez votre propriété",
+      "desc": "Partagez les détails de votre propriété et obtenez le meilleur prix du marché."
     }
   },
 
   "form": {
     "firstName": "Prénom",
-    "lastName": "Nom",
+    "lastName": "Nom de famille",
     "email": "Adresse e-mail",
-    "phone": "Numéro de téléphone",
-    "bedrooms": "Nombre de chambres recherchées",
+    "phone": "Numéro de mobile",
+    "bedrooms": "Nombre de chambres",
 
-    "preferredContact": "Méthode de contact préférée",
+    "preferredContactTitle": "Méthode de contact préférée",
 
     "contact": {
       "call": "Appel téléphonique",
@@ -38,32 +42,30 @@
     },
 
     "sell": {
-      "listingType": "Type de bien (ex. appartement)",
+      "listingType": "Type d’annonce (ex. : Appartement)",
       "city": "Ville",
-      "area": "Zone",
-      "project": "Nom du projet",
-      "bedroomConfig": "Configuration des chambres (ex. 2 chambres)",
+      "area": "Quartier",
+      "project_name": "Nom du projet",
+      "bedroom_config": "Configuration des chambres (ex. : 2 BHK)",
       "price": "Prix (AED)",
-      "description": "Dites-nous en plus sur votre propriété (facultatif)"
+      "description": "Parlez-nous davantage de votre propriété (optionnel)"
     },
 
     "submit": {
-      "buy": "TROUVER MA MAISON DE RÊVE",
-      "sell": "VENDRE MON BIEN"
-    }
+      "buy": "Envoyer la demande d’achat",
+      "sell": "Envoyer la demande de vente"
+    },
+
+    "processing": "Traitement en cours..."
   },
 
   "checkbox": {
-    "marketing": "J’accepte de recevoir des newsletters et des communications marketing via des médias numériques et je comprends que je peux me désinscrire à tout moment.",
-    "terms": "J’ai lu, compris et j’accepte les Conditions générales et la Politique de confidentialité de Xoto."
+    "marketing": "J’accepte de recevoir des newsletters et des communications marketing via des supports numériques et je comprends que je peux me désinscrire à tout moment.",
+    "terms": "J’ai lu, compris et accepté les Conditions générales et la Politique de confidentialité de Xoto. *"
   },
 
   "toast": {
-    "success": "Merci {{name}} ! Nous vous contacterons bientôt.",
-    "error": "Échec de l’envoi. Veuillez réessayer."
-  },
-
-  "loading": {
-    "processing": "Traitement en cours..."
+    "success": "Merci {{name}} ! Vos informations ont été envoyées avec succès.",
+    "error": "Une erreur s’est produite. Veuillez réessayer."
   }
 }

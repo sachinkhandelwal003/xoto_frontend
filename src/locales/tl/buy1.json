@@ -1,35 +1,39 @@
 {
   "hero": {
     "title": {
-      "line1": "Binabago namin ang paraan kung paano ka",
-      "line2": "umuupa, bumibili, at nagbebenta ng iyong tahanan."
+      "line1": "Ang paraan ng pag-upa, pagbili",
+      "line2": "at pagbebenta ng mga bahay ay nagbabago"
     },
     "buttons": {
-      "rent": "Umupa ng Bahay",
+      "rent": "Umarkila ng Bahay",
       "find": "Maghanap ng Bahay",
       "sell": "Magbenta ng Bahay"
     }
   },
 
   "modal": {
+    "tabs": {
+      "buy": "Bumili",
+      "sell": "Magbenta"
+    },
     "buy": {
-      "title": "HANAPIN ANG IYONG PANGARAP NA BAHAY",
-      "desc": "Sabihin sa amin kung ano ang hinahanap mo at hahanapin namin ang perpektong tugma para sa iyo"
+      "title": "Hanapin ang Pangarap Mong Bahay",
+      "desc": "Sabihin sa amin kung ano ang hinahanap mo at makikipag-ugnayan sa iyo ang aming mga eksperto."
     },
     "sell": {
-      "title": "IBENTA ANG IYONG ARI-ARIAN",
-      "desc": "Makipag-ugnayan sa mga seryosong mamimili at makuha ang pinakamainam na halaga para sa iyong ari-arian"
+      "title": "Ibenta ang Iyong Ari-arian",
+      "desc": "Ibahagi ang mga detalye ng iyong ari-arian at makuha ang pinakamahusay na halaga sa merkado."
     }
   },
 
   "form": {
-    "firstName": "Unang Pangalan",
+    "firstName": "Pangalan",
     "lastName": "Apelyido",
     "email": "Email Address",
-    "phone": "Numero ng Telepono",
-    "bedrooms": "Bilang ng mga kuwartong gusto mo",
+    "phone": "Numero ng Mobile",
+    "bedrooms": "Bilang ng mga Silid-tulugan",
 
-    "preferredContact": "Mas gustong paraan ng pakikipag-ugnayan",
+    "preferredContactTitle": "Mas Gustong Paraan ng Pakikipag-ugnayan",
 
     "contact": {
       "call": "Tawag sa Telepono",
@@ -38,32 +42,30 @@
     },
 
     "sell": {
-      "listingType": "Uri ng Ari-arian (hal. apartment)",
+      "listingType": "Uri ng Listing (hal. Apartment)",
       "city": "Lungsod",
       "area": "Lugar",
-      "project": "Pangalan ng Proyekto",
-      "bedroomConfig": "Ayos ng mga kuwarto (hal. 2 kuwarto)",
+      "project_name": "Pangalan ng Proyekto",
+      "bedroom_config": "Ayos ng mga Silid-tulugan (hal. 2 BHK)",
       "price": "Presyo (AED)",
-      "description": "Sabihin pa sa amin ang tungkol sa iyong ari-arian (opsyonal)"
+      "description": "Ikwento pa ang tungkol sa iyong ari-arian (opsyonal)"
     },
 
     "submit": {
-      "buy": "HANAPIN ANG AKING PANGARAP NA BAHAY",
-      "sell": "IBENTA ANG AKING ARI-ARIAN"
-    }
+      "buy": "Ipadala ang Kahilingan sa Pagbili",
+      "sell": "Ipadala ang Kahilingan sa Pagbebenta"
+    },
+
+    "processing": "Pinoproseso..."
   },
 
   "checkbox": {
-    "marketing": "Sumasang-ayon akong makatanggap ng mga newsletter at marketing na komunikasyon sa pamamagitan ng digital media at nauunawaan kong maaari akong mag-unsubscribe anumang oras.",
-    "terms": "Nabasa ko, naunawaan, at tinatanggap ko ang Mga Tuntunin at Kundisyon at Patakaran sa Privacy ng Xoto."
+    "marketing": "Sumasang-ayon akong makatanggap ng mga newsletter at mensaheng pang-marketing sa pamamagitan ng digital media at nauunawaan kong maaari akong mag-unsubscribe anumang oras.",
+    "terms": "Nabasa ko, naunawaan, at tinatanggap ko ang Mga Tuntunin at Kundisyon at ang Patakaran sa Privacy ng Xoto. *"
   },
 
   "toast": {
-    "success": "Salamat {{name}}! Makikipag-ugnayan kami sa iyo sa lalong madaling panahon.",
-    "error": "Nabigo ang pagpapadala. Pakisubukang muli."
-  },
-
-  "loading": {
-    "processing": "Pinoproseso..."
+    "success": "Salamat {{name}}! Matagumpay na naisumite ang iyong impormasyon.",
+    "error": "May nangyaring mali. Pakisubukang muli."
   }
 }
