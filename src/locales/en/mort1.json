@@ -1,5 +1,13 @@
 {
   "title": "Smarter Home Loans, Simplified",
-  "descriptionLine1": "Compare lenders, get pre-approved, and secure your dream",
-  "descriptionLine2": "home faster — all in one place."
+  "description": {
+    "line1": "Compare lenders, get pre-approved, and secure your dream",
+    "line2": "home faster — all in one place."
+  },
+  "cta": {
+    "preApproved": "Get Pre-Approved",
+    "calculate": "Calculate Your Mortgage",
+    "preApprovedAlert": "Get Pre-Approved clicked",
+    "calculateAlert": "Calculate Mortgage clicked"
+  }
 }

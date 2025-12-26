@@ -118,8 +118,7 @@ export default function TestimonialsSection() {
           </button>
         </div>
       </div>
-
-      {/* WAVE */}
+    {/* WAVE */}
       <div className="absolute left-0 w-full z-0 -bottom-110">
         <img src={image} alt="wave-bg" className="w-full object-cover" />
       </div>
