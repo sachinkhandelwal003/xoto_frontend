@@ -36,8 +36,6 @@ const steps = [
   { title: 'Location', icon: <CompassOutlined /> },
   { title: 'Service', icon: <EnvironmentOutlined /> },
   { title: 'Style', icon: <HomeOutlined /> },
-  { title: 'Preview', icon: <PictureOutlined /> },
-  { title: 'Moodboard', icon: <ExperimentOutlined /> },
   { title: 'Dimensions', icon: <CalculatorOutlined /> },
   { title: 'Packages', icon: <BuildOutlined /> },
   { title: 'Contact', icon: <PhoneFilled /> },
@@ -119,9 +117,6 @@ const Calculator = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [types, setTypes] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [typeGallery, setTypeGallery] = useState(null);
-  const [moodboardData, setMoodboardData] = useState([]);
-  const [selectedMoodboardImages, setSelectedMoodboardImages] = useState([]);
 
   // User Selections
   const [coords, setCoords] = useState({
@@ -148,8 +143,6 @@ const Calculator = () => {
   const [loading, setLoading] = useState({
     subcat: true,
     types: false,
-    gallery: false,
-    moodboard: false,
     packages: true,
     submitting: false,
     geocoding: false
@@ -284,48 +277,6 @@ const Calculator = () => {
     }
   };
 
-  const fetchTypePreview = async (typeId) => {
-    setLoading(prev => ({ ...prev, gallery: true }));
-    try {
-      const res = await apiService.get(`/estimate/master/category/types/${typeId}/gallery`);
-      if (res.success) setTypeGallery(res.gallery);
-    } catch (err) {
-      setTypeGallery(null);
-    } finally {
-      setLoading(prev => ({ ...prev, gallery: false }));
-    }
-  };
-
-  const handleGenerateMoodboard = async () => {
-    setLoading(prev => ({ ...prev, moodboard: true }));
-    try {
-      const res = await apiService.get(`/estimate/master/category/types/${selectedType}/gallery/moodboard/generate`);
-      if (res.success) {
-        const moodboard = res.moodboard || [];
-        setMoodboardData(moodboard);
-        // Auto-select first 4 images or all if less than 4
-        const autoSelected = moodboard.slice(0, Math.min(4, moodboard.length)).map(img => img._id || img.id);
-        setSelectedMoodboardImages(autoSelected);
-        setActiveStep(4);
-        message.success("Moodboard generated! Select your favorite images.");
-      }
-    } catch (err) {
-      message.error("Moodboard generation failed");
-    } finally {
-      setLoading(prev => ({ ...prev, moodboard: false }));
-    }
-  };
-
-  const handleMoodboardImageToggle = (imageId) => {
-    setSelectedMoodboardImages(prev => {
-      if (prev.includes(imageId)) {
-        return prev.filter(id => id !== imageId);
-      } else {
-        return [...prev, imageId];
-      }
-    });
-  };
-
   const onFinalSubmit = async () => {
     // Validate form fields
     if (!firstName.trim() || !lastName.trim()) {
@@ -349,13 +300,6 @@ const Calculator = () => {
     }
 
     setLoading(prev => ({ ...prev, submitting: true }));
-    
-    // Get selected moodboard images data
-    const selectedMoodboardData = moodboardData.filter(img => 
-      selectedMoodboardImages.includes(img._id || img.id)
-    ).map(img => ({
-      id: img._id || img.id
-    }));
 
     // Get selected type and subcategory details
     const selectedTypeData = types.find(t => t._id === selectedType);
@@ -374,9 +318,6 @@ const Calculator = () => {
         number: phone.trim()
       },
       type: selectedType,
-      type_gallery_snapshot: {
-        moodboardImages: selectedMoodboardData
-      },
       subcategory: selectedSubcategory,
       package: selectedPackage,
       area_length: parseFloat(length),
@@ -401,7 +342,7 @@ const Calculator = () => {
       console.log("API Response:", response);
       
       if (response.success) {
-        setActiveStep(8);
+        setActiveStep(6); // Move to success step
         message.success("Estimate submitted successfully!");
       } else {
         message.error(response.message || "Submission failed");
@@ -415,12 +356,8 @@ const Calculator = () => {
   };
 
   const handleNext = () => {
-    if (activeStep === 2 && selectedType) {
-      fetchTypePreview(selectedType);
-    }
-    
-    // If moving to contact step (step 7), validate all previous steps
-    if (activeStep === 7) {
+    // If moving to contact step (step 5), validate and submit
+    if (activeStep === 5) {
       onFinalSubmit();
       return;
     }
@@ -435,10 +372,9 @@ const Calculator = () => {
       case 0: return !!coords.lat;
       case 1: return !!selectedSubcategory;
       case 2: return !!selectedType;
-      case 4: return selectedMoodboardImages.length > 0;
-      case 5: return areaSqFt >= 100;
-      case 6: return !!selectedPackage;
-      case 7: return firstName.trim() && lastName.trim() && email.trim() && phone.trim();
+      case 3: return areaSqFt >= 100;
+      case 4: return !!selectedPackage;
+      case 5: return firstName.trim() && lastName.trim() && email.trim() && phone.trim();
       default: return true;
     }
   };
@@ -587,125 +523,6 @@ const Calculator = () => {
 
       case 3:
         return (
-          <motion.div {...variants} className="flex flex-col items-center">
-            <Title level={2} className="mb-2">Visual Direction</Title>
-            <Text type="secondary" className="block mb-10">Base concept for your selected style</Text>
-            {loading.gallery ? <Spin size="large" className="py-20" /> : typeGallery ? (
-             <Card className="max-w-2xl w-full rounded-[2.5rem] overflow-hidden shadow-2xl border-none">
-  <div className="relative flex items-center justify-center bg-black/5">
-    <Image 
-      src={`${BASE_URL}${typeGallery.previewImage?.url}`} 
-      alt="Style preview"
-      className="
-        w-full
-        h-[240px] sm:h-[360px] md:h-[450px] lg:h-[600px]
-        object-cover
-        object-center
-      "
-    />
-  </div>
-
-  <div className="p-6 sm:p-8 md:p-10 text-center">
-    <Title level={3} style={{ color: BRAND_PURPLE }}>
-      {typeGallery.type?.label}
-    </Title>
-
-    <Text className="text-gray-500 italic block mb-6 sm:mb-8">
-      "Every detail curated to harmonize with your vision"
-    </Text>
-
-    <Button 
-      type="primary" 
-      size="large" 
-      icon={<ExperimentOutlined />} 
-      loading={loading.moodboard} 
-      onClick={handleGenerateMoodboard}
-      className="h-12 sm:h-14 md:h-16 px-6 sm:px-10 md:px-12 rounded-2xl text-base sm:text-lg border-none shadow-xl"
-      style={{ backgroundColor: BRAND_PURPLE }}
-    >
-      Generate AI Moodboard
-    </Button>
-  </div>
-</Card>
-
-            ) : <Empty description="No preview available" />}
-          </motion.div>
-        );
-
-      case 4:
-        return (
-          <motion.div {...variants}>
-            <Title level={2} className="text-center mb-2">Select Your Favorite Moodboard Images</Title>
-            <Text type="secondary" className="text-center block mb-10">
-              Choose the images that best represent your vision ({selectedMoodboardImages.length} selected)
-            </Text>
-            
-            <div className="mb-8 flex justify-center">
-              <Tag color="purple" className="px-6 py-2 rounded-full text-lg">
-                <SelectOutlined /> Select at least 1 image to continue
-              </Tag>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {moodboardData.map((img, i) => {
-                const isSelected = selectedMoodboardImages.includes(img._id || img.id);
-                return (
-                  <motion.div 
-                    key={i} 
-                    initial={{ opacity: 0, scale: 0.9 }} 
-                    animate={{ opacity: 1, scale: 1 }} 
-                    transition={{ delay: i * 0.1 }}
-                    className="group relative"
-                    onClick={() => handleMoodboardImageToggle(img._id || img.id)}
-                  >
-                    <Card 
-                      hoverable 
-                      className={`overflow-hidden rounded-3xl border-2 transition-all cursor-pointer
-                        ${isSelected ? 'border-purple-500 shadow-2xl' : 'border-gray-100 hover:border-gray-300'}`}
-                      cover={
-                        <div className="relative">
-                          <Image 
-                            src={`${BASE_URL}${img.url || img.imageUrl}`} 
-                            className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                            alt={`Moodboard item ${i + 1}`}
-                          />
-                          {isSelected && (
-                            <div className="absolute top-4 right-4">
-                              <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center">
-                                <CheckOutlined className="text-white text-lg" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      }
-                    >
-                      <div className="text-center">
-                        <Checkbox 
-                          checked={isSelected}
-                          onChange={() => handleMoodboardImageToggle(img._id || img.id)}
-                          className="mr-2"
-                        >
-                          Select
-                        </Checkbox>
-                      </div>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </div>
-            
-            {selectedMoodboardImages.length > 0 && (
-              <div className="mt-10 text-center">
-                <Text type="secondary">
-                  Selected {selectedMoodboardImages.length} image(s) for your project
-                </Text>
-              </div>
-            )}
-          </motion.div>
-        );
-
-      case 5:
-        return (
           <motion.div {...variants} className="max-w-lg mx-auto py-10">
             <Title level={2} className="text-center mb-10">Project Area</Title>
             <Card className="rounded-[3rem] shadow-2xl overflow-hidden border-none">
@@ -753,7 +570,7 @@ const Calculator = () => {
           </motion.div>
         );
 
-      case 6:
+      case 4:
         return (
           <motion.div {...variants}>
             <Title level={2} className="text-center mb-10">Select Execution Package</Title>
@@ -791,7 +608,7 @@ const Calculator = () => {
           </motion.div>
         );
 
-      case 7:
+      case 5:
         const selectedPkg = packages.find(p => p._id === selectedPackage);
         const selectedTypeData = types.find(t => t._id === selectedType);
         const selectedSubcat = subcategories.find(s => s._id === selectedSubcategory);
@@ -826,12 +643,6 @@ const Calculator = () => {
                       <Text strong className="text-white text-xl">{areaSqFt} SQ FT</Text>
                       <Text className="text-purple-300 text-xs">
                         ({length}ft × {width}ft)
-                      </Text>
-                    </div>
-                    <div>
-                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Moodboard Images</Text>
-                      <Text strong className="text-white text-xl">
-                        {selectedMoodboardImages.length} selected
                       </Text>
                     </div>
                     <Divider className="border-purple-400 opacity-30" />
@@ -932,7 +743,7 @@ const Calculator = () => {
           </motion.div>
         );
 
-      case 8:
+      case 6:
         const pkg = packages.find(p => p._id === selectedPackage);
         return (
           <motion.div {...variants} className="text-center py-20">
@@ -992,7 +803,7 @@ const Calculator = () => {
       </div>
 
       {/* Navigation Footer */}
-      {activeStep < 8 && activeStep !== 7 && (
+      {activeStep < 6 && activeStep !== 5 && (
         <div className="fixed bottom-0 left-0 right-0 p-8 z-50 pointer-events-none">
           <div className="max-w-4xl mx-auto flex justify-between items-center bg-white/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-2xl border border-white/50 pointer-events-auto">
             <Button 
@@ -1026,7 +837,7 @@ const Calculator = () => {
                   color: !validateStep() ? '#ccc' : 'white' 
                 }}
               >
-                {activeStep === 6 ? 'Continue to Contact' : 'Continue'} 
+                {activeStep === 4 ? 'Continue to Contact' : 'Continue'} 
                 <ArrowRightOutlined className="ml-2" />
               </Button>
             </div>

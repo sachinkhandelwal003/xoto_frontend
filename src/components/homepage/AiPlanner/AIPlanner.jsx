@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from "lucide-react";
+
+
 import { 
   Sparkles, Upload, Sun, Sprout, Loader2, Image as ImageIcon, 
   Download, Trash2, CheckCircle2, Info, Check, RefreshCw
@@ -491,17 +495,34 @@ const AIPlanner = () => {
 
       {/* --- SIDEBAR --- */}
       <aside className="lg:w-[400px] w-full h-screen lg:h-screen lg:sticky lg:top-0 bg-white border-r border-gray-100 flex flex-col shadow-sm z-20 overflow-hidden">
-        <div className="p-4 lg:p-8 border-b shrink-0" style={{ background: BRAND_PURPLE }}>
-          <div className="flex items-center gap-3 text-white">
-            <div className="bg-white/20 p-2 lg:p-3 rounded-xl">
-              <Sparkles className="w-5 h-5 lg:w-7 lg:h-7 fill-white/20" />
-            </div>
-            <div>
-              <h1 className="text-lg lg:text-4xl font-bold leading-none">Xoto AI</h1>
-              <span className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] opacity-70">Landscape Architect</span>
-            </div>
-          </div>
-        </div>
+<div
+  className="relative p-4 lg:p-8 border-b shrink-0"
+  style={{ background: BRAND_PURPLE }}
+>
+  <Link
+    to="/landscaping"
+    className="absolute top-4 right-4 text-white"
+  >
+    <ArrowLeft className="w-7 h-8" />
+  </Link>
+
+  <div className="flex items-center gap-3 text-white">
+    <div className="bg-white/20 p-2 lg:p-3 rounded-xl">
+      <Sparkles className="w-5 h-5 lg:w-7 lg:h-7 fill-white/20" />
+    </div>
+
+    <div>
+      <h1 className="text-lg lg:text-4xl font-bold leading-none">
+        Xoto AI
+      </h1>
+      <span className="text-[9px] lg:text-[10px] uppercase tracking-[0.2em] opacity-70">
+        Landscape Architect
+      </span>
+    </div>
+  </div>
+</div>
+
+
 
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 lg:space-y-8 custom-scrollbar max-h-screen lg:max-h-[calc(100vh-200px)]">
           {/* Step 1: Upload */}
