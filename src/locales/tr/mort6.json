@@ -6,15 +6,22 @@
       "secondaryCta": "Uzmanla Konuş"
     },
     "form": {
-      "heading": "Keşfedin, karar verin ve tamamlayın — hepsi tek yerde.",
+      "heading": "Keşfedin, karar verin ve tamamlayın – hepsi tek yerde.",
+  
       "firstName": "Ad",
       "lastName": "Soyad",
-      "email": "E-posta",
-      "phone": "Telefon Numarası",
-      "lookingFor": "Aradığım",
+  
+      "email": "E-posta adresi",
+      "phone": "Numara",
+  
+      "lookingFor": "Arıyorum",
+      "select": "Seç",
+  
       "city": "Tercih Edilen Şehir",
       "budget": "Bütçe",
-      "submit": "Hemen Ön Onay Al",
+  
+      "submit": "Şimdi Ön Onay Al",
+  
       "options": {
         "homeLoan": "Konut Kredisi",
         "refinance": "Yeniden Finansman",

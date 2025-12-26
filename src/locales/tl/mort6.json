@@ -6,15 +6,22 @@
       "secondaryCta": "Makipag-usap sa Eksperto"
     },
     "form": {
-      "heading": "Tuklasin, magpasya, at tapusin — lahat sa isang lugar.",
-      "firstName": "Pangalan",
+      "heading": "Tuklasin, magpasya, at makipag-deal – lahat sa isang lugar.",
+  
+      "firstName": "Unang Pangalan",
       "lastName": "Apelyido",
-      "email": "Email",
-      "phone": "Numero ng Telepono",
+  
+      "email": "Email address",
+      "phone": "Numero",
+  
       "lookingFor": "Ako ay naghahanap ng",
-      "city": "Mas Gustong Lungsod",
+      "select": "Piliin",
+  
+      "city": "Piniling Lungsod",
       "budget": "Badyet",
-      "submit": "Kumuha ng Pre-Approval",
+  
+      "submit": "Kumuha ng Pre-Approval Ngayon",
+  
       "options": {
         "homeLoan": "Home Loan",
         "refinance": "Refinance",

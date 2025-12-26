@@ -6,15 +6,22 @@
       "secondaryCta": "Hablar con un experto"
     },
     "form": {
-      "heading": "Descubre, decide y concreta — todo en un solo lugar.",
+      "heading": "Descubre, decide y cierra – todo en un solo lugar.",
+  
       "firstName": "Nombre",
       "lastName": "Apellido",
-      "email": "Correo electrónico",
-      "phone": "Número de teléfono",
+  
+      "email": "Dirección de correo electrónico",
+      "phone": "Número",
+  
       "lookingFor": "Estoy buscando",
+      "select": "Seleccionar",
+  
       "city": "Ciudad preferida",
       "budget": "Presupuesto",
-      "submit": "Obtener preaprobación",
+  
+      "submit": "Obtener preaprobación ahora",
+  
       "options": {
         "homeLoan": "Préstamo hipotecario",
         "refinance": "Refinanciar",

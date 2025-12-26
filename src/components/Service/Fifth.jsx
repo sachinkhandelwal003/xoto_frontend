@@ -4,16 +4,25 @@ import { useTranslation } from "react-i18next";
 import image from "../../assets/img/wave/wave2.png";
 
 export default function TestimonialsSection() {
-  const { t } = useTranslation("mort5");
+  const { t } = useTranslation("interior6");
   const scrollRef = useRef(null);
   const [activeBtn, setActiveBtn] = useState("right");
 
-  // ✅ cards object → array me convert
-  const testimonials = Object.values(t("cards", { returnObjects: true }));
+  // ✅ ALL CARDS (none removed)
+  const testimonials = [
+    { title: "cards.title1", text: "cards.text", name: "Shubham", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
+    { title: "cards.title1", text: "cards.text", name: "Punit", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
+    { title: "cards.title2", text: "cards.text", name: "Harsh", location: "HSR Layout, Bangalore", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
+    { title: "cards.title1", text: "cards.text", name: "Shubham", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
+    { title: "cards.title3", text: "cards.text", name: "Jai Mathur", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
+    { title: "cards.title3", text: "cards.text", name: "Madhur", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
+    { title: "cards.title3", text: "cards.text", name: "Avn", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
+    { title: "cards.title3", text: "cards.text", name: "Sam", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" }
+  ];
 
   const slide = (dir) => {
     if (!scrollRef.current) return;
-    const cardWidth = scrollRef.current.firstChild.offsetWidth + 24;
+    const cardWidth = scrollRef.current.firstChild.offsetWidth + 24; // gap
     scrollRef.current.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
   };
 
@@ -36,27 +45,32 @@ export default function TestimonialsSection() {
               <div
                 key={i}
                 className="
-                  snap-start bg-white flex-none
-                  w-[260px] sm:w-[300px] md:w-[320px]
-                  min-h-[380px]
-                  rounded-2xl p-6 text-center
+                  snap-start
+                  bg-white
+                  flex-none
+                  w-[260px] sm:w-[300px] md:w-[320px]   /* ✅ FIXED WIDTH */
+                  min-h-[380px]                         /* ✅ FIXED HEIGHT */
+                  rounded-2xl
+                  p-6
+                  text-center
                   shadow-[0_4px_15px_rgba(92,3,155,0.2)]
                   hover:shadow-[0_8px_25px_rgba(92,3,155,0.3)]
-                  hover:-translate-y-2 transition-transform
+                  hover:-translate-y-2
+                  transition-transform
                 "
               >
                 <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+                  src={item.image}
                   alt={item.name}
                   className="w-20 h-20 rounded-full mx-auto mb-4"
                 />
 
                 <h3 className="font-semibold text-gray-900">
-                  {item.title}
+                  {t(item.title)}
                 </h3>
 
                 <p className="text-sm text-[#547593] mt-2 leading-relaxed">
-                  {item.text}
+                  {t(item.text)}
                 </p>
 
                 <div className="flex justify-center gap-1 my-3">
@@ -79,7 +93,7 @@ export default function TestimonialsSection() {
           </div>
         </div>
 
-        {/* BUTTONS */}
+        {/* BUTTONS – UNCHANGED */}
         <div className="flex justify-center gap-3 sm:gap-6 mt-6 sm:mt-8 md:mt-12 mb-4 z-10 relative">
           <button
             onClick={() => { slide(-1); setActiveBtn("left"); }}
