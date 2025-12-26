@@ -367,12 +367,12 @@ const SellerPage = () => {
                       </Title>
                       <Row gutter={16}>
                         <Col span={12}>
-                          <Form.Item label="PAN Number" required validateStatus={errors.registration?.pan_number ? 'error' : ''} help={errors.registration?.pan_number?.message}>
+                          <Form.Item label="TRN Number" required validateStatus={errors.registration?.pan_number ? 'error' : ''} help={errors.registration?.pan_number?.message}>
                             <Controller name="registration.pan_number" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
                           </Form.Item>
                         </Col>
                         <Col span={12}>
-                          <Form.Item label="GSTIN (Optional)">
+                          <Form.Item label="VAT (Optional)">
                             <Controller name="registration.gstin" control={control} render={({ field }) => <Input size="large" {...field} />} />
                           </Form.Item>
                         </Col>
@@ -396,7 +396,7 @@ const SellerPage = () => {
                           </Form.Item>
                         </Col>
                         <Col span={8}>
-                          <Form.Item label="PIN Code" required validateStatus={errors.store_details?.pincode ? 'error' : ''} help={errors.store_details?.pincode?.message}>
+                          <Form.Item label="PO" required validateStatus={errors.store_details?.pincode ? 'error' : ''} help={errors.store_details?.pincode?.message}>
                             <Controller name="store_details.pincode" control={control} rules={{ required: 'Required' }} render={({ field }) => <Input size="large" {...field} />} />
                           </Form.Item>
                         </Col>
