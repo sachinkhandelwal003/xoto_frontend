@@ -6,7 +6,7 @@ import { Navigate } from "react-router-dom";
 import Navbar from "./components/navbar/index.jsx";
 import Footer from "./components/footer/footer";
 import FloatingIcons from "./components/FloatingIcons";
-import QuoteModal from "./components/modal/QuoteModal.jsx";
+import QuoteModal from "./components/modal/QuoteModal.jsx"; 
 import ScrollToTop from "./components/ScrollToTop.js";
 import Loader from "./components/Loader.jsx";
 import FreelancerNavbar from "./components/navbar/FreelancerNavbar.jsx";
