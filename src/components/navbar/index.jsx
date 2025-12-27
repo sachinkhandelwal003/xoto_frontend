@@ -41,7 +41,7 @@ const navItems = [
       { key: "properties", path: "/marketplace" },
     ],
   },
-  { key: "store", path: "/mortgage/services" },
+  { key: "store", path: "/ecommerce/b2c" },
   {
     key: "knowledgeHub",
     children: [
@@ -51,7 +51,7 @@ const navItems = [
     ],
   },
   { key: "ecosystem", path: "/ecosystem" },
-  { key: "about", path: "/marketplace" },
+  { key: "about", path: "/about" },
 ];
 
 const Navbar = () => {
