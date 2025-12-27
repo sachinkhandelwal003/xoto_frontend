@@ -1,11 +1,10 @@
-
 "use client";
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { apiService } from "../../manageApi/utils/custom.apiservice";
 import { showSuccessAlert } from "../../manageApi/utils/sweetAlert";
-import helloImage from "../../assets/img/hello.jpg"; 
+import helloImage from "../../assets/img/hello.jpg";
 
 const countryCodes = [
   { value: "+91", label: "+91 India" },
@@ -24,73 +23,73 @@ export default function Consultation() {
     email: "",
     country_code: "+971",
     number: "",
-    message: ""
+    message: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCountryCode = (value) => {
-    setFormData(prev => ({ ...prev, country_code: value }));
+    setFormData((prev) => ({ ...prev, country_code: value }));
   };
 
   const handleNumber = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 15);
-    setFormData(prev => ({ ...prev, number: value }));
+    setFormData((prev) => ({ ...prev, number: value }));
   };
 
- const onSubmit = async (e) => {
-  e.preventDefault();
+  const onSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!formData.first_name.trim()) return alert("First name is required");
-  if (!formData.last_name.trim()) return alert("Last name is required");
-  if (!formData.email.includes("@")) return alert("Valid email is required");
-  if (formData.number.length < 8) return alert("Mobile number must be at least 8 digits");
-  if (!formData.message.trim()) return alert("Message is required");
+    if (!formData.first_name.trim()) return alert("First name is required");
+    if (!formData.last_name.trim()) return alert("Last name is required");
+    if (!formData.email.includes("@")) return alert("Valid email is required");
+    if (formData.number.length < 8)
+      return alert("Mobile number must be at least 8 digits");
+    if (!formData.message.trim()) return alert("Message is required");
 
-  setLoading(true);
+    setLoading(true);
 
-  const payload = {
-    type: "consultation",
-    consultant_type: "landscape",
+    const payload = {
+      type: "consultation",
+      consultant_type: "landscape",
 
-    name: {
-      first_name: formData.first_name.trim(),
-      last_name: formData.last_name.trim()
-    },
-    mobile: {
-      country_code: formData.country_code,
-      number: formData.number
-    },
-    email: formData.email.trim().toLowerCase(),
-    message: formData.message.trim()
+      name: {
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+      },
+      mobile: {
+        country_code: formData.country_code,
+        number: formData.number,
+      },
+      email: formData.email.trim().toLowerCase(),
+      message: formData.message.trim(),
+    };
+
+    try {
+      await apiService.post("/property/lead", payload);
+
+      showSuccessAlert(
+        "Thank You!",
+        "Your consultation request has been submitted successfully. We'll contact you within 24 hours!"
+      );
+
+      setFormData({
+        first_name: "",
+        last_name: "",
+        email: "",
+        country_code: "+971",
+        number: "",
+        message: "",
+      });
+    } catch (err) {
+      alert(err.response?.data?.message || "Submission failed");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  try {
-    await apiService.post("/property/lead", payload);
-
-    showSuccessAlert(
-      "Thank You!",
-      "Your consultation request has been submitted successfully. We'll contact you within 24 hours!"
-    );
-
-    setFormData({
-      first_name: "",
-      last_name: "",
-      email: "",
-      country_code: "+971",
-      number: "",
-      message: ""
-    });
-
-  } catch (err) {
-    alert(err.response?.data?.message || "Submission failed");
-  } finally {
-    setLoading(false);
-  }
-};
 
   return (
     <section className="relative w-full overflow-hidden bg-gray-900">
@@ -103,12 +102,12 @@ export default function Consultation() {
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(180deg, rgba(92, 3, 155, 0.85) 20%, rgba(3, 164, 244, 0.85) 95%)",
+          background:
+            "linear-gradient(180deg, rgba(92, 3, 155, 0.85) 20%, rgba(3, 164, 244, 0.85) 95%)",
         }}
       />
 
       <div className="relative z-10 mx-auto flex flex-col lg:flex-row items-start justify-start max-w-7xl px-4 sm:px-6 lg:px-8  pt-16 pb-16 gap-20">
-
         {/* Heading & Description */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -120,7 +119,8 @@ export default function Consultation() {
             Book Consultation
           </h2>
           <p className="mt-5 text-xl md:text-2xl paragraph-light-1">
-            One simple form to connect with XOTO experts for tailored interior design advice and project planning.
+            One simple form to connect with XOTO experts for tailored interior
+            design advice and project planning.
           </p>
         </motion.div>
 
@@ -133,7 +133,6 @@ export default function Consultation() {
         >
           <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-2xl">
             <form onSubmit={onSubmit} className="space-y-4">
-
               {/* Name Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -194,8 +193,10 @@ export default function Consultation() {
                     onChange={(e) => handleCountryCode(e.target.value)}
                     className="rounded-xl border border-gray-300 px-3 py-2.5 bg-white text-gray-700 focus:border-purple-600 focus:ring-4 focus:ring-purple-100"
                   >
-                    {countryCodes.map(c => (
-                      <option key={c.value} value={c.value}>{c.label}</option>
+                    {countryCodes.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.label}
+                      </option>
                     ))}
                   </select>
                   <input
@@ -203,13 +204,26 @@ export default function Consultation() {
                     value={formData.number}
                     onChange={handleNumber}
                     required
-                    maxLength="15"
-                    className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-base focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition"
+                    maxLength={15}
+                    className="
+                    w-full
+                    flex-1
+                    rounded-xl
+                    border border-gray-300
+                    px-3 py-2
+                    sm:px-4 sm:py-2.5
+                    text-sm sm:text-base
+                    focus:border-purple-600
+                    focus:ring-4 focus:ring-purple-100
+                    transition
+                    "
                     placeholder="501234567"
                   />
                 </div>
                 {formData.number && formData.number.length < 8 && (
-                  <p className="text-red-500 text-sm mt-1">Minimum 8 digits required</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    Minimum 8 digits required
+                  </p>
                 )}
               </div>
 

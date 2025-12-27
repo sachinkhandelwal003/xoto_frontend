@@ -1,32 +1,34 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import jjjImage from "../../assets/img/jjj.png";
 import wave1 from "../../assets/img/wave/wave1.png";
 
-const features = [
-  {
-    id: 1,
-    title: "All-in-One Platform",
-    desc: "Connect with customers seamlessly.",
-  },
-  {
-    id: 2,
-    title: "AI-Powered Tools",
-    desc: "Streamline workflows, track progress, and uncover revenue opportunities.",
-  },
-  {
-    id: 3,
-    title: "Grow Your Business",
-    desc: "Expand your reach, accelerate deals, and maximize earnings.",
-  },
-  {
-    id: 4,
-    title: "Transparency & Control",
-    desc: "Full visibility into projects, leads, and client interactions.",
-  },
-];
-
 const WhyPartnerSection = () => {
+  const { t } = useTranslation("whyPartner");
   const [active, setActive] = useState(1);
+
+  const features = [
+    {
+      id: 1,
+      title: t("features.1.title"),
+      desc: t("features.1.desc"),
+    },
+    {
+      id: 2,
+      title: t("features.2.title"),
+      desc: t("features.2.desc"),
+    },
+    {
+      id: 3,
+      title: t("features.3.title"),
+      desc: t("features.3.desc"),
+    },
+    {
+      id: 4,
+      title: t("features.4.title"),
+      desc: t("features.4.desc"),
+    },
+  ];
 
   // Horizontal progress (desktop)
   const progressWidth = `${(active / features.length) * 100}%`;
@@ -37,8 +39,8 @@ const WhyPartnerSection = () => {
   return (
     <section className="relative w-full bg-white overflow-hidden py-20">
 
-      {/* WAVE (responsive) */}
-      <div className="absolute bottom-[-20px] md:bottom-[-200px] left-0 w-full z-0 ">
+      {/* WAVE */}
+      <div className="absolute bottom-[-20px] md:bottom-[-200px] left-0 w-full z-0">
         <img
           src={wave1}
           alt=""
@@ -49,7 +51,7 @@ const WhyPartnerSection = () => {
       {/* Heading */}
       <div className="text-center mb-10 relative z-10">
         <h2 className="text-4xl md:text-5xl font-bold text-black heading-dark-1">
-          Why Partner With <span className="text-black">XOTO?</span>
+          {t("title")} <span className="text-black">XOTO?</span>
         </h2>
       </div>
 
@@ -62,13 +64,13 @@ const WhyPartnerSection = () => {
         />
       </div>
 
-      {/* ========= DESKTOP PROGRESS (HORIZONTAL) ========= */}
+      {/* ========= DESKTOP PROGRESS ========= */}
       <div className="hidden sm:flex justify-center mb-2 relative z-10">
         <div className="relative w-[85%] h-[8px] bg-gray-200 rounded-full">
           <div
             className="absolute left-0 top-0 h-[8px] bg-gradient-to-r from-green-400 to-green-500 rounded-full transition-all duration-500"
             style={{ width: progressWidth }}
-          ></div>
+          />
         </div>
       </div>
 
@@ -80,7 +82,9 @@ const WhyPartnerSection = () => {
             onClick={() => setActive(item.id)}
             className="w-[22%] cursor-pointer"
           >
-            <p className="text-xs text-gray-400 mb-1">Feature {item.id}</p>
+            <p className="text-xs text-gray-400 mb-1">
+              {t("featureLabel", { id: item.id })}
+            </p>
 
             <h3
               className={`text-2xl font-bold transition-all duration-300 ${
@@ -103,29 +107,29 @@ const WhyPartnerSection = () => {
         ))}
       </div>
 
-      {/* ========= MOBILE LAYOUT (VERTICAL PROGRESS + FEATURES) ========= */}
+      {/* ========= MOBILE ========= */}
       <div className="md:hidden block relative z-10 px-6 mb-12">
-
         <div className="flex gap-5">
 
-          {/* Vertical progress bar */}
+          {/* Vertical progress */}
           <div className="relative w-[6px] bg-gray-200 rounded-full h-full mt-2">
             <div
               className="absolute left-0 bottom-0 w-full bg-gradient-to-b from-green-400 to-green-500 rounded-full transition-all duration-500"
               style={{ height: progressHeight }}
-            ></div>
+            />
           </div>
 
-          {/* Features list */}
+          {/* Features */}
           <div className="flex flex-col gap-8 w-full">
-
             {features.map((item) => (
               <div
                 key={item.id}
                 onClick={() => setActive(item.id)}
                 className="cursor-pointer"
               >
-                <p className="text-xs text-gray-400 mb-1">Feature {item.id}</p>
+                <p className="text-xs text-gray-400 mb-1">
+                  {t("featureLabel", { id: item.id })}
+                </p>
 
                 <h3
                   className={`text-xl font-bold transition-all duration-300 ${
@@ -146,12 +150,9 @@ const WhyPartnerSection = () => {
                 </p>
               </div>
             ))}
-
           </div>
         </div>
-
       </div>
-
     </section>
   );
 };

@@ -1,0 +1,12 @@
+{
+  "title": "Creado para todos",
+  "cards": {
+    "commonDesc": "Red de Contratistas Elite",
+    "business": { "title": "Asociados Comerciales" },
+    "contractors": { "title": "Contratistas" },
+    "execution": { "title": "Socios de Ejecución" },
+    "strategic": { "title": "Alianzas Estratégicas" },
+    "developers": { "title": "Desarrolladores" },
+    "financial": { "title": "Instituciones Financieras" }
+  }
+}

@@ -8,7 +8,7 @@ import {
 import {
   PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined,
   RestOutlined, ArrowLeftOutlined, FolderOutlined,
-  FolderOpenOutlined, TagsOutlined, DatabaseOutlined,
+  FolderOpenOutlined, TagsOutlined, DatabaseOutlined, 
   SearchOutlined, ReloadOutlined, AppstoreOutlined,
   HomeOutlined
 } from '@ant-design/icons';
