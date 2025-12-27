@@ -1,0 +1,28 @@
+{
+  "hero": {
+    "titleDesktop": "Únete hoy al\nEcosistema de\nSocios XOTO",
+    "titleMobile": "Únete al Ecosistema\nde Socios XOTO"
+  },
+  "form": {
+    "firstName": "Ingrese nombre",
+    "lastName": "Ingrese apellido",
+    "email": "Ingrese correo electrónico",
+    "company": "Ingrese nombre de la empresa",
+    "phone": "Ingrese número",
+    "message": "Ingrese su mensaje",
+    "submit": "Enviar ahora",
+    "submitting": "Enviando...",
+    "stakeholder": {
+      "select": "Seleccionar",
+      "business": "Asociado Comercial",
+      "execution": "Socio de Ejecución",
+      "developer": "Desarrollador",
+      "investor": "Inversor"
+    }
+  },
+  "toast": {
+    "success": "¡Gracias! Su solicitud de asociación ha sido enviada.",
+    "error": "Error al enviar. Inténtelo de nuevo.",
+    "invalid": "Por favor complete todos los campos correctamente"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "hero": {
+    "titleDesktop": "Bugün XOTO\nPartner Ekosistemine\nKatılın",
+    "titleMobile": "XOTO Partner\nEkosistemine Katılın"
+  },
+  "form": {
+    "firstName": "Ad girin",
+    "lastName": "Soyad girin",
+    "email": "E-posta girin",
+    "company": "Şirket adı girin",
+    "phone": "Numara girin",
+    "message": "Mesajınızı girin",
+    "submit": "Gönder",
+    "submitting": "Gönderiliyor...",
+    "stakeholder": {
+      "select": "Seç",
+      "business": "İş Ortağı",
+      "execution": "Uygulama Ortağı",
+      "developer": "Geliştirici",
+      "investor": "Yatırımcı"
+    }
+  },
+  "toast": {
+    "success": "Teşekkürler! Ortaklık talebiniz gönderildi.",
+    "error": "Gönderilemedi. Lütfen tekrar deneyin.",
+    "invalid": "Lütfen tüm alanları doğru doldurun"
+  }
+}

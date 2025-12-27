@@ -1,0 +1,28 @@
+{
+  "hero": {
+    "titleDesktop": "Sumali ngayon sa\nXOTO Partner\nEcosystem",
+    "titleMobile": "Sumali sa XOTO\nPartner Ecosystem"
+  },
+  "form": {
+    "firstName": "Ilagay ang unang pangalan",
+    "lastName": "Ilagay ang apelyido",
+    "email": "Ilagay ang email",
+    "company": "Ilagay ang pangalan ng kumpanya",
+    "phone": "Ilagay ang numero",
+    "message": "Ilagay ang iyong mensahe",
+    "submit": "Isumite",
+    "submitting": "Isinusumite...",
+    "stakeholder": {
+      "select": "Piliin",
+      "business": "Business Associate",
+      "execution": "Execution Partner",
+      "developer": "Developer",
+      "investor": "Investor"
+    }
+  },
+  "toast": {
+    "success": "Salamat! Naipadala na ang iyong partnership request.",
+    "error": "Hindi naisumite. Pakisubukang muli.",
+    "invalid": "Pakipunan nang tama ang lahat ng field"
+  }
+}

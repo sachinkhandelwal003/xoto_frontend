@@ -54,16 +54,18 @@ export default function DreamSpacesShowcase() {
 
       <div className="mx-auto pt-12 relative z-10 px-4">
         {/* Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-10 mb-16 text-center lg:text-left">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1 text-black px-20">
-            {t("showcase.title")} <br />
-            <span>{t("showcase.subtitle")}</span>
-          </h1>
+        <div className="flex flex-col lg:flex-row gap-8 px-6 lg:px-10 mb-16 text-center lg:text-left items-center lg:items-start w-full">
 
-          <p className="text-base sm:text-lg text-[#547593] px-10">
-            {t("showcase.description")}
-          </p>
-        </div>
+<h1 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1 text-black max-w-xl">
+  {t("showcase.title")} <br />
+  <span>{t("showcase.subtitle")}</span>
+</h1>
+
+<p className="text-base sm:text-lg text-[#547593] max-w-xl lg:ml-auto">
+  {t("showcase.description")}
+</p>
+
+</div>
 
         {/* Slider */}
         <div
