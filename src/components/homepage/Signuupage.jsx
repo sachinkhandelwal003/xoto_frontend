@@ -1,307 +1,378 @@
-import React, { useState } from 'react';
-import { Sparkles, User, Mail, Phone, Lock, X } from 'lucide-react';
-import { Button, Modal, Form, Input, Typography, notification } from 'antd';
-import Cookies from 'js-cookie';
+import React, { useState, useContext } from 'react';
+import { 
+  Sparkles, X, User, Mail, Lock, 
+  ArrowRight, CheckCircle2, MapPin, Smartphone
+} from 'lucide-react';
+import { 
+  Button, Modal, Form, Input, Select, 
+  notification, ConfigProvider, Typography 
+} from 'antd';
+import { AuthContext } from '../../manageApi/context/AuthContext';
+import { apiService } from '../../manageApi/utils/custom.apiservice';
+import { showToast } from '../../manageApi/utils/toast';
 
-const { Text } = Typography;
-
-const AI_BACKGROUND_IMAGES = [
-  'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1678727173100-0d44fa5e57b3?q=80&w=2070&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2065&auto=format&fit=crop',
-];
+const { Option } = Select;
+const { Text, Title } = Typography;
 
 const BRAND_PURPLE = "#5C039B";
+const BRAND_PURPLE_DARK = "#4a027d";
 
 const LeadGenerationModal = ({ 
   visible, 
   onCancel, 
-  onSubmit,
-  selectedImage 
+  onAuthSuccess 
 }) => {
   const [form] = Form.useForm();
+  const { login } = useContext(AuthContext); // Use context for Login
+  
+  const [activeTab, setActiveTab] = useState('signin'); 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // --- UI Components ---
+
+  // Custom Country Selector
+  const prefixSelector = (
+    <Form.Item name="country_code" noStyle initialValue="+91">
+      <Select 
+        style={{ width: 90 }} 
+        dropdownMatchSelectWidth={false}
+        bordered={false}
+        className="font-medium text-gray-700"
+      >
+        <Option value="+91">🇮🇳 +91</Option>
+        <Option value="+971">🇦🇪 +971</Option>
+        <Option value="+1">🇺🇸 +1</Option>
+        <Option value="+44">🇬🇧 +44</Option>
+        <Option value="+966">🇸🇦 +966</Option>
+      </Select>
+    </Form.Item>
+  );
+
+  // --- Logic ---
 
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
-    
     try {
-      // Save to cookies (30 days persistence)
-      const cookieOptions = {
-        expires: 30,
-        path: '/',
-        secure: false, // false for localhost
-        sameSite: 'Lax'
-      };
       
-      Cookies.set('xoto_user_data', JSON.stringify(values), cookieOptions);
-      Cookies.set('xoto_user_signed', 'true', cookieOptions);
+      // 1. SIGN IN LOGIC
+      if (activeTab === 'signin') {
+        const mobile = values.mobile.toString();
+        
+        // Uses AuthContext logic
+        await login('/users/login/customer', { mobile });
+
+        notification.success({
+          message: 'Welcome Back!',
+          description: 'Login successful. Preparing your vision...',
+          icon: <CheckCircle2 className="text-green-500" />,
+          placement: 'topRight'
+        });
+
+        if (onAuthSuccess) onAuthSuccess();
+        onCancel();
+      } 
       
-      // ALSO save to sessionStorage for immediate use in current session
-      sessionStorage.setItem('xoto_session_user', JSON.stringify(values));
-      sessionStorage.setItem('xoto_session_signed', 'true');
-      
-      // Save to localStorage as backup
-      localStorage.setItem('xoto_user_info', JSON.stringify(values));
-      localStorage.setItem('xoto_user_signed_up', 'true');
-      
-      console.log('✅ User data saved to ALL storage systems');
-      console.log('- SessionStorage:', sessionStorage.getItem('xoto_session_signed'));
-      console.log('- Cookies:', Cookies.get('xoto_user_signed'));
-      console.log('- LocalStorage:', localStorage.getItem('xoto_user_signed_up'));
-      
-      notification.success({
-        message: 'Preferences Saved!',
-        description: 'Your information has been saved for future visits.',
-        duration: 2,
-      });
-      
-      // Submit to parent and close modal
-      onSubmit(values);
-      form.resetFields();
-      
+      // 2. SIGN UP LOGIC
+      else {
+        const payload = {
+          name: {
+            first_name: values.first_name,
+            last_name: values.last_name
+          },
+          email: values.email,
+          comingFromAiPage:true,
+          mobile: {
+            country_code: values.country_code,
+            number: values.mobile.toString()
+          },
+          location: {
+            country: values.country_code === '+91' ? 'India' : 'UAE',
+            state: values.state,
+            city: values.city,
+            address: ''
+          }
+        };
+
+        const response = await apiService.post('/users/signup/customer', payload);
+
+        console.log(response)
+       if (response?.success) {
+  // 1️⃣ Show success toast
+  notification.success({
+    message: 'Account Created Successfully 🎉',
+    description: 'Please sign in with your mobile number to continue.',
+    icon: <CheckCircle2 className="text-green-500" />,
+    placement: 'topRight',
+    duration: 3,
+  });
+
+  // 2️⃣ Reset FULL form
+  form.resetFields();
+
+  // 3️⃣ Switch to Sign In tab
+  setActiveTab('signin');
+
+  // 4️⃣ (Optional) Prefill mobile & country code
+  setTimeout(() => {
+    form.setFieldsValue({
+      mobile: values.mobile,
+      country_code: values.country_code,
+    });
+  }, 0);
+}
+
+      }
+
     } catch (error) {
-      console.error('❌ Error saving user data:', error);
-      notification.error({
-        message: 'Error',
-        description: 'Could not save your preferences. Please try again.',
-      });
+      console.error("Auth Error:", error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Authentication failed';
+      
+      if (error.response?.data?.errors) {
+         const serverErrors = error.response.data.errors.map(err => ({
+            name: err.field === 'mobile.number' ? 'mobile' : err.field,
+            errors: [err.message]
+         }));
+         form.setFields(serverErrors);
+      } else {
+        const displayMsg = errorMessage.includes('not found') 
+        ? 'Account not found. Please create an account.' 
+        : errorMessage;
+
+        notification.error({ message: 'Error', description: displayMsg });
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Modal
-      open={visible}
-      footer={null}
-      onCancel={onCancel}
-      width={950}
-      centered
-      closable={false}
-      bodyStyle={{ padding: 0, borderRadius: '20px', overflow: 'hidden' }}
-      className="lead-generation-modal"
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: BRAND_PURPLE,
+          borderRadius: 12,
+          controlHeight: 45, // Taller inputs
+          fontFamily: "'Inter', sans-serif",
+        },
+        components: {
+          Input: {
+            colorBorder: '#E5E7EB',
+            hoverBorderColor: BRAND_PURPLE,
+            activeBorderColor: BRAND_PURPLE,
+            colorBgContainer: '#F9FAFB', // Light gray background for inputs
+          },
+          Button: {
+            fontWeight: 600,
+          }
+        }
+      }}
     >
-      <div className="flex flex-col lg:flex-row h-[550px] relative">
-        {/* Close button */}
-        <button
-          onClick={onCancel}
-          className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 hover:bg-white shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 hover:border-gray-300"
-          aria-label="Close modal"
-        >
-          <X size={16} className="text-gray-600 hover:text-gray-800" />
-        </button>
-
-        {/* Left Side: Signup Form */}
-        <div className="lg:w-1/2 p-6 lg:p-8 bg-white flex flex-col justify-center">
-          <div className="mb-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-purple-600 to-purple-800">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="m-0 text-xl font-bold text-gray-900">Access Your AI Design</h2>
-                <Text className="m-0 text-xs text-gray-500 mt-1">
-                  Enter your details to download your generated vision
-                </Text>
-              </div>
-            </div>
-            
-            <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs font-semibold text-purple-800">
-                  ✓ AI Design Ready
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleSubmit}
-            className="space-y-3"
-            size="middle"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <Form.Item
-                name="firstName"
-                rules={[{ required: true, message: 'First name required' }]}
-                className="mb-2"
-              >
-                <Input 
-                  prefix={<User size={14} className="text-gray-400" />} 
-                  placeholder="First Name" 
-                  className="rounded-lg h-10"
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="lastName"
-                rules={[{ required: true, message: 'Last name required' }]}
-                className="mb-2"
-              >
-                <Input 
-                  placeholder="Last Name" 
-                  className="rounded-lg h-10"
-                />
-              </Form.Item>
-            </div>
-
-            <Form.Item
-              name="email"
-              rules={[
-                { required: true, message: 'Email required' },
-                { type: 'email', message: 'Valid email required' }
-              ]}
-              className="mb-2"
-            >
-              <Input 
-                prefix={<Mail size={14} className="text-gray-400" />} 
-                placeholder="Email Address" 
-                className="rounded-lg h-10"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="phone"
-              rules={[
-                { required: true, message: 'Phone required' },
-                { pattern: /^[+]?[\d\s-]+$/, message: 'Valid phone required' }
-              ]}
-              className="mb-2"
-            >
-              <Input 
-                prefix={<Phone size={14} className="text-gray-400" />} 
-                placeholder="Phone Number" 
-                className="rounded-lg h-10"
-              />
-            </Form.Item>
-
-            <div className="flex items-center gap-2 mb-2">
-              <input 
-                type="checkbox" 
-                id="rememberSession"
-                defaultChecked
-                className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-              />
-              <label htmlFor="rememberSession" className="text-xs text-gray-600">
-                Remember me for this session
-              </label>
-            </div>
-
-            <div className="pt-2">
-              <Button 
-                type="primary" 
-                size="large" 
-                htmlType="submit"
-                loading={isSubmitting}
-                disabled={isSubmitting}
-                style={{ 
-                  background: 'linear-gradient(135deg, #5C039B 0%, #8E2DE2 100%)',
-                  border: 'none'
-                }}
-                className="w-full h-12 rounded-lg font-semibold text-sm shadow-lg shadow-purple-300 hover:shadow-xl hover:shadow-purple-400 transition-all duration-300"
-                icon={<Sparkles size={16} />}
-              >
-                {isSubmitting ? 'Saving...' : 'Get My Design & Save'}
-              </Button>
-            </div>
-            
-            <Text className="block text-center text-xs text-gray-400 mt-1">
-              Your information will be saved for future visits
-            </Text>
-          </Form>
-
-          <div className="mt-4 pt-3 border-t border-gray-100">
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-              <Lock size={10} />
-              <span>Secure & Encrypted</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side: AI Background */}
-        <div 
-          className="lg:w-1/2 relative hidden lg:block"
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(92, 3, 155, 0.85) 0%, rgba(142, 45, 226, 0.75) 100%), url(${AI_BACKGROUND_IMAGES[1]})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/70 via-purple-800/50 to-transparent" />
+      <Modal
+        open={visible}
+        footer={null}
+        onCancel={onCancel}
+        width={1000}
+        centered
+        closable={false}
+        bodyStyle={{ padding: 0, borderRadius: '24px', overflow: 'hidden' }}
+        maskStyle={{ backdropFilter: 'blur(8px)', background: 'rgba(0,0,0,0.6)' }}
+      >
+        <div className="flex flex-col lg:flex-row min-h-[600px] bg-white">
           
-          <div className="relative z-10 h-full flex flex-col justify-center items-center p-6 text-center text-white">
-            <div className="max-w-xs">
-              <div className="mb-6">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
-                  <Sparkles className="w-7 h-7" />
-                </div>
-                <h3 className="text-2xl font-bold mb-3">
-                  Your Vision<br />Is Ready!
-                </h3>
-                <p className="text-sm text-white/90 leading-relaxed">
-                  Xoto AI has transformed your space. Enter your details to download your personalized landscape design.
-                </p>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-bold text-sm">Instant Download</h4>
-                    <p className="text-white/80 text-xs">Get your high-res AI render</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-bold text-sm">Expert Tips</h4>
-                    <p className="text-white/80 text-xs">Receive professional insights</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-bold text-sm">Session Memory</h4>
-                    <p className="text-white/80 text-xs">No signup needed for multiple designs</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          {/* --- LEFT SIDE: BRANDING & VISUALS --- */}
+          <div className="lg:w-5/12 relative hidden lg:flex flex-col justify-between p-10 text-white overflow-hidden bg-gray-900">
+             {/* Background */}
+             <div className="absolute inset-0 z-0">
+               <img 
+                 src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" 
+                 alt="Login bg" 
+                 className="w-full h-full object-cover opacity-60"
+               />
+               <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 to-black/80" />
+             </div>
 
-        {/* Mobile view */}
-        <div className="lg:hidden p-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mb-2">
-              <Sparkles className="w-5 h-5" />
+             {/* Content */}
+             <div className="relative z-10">
+               <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 mb-8 shadow-xl">
+                 <Sparkles className="text-purple-300 w-7 h-7" />
+               </div>
+               <h2 className="text-4xl font-extrabold leading-tight mb-4 tracking-tight">
+                 Design Your<br/>
+                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200">Dream Space</span>
+               </h2>
+               <p className="text-purple-100/80 text-base leading-relaxed">
+                 Unlock the power of AI landscape architecture. Transform your outdoors in seconds.
+               </p>
+             </div>
+
+             <div className="relative z-10 space-y-5">
+                {[
+                  "Unlimited AI Generations",
+                  "High-Resolution Downloads",
+                  "Save Your Designs"
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3 text-sm font-medium text-white/90">
+                    <div className="bg-green-500/20 p-1 rounded-full">
+                      <CheckCircle2 size={14} className="text-green-400" />
+                    </div>
+                    <span>{item}</span>
+                  </div>
+                ))}
+             </div>
+          </div>
+
+          {/* --- RIGHT SIDE: FORM --- */}
+          <div className="lg:w-7/12 p-8 lg:p-12 flex flex-col relative bg-white">
+            <button 
+              onClick={onCancel}
+              className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Header */}
+            <div className="mb-8 text-center lg:text-left">
+              <Title level={2} style={{ margin: 0, fontWeight: 700, color: '#111827' }}>
+                {activeTab === 'signin' ? 'Welcome Back' : 'Create Account'}
+              </Title>
+              <Text className="text-gray-500 mt-2 block text-base">
+                {activeTab === 'signin' 
+                  ? 'Access your saved designs and generate new ideas.' 
+                  : 'Join Xoto AI to start generating your dream gardens.'}
+              </Text>
             </div>
-            <h3 className="text-lg font-bold mb-2">
-              Your Design Is Ready!
-            </h3>
-            <p className="text-xs text-white/90">
-              Enter your details to download your AI-generated landscape.
-            </p>
+
+            {/* Custom Tabs */}
+            <div className="flex p-1.5 bg-gray-100 rounded-xl mb-8 w-full">
+              <button
+                onClick={() => { setActiveTab('signin'); form.resetFields(); }}
+                className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all duration-200 ${
+                  activeTab === 'signin' 
+                    ? 'bg-white text-purple-800 shadow-md transform scale-[1.02]' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => { setActiveTab('signup'); form.resetFields(); }}
+                className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all duration-200 ${
+                  activeTab === 'signup' 
+                    ? 'bg-white text-purple-800 shadow-md transform scale-[1.02]' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Create Account
+              </button>
+            </div>
+
+            {/* Form */}
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
+              className="flex-1 flex flex-col"
+              size="large"
+              initialValues={{ country_code: '+91' }}
+              requiredMark={false} // Clean look, removes asterisk
+            >
+              {/* --- SIGN UP FIELDS --- */}
+              {activeTab === 'signup' && (
+                <div className="grid grid-cols-2 gap-4">
+                  <Form.Item 
+                    label={<span className="font-semibold text-gray-700">First Name</span>}
+                    name="first_name" 
+                    rules={[{ required: true, message: 'Required' }]}
+                  >
+                    <Input prefix={<User size={18} className="text-gray-400 mr-1"/>} placeholder="John" />
+                  </Form.Item>
+                  <Form.Item 
+                    label={<span className="font-semibold text-gray-700">Last Name</span>}
+                    name="last_name" 
+                    rules={[{ required: true, message: 'Required' }]}
+                  >
+                    <Input placeholder="Doe" />
+                  </Form.Item>
+                </div>
+              )}
+
+              {activeTab === 'signup' && (
+                <Form.Item 
+                  label={<span className="font-semibold text-gray-700">Email Address</span>}
+                  name="email" 
+                  rules={[{ required: true, message: 'Email required' }, { type: 'email', message: 'Invalid email' }]}
+                >
+                  <Input prefix={<Mail size={18} className="text-gray-400 mr-1"/>} placeholder="john@example.com" />
+                </Form.Item>
+              )}
+
+              {/* --- SHARED MOBILE FIELD --- */}
+              <Form.Item
+                label={<span className="font-semibold text-gray-700">Mobile Number</span>}
+                name="mobile"
+                rules={[
+                  { required: true, message: 'Mobile number is required' },
+                  { pattern: /^[0-9]{7,15}$/, message: 'Invalid number format' }
+                ]}
+              >
+                <Input 
+                  addonBefore={prefixSelector} 
+                  prefix={<Smartphone size={18} className="text-gray-400 mr-1"/>}
+                  placeholder="9876543210" 
+                  className="w-full"
+                />
+              </Form.Item>
+
+              {/* --- SIGN UP LOCATION FIELDS --- */}
+              {activeTab === 'signup' && (
+                 <div className="grid grid-cols-2 gap-4">
+                  <Form.Item 
+                    label={<span className="font-semibold text-gray-700">State</span>}
+                    name="state" 
+                    rules={[{ required: true, message: 'Required' }]}
+                  >
+                    <Input prefix={<MapPin size={18} className="text-gray-400 mr-1"/>} placeholder="California" />
+                  </Form.Item>
+                  <Form.Item 
+                    label={<span className="font-semibold text-gray-700">City</span>}
+                    name="city" 
+                    rules={[{ required: true, message: 'Required' }]}
+                  >
+                    <Input placeholder="Los Angeles" />
+                  </Form.Item>
+                </div>
+              )}
+
+              <div className="mt-8">
+                <Button 
+                  type="primary" 
+                  htmlType="submit" 
+                  block 
+                  size="large"
+                  loading={isSubmitting}
+                  className="h-14 text-base rounded-xl shadow-lg shadow-purple-200 hover:shadow-purple-300 transition-all duration-300"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${BRAND_PURPLE} 0%, ${BRAND_PURPLE_DARK} 100%)`, 
+                    border: 'none' 
+                  }}
+                >
+                   {activeTab === 'signin' ? (
+                     <span className="flex items-center justify-center gap-2">Secure Login <ArrowRight size={18} /></span>
+                   ) : (
+                     <span className="flex items-center justify-center gap-2">Create Account <Sparkles size={18} /></span>
+                   )}
+                </Button>
+                
+                <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400 bg-gray-50 py-2 rounded-lg border border-gray-100">
+                  <Lock size={12} />
+                  <span>256-bit SSL Encrypted Connection</span>
+                </div>
+              </div>
+            </Form>
           </div>
         </div>
-      </div>
-    </Modal>
+      </Modal>
+    </ConfigProvider>
   );
 };
 
