@@ -153,7 +153,6 @@ const WhyPartnerSection = () => {
           </div>
         </div>
       </div>
-
     </section>
   );
 };
