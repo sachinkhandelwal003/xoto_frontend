@@ -1,16 +1,24 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function CTAButtons() {
-  return (
-    <div className="flex items-center gap-4 flex-wrap justify-center">
+  const { t, i18n } = useTranslation("mort1");
 
+  const isRTL = i18n.language === "fa";
+
+  return (
+    <div
+      dir={isRTL ? "rtl" : "ltr"}
+      className={`flex items-center gap-4 flex-wrap ${
+        isRTL ? "justify-end" : "justify-center"
+      }`}
+    >
       {/* PRIMARY BUTTON */}
       <button
-        onClick={() => alert("Get Pre-Approved clicked")}
+        onClick={() => alert(t("cta.preApprovedAlert"))}
         className="
           px-8 py-3
-               bg-[var(--color-primary)] 
-
+          bg-[var(--color-primary)]
           text-white
           font-semibold
           rounded-lg
@@ -18,12 +26,12 @@ export default function CTAButtons() {
           transition-all duration-300
         "
       >
-        Get Pre-Approved
+        {t("cta.preApproved")}
       </button>
 
       {/* OUTLINE BUTTON */}
       <button
-        onClick={() => alert("Calculate Mortgage clicked")}
+        onClick={() => alert(t("cta.calculateAlert"))}
         className="
           px-8 py-3
           border-2 border-white/70
@@ -32,16 +40,13 @@ export default function CTAButtons() {
           rounded-lg
           backdrop-blur-sm
           transition-all duration-300
-
-          hover:bg-[var(--color-primary)] 
-
+          hover:bg-[var(--color-primary)]
           hover:border-[#5C039B]
           hover:shadow-lg
         "
       >
-        Calculate Your Mortgage
+        {t("cta.calculate")}
       </button>
-
     </div>
   );
 }

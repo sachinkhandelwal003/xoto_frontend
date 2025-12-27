@@ -26,6 +26,24 @@ import enInterior6 from "./locales/en/interior6.json";
 import enInterior7 from "./locales/en/interior7.json";
 import enScape1 from "./locales/en/scape1.json";
 import enScape2 from "./locales/en/scape2.json";
+import enbuy1 from './locales/en/buy1.json'
+import enbuy2 from './locales/en/buy2.json'
+import enbuy3 from './locales/en/buy3.json'
+import enbuy4 from './locales/en/buy4.json'
+import enbuy5 from './locales/en/buy5.json'
+import enbuy6 from './locales/en/buy6.json'
+import enbuy7 from './locales/en/buy7.json'
+import enpage3 from './locales/en/page3.json'
+import enecosystem from './locales/en/ecosystem.json'
+import enwhyPartner from './locales/en/whyPartner.json'
+import enstakeholders from './locales/en/stakeholders.json'
+import enpartnerForm from './locales/en/partnerForm.json'
+import enbuiltForEveryone from './locales/en/builtForEveryone.json'
+
+import enMort1 from "./locales/en/mort1.json";
+import enMort2 from "./locales/en/mort2.json";
+import enMort3 from "./locales/en/mort3.json";
+import enMort6 from "./locales/en/mort6.json";
 
 /* =========================
    HI
@@ -47,6 +65,23 @@ import hiInterior6 from "./locales/hi/interior6.json";
 import hiInterior7 from "./locales/hi/interior7.json";
 import hiScape1 from "./locales/hi/scape1.json";
 import hiScape2 from "./locales/hi/scape2.json";
+import hibuy1 from './locales/hi/buy1.json'
+import hibuy2 from './locales/hi/buy2.json'
+import hibuy3 from './locales/hi/buy3.json'
+import hibuy4 from './locales/hi/buy4.json'
+import hibuy5 from './locales/hi/buy5.json'
+import hibuy6 from './locales/hi/buy6.json'
+import hibuy7 from './locales/hi/buy7.json'
+import hipage3 from './locales/hi/page3.json'
+import hiecosystem from './locales/hi/ecosystem.json'
+import hiwhyPartner from './locales/hi/whyPartner.json'
+import histakeholders from './locales/hi/stakeholders.json'
+import hipartnerForm from './locales/hi/partnerForm.json'
+import hibuiltForEveryone from './locales/hi/builtForEveryone.json'
+import hiMort1 from "./locales/hi/mort1.json";
+import hiMort2 from "./locales/hi/mort2.json";
+import hiMort3 from "./locales/hi/mort3.json";
+import hiMort6 from "./locales/hi/mort6.json";
 
 /* =========================
    DE
@@ -68,6 +103,23 @@ import deInterior6 from "./locales/de/interior6.json";
 import deInterior7 from "./locales/de/interior7.json";
 import deScape1 from "./locales/de/scape1.json";
 import deScape2 from "./locales/de/scape2.json";
+import debuy1 from './locales/de/buy1.json'
+import debuy2 from './locales/de/buy2.json'
+import debuy3 from './locales/de/buy3.json'
+import debuy4 from './locales/de/buy4.json'
+import debuy5 from './locales/de/buy5.json'
+import debuy6 from './locales/de/buy6.json'
+import debuy7 from './locales/de/buy7.json'
+import depage3 from './locales/de/page3.json'
+import deecosystem from './locales/de/ecosystem.json'
+import dewhyPartner from './locales/de/whyPartner.json'
+import destakeholders from './locales/de/stakeholders.json'
+import departnerForm from './locales/de/partnerForm.json'
+import debuiltForEveryone from './locales/de/builtForEveryone.json'
+import deMort1 from "./locales/de/mort1.json";
+import deMort2 from "./locales/de/mort2.json";
+import deMort3 from "./locales/de/mort3.json";
+import deMort6 from "./locales/de/mort6.json";
 
 /* =========================
    ES
@@ -89,6 +141,23 @@ import esInterior6 from "./locales/es/interior6.json";
 import esInterior7 from "./locales/es/interior7.json";
 import esScape1 from "./locales/es/scape1.json";
 import esScape2 from "./locales/es/scape2.json";
+import esbuy1 from './locales/es/buy1.json'
+import esbuy2 from './locales/es/buy2.json'
+import esbuy3 from './locales/es/buy3.json'
+import esbuy4 from './locales/es/buy4.json'
+import esbuy5 from './locales/es/buy5.json'
+import esbuy6 from './locales/es/buy6.json'
+import esbuy7 from './locales/es/buy7.json'
+import espage3 from './locales/es/page3.json'
+import esecosystem from './locales/es/ecosystem.json'
+import eswhyPartner from './locales/es/whyPartner.json'
+import esstakeholders from './locales/es/stakeholders.json'
+import espartnerForm from './locales/es/partnerForm.json'
+import esbuiltForEveryone from './locales/es/builtForEveryone.json'
+import esMort1 from "./locales/es/mort1.json";
+import esMort2 from "./locales/es/mort2.json";
+import esMort3 from "./locales/es/mort3.json";
+import esMort6 from "./locales/es/mort6.json";
 
 /* =========================
    FR
@@ -110,6 +179,23 @@ import frInterior6 from "./locales/fr/interior6.json";
 import frInterior7 from "./locales/fr/interior7.json";
 import frScape1 from "./locales/fr/scape1.json";
 import frScape2 from "./locales/fr/scape2.json";
+import frbuy1 from './locales/fr/buy1.json'
+import frbuy2 from './locales/fr/buy2.json'
+import frbuy3 from './locales/fr/buy3.json'
+import frbuy4 from './locales/fr/buy4.json'
+import frbuy5 from './locales/fr/buy5.json'
+import frbuy6 from './locales/fr/buy6.json'
+import frbuy7 from './locales/fr/buy7.json'
+import frpage3 from './locales/fr/page3.json'
+import frecosystem from './locales/fr/ecosystem.json'
+import frwhyPartner from './locales/fr/whyPartner.json'
+import frstakeholders from './locales/fr/stakeholders.json'
+import frpartnerForm from './locales/fr/partnerForm.json'
+import frbuiltForEveryone from './locales/fr/builtForEveryone.json'
+import frMort1 from "./locales/fr/mort1.json";
+import frMort2 from "./locales/fr/mort2.json";
+import frMort3 from "./locales/fr/mort3.json";
+import frMort6 from "./locales/fr/mort6.json";
 
 /* =========================
    RU
@@ -131,6 +217,23 @@ import ruInterior6 from "./locales/ru/interior6.json";
 import ruInterior7 from "./locales/ru/interior7.json";
 import ruScape1 from "./locales/ru/scape1.json";
 import ruScape2 from "./locales/ru/scape2.json";
+import rubuy1 from './locales/ru/buy1.json'
+import rubuy2 from './locales/ru/buy2.json'
+import rubuy3 from './locales/ru/buy3.json'
+import rubuy4 from './locales/ru/buy4.json'
+import rubuy5 from './locales/ru/buy5.json'
+import rubuy6 from './locales/ru/buy6.json'
+import rubuy7 from './locales/ru/buy7.json'
+import rupage3 from './locales/ru/page3.json'
+import ruecosystem from './locales/ru/ecosystem.json'
+import ruwhyPartner from './locales/ru/whyPartner.json'
+import rustakeholders from './locales/ru/stakeholders.json'
+import rupartnerForm from './locales/ru/partnerForm.json'
+import rubuiltForEveryone from './locales/ru/builtForEveryone.json'
+import ruMort1 from "./locales/ru/mort1.json";
+import ruMort2 from "./locales/ru/mort2.json";
+import ruMort3 from "./locales/ru/mort3.json";
+import ruMort6 from "./locales/ru/mort6.json";
 
 /* =========================
    TR
@@ -152,6 +255,23 @@ import trInterior6 from "./locales/tr/interior6.json";
 import trInterior7 from "./locales/tr/interior7.json";
 import trScape1 from "./locales/tr/scape1.json";
 import trScape2 from "./locales/tr/scape2.json";
+import trbuy1 from './locales/tr/buy1.json'
+import trbuy2 from './locales/tr/buy2.json'
+import trbuy3 from './locales/tr/buy3.json'
+import trbuy4 from './locales/tr/buy4.json'
+import trbuy5 from './locales/tr/buy5.json'
+import trbuy6 from './locales/tr/buy6.json'
+import trbuy7 from './locales/tr/buy7.json'
+import trpage3 from './locales/tr/page3.json'
+import trecosystem from './locales/tr/ecosystem.json'
+import trwhyPartner from './locales/tr/whyPartner.json'
+import trstakeholders from './locales/tr/stakeholders.json'
+import trpartnerForm from './locales/tr/partnerForm.json'
+import trbuiltForEveryone from './locales/tr/builtForEveryone.json'
+import trMort1 from "./locales/tr/mort1.json";
+import trMort2 from "./locales/tr/mort2.json";
+import trMort3 from "./locales/tr/mort3.json";
+import trMort6 from "./locales/tr/mort6.json";
 
 /* =========================
    ZH
@@ -173,6 +293,23 @@ import zhInterior6 from "./locales/zh/interior6.json";
 import zhInterior7 from "./locales/zh/interior7.json";
 import zhScape1 from "./locales/zh/scape1.json";
 import zhScape2 from "./locales/zh/scape2.json";
+import zhbuy1 from './locales/zh/buy1.json'
+import zhbuy2 from './locales/zh/buy2.json'
+import zhbuy3 from './locales/zh/buy3.json'
+import zhbuy4 from './locales/zh/buy4.json'
+import zhbuy5 from './locales/zh/buy5.json'
+import zhbuy6 from './locales/zh/buy6.json'
+import zhbuy7 from './locales/zh/buy7.json'
+import zhpage3 from './locales/zh/page3.json'
+import zhecosystem from './locales/zh/ecosystem.json'
+import zhwhyPartner from './locales/zh/whyPartner.json'
+import zhstakeholders from './locales/zh/stakeholders.json'
+import zhpartnerForm from './locales/zh/partnerForm.json'
+import zhbuiltForEveryone from './locales/zh/builtForEveryone.json'
+import zhMort1 from "./locales/zh/mort1.json";
+import zhMort2 from "./locales/zh/mort2.json";
+import zhMort3 from "./locales/zh/mort3.json";
+import zhMort6 from "./locales/zh/mort6.json";
 
 /* =========================
    TL
@@ -194,33 +331,494 @@ import tlInterior6 from "./locales/tl/interior6.json";
 import tlInterior7 from "./locales/tl/interior7.json";
 import tlScape1 from "./locales/tl/scape1.json";
 import tlScape2 from "./locales/tl/scape2.json";
+import tlbuy1 from './locales/tl/buy1.json'
+import tlbuy2 from './locales/tl/buy2.json'
+import tlbuy3 from './locales/tl/buy3.json'
+import tlbuy4 from './locales/tl/buy4.json'
+import tlbuy5 from './locales/tl/buy5.json'
+import tlbuy6 from './locales/tl/buy6.json'
+import tlbuy7 from './locales/tl/buy7.json'
+import tlpage3 from './locales/tl/page3.json'
+import tlecosystem from './locales/tl/ecosystem.json'
+import tlwhyPartner from './locales/tl/whyPartner.json'
+import tlstakeholders from './locales/tl/stakeholders.json'
+import tlpartnerForm from './locales/tl/partnerForm.json'
+import tlbuiltForEveryone from './locales/tl/builtForEveryone.json'
+import tlMort1 from "./locales/tl/mort1.json";
+import tlMort2 from "./locales/tl/mort2.json";
+import tlMort3 from "./locales/tl/mort3.json";
+import tlMort6 from "./locales/tl/mort6.json";
+
+/* =========================
+   FA
+========================= */
+import faCommon from "./locales/fa/common.json";
+import faMort1 from "./locales/fa/mort1.json";
+import faMort2 from "./locales/fa/mort2.json";
+import faMort3 from "./locales/fa/mort3.json";
+import faMort6 from "./locales/fa/mort6.json";
 
 /* =========================
    INIT
 ========================= */
+
+// i18n
+//   .use(LanguageDetector)
+//   .use(initReactI18next)
+//   .init({
+//     resources: {
+//       en: { common: enCommon, home: enHome, home1: enHome1, home2: enHome2, home3: enHome3, home4: enHome4, home5: enHome5, footer: enFooter, interior1: enInterior1, interior2: enInterior2, interior3: enInterior3, interior4: enInterior4, interior5: enInterior5, interior6: enInterior6, interior7: enInterior7, scape1: enScape1, scape2: enScape2, buy1: enbuy1, buy2: enbuy2, buy3: enbuy3, buy4: enbuy4, buy5: enbuy5, buy6: enbuy6, buy7: enbuy7, page3: enpage3, ecosystem: enecosystem, whyPartner: enwhyPartner, stakeholders: enstakeholders, partnerForm: enpartnerForm, builtForEveryone: enbuiltForEveryone  },
+//       hi: { common: hiCommon, home: hiHome, home1: hiHome1, home2: hiHome2, home3: hiHome3, home4: hiHome4, home5: hiHome5, footer: hiFooter, interior1: hiInterior1, interior2: hiInterior2, interior3: hiInterior3, interior4: hiInterior4, interior5: hiInterior5, interior6: hiInterior6, interior7: hiInterior7, scape1: hiScape1, scape2: hiScape2, buy1: hibuy1, buy2: hibuy2, buy3: hibuy3, buy4: hibuy4, buy5: hibuy5, buy6: hibuy6, buy7: hibuy7, page3: hipage3, ecosystem: hiecosystem, whyPartner: hiwhyPartner, stakeholders: histakeholders, partnerForm: hipartnerForm, builtForEveryone: hibuiltForEveryone  },
+//       de: { common: deCommon, home: deHome, home1: deHome1, home2: deHome2, home3: deHome3, home4: deHome4, home5: deHome5, footer: deFooter, interior1: deInterior1, interior2: deInterior2, interior3: deInterior3, interior4: deInterior4, interior5: deInterior5, interior6: deInterior6, interior7: deInterior7, scape1: deScape1, scape2: deScape2, buy1: debuy1, buy2: debuy2, buy3: debuy3, buy4: debuy4, buy5: debuy5, buy6: debuy6, buy7: debuy7, page3: depage3, ecosystem: deecosystem, whyPartner: dewhyPartner, stakeholders: destakeholders, partnerForm: departnerForm, builtForEveryone: debuiltForEveryone  },
+//       es: { common: esCommon, home: esHome, home1: esHome1, home2: esHome2, home3: esHome3, home4: esHome4, home5: esHome5, footer: esFooter, interior1: esInterior1, interior2: esInterior2, interior3: esInterior3, interior4: esInterior4, interior5: esInterior5, interior6: esInterior6, interior7: esInterior7, scape1: esScape1, scape2: esScape2, buy1: esbuy1, buy2: esbuy2, buy3: esbuy3, buy4: esbuy4, buy5: esbuy5, buy6: esbuy6, buy7: esbuy7, page3: espage3, ecosystem: esecosystem, whyPartner: eswhyPartner, stakeholders: esstakeholders, partnerForm: espartnerForm, builtForEveryone: esbuiltForEveryone  },
+//       fr: { common: frCommon, home: frHome, home1: frHome1, home2: frHome2, home3: frHome3, home4: frHome4, home5: frHome5, footer: frFooter, interior1: frInterior1, interior2: frInterior2, interior3: frInterior3, interior4: frInterior4, interior5: frInterior5, interior6: frInterior6, interior7: frInterior7, scape1: frScape1, scape2: frScape2, buy1: frbuy1, buy2: frbuy2, buy3: frbuy3, buy4: frbuy4, buy5: frbuy5, buy6: frbuy6, buy7: frbuy7, page3: frpage3, ecosystem: frecosystem, whyPartner: frwhyPartner, stakeholders: frstakeholders, partnerForm: frpartnerForm, builtForEveryone: frbuiltForEveryone  },
+//       ru: { common: ruCommon, home: ruHome, home1: ruHome1, home2: ruHome2, home3: ruHome3, home4: ruHome4, home5: ruHome5, footer: ruFooter, interior1: ruInterior1, interior2: ruInterior2, interior3: ruInterior3, interior4: ruInterior4, interior5: ruInterior5, interior6: ruInterior6, interior7: ruInterior7, scape1: ruScape1, scape2: ruScape2, buy1: rubuy1, buy2: rubuy2, buy3: rubuy3, buy4: rubuy4, buy5: rubuy5, buy6: rubuy6, buy7: rubuy7, page3: rupage3, ecosystem: ruecosystem, whyPartner: ruwhyPartner, stakeholders: rustakeholders, partnerForm: rupartnerForm, builtForEveryone: rubuiltForEveryone  },
+//       tr: { common: trCommon, home: trHome, home1: trHome1, home2: trHome2, home3: trHome3, home4: trHome4, home5: trHome5, footer: trFooter, interior1: trInterior1, interior2: trInterior2, interior3: trInterior3, interior4: trInterior4, interior5: trInterior5, interior6: trInterior6, interior7: trInterior7, scape1: trScape1, scape2: trScape2, buy1: trbuy1, buy2: trbuy2, buy3: trbuy3, buy4: trbuy4, buy5: trbuy5, buy6: trbuy6, buy7: trbuy7, page3: trpage3, ecosystem: trecosystem, whyPartner: trwhyPartner, stakeholders: trstakeholders, partnerForm: trpartnerForm, builtForEveryone: trbuiltForEveryone  },
+//       zh: { common: zhCommon, home: zhHome, home1: zhHome1, home2: zhHome2, home3: zhHome3, home4: zhHome4, home5: zhHome5, footer: zhFooter, interior1: zhInterior1, interior2: zhInterior2, interior3: zhInterior3, interior4: zhInterior4, interior5: zhInterior5, interior6: zhInterior6, interior7: zhInterior7, scape1: zhScape1, scape2: zhScape2, buy1: zhbuy1, buy2: zhbuy2, buy3: zhbuy3, buy4: zhbuy4, buy5: zhbuy5, buy6: zhbuy6, buy7: zhbuy7, page3: zhpage3, ecosystem: zhecosystem, whyPartner: zhwhyPartner, stakeholders: zhstakeholders, partnerForm: zhpartnerForm, builtForEveryone: zhbuiltForEveryone  },
+//       tl: { common: tlCommon, home: tlHome, home1: tlHome1, home2: tlHome2, home3: tlHome3, home4: tlHome4, home5: tlHome5, footer: tlFooter, interior1: tlInterior1, interior2: tlInterior2, interior3: tlInterior3, interior4: tlInterior4, interior5: tlInterior5, interior6: tlInterior6, interior7: tlInterior7, scape1: tlScape1, scape2: tlScape2, buy1: tlbuy1, buy2: tlbuy2, buy3: tlbuy3, buy4: tlbuy4, buy5: tlbuy5, buy6: tlbuy6, buy7: tlbuy7, page3: tlpage3, ecosystem: tlecosystem, whyPartner: tlwhyPartner, stakeholders: tlstakeholders, partnerForm: tlpartnerForm, builtForEveryone: tlbuiltForEveryone  }
+//     },
+//     fallbackLng: "en",
+//     supportedLngs: ["en", "hi", "de", "es", "fr", "ru", "tr", "zh", "tl"],
+//     ns: [
+//   "common","home","home1","home2","home3","home4","home5",
+//   "footer",
+//   "interior1","interior2","interior3","interior4",
+//   "interior5","interior6","interior7",
+//   "scape1","scape2",
+//   "buy1","buy2","buy3","buy4","buy5","buy6","buy7", "page3", "ecosystem", "whyPartner.json", "stakeholders", "partnerForm", "builtForEveryone"
+// ],
+//       en: { common: enCommon, home: enHome, home1: enHome1, home2: enHome2, home3: enHome3, home4: enHome4, home5: enHome5, footer: enFooter, interior1: enInterior1, interior2: enInterior2, interior3: enInterior3, interior4: enInterior4, interior5: enInterior5, interior6: enInterior6, interior7: enInterior7, scape1: enScape1, scape2: enScape2, mort1: enMort1, mort2: enMort2, mort3: enMort3,  mort6: enMort6 },
+//       hi: { common: hiCommon, home: hiHome, home1: hiHome1, home2: hiHome2, home3: hiHome3, home4: hiHome4, home5: hiHome5, footer: hiFooter, interior1: hiInterior1, interior2: hiInterior2, interior3: hiInterior3, interior4: hiInterior4, interior5: hiInterior5, interior6: hiInterior6, interior7: hiInterior7, scape1: hiScape1, scape2: hiScape2, mort1: hiMort1, mort2: hiMort2, mort3: hiMort3, mort6: hiMort6 },
+//       de: { common: deCommon, home: deHome, home1: deHome1, home2: deHome2, home3: deHome3, home4: deHome4, home5: deHome5, footer: deFooter, interior1: deInterior1, interior2: deInterior2, interior3: deInterior3, interior4: deInterior4, interior5: deInterior5, interior6: deInterior6, interior7: deInterior7, scape1: deScape1, scape2: deScape2, mort1: deMort1, mort2: deMort2, mort3: deMort3, mort6: deMort6 },
+//       es: { common: esCommon, home: esHome, home1: esHome1, home2: esHome2, home3: esHome3, home4: esHome4, home5: esHome5, footer: esFooter, interior1: esInterior1, interior2: esInterior2, interior3: esInterior3, interior4: esInterior4, interior5: esInterior5, interior6: esInterior6, interior7: esInterior7, scape1: esScape1, scape2: esScape2, mort1: esMort1, mort2: esMort2, mort3: esMort3, mort6: esMort6 },
+//       fr: { common: frCommon, home: frHome, home1: frHome1, home2: frHome2, home3: frHome3, home4: frHome4, home5: frHome5, footer: frFooter, interior1: frInterior1, interior2: frInterior2, interior3: frInterior3, interior4: frInterior4, interior5: frInterior5, interior6: frInterior6, interior7: frInterior7, scape1: frScape1, scape2: frScape2, mort1: frMort1, mort2: frMort2, mort3: frMort3, mort6: frMort6 },
+//       ru: { common: ruCommon, home: ruHome, home1: ruHome1, home2: ruHome2, home3: ruHome3, home4: ruHome4, home5: ruHome5, footer: ruFooter, interior1: ruInterior1, interior2: ruInterior2, interior3: ruInterior3, interior4: ruInterior4, interior5: ruInterior5, interior6: ruInterior6, interior7: ruInterior7, scape1: ruScape1, scape2: ruScape2, mort1: ruMort1, mort2: ruMort2, mort3: ruMort3, mort6: ruMort6 },
+//       tr: { common: trCommon, home: trHome, home1: trHome1, home2: trHome2, home3: trHome3, home4: trHome4, home5: trHome5, footer: trFooter, interior1: trInterior1, interior2: trInterior2, interior3: trInterior3, interior4: trInterior4, interior5: trInterior5, interior6: trInterior6, interior7: trInterior7, scape1: trScape1, scape2: trScape2, mort1: trMort1, mort2: trMort2, mort3: trMort3, mort6: trMort6 },
+//       zh: { common: zhCommon, home: zhHome, home1: zhHome1, home2: zhHome2, home3: zhHome3, home4: zhHome4, home5: zhHome5, footer: zhFooter, interior1: zhInterior1, interior2: zhInterior2, interior3: zhInterior3, interior4: zhInterior4, interior5: zhInterior5, interior6: zhInterior6, interior7: zhInterior7, scape1: zhScape1, scape2: zhScape2, mort1: zhMort1, mort2: zhMort2, mort3: zhMort3, mort6: zhMort6 },
+//       tl: { common: tlCommon, home: tlHome, home1: tlHome1, home2: tlHome2, home3: tlHome3, home4: tlHome4, home5: tlHome5, footer: tlFooter, interior1: tlInterior1, interior2: tlInterior2, interior3: tlInterior3, interior4: tlInterior4, interior5: tlInterior5, interior6: tlInterior6, interior7: tlInterior7, scape1: tlScape1, scape2: tlScape2, mort1: tlMort1, mort2: tlMort2, mort3: tlMort3, mort6: tlMort6 },
+//       fa: {
+//          common: faCommon,
+//          mort1: faMort1,
+//          mort2: faMort2,
+//          mort3: faMort3,
+//          mort6: faMort6
+//        }   },
+   
+//    fallbackLng: "en",
+   
+//    supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa"],
+//    detection: {
+//       order: ["localStorage", "navigator"],
+//       caches: ["localStorage"],
+//     },
+
+//     ns: [
+//       "common",
+//       "home",
+//       "home1",
+//       "home2",
+//       "home3",
+//       "home4",
+//       "home5",
+//       "footer",
+//       "interior1",
+//       "interior2",
+//       "interior3",
+//       "interior4",
+//       "interior5",
+//       "interior6",
+//       "interior7",
+//       "scape1",
+//       "scape2",
+//       "mort1",
+//       "mort2",
+//       "mort3",
+//       "buy5",
+//       "mort6"
+//     ],
+
+//     defaultNS: "common",
+
+//     interpolation: {
+//       escapeValue: false
+//     }
+//   });
+
+// export default i18n;
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, home: enHome, home1: enHome1, home2: enHome2, home3: enHome3, home4: enHome4, home5: enHome5, footer: enFooter, interior1: enInterior1, interior2: enInterior2, interior3: enInterior3, interior4: enInterior4, interior5: enInterior5, interior6: enInterior6, interior7: enInterior7, scape1: enScape1, scape2: enScape2 },
-      hi: { common: hiCommon, home: hiHome, home1: hiHome1, home2: hiHome2, home3: hiHome3, home4: hiHome4, home5: hiHome5, footer: hiFooter, interior1: hiInterior1, interior2: hiInterior2, interior3: hiInterior3, interior4: hiInterior4, interior5: hiInterior5, interior6: hiInterior6, interior7: hiInterior7, scape1: hiScape1, scape2: hiScape2 },
-      de: { common: deCommon, home: deHome, home1: deHome1, home2: deHome2, home3: deHome3, home4: deHome4, home5: deHome5, footer: deFooter, interior1: deInterior1, interior2: deInterior2, interior3: deInterior3, interior4: deInterior4, interior5: deInterior5, interior6: deInterior6, interior7: deInterior7, scape1: deScape1, scape2: deScape2 },
-      es: { common: esCommon, home: esHome, home1: esHome1, home2: esHome2, home3: esHome3, home4: esHome4, home5: esHome5, footer: esFooter, interior1: esInterior1, interior2: esInterior2, interior3: esInterior3, interior4: esInterior4, interior5: esInterior5, interior6: esInterior6, interior7: esInterior7, scape1: esScape1, scape2: esScape2 },
-      fr: { common: frCommon, home: frHome, home1: frHome1, home2: frHome2, home3: frHome3, home4: frHome4, home5: frHome5, footer: frFooter, interior1: frInterior1, interior2: frInterior2, interior3: frInterior3, interior4: frInterior4, interior5: frInterior5, interior6: frInterior6, interior7: frInterior7, scape1: frScape1, scape2: frScape2 },
-      ru: { common: ruCommon, home: ruHome, home1: ruHome1, home2: ruHome2, home3: ruHome3, home4: ruHome4, home5: ruHome5, footer: ruFooter, interior1: ruInterior1, interior2: ruInterior2, interior3: ruInterior3, interior4: ruInterior4, interior5: ruInterior5, interior6: ruInterior6, interior7: ruInterior7, scape1: ruScape1, scape2: ruScape2 },
-      tr: { common: trCommon, home: trHome, home1: trHome1, home2: trHome2, home3: trHome3, home4: trHome4, home5: trHome5, footer: trFooter, interior1: trInterior1, interior2: trInterior2, interior3: trInterior3, interior4: trInterior4, interior5: trInterior5, interior6: trInterior6, interior7: trInterior7, scape1: trScape1, scape2: trScape2 },
-      zh: { common: zhCommon, home: zhHome, home1: zhHome1, home2: zhHome2, home3: zhHome3, home4: zhHome4, home5: zhHome5, footer: zhFooter, interior1: zhInterior1, interior2: zhInterior2, interior3: zhInterior3, interior4: zhInterior4, interior5: zhInterior5, interior6: zhInterior6, interior7: zhInterior7, scape1: zhScape1, scape2: zhScape2 },
-      tl: { common: tlCommon, home: tlHome, home1: tlHome1, home2: tlHome2, home3: tlHome3, home4: tlHome4, home5: tlHome5, footer: tlFooter, interior1: tlInterior1, interior2: tlInterior2, interior3: tlInterior3, interior4: tlInterior4, interior5: tlInterior5, interior6: tlInterior6, interior7: tlInterior7, scape1: tlScape1, scape2: tlScape2 },
- ar :{common : arCommon}
-   },
+      en: {
+        common: enCommon,
+        home: enHome,
+        home1: enHome1,
+        home2: enHome2,
+        home3: enHome3,
+        home4: enHome4,
+        home5: enHome5,
+        footer: enFooter,
+        interior1: enInterior1,
+        interior2: enInterior2,
+        interior3: enInterior3,
+        interior4: enInterior4,
+        interior5: enInterior5,
+        interior6: enInterior6,
+        interior7: enInterior7,
+        scape1: enScape1,
+        scape2: enScape2,
+        buy1: enbuy1,
+        buy2: enbuy2,
+        buy3: enbuy3,
+        buy4: enbuy4,
+        buy5: enbuy5,
+        buy6: enbuy6,
+        buy7: enbuy7,
+        page3: enpage3,
+        ecosystem: enecosystem,
+        whyPartner: enwhyPartner,
+        stakeholders: enstakeholders,
+        partnerForm: enpartnerForm,
+        builtForEveryone: enbuiltForEveryone,
+        mort1: enMort1,
+        mort2: enMort2,
+        mort3: enMort3,
+        mort6: enMort6
+      },
+
+      hi: {
+        common: hiCommon,
+        home: hiHome,
+        home1: hiHome1,
+        home2: hiHome2,
+        home3: hiHome3,
+        home4: hiHome4,
+        home5: hiHome5,
+        footer: hiFooter,
+        interior1: hiInterior1,
+        interior2: hiInterior2,
+        interior3: hiInterior3,
+        interior4: hiInterior4,
+        interior5: hiInterior5,
+        interior6: hiInterior6,
+        interior7: hiInterior7,
+        scape1: hiScape1,
+        scape2: hiScape2,
+        buy1: hibuy1,
+        buy2: hibuy2,
+        buy3: hibuy3,
+        buy4: hibuy4,
+        buy5: hibuy5,
+        buy6: hibuy6,
+        buy7: hibuy7,
+        page3: hipage3,
+        ecosystem: hiecosystem,
+        whyPartner: hiwhyPartner,
+        stakeholders: histakeholders,
+        partnerForm: hipartnerForm,
+        builtForEveryone: hibuiltForEveryone,
+        mort1: hiMort1,
+        mort2: hiMort2,
+        mort3: hiMort3,
+        mort6: hiMort6
+      },
+
+      de: {
+        common: deCommon,
+        home: deHome,
+        home1: deHome1,
+        home2: deHome2,
+        home3: deHome3,
+        home4: deHome4,
+        home5: deHome5,
+        footer: deFooter,
+        interior1: deInterior1,
+        interior2: deInterior2,
+        interior3: deInterior3,
+        interior4: deInterior4,
+        interior5: deInterior5,
+        interior6: deInterior6,
+        interior7: deInterior7,
+        scape1: deScape1,
+        scape2: deScape2,
+        buy1: debuy1,
+        buy2: debuy2,
+        buy3: debuy3,
+        buy4: debuy4,
+        buy5: debuy5,
+        buy6: debuy6,
+        buy7: debuy7,
+        page3: depage3,
+        ecosystem: deecosystem,
+        whyPartner: dewhyPartner,
+        stakeholders: destakeholders,
+        partnerForm: departnerForm,
+        builtForEveryone: debuiltForEveryone,
+        mort1: deMort1,
+        mort2: deMort2,
+        mort3: deMort3,
+        mort6: deMort6
+      },
+
+      es: {
+        common: esCommon,
+        home: esHome,
+        home1: esHome1,
+        home2: esHome2,
+        home3: esHome3,
+        home4: esHome4,
+        home5: esHome5,
+        footer: esFooter,
+        interior1: esInterior1,
+        interior2: esInterior2,
+        interior3: esInterior3,
+        interior4: esInterior4,
+        interior5: esInterior5,
+        interior6: esInterior6,
+        interior7: esInterior7,
+        scape1: esScape1,
+        scape2: esScape2,
+        buy1: esbuy1,
+        buy2: esbuy2,
+        buy3: esbuy3,
+        buy4: esbuy4,
+        buy5: esbuy5,
+        buy6: esbuy6,
+        buy7: esbuy7,
+        page3: espage3,
+        ecosystem: esecosystem,
+        whyPartner: eswhyPartner,
+        stakeholders: esstakeholders,
+        partnerForm: espartnerForm,
+        builtForEveryone: esbuiltForEveryone,
+        mort1: esMort1,
+        mort2: esMort2,
+        mort3: esMort3,
+        mort6: esMort6
+      },
+
+      fr: {
+        common: frCommon,
+        home: frHome,
+        home1: frHome1,
+        home2: frHome2,
+        home3: frHome3,
+        home4: frHome4,
+        home5: frHome5,
+        footer: frFooter,
+        interior1: frInterior1,
+        interior2: frInterior2,
+        interior3: frInterior3,
+        interior4: frInterior4,
+        interior5: frInterior5,
+        interior6: frInterior6,
+        interior7: frInterior7,
+        scape1: frScape1,
+        scape2: frScape2,
+        buy1: frbuy1,
+        buy2: frbuy2,
+        buy3: frbuy3,
+        buy4: frbuy4,
+        buy5: frbuy5,
+        buy6: frbuy6,
+        buy7: frbuy7,
+        page3: frpage3,
+        ecosystem: frecosystem,
+        whyPartner: frwhyPartner,
+        stakeholders: frstakeholders,
+        partnerForm: frpartnerForm,
+        builtForEveryone: frbuiltForEveryone,
+        mort1: frMort1,
+        mort2: frMort2,
+        mort3: frMort3,
+        mort6: frMort6
+      },
+
+      ru: {
+        common: ruCommon,
+        home: ruHome,
+        home1: ruHome1,
+        home2: ruHome2,
+        home3: ruHome3,
+        home4: ruHome4,
+        home5: ruHome5,
+        footer: ruFooter,
+        interior1: ruInterior1,
+        interior2: ruInterior2,
+        interior3: ruInterior3,
+        interior4: ruInterior4,
+        interior5: ruInterior5,
+        interior6: ruInterior6,
+        interior7: ruInterior7,
+        scape1: ruScape1,
+        scape2: ruScape2,
+        buy1: rubuy1,
+        buy2: rubuy2,
+        buy3: rubuy3,
+        buy4: rubuy4,
+        buy5: rubuy5,
+        buy6: rubuy6,
+        buy7: rubuy7,
+        page3: rupage3,
+        ecosystem: ruecosystem,
+        whyPartner: ruwhyPartner,
+        stakeholders: rustakeholders,
+        partnerForm: rupartnerForm,
+        builtForEveryone: rubuiltForEveryone,
+        mort1: ruMort1,
+        mort2: ruMort2,
+        mort3: ruMort3,
+        mort6: ruMort6
+      },
+
+      tr: {
+        common: trCommon,
+        home: trHome,
+        home1: trHome1,
+        home2: trHome2,
+        home3: trHome3,
+        home4: trHome4,
+        home5: trHome5,
+        footer: trFooter,
+        interior1: trInterior1,
+        interior2: trInterior2,
+        interior3: trInterior3,
+        interior4: trInterior4,
+        interior5: trInterior5,
+        interior6: trInterior6,
+        interior7: trInterior7,
+        scape1: trScape1,
+        scape2: trScape2,
+        buy1: trbuy1,
+        buy2: trbuy2,
+        buy3: trbuy3,
+        buy4: trbuy4,
+        buy5: trbuy5,
+        buy6: trbuy6,
+        buy7: trbuy7,
+        page3: trpage3,
+        ecosystem: trecosystem,
+        whyPartner: trwhyPartner,
+        stakeholders: trstakeholders,
+        partnerForm: trpartnerForm,
+        builtForEveryone: trbuiltForEveryone,
+        mort1: trMort1,
+        mort2: trMort2,
+        mort3: trMort3,
+        mort6: trMort6
+      },
+
+      zh: {
+        common: zhCommon,
+        home: zhHome,
+        home1: zhHome1,
+        home2: zhHome2,
+        home3: zhHome3,
+        home4: zhHome4,
+        home5: zhHome5,
+        footer: zhFooter,
+        interior1: zhInterior1,
+        interior2: zhInterior2,
+        interior3: zhInterior3,
+        interior4: zhInterior4,
+        interior5: zhInterior5,
+        interior6: zhInterior6,
+        interior7: zhInterior7,
+        scape1: zhScape1,
+        scape2: zhScape2,
+        buy1: zhbuy1,
+        buy2: zhbuy2,
+        buy3: zhbuy3,
+        buy4: zhbuy4,
+        buy5: zhbuy5,
+        buy6: zhbuy6,
+        buy7: zhbuy7,
+        page3: zhpage3,
+        ecosystem: zhecosystem,
+        whyPartner: zhwhyPartner,
+        stakeholders: zhstakeholders,
+        partnerForm: zhpartnerForm,
+        builtForEveryone: zhbuiltForEveryone,
+        mort1: zhMort1,
+        mort2: zhMort2,
+        mort3: zhMort3,
+        mort6: zhMort6
+      },
+
+      tl: {
+        common: tlCommon,
+        home: tlHome,
+        home1: tlHome1,
+        home2: tlHome2,
+        home3: tlHome3,
+        home4: tlHome4,
+        home5: tlHome5,
+        footer: tlFooter,
+        interior1: tlInterior1,
+        interior2: tlInterior2,
+        interior3: tlInterior3,
+        interior4: tlInterior4,
+        interior5: tlInterior5,
+        interior6: tlInterior6,
+        interior7: tlInterior7,
+        scape1: tlScape1,
+        scape2: tlScape2,
+        buy1: tlbuy1,
+        buy2: tlbuy2,
+        buy3: tlbuy3,
+        buy4: tlbuy4,
+        buy5: tlbuy5,
+        buy6: tlbuy6,
+        buy7: tlbuy7,
+        page3: tlpage3,
+        ecosystem: tlecosystem,
+        whyPartner: tlwhyPartner,
+        stakeholders: tlstakeholders,
+        partnerForm: tlpartnerForm,
+        builtForEveryone: tlbuiltForEveryone,
+        mort1: tlMort1,
+        mort2: tlMort2,
+        mort3: tlMort3,
+        mort6: tlMort6
+      },
+
+      fa: {
+        common: faCommon,
+        mort1: faMort1,
+        mort2: faMort2,
+        mort3: faMort3,
+        mort6: faMort6
+      }
+    },
+
     fallbackLng: "en",
-    supportedLngs: ["en", "hi", "de", "es", "fr", "ru", "tr", "zh", "tl"],
-    ns: ["common","home","home1","home2","home3","home4","home5","footer","interior1","interior2","interior3","interior4","interior5","interior6","interior7","scape1","scape2"],
+
+    supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa"],
+
+    ns: [
+      "common","home","home1","home2","home3","home4","home5",
+      "footer",
+      "interior1","interior2","interior3","interior4",
+      "interior5","interior6","interior7",
+      "scape1","scape2",
+      "buy1","buy2","buy3","buy4","buy5","buy6","buy7",
+      "page3","ecosystem","whyPartner","stakeholders",
+      "partnerForm","builtForEveryone",
+      "mort1","mort2","mort3","mort6"
+    ],
+
     defaultNS: "common",
-    interpolation: { escapeValue: false }
+
+    detection: {
+      order: ["localStorage", "navigator"],
+      caches: ["localStorage"]
+    },
+
+    interpolation: {
+      escapeValue: false
+    }
   });
 
 export default i18n;
-  
