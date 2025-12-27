@@ -115,24 +115,24 @@ export default function Landspackng() {
       </section>
 
       {/* ================= INTERACTIVE BUILDER ================= */}
-      <section className="relative bg-[#f5f5f5] pt-20 overflow-hidden">
-        <div className="absolute bottom-[-200px] left-0 w-full">
+      <section className="relative bg-[#f5f5f5] pt-24 overflow-hidden">
+        <div className="absolute bottom-[-600px] left-0 w-full">
           <img src={wave2} alt="" className="w-full" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6 text-center lg:text-left">
             <h2 className="text-3xl sm:text-4xl md:text-5xl heading-dark-1">
-              {t("builder.title", { ns: "scape2" })}
+              {t("services.builder.title", { ns: "scape2" })}
             </h2>
 
             <p className="text-lg text-[#547593] max-w-md mx-auto lg:mx-0">
-              {t("builder.description", { ns: "scape2" })}
+              {t("services.builder.description", { ns: "scape2" })}
             </p>
 
             <Link to="/aiPlanner">
               <button className="bg-[var(--color-primary)] px-10 py-3 rounded-md text-white">
-                {t("builder.button", { ns: "scape2" })}
+                {t("services.builder.button", { ns: "scape2" })}
               </button>
             </Link>
           </div>
