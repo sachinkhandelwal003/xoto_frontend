@@ -131,7 +131,7 @@ const BuiltForEveryone = () => {
               </div>
             </div>
 
-            <div className="flex gap-3 mt-8">
+   <div className="relative z-30 flex gap-3 mt-8 mb-16 sm:mb-0">
   {/* LEFT */}
   <button
     onClick={prevSlide}
@@ -139,6 +139,7 @@ const BuiltForEveryone = () => {
       p-3 rounded-sm border border-gray-300
       bg-white text-black
       hover:bg-[#5c039b] hover:text-white
+      active:bg-[#5c039b] active:text-white
       transition
     "
   >
@@ -151,12 +152,14 @@ const BuiltForEveryone = () => {
     className="
       p-3 rounded-sm border border-[#5c039b]
       bg-[#5c039b] text-white
+      active:scale-95
       transition
     "
   >
     <ChevronRight className="w-5 h-5" />
   </button>
 </div>
+
 
           </div>
         </div>

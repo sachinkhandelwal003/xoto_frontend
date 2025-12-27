@@ -8,37 +8,17 @@ const WhyPartnerSection = () => {
   const [active, setActive] = useState(1);
 
   const features = [
-    {
-      id: 1,
-      title: t("features.1.title"),
-      desc: t("features.1.desc"),
-    },
-    {
-      id: 2,
-      title: t("features.2.title"),
-      desc: t("features.2.desc"),
-    },
-    {
-      id: 3,
-      title: t("features.3.title"),
-      desc: t("features.3.desc"),
-    },
-    {
-      id: 4,
-      title: t("features.4.title"),
-      desc: t("features.4.desc"),
-    },
+    { id: 1, title: t("features.1.title"), desc: t("features.1.desc") },
+    { id: 2, title: t("features.2.title"), desc: t("features.2.desc") },
+    { id: 3, title: t("features.3.title"), desc: t("features.3.desc") },
+    { id: 4, title: t("features.4.title"), desc: t("features.4.desc") },
   ];
 
-  // Horizontal progress (desktop)
   const progressWidth = `${(active / features.length) * 100}%`;
-
-  // Vertical progress (mobile)
   const progressHeight = `${(active / features.length) * 100}%`;
 
   return (
     <section className="relative w-full bg-white overflow-hidden py-20">
-
       {/* WAVE */}
       <div className="absolute bottom-[-20px] md:bottom-[-200px] left-0 w-full z-0">
         <img
@@ -48,14 +28,14 @@ const WhyPartnerSection = () => {
         />
       </div>
 
-      {/* Heading */}
+      {/* HEADING */}
       <div className="text-center mb-10 relative z-10">
         <h2 className="text-4xl md:text-5xl font-bold text-black heading-dark-1">
           {t("title")} <span className="text-black">XOTO?</span>
         </h2>
       </div>
 
-      {/* Image */}
+      {/* IMAGE */}
       <div className="flex justify-center mb-16 relative z-10">
         <img
           src={jjjImage}
@@ -64,8 +44,8 @@ const WhyPartnerSection = () => {
         />
       </div>
 
-      {/* ========= DESKTOP PROGRESS ========= */}
-      <div className="hidden sm:flex justify-center mb-2 relative z-10">
+      {/* ========= DESKTOP HORIZONTAL PROGRESS ========= */}
+      <div className="hidden md:flex justify-center mb-6 relative z-10">
         <div className="relative w-[85%] h-[8px] bg-gray-200 rounded-full">
           <div
             className="absolute left-0 top-0 h-[8px] bg-gradient-to-r from-green-400 to-green-500 rounded-full transition-all duration-500"
@@ -107,19 +87,18 @@ const WhyPartnerSection = () => {
         ))}
       </div>
 
-      {/* ========= MOBILE ========= */}
+      {/* ========= MOBILE VERSION ========= */}
       <div className="md:hidden block relative z-10 px-6 mb-12">
         <div className="flex gap-5">
-
-          {/* Vertical progress */}
-          <div className="relative w-[6px] bg-gray-200 rounded-full h-full mt-2">
+          {/* VERTICAL PROGRESS (LEFT) */}
+          <div className="relative w-[6px] bg-gray-200 rounded-full">
             <div
               className="absolute left-0 bottom-0 w-full bg-gradient-to-b from-green-400 to-green-500 rounded-full transition-all duration-500"
               style={{ height: progressHeight }}
             />
           </div>
 
-          {/* Features */}
+          {/* FEATURES */}
           <div className="flex flex-col gap-8 w-full">
             {features.map((item) => (
               <div

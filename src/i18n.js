@@ -35,6 +35,7 @@ import enwhyPartner from './locales/en/whyPartner.json'
 import enstakeholders from './locales/en/stakeholders.json'
 import enpartnerForm from './locales/en/partnerForm.json'
 import enbuiltForEveryone from './locales/en/builtForEveryone.json'
+import enCta from './locales/en/cta.json'
 
 
 /* =========================
@@ -70,6 +71,7 @@ import hiwhyPartner from './locales/hi/whyPartner.json'
 import histakeholders from './locales/hi/stakeholders.json'
 import hipartnerForm from './locales/hi/partnerForm.json'
 import hibuiltForEveryone from './locales/hi/builtForEveryone.json'
+import hiCta from './locales/hi/cta.json'
 
 /* =========================
    DE
@@ -104,6 +106,7 @@ import dewhyPartner from './locales/de/whyPartner.json'
 import destakeholders from './locales/de/stakeholders.json'
 import departnerForm from './locales/de/partnerForm.json'
 import debuiltForEveryone from './locales/de/builtForEveryone.json'
+import deCta from './locales/de/cta.json'
 
 /* =========================
    ES
@@ -138,6 +141,7 @@ import eswhyPartner from './locales/es/whyPartner.json'
 import esstakeholders from './locales/es/stakeholders.json'
 import espartnerForm from './locales/es/partnerForm.json'
 import esbuiltForEveryone from './locales/es/builtForEveryone.json'
+import esCta from './locales/es/cta.json'
 
 /* =========================
    FR
@@ -172,6 +176,7 @@ import frwhyPartner from './locales/fr/whyPartner.json'
 import frstakeholders from './locales/fr/stakeholders.json'
 import frpartnerForm from './locales/fr/partnerForm.json'
 import frbuiltForEveryone from './locales/fr/builtForEveryone.json'
+import frCta from './locales/fr/cta.json'
 
 /* =========================
    RU
@@ -206,6 +211,7 @@ import ruwhyPartner from './locales/ru/whyPartner.json'
 import rustakeholders from './locales/ru/stakeholders.json'
 import rupartnerForm from './locales/ru/partnerForm.json'
 import rubuiltForEveryone from './locales/ru/builtForEveryone.json'
+import ruCta from './locales/ru/cta.json'
 
 /* =========================
    TR
@@ -240,6 +246,7 @@ import trwhyPartner from './locales/tr/whyPartner.json'
 import trstakeholders from './locales/tr/stakeholders.json'
 import trpartnerForm from './locales/tr/partnerForm.json'
 import trbuiltForEveryone from './locales/tr/builtForEveryone.json'
+import trCta from './locales/tr/cta.json'
 
 /* =========================
    ZH
@@ -274,6 +281,7 @@ import zhwhyPartner from './locales/zh/whyPartner.json'
 import zhstakeholders from './locales/zh/stakeholders.json'
 import zhpartnerForm from './locales/zh/partnerForm.json'
 import zhbuiltForEveryone from './locales/zh/builtForEveryone.json'
+import zhCta from './locales/zh/cta.json'
 
 /* =========================
    TL
@@ -308,6 +316,8 @@ import tlwhyPartner from './locales/tl/whyPartner.json'
 import tlstakeholders from './locales/tl/stakeholders.json'
 import tlpartnerForm from './locales/tl/partnerForm.json'
 import tlbuiltForEveryone from './locales/tl/builtForEveryone.json'
+import tlCta from './locales/tl/cta.json'
+// import { from } from "gsap";
 
 /* =========================
    INIT
@@ -318,15 +328,15 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, home: enHome, home1: enHome1, home2: enHome2, home3: enHome3, home4: enHome4, home5: enHome5, footer: enFooter, interior1: enInterior1, interior2: enInterior2, interior3: enInterior3, interior4: enInterior4, interior5: enInterior5, interior6: enInterior6, interior7: enInterior7, scape1: enScape1, scape2: enScape2, buy1: enbuy1, buy2: enbuy2, buy3: enbuy3, buy4: enbuy4, buy5: enbuy5, buy6: enbuy6, buy7: enbuy7, page3: enpage3, ecosystem: enecosystem, whyPartner: enwhyPartner, stakeholders: enstakeholders, partnerForm: enpartnerForm, builtForEveryone: enbuiltForEveryone  },
-      hi: { common: hiCommon, home: hiHome, home1: hiHome1, home2: hiHome2, home3: hiHome3, home4: hiHome4, home5: hiHome5, footer: hiFooter, interior1: hiInterior1, interior2: hiInterior2, interior3: hiInterior3, interior4: hiInterior4, interior5: hiInterior5, interior6: hiInterior6, interior7: hiInterior7, scape1: hiScape1, scape2: hiScape2, buy1: hibuy1, buy2: hibuy2, buy3: hibuy3, buy4: hibuy4, buy5: hibuy5, buy6: hibuy6, buy7: hibuy7, page3: hipage3, ecosystem: hiecosystem, whyPartner: hiwhyPartner, stakeholders: histakeholders, partnerForm: hipartnerForm, builtForEveryone: hibuiltForEveryone  },
-      de: { common: deCommon, home: deHome, home1: deHome1, home2: deHome2, home3: deHome3, home4: deHome4, home5: deHome5, footer: deFooter, interior1: deInterior1, interior2: deInterior2, interior3: deInterior3, interior4: deInterior4, interior5: deInterior5, interior6: deInterior6, interior7: deInterior7, scape1: deScape1, scape2: deScape2, buy1: debuy1, buy2: debuy2, buy3: debuy3, buy4: debuy4, buy5: debuy5, buy6: debuy6, buy7: debuy7, page3: depage3, ecosystem: deecosystem, whyPartner: dewhyPartner, stakeholders: destakeholders, partnerForm: departnerForm, builtForEveryone: debuiltForEveryone  },
-      es: { common: esCommon, home: esHome, home1: esHome1, home2: esHome2, home3: esHome3, home4: esHome4, home5: esHome5, footer: esFooter, interior1: esInterior1, interior2: esInterior2, interior3: esInterior3, interior4: esInterior4, interior5: esInterior5, interior6: esInterior6, interior7: esInterior7, scape1: esScape1, scape2: esScape2, buy1: esbuy1, buy2: esbuy2, buy3: esbuy3, buy4: esbuy4, buy5: esbuy5, buy6: esbuy6, buy7: esbuy7, page3: espage3, ecosystem: esecosystem, whyPartner: eswhyPartner, stakeholders: esstakeholders, partnerForm: espartnerForm, builtForEveryone: esbuiltForEveryone  },
-      fr: { common: frCommon, home: frHome, home1: frHome1, home2: frHome2, home3: frHome3, home4: frHome4, home5: frHome5, footer: frFooter, interior1: frInterior1, interior2: frInterior2, interior3: frInterior3, interior4: frInterior4, interior5: frInterior5, interior6: frInterior6, interior7: frInterior7, scape1: frScape1, scape2: frScape2, buy1: frbuy1, buy2: frbuy2, buy3: frbuy3, buy4: frbuy4, buy5: frbuy5, buy6: frbuy6, buy7: frbuy7, page3: frpage3, ecosystem: frecosystem, whyPartner: frwhyPartner, stakeholders: frstakeholders, partnerForm: frpartnerForm, builtForEveryone: frbuiltForEveryone  },
-      ru: { common: ruCommon, home: ruHome, home1: ruHome1, home2: ruHome2, home3: ruHome3, home4: ruHome4, home5: ruHome5, footer: ruFooter, interior1: ruInterior1, interior2: ruInterior2, interior3: ruInterior3, interior4: ruInterior4, interior5: ruInterior5, interior6: ruInterior6, interior7: ruInterior7, scape1: ruScape1, scape2: ruScape2, buy1: rubuy1, buy2: rubuy2, buy3: rubuy3, buy4: rubuy4, buy5: rubuy5, buy6: rubuy6, buy7: rubuy7, page3: rupage3, ecosystem: ruecosystem, whyPartner: ruwhyPartner, stakeholders: rustakeholders, partnerForm: rupartnerForm, builtForEveryone: rubuiltForEveryone  },
-      tr: { common: trCommon, home: trHome, home1: trHome1, home2: trHome2, home3: trHome3, home4: trHome4, home5: trHome5, footer: trFooter, interior1: trInterior1, interior2: trInterior2, interior3: trInterior3, interior4: trInterior4, interior5: trInterior5, interior6: trInterior6, interior7: trInterior7, scape1: trScape1, scape2: trScape2, buy1: trbuy1, buy2: trbuy2, buy3: trbuy3, buy4: trbuy4, buy5: trbuy5, buy6: trbuy6, buy7: trbuy7, page3: trpage3, ecosystem: trecosystem, whyPartner: trwhyPartner, stakeholders: trstakeholders, partnerForm: trpartnerForm, builtForEveryone: trbuiltForEveryone  },
-      zh: { common: zhCommon, home: zhHome, home1: zhHome1, home2: zhHome2, home3: zhHome3, home4: zhHome4, home5: zhHome5, footer: zhFooter, interior1: zhInterior1, interior2: zhInterior2, interior3: zhInterior3, interior4: zhInterior4, interior5: zhInterior5, interior6: zhInterior6, interior7: zhInterior7, scape1: zhScape1, scape2: zhScape2, buy1: zhbuy1, buy2: zhbuy2, buy3: zhbuy3, buy4: zhbuy4, buy5: zhbuy5, buy6: zhbuy6, buy7: zhbuy7, page3: zhpage3, ecosystem: zhecosystem, whyPartner: zhwhyPartner, stakeholders: zhstakeholders, partnerForm: zhpartnerForm, builtForEveryone: zhbuiltForEveryone  },
-      tl: { common: tlCommon, home: tlHome, home1: tlHome1, home2: tlHome2, home3: tlHome3, home4: tlHome4, home5: tlHome5, footer: tlFooter, interior1: tlInterior1, interior2: tlInterior2, interior3: tlInterior3, interior4: tlInterior4, interior5: tlInterior5, interior6: tlInterior6, interior7: tlInterior7, scape1: tlScape1, scape2: tlScape2, buy1: tlbuy1, buy2: tlbuy2, buy3: tlbuy3, buy4: tlbuy4, buy5: tlbuy5, buy6: tlbuy6, buy7: tlbuy7, page3: tlpage3, ecosystem: tlecosystem, whyPartner: tlwhyPartner, stakeholders: tlstakeholders, partnerForm: tlpartnerForm, builtForEveryone: tlbuiltForEveryone  }
+      en: { common: enCommon, home: enHome, home1: enHome1, home2: enHome2, home3: enHome3, home4: enHome4, home5: enHome5, footer: enFooter, interior1: enInterior1, interior2: enInterior2, interior3: enInterior3, interior4: enInterior4, interior5: enInterior5, interior6: enInterior6, interior7: enInterior7, scape1: enScape1, scape2: enScape2, buy1: enbuy1, buy2: enbuy2, buy3: enbuy3, buy4: enbuy4, buy5: enbuy5, buy6: enbuy6, buy7: enbuy7, page3: enpage3, ecosystem: enecosystem, whyPartner: enwhyPartner, stakeholders: enstakeholders, partnerForm: enpartnerForm, builtForEveryone: enbuiltForEveryone, cta: enCta  },
+      hi: { common: hiCommon, home: hiHome, home1: hiHome1, home2: hiHome2, home3: hiHome3, home4: hiHome4, home5: hiHome5, footer: hiFooter, interior1: hiInterior1, interior2: hiInterior2, interior3: hiInterior3, interior4: hiInterior4, interior5: hiInterior5, interior6: hiInterior6, interior7: hiInterior7, scape1: hiScape1, scape2: hiScape2, buy1: hibuy1, buy2: hibuy2, buy3: hibuy3, buy4: hibuy4, buy5: hibuy5, buy6: hibuy6, buy7: hibuy7, page3: hipage3, ecosystem: hiecosystem, whyPartner: hiwhyPartner, stakeholders: histakeholders, partnerForm: hipartnerForm, builtForEveryone: hibuiltForEveryone, cta: hiCta  },
+      de: { common: deCommon, home: deHome, home1: deHome1, home2: deHome2, home3: deHome3, home4: deHome4, home5: deHome5, footer: deFooter, interior1: deInterior1, interior2: deInterior2, interior3: deInterior3, interior4: deInterior4, interior5: deInterior5, interior6: deInterior6, interior7: deInterior7, scape1: deScape1, scape2: deScape2, buy1: debuy1, buy2: debuy2, buy3: debuy3, buy4: debuy4, buy5: debuy5, buy6: debuy6, buy7: debuy7, page3: depage3, ecosystem: deecosystem, whyPartner: dewhyPartner, stakeholders: destakeholders, partnerForm: departnerForm, builtForEveryone: debuiltForEveryone, cta: deCta  },
+      es: { common: esCommon, home: esHome, home1: esHome1, home2: esHome2, home3: esHome3, home4: esHome4, home5: esHome5, footer: esFooter, interior1: esInterior1, interior2: esInterior2, interior3: esInterior3, interior4: esInterior4, interior5: esInterior5, interior6: esInterior6, interior7: esInterior7, scape1: esScape1, scape2: esScape2, buy1: esbuy1, buy2: esbuy2, buy3: esbuy3, buy4: esbuy4, buy5: esbuy5, buy6: esbuy6, buy7: esbuy7, page3: espage3, ecosystem: esecosystem, whyPartner: eswhyPartner, stakeholders: esstakeholders, partnerForm: espartnerForm, builtForEveryone: esbuiltForEveryone, cta: esCta  },
+      fr: { common: frCommon, home: frHome, home1: frHome1, home2: frHome2, home3: frHome3, home4: frHome4, home5: frHome5, footer: frFooter, interior1: frInterior1, interior2: frInterior2, interior3: frInterior3, interior4: frInterior4, interior5: frInterior5, interior6: frInterior6, interior7: frInterior7, scape1: frScape1, scape2: frScape2, buy1: frbuy1, buy2: frbuy2, buy3: frbuy3, buy4: frbuy4, buy5: frbuy5, buy6: frbuy6, buy7: frbuy7, page3: frpage3, ecosystem: frecosystem, whyPartner: frwhyPartner, stakeholders: frstakeholders, partnerForm: frpartnerForm, builtForEveryone: frbuiltForEveryone, cta: frCta  },
+      ru: { common: ruCommon, home: ruHome, home1: ruHome1, home2: ruHome2, home3: ruHome3, home4: ruHome4, home5: ruHome5, footer: ruFooter, interior1: ruInterior1, interior2: ruInterior2, interior3: ruInterior3, interior4: ruInterior4, interior5: ruInterior5, interior6: ruInterior6, interior7: ruInterior7, scape1: ruScape1, scape2: ruScape2, buy1: rubuy1, buy2: rubuy2, buy3: rubuy3, buy4: rubuy4, buy5: rubuy5, buy6: rubuy6, buy7: rubuy7, page3: rupage3, ecosystem: ruecosystem, whyPartner: ruwhyPartner, stakeholders: rustakeholders, partnerForm: rupartnerForm, builtForEveryone: rubuiltForEveryone, cta: ruCta  },
+      tr: { common: trCommon, home: trHome, home1: trHome1, home2: trHome2, home3: trHome3, home4: trHome4, home5: trHome5, footer: trFooter, interior1: trInterior1, interior2: trInterior2, interior3: trInterior3, interior4: trInterior4, interior5: trInterior5, interior6: trInterior6, interior7: trInterior7, scape1: trScape1, scape2: trScape2, buy1: trbuy1, buy2: trbuy2, buy3: trbuy3, buy4: trbuy4, buy5: trbuy5, buy6: trbuy6, buy7: trbuy7, page3: trpage3, ecosystem: trecosystem, whyPartner: trwhyPartner, stakeholders: trstakeholders, partnerForm: trpartnerForm, builtForEveryone: trbuiltForEveryone, cta: trCta  },
+      zh: { common: zhCommon, home: zhHome, home1: zhHome1, home2: zhHome2, home3: zhHome3, home4: zhHome4, home5: zhHome5, footer: zhFooter, interior1: zhInterior1, interior2: zhInterior2, interior3: zhInterior3, interior4: zhInterior4, interior5: zhInterior5, interior6: zhInterior6, interior7: zhInterior7, scape1: zhScape1, scape2: zhScape2, buy1: zhbuy1, buy2: zhbuy2, buy3: zhbuy3, buy4: zhbuy4, buy5: zhbuy5, buy6: zhbuy6, buy7: zhbuy7, page3: zhpage3, ecosystem: zhecosystem, whyPartner: zhwhyPartner, stakeholders: zhstakeholders, partnerForm: zhpartnerForm, builtForEveryone: zhbuiltForEveryone, cta: zhCta  },
+      tl: { common: tlCommon, home: tlHome, home1: tlHome1, home2: tlHome2, home3: tlHome3, home4: tlHome4, home5: tlHome5, footer: tlFooter, interior1: tlInterior1, interior2: tlInterior2, interior3: tlInterior3, interior4: tlInterior4, interior5: tlInterior5, interior6: tlInterior6, interior7: tlInterior7, scape1: tlScape1, scape2: tlScape2, buy1: tlbuy1, buy2: tlbuy2, buy3: tlbuy3, buy4: tlbuy4, buy5: tlbuy5, buy6: tlbuy6, buy7: tlbuy7, page3: tlpage3, ecosystem: tlecosystem, whyPartner: tlwhyPartner, stakeholders: tlstakeholders, partnerForm: tlpartnerForm, builtForEveryone: tlbuiltForEveryone, cta: tlCta  }
     },
     fallbackLng: "en",
     supportedLngs: ["en", "hi", "de", "es", "fr", "ru", "tr", "zh", "tl"],
@@ -336,7 +346,7 @@ i18n
   "interior1","interior2","interior3","interior4",
   "interior5","interior6","interior7",
   "scape1","scape2",
-  "buy1","buy2","buy3","buy4","buy5","buy6","buy7", "page3", "ecosystem", "whyPartner.json", "stakeholders", "partnerForm", "builtForEveryone"
+  "buy1","buy2","buy3","buy4","buy5","buy6","buy7", "page3", "ecosystem", "whyPartner.json", "stakeholders", "partnerForm", "builtForEveryone", "cta"
 ],
 
     defaultNS: "common",
