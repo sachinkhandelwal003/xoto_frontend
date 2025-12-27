@@ -10,8 +10,7 @@ import {
   Row,
   Col,
   Grid,
-  ConfigProvider,
-  Spin
+  ConfigProvider
 } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -28,9 +27,9 @@ import {
   ArrowLeftOutlined,
   MailOutlined,
   LockOutlined,
-  CheckCircleFilled,
   RocketFilled,
-  ShoppingFilled
+  ShoppingFilled,
+  TeamOutlined
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -46,7 +45,6 @@ const PageWrapper = styled.div`
   overflow: hidden;
 `;
 
-// Adds a purple/blue tint over the image to match the theme
 const GradientOverlay = styled.div`
   position: absolute;
   inset: 0;
@@ -81,15 +79,16 @@ const SelectionCard = styled.div`
   background: ${props => props.$active ? `${props.$color}15` : 'rgba(255,255,255,0.5)'};
   border: 2px solid ${props => props.$active ? props.$color : 'transparent'};
   border-radius: 16px;
-  padding: 20px;
+  padding: 24px;
   cursor: pointer;
   transition: all 0.3s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   text-align: center;
+  min-height: 180px;
 
   &:hover {
     transform: translateY(-5px);
@@ -117,18 +116,26 @@ const Login = () => {
       value: 'freelancer',
       label: 'Execution Partner',
       desc: 'For Service Providers',
-      icon: <UserOutlined style={{ fontSize: "24px" }} />,
-      color: "#5C039B", // Purple
+      icon: <UserOutlined style={{ fontSize: "28px" }} />,
+      color: "#5C039B",
       gradient: "linear-gradient(135deg, #5C039B, #8E44AD)"
     },
     {
       value: 'vendor-b2c',
       label: 'Strategic Alliance',
       desc: 'For Product Sellers',
-      icon: <ShopOutlined style={{ fontSize: "24px" }} />,
-      color: "#03A4F4", // Blue
+      icon: <ShopOutlined style={{ fontSize: "28px" }} />,
+      color: "#03A4F4",
       gradient: "linear-gradient(135deg, #03A4F4, #0077b6)"
     },
+    {
+      value: 'business-association',
+      label: 'Business Association',
+      desc: 'For Business Networks',
+      icon: <TeamOutlined style={{ fontSize: "28px" }} />,
+      color: "#10B981",
+      gradient: "linear-gradient(135deg, #10B981, #059669)"
+    }
   ];
 
   const getSelectedPartner = () => partnerTypes.find(t => t.value === selectedPartnerType);
@@ -140,13 +147,17 @@ const Login = () => {
       const userName = user?.name || user?.firstName || "Partner";
       const roleCode = user?.role?.code?.toString() || user?.role;
       
-      // Determine style based on partner type/role logic
-      // Default to Purple if unknown, Blue for Vendor roles
-      const isVendor = ['5', '6'].includes(roleCode); 
-      const themeColor = isVendor ? "#03A4F4" : "#5C039B";
-      const themeIcon = isVendor ? <ShoppingFilled /> : <RocketFilled />;
+      let themeColor = "#5C039B";
+      let themeIcon = <RocketFilled />;
+      
+      if (['5', '6'].includes(roleCode)) {
+        themeColor = "#03A4F4";
+        themeIcon = <ShoppingFilled />;
+      } else if (['8', '9'].includes(roleCode)) {
+        themeColor = "#10B981";
+        themeIcon = <TeamOutlined />;
+      }
 
-      // Custom Toast
       toast.success(
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ 
@@ -167,9 +178,11 @@ const Login = () => {
           position: "top-center",
           autoClose: 2000,
           style: {
-            background: isVendor 
-              ? "linear-gradient(135deg, #03A4F4, #0077b6)" 
-              : "linear-gradient(135deg, #5C039B, #8E44AD)",
+            background: themeColor === "#5C039B" 
+              ? "linear-gradient(135deg, #5C039B, #8E44AD)"
+              : themeColor === "#03A4F4"
+              ? "linear-gradient(135deg, #03A4F4, #0077b6)"
+              : "linear-gradient(135deg, #10B981, #059669)",
             color: "#fff",
             borderRadius: "16px",
             boxShadow: "0 20px 60px rgba(0, 0, 0, 0.45)",
@@ -179,7 +192,6 @@ const Login = () => {
         }
       );
 
-      // Redirect Logic
       setTimeout(() => {
         const rolePathMap = {
           "0": "/dashboard/superadmin",
@@ -188,6 +200,8 @@ const Login = () => {
           "5": "/dashboard/vendor-b2c",
           "6": "/dashboard/vendor-b2b",
           "7": "/dashboard/freelancer",
+          "8": "/dashboard/business-association",
+          "9": "/dashboard/association-admin",
         };
         const path = rolePathMap[roleCode] || "/dashboard";
         navigate(path, { replace: true });
@@ -216,9 +230,9 @@ const Login = () => {
       let endpoint = '';
       if (selectedPartnerType === 'freelancer') endpoint = '/freelancer/login';
       else if (selectedPartnerType === 'vendor-b2c') endpoint = '/vendor/b2c/login';
+      else if (selectedPartnerType === 'business-association') endpoint = '/association/login';
       
       await login(endpoint, { email: values.email, password: values.password });
-      // Toast handled in useEffect
     } catch (err) {
       const errorMessage = err?.message || err?.status || 'Invalid credentials';
       setGeneralError(errorMessage);
@@ -231,6 +245,7 @@ const Login = () => {
   const handleRegister = () => {
     if (selectedPartnerType === 'freelancer') navigate('/freelancer/registration');
     else if (selectedPartnerType === 'vendor-b2c') navigate('/ecommerce/seller');
+    else if (selectedPartnerType === 'business-association') navigate('/ecommerce/seller');
   };
 
   // --- RENDER CONTENT ---
@@ -245,31 +260,76 @@ const Login = () => {
     >
       <div style={{ textAlign: 'center', marginBottom: 30 }}>
         <Title level={3} style={{ margin: 0, color: '#333' }}>Select Partner Type</Title>
-        <Text type="secondary">Choose your account type to continue</Text>
+        <Text type="secondary">Choose your Account type to continue</Text>
       </div>
 
-      <Row gutter={[16, 16]}>
-        {partnerTypes.map((type) => (
-          <Col xs={24} sm={12} key={type.value}>
-            <SelectionCard 
-              $active={selectedPartnerType === type.value} 
-              $color={type.color}
-              onClick={() => handlePartnerSelect(type.value)}
-            >
-              <div style={{ 
-                width: 60, height: 60, borderRadius: '50%', 
-                background: type.color, color: '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}>
-                {type.icon}
-              </div>
-              <div>
-                <div style={{ fontSize: 18, fontWeight: 'bold', color: '#333' }}>{type.label}</div>
-                <div style={{ fontSize: 13, color: '#888' }}>{type.desc}</div>
-              </div>
-            </SelectionCard>
-          </Col>
-        ))}
+      {/* First Row: 2 boxes */}
+      <Row gutter={[20, 20]} style={{ marginBottom: 20 }}>
+        <Col xs={24} sm={12} md={12}>
+          <SelectionCard 
+            $active={selectedPartnerType === 'freelancer'} 
+            $color="#5C039B"
+            onClick={() => handlePartnerSelect('freelancer')}
+          >
+            <div style={{ 
+              width: 70, height: 70, borderRadius: '50%', 
+              background: "#5C039B", color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+            }}>
+              <UserOutlined style={{ fontSize: "28px" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Execution Partner</div>
+              <div style={{ fontSize: 14, color: '#888' }}>For Service Providers</div>
+            </div>
+          </SelectionCard>
+        </Col>
+        
+        <Col xs={24} sm={12} md={12}>
+          <SelectionCard 
+            $active={selectedPartnerType === 'vendor-b2c'} 
+            $color="#03A4F4"
+            onClick={() => handlePartnerSelect('vendor-b2c')}
+          >
+            <div style={{ 
+              width: 70, height: 70, borderRadius: '50%', 
+              background: "#03A4F4", color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+            }}>
+              <ShopOutlined style={{ fontSize: "28px" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Strategic Alliance</div>
+              <div style={{ fontSize: 14, color: '#888' }}>For Product Sellers</div>
+            </div>
+          </SelectionCard>
+        </Col>
+      </Row>
+
+      {/* Second Row: Business Association box centered */}
+      <Row justify="center">
+        <Col xs={24} sm={12} md={12}>
+          <SelectionCard 
+            $active={selectedPartnerType === 'business-association'} 
+            $color="#10B981"
+            onClick={() => handlePartnerSelect('business-association')}
+          >
+            <div style={{ 
+              width: 70, height: 70, borderRadius: '50%', 
+              background: "#10B981", color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+            }}>
+              <TeamOutlined style={{ fontSize: "28px" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Business Association</div>
+              <div style={{ fontSize: 14, color: '#888' }}>For Business Networks</div>
+            </div>
+          </SelectionCard>
+        </Col>
       </Row>
     </motion.div>
   );
@@ -284,13 +344,19 @@ const Login = () => {
         exit={{ opacity: 0, x: 20 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Back Button */}
-      
+        <Button 
+          type="text" 
+          icon={<ArrowLeftOutlined />} 
+          onClick={handleBackToSelection}
+          style={{ marginBottom: 16, paddingLeft: 0, color: '#888' }}
+        >
+          Back to Selection
+        </Button>
 
         {/* Form Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
           <div style={{ 
-            width: 50, height: 50, borderRadius: 12, 
+            width: 60, height: 60, borderRadius: 12, 
             background: activePartner.gradient, color: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
@@ -312,7 +378,7 @@ const Login = () => {
             <Input 
               prefix={<MailOutlined style={{ color: '#bfbfbf' }} />} 
               placeholder="Email Address" 
-              style={{ borderRadius: 12 }} 
+              style={{ borderRadius: 12, height: 48 }} 
             />
           </Form.Item>
           
@@ -320,7 +386,7 @@ const Login = () => {
             <Input.Password 
               prefix={<LockOutlined style={{ color: '#bfbfbf' }} />} 
               placeholder="Password" 
-              style={{ borderRadius: 12 }} 
+              style={{ borderRadius: 12, height: 48 }} 
             />
           </Form.Item>
 
@@ -331,7 +397,7 @@ const Login = () => {
               loading={loading}
               block
               style={{ 
-                height: 48, borderRadius: 12, fontWeight: 'bold',
+                height: 52, borderRadius: 12, fontWeight: 'bold', fontSize: '15px',
                 background: activePartner.gradient, border: 'none',
                 boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
               }}
@@ -343,21 +409,13 @@ const Login = () => {
               onClick={handleRegister}
               block
               style={{ 
-                height: 48, borderRadius: 12, fontWeight: 'bold',
+                height: 52, borderRadius: 12, fontWeight: 'bold', fontSize: '15px',
                 borderColor: activePartner.color, color: activePartner.color
               }}
             >
               Register
             </Button>
           </div>
-            <Button 
-          type="text" 
-          icon={<ArrowLeftOutlined />} 
-          onClick={handleBackToSelection}
-          style={{ marginBottom: 16, paddingLeft: 0, color: '#888' }}
-        >
-          Back to Selection
-        </Button>
         </Form>
       </motion.div>
     );
@@ -367,7 +425,11 @@ const Login = () => {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: selectedPartnerType === 'vendor-b2c' ? '#03A4F4' : '#5C039B',
+          colorPrimary: selectedPartnerType === 'vendor-b2c' 
+            ? '#03A4F4' 
+            : selectedPartnerType === 'business-association'
+            ? '#10B981'
+            : '#5C039B',
           borderRadius: 8,
           fontFamily: 'Poppins, sans-serif',
         }
@@ -378,7 +440,6 @@ const Login = () => {
         
         <ContentLayer>
           <Row style={{ width: '100%', maxWidth: 1200, padding: isMobile ? 16 : 0 }}>
-            {/* Left Side: Logo & Welcome Text (Hidden on small mobile if in form view?) - Let's keep it visible but stacked */}
             <Col xs={24} lg={12} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: isMobile ? 'center' : 'flex-start', padding: 40 }}>
               <motion.div
                 initial={{ opacity: 0, y: -30 }}
@@ -406,13 +467,12 @@ const Login = () => {
               </motion.div>
             </Col>
 
-            {/* Right Side: Glass Card */}
             <Col xs={24} lg={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                style={{ width: '100%', maxWidth: 480 }}
+                style={{ width: '100%', maxWidth: 550 }}
               >
                 <GlassCard bordered={false} $isMobile={isMobile}>
                   <AnimatePresence mode="wait">

@@ -8,7 +8,7 @@ import {
 import {
   PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined,
   RestOutlined, ArrowLeftOutlined, FolderOutlined,
-  FolderOpenOutlined, TagsOutlined, DatabaseOutlined,
+  FolderOpenOutlined, TagsOutlined, DatabaseOutlined, 
   SearchOutlined, ReloadOutlined, AppstoreOutlined,
   HomeOutlined
 } from '@ant-design/icons';
@@ -244,18 +244,62 @@ const MasterCategory = () => {
 
     return (
       <Modal title={`Add New ${level.slice(0, -1)}`} open={createModalOpen} onCancel={() => setCreateModalOpen(false)} footer={null} centered destroyOnClose>
-        <Form form={form} layout="vertical" onFinish={onSubmit} style={{ marginTop: '16px' }}>
-          {level === 'categories' ? (
-            <Form.Item name="name" label="Category Type" rules={[{ required: true }]}><Select placeholder="Select Type"><Select.Option value="Interior">Interior</Select.Option><Select.Option value="Landscaping">Landscaping</Select.Option></Select></Form.Item>
-          ) : (
-            <Form.Item name="label" label="Name" rules={[{ required: true }]}><Input placeholder="Enter name" /></Form.Item>
-          )}
-          <Form.Item name="description" label="Description"><TextArea rows={3} placeholder="Enter details..." /></Form.Item>
-          <div style={{ display: 'flex', justifyContent: 'end', gap: '8px' }}>
-            <Button onClick={() => setCreateModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" loading={saving} style={{ background: THEME.primary }}>Create</Button>
-          </div>
-        </Form>
+        <Form
+  form={form}
+  layout="vertical"
+  onFinish={onSubmit} 
+  style={{ marginTop: '16px' }}
+>
+  {level === 'categories' ? (
+    <Form.Item
+      name="name"
+      label="Category Type"
+      rules={[{ required: true }]}
+    >
+      <Input />
+    </Form.Item>
+  ) : (
+    <Form.Item
+      name="label"
+      label="Name"
+      rules={[{ required: true }]}
+    >
+      <Input />
+    </Form.Item>
+  )}
+
+  {/* New Base Rate Field */}
+{level === 'types' && (
+  <Form.Item
+    name="baseRatePerSqFt"
+    label="Base Rate per Sq. Ft"
+    rules={[{ required: true }]}
+    extra="For example, if the minimum total charge is $1000 for 100 sq. ft, enter 10 ($/sq. ft). "
+  >
+    <Input type="number" addonAfter="$/sq. ft" />
+  </Form.Item>
+)}
+
+
+  <Form.Item name="description" label="Description">
+    <TextArea rows={3} />
+  </Form.Item>
+
+
+
+  <div style={{ display: 'flex', justifyContent: 'end', gap: '8px' }}>
+    <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
+    <Button
+      type="primary"
+      htmlType="submit"
+      loading={saving}
+      style={{ background: THEME.primary }}
+    >
+      Save Changes
+    </Button>
+  </div>
+</Form>
+
       </Modal>
     );
   };
@@ -310,6 +354,7 @@ const MasterCategory = () => {
             <Button type="primary" htmlType="submit" loading={saving} style={{ background: THEME.primary }}>Save Changes</Button>
           </div>
         </Form>
+        
       </Modal>
     );
   };
@@ -355,7 +400,8 @@ const MasterCategory = () => {
         <CustomTable columns={columns} data={data} loading={loading} totalItems={pagination.totalItems} currentPage={pagination.currentPage} onPageChange={fetchData} />
       </Card>
 
-      <CreateModal />
+   <CreateModal key={level} />
+
       <EditModal />
 
       {/* Details View */}
