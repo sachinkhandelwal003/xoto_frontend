@@ -1,5 +1,13 @@
 {
-  "title": "Des prêts immobiliers plus intelligents, simplifiés",
-  "descriptionLine1": "Comparez les prêteurs, obtenez une pré-approbation et sécurisez la maison de vos rêves",
-  "descriptionLine2": "plus rapidement — tout en un seul endroit."
+  "title": "Умные ипотечные кредиты — просто",
+  "description": {
+    "line1": "Сравните банки, получите предварительное одобрение и",
+    "line2": "быстрее приобретите дом мечты — в одном месте."
+  },
+  "cta": {
+    "preApproved": "Получить предварительное одобрение",
+    "calculate": "Рассчитать ипотеку",
+    "preApprovedAlert": "Нажато: Предварительное одобрение",
+    "calculateAlert": "Нажато: Рассчитать ипотеку"
+  }
 }

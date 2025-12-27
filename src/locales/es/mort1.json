@@ -1,5 +1,13 @@
 {
-  "title": "Préstamos para el hogar más inteligentes, simplificados",
-  "descriptionLine1": "Compare prestamistas, obtenga una preaprobación y asegure la casa de sus sueños",
-  "descriptionLine2": "más rápido, todo en un solo lugar."
+  "title": "Préstamos hipotecarios inteligentes, simplificados",
+  "description": {
+    "line1": "Compara prestamistas, obtén preaprobación y",
+    "line2": "asegura la casa de tus sueños más rápido — todo en un solo lugar."
+  },
+  "cta": {
+    "preApproved": "Obtener preaprobación",
+    "calculate": "Calcular tu hipoteca",
+    "preApprovedAlert": "Preaprobación seleccionada",
+    "calculateAlert": "Cálculo de hipoteca seleccionado"
+  }
 }

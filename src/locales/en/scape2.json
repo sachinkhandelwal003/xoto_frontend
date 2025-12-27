@@ -40,6 +40,14 @@
         "BBQ",
         "Pots & fountains"
       ]
+      
+    },
+    "builder": {
+      "title": "Bring your vision to life with our interactive builder",
+      "description": "Upload your space or choose a template and get instant AI-powered previews.",
+      "button": "Take a first step"
     }
+    
   }
+  
 }

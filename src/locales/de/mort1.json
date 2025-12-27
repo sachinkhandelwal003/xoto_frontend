@@ -1,5 +1,13 @@
 {
-  "title": "Intelligentere Wohnkredite, vereinfacht",
-  "descriptionLine1": "Vergleichen Sie Kreditgeber, erhalten Sie eine Vorabgenehmigung und sichern Sie sich Ihr Traumhaus",
-  "descriptionLine2": "schneller – alles an einem Ort."
+  "title": "Intelligente Baufinanzierung, einfach gemacht",
+  "description": {
+    "line1": "Vergleichen Sie Kreditgeber, erhalten Sie eine Vorabgenehmigung und",
+    "line2": "sichern Sie sich schneller Ihr Traumhaus — alles an einem Ort."
+  },
+  "cta": {
+    "preApproved": "Vorabgenehmigung erhalten",
+    "calculate": "Hypothek berechnen",
+    "preApprovedAlert": "Vorabgenehmigung geklickt",
+    "calculateAlert": "Hypothekenberechnung geklickt"
+  }
 }
