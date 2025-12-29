@@ -20,12 +20,11 @@ export default function MainCalculatorPage() {
              
               
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                Smart Property Calculators
-              </h1>
+Plan Your Space
+with Confidence              </h1>
               
               <p className="text-xl text-purple-100 max-w-3xl mx-auto mb-12">
-                Make intelligent property decisions with our advanced calculation tools. Estimate costs, plan investments, and maximize returns.
-              </p>
+Get transparent, detailed cost estimates tailored to your space, design, and budget.              </p>
               
               <div className="flex flex-wrap justify-center gap-6">
                 <a 
@@ -33,7 +32,7 @@ export default function MainCalculatorPage() {
                   className="group inline-flex items-center gap-3 px-10 py-5 bg-[var(--color-primary)] text-white font-bold rounded-2xl "
                 >
                   <Trees className="w-7 h-7" />
-                  Landscaping Calculator
+                  Landscaping 
                 </a>
                 
                 <a 
@@ -41,7 +40,7 @@ export default function MainCalculatorPage() {
                   className="group inline-flex bg-[var(--color-primary)] items-center gap-3 px-10 py-5  text-white font-bold rounded-2xl   shadow-lg  "
                 >
                   <Home className="w-7 h-7" />
-                  Interior Calculator
+                  Interior 
                 </a>
               </div>
             </div>
@@ -61,7 +60,7 @@ export default function MainCalculatorPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Choose Your Calculator
+             Start Estimating
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Professional tools designed for accurate property investment calculations
@@ -79,10 +78,9 @@ export default function MainCalculatorPage() {
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-6 border border-white/30">
                     <Trees className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-3xl font-bold text-white mb-4">Landscaping Calculator</h3>
+                  <h3 className="text-3xl font-bold text-white mb-4">Landscaping </h3>
                   <p className="text-white/90 text-lg mb-8">
-                    Estimate garden design, lawn installation, irrigation systems, and outdoor landscaping costs with precision.
-                  </p>
+Transform your outdoors. Calculate precise costs for gardens, irrigation, hardscaping, and lighting installations.                  </p>
                 </div>
 
                 <div className="mt-auto space-y-6">
@@ -123,7 +121,7 @@ export default function MainCalculatorPage() {
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-6 border border-white/30">
                     <PaintBucket className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-3xl font-bold text-white mb-4">Interior Calculator</h3>
+                  <h3 className="text-3xl font-bold text-white mb-4">Interior</h3>
                   <p className="text-white/90 text-lg mb-8">
                     Plan your interior renovation budget with accurate estimates for materials, labor, and premium finishing.
                   </p>

@@ -88,7 +88,7 @@ const Navbar = () => {
 
           {/* LOGO */}
           <Link to="/" className="flex flex-col">
-            <img src={logoNew} alt="Logo" className="h-40 " />
+            <img src={logoNew} alt="Logo" className="h-15 " />
          
           </Link>
 
