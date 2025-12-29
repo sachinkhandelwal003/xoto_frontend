@@ -27,7 +27,7 @@ const toolsData = [
     title: 'Exterior Upgrade',
     description: "Refresh your home's curb appeal.",
     image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=80',
-    route: '/aiPlanner/exterior',
+    route: '/aiPlanner/interior',
     category: 'Design',
     icon: <Home size={20} />,
     isNew: true
@@ -47,7 +47,7 @@ const toolsData = [
     title: 'Smart Furniture Swap',
     description: 'See chosen furniture in your space.',
     image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
-    route: '/aiPlanner/furniture',
+    route: '/aiPlanner/interior',
     category: 'Staging',
     icon: <Layers size={20} />,
     isNew: true
@@ -57,7 +57,7 @@ const toolsData = [
     title: 'Virtual Design Studio',
     description: 'Furnish empty rooms automatically.',
     image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80',
-    route: '/aiPlanner/virtual',
+    route: '/aiPlanner/interior',
     category: 'Staging',
     icon: <MonitorPlay size={20} />,
     isNew: false
@@ -67,7 +67,7 @@ const toolsData = [
     title: 'Image Perfection',
     description: 'Enhance lighting and resolution.',
     image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80',
-    route: '/aiPlanner/image',
+    route: '/aiPlanner/interior',
     category: 'Present',
     icon: <ScanLine size={20} />,
     isNew: false
