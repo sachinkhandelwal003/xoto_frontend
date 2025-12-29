@@ -1,0 +1,34 @@
+{
+  "title": "Réserver une consultation gratuite",
+  "description": "Contactez les experts XOTO pour un conseil personnalisé.",
+  "imageAlt": "Fond de consultation",
+
+  "form": {
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Adresse e-mail",
+    "mobile": "Numéro de mobile",
+    "message": "Votre message"
+  },
+
+  "buttons": {
+    "submit": "Réserver",
+    "submitting": "Envoi..."
+  },
+
+  "errors": {
+    "firstName": "Le prénom est requis",
+    "lastName": "Le nom est requis",
+    "email": "E-mail valide requis",
+    "mobile": "Minimum 8 chiffres requis",
+    "message": "Message requis",
+    "submit": "Échec de l'envoi"
+  },
+
+  "success": {
+    "title": "Merci !",
+    "message": "Votre demande de consultation a été envoyée."
+  },
+
+  "privacy": "Nous respectons votre confidentialité."
+}

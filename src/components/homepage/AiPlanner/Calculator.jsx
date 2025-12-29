@@ -1,13 +1,13 @@
 // src/components/homepage/AiPlanner/GardenCalculator.jsx
 import React, { useState, useEffect } from 'react';
 import {
-  Card, Button, Typography, Form, Input, Select, Space, Row, Col, 
-  message, Spin, Result, Divider, Image, Badge, Empty, Tag, Checkbox
+  Card, Button, Typography, Form, Input, Select, Space, Row, Col,
+  message, Spin, Result, Divider, Image, Badge, Empty, Tag, Checkbox, Radio
 } from 'antd';
 import {
   UserOutlined, MailOutlined, CheckCircleOutlined,
   SmileOutlined, HomeOutlined, BuildOutlined,
-  EnvironmentOutlined, CalculatorOutlined, PhoneFilled, 
+  EnvironmentOutlined, CalculatorOutlined, PhoneFilled,
   ArrowRightOutlined, ArrowLeftOutlined, CheckOutlined,
   CompassOutlined, PictureOutlined, ExperimentOutlined,
   EnvironmentFilled, SelectOutlined
@@ -32,12 +32,12 @@ const { Option } = Select;
 const BASE_URL = 'https://xoto.ae/api';
 const BRAND_PURPLE = '#5C039B';
 
+
 const steps = [
   { title: 'Location', icon: <CompassOutlined /> },
   { title: 'Service', icon: <EnvironmentOutlined /> },
   { title: 'Style', icon: <HomeOutlined /> },
-  { title: 'Dimensions', icon: <CalculatorOutlined /> },
-  { title: 'Packages', icon: <BuildOutlined /> },
+  { title: 'Estimate Questions', icon: <BuildOutlined /> },
   { title: 'Contact', icon: <PhoneFilled /> },
 ];
 
@@ -74,7 +74,9 @@ const reverseGeocode = async (lat, lng) => {
 // Map Picker Component
 const MapPicker = ({ coords, onChange }) => {
   const [position, setPosition] = useState(coords.lat && coords.lng ? [coords.lat, coords.lng] : [25.2048, 55.2708]);
-  
+
+
+
   useEffect(() => {
     if (coords.lat && coords.lng) {
       setPosition([coords.lat, coords.lng]);
@@ -112,7 +114,7 @@ const MapPicker = ({ coords, onChange }) => {
 const Calculator = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [form] = Form.useForm();
-
+    const [estimationValue,setEstimationValue] = useState(0);
   // Data Collections
   const [subcategories, setSubcategories] = useState([]);
   const [types, setTypes] = useState([]);
@@ -139,7 +141,7 @@ const Calculator = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  
+
   const [loading, setLoading] = useState({
     subcat: true,
     types: false,
@@ -179,6 +181,86 @@ const Calculator = () => {
     initFetch();
   }, []);
 
+
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState({});
+
+  const buildEstimateAnswersPayload = () => {
+    return questions.map(q => {
+      const userAnswer = answers[q._id];
+
+      // TEXT / NUMBER / YES-NO
+      if (q.questionType !== "options" && q.questionType !=="yesorno") {
+        return {
+          question: q._id,
+          questionText: q.question,
+          questionType: q.questionType,
+          answerValue: userAnswer || null,
+          includeInEstimate: true,
+          areaQuestion: q.areaQuestion || false
+        };
+      }
+
+      
+      // OPTIONS / yes or no 
+      const selectedOpt = q.options.find(
+        opt => opt.title === userAnswer
+      );
+
+      return {
+        question: q._id,
+        questionText: q.question,
+        questionType: q.questionType,
+        selectedOption: selectedOpt
+          ? {
+            optionId: selectedOpt._id,
+            title: selectedOpt.title,
+            value: selectedOpt.value || 0,
+            valueSubType: selectedOpt.valueSubType || "flat"
+          }
+          : null,
+        includeInEstimate: true,
+        areaQuestion: q.areaQuestion || false
+      };
+    });
+  };
+
+
+
+  const handleAnswerChange = (questionId, value) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: value
+    }));
+  };
+
+
+  useEffect(() => {
+    if (!selectedType) return;
+
+    const getAllQuestions = async () => {
+      setLoading(prev => ({ ...prev, questions: true }));
+
+      try {
+        const res = await apiService.get(
+          `/estimate/master/category/types/${selectedType}/questions`
+        );
+
+        if (res.success) {
+          setQuestions(res.data || []);
+          console.log("Questiiiiiiiiiiioooooooooonnnnnnnnnnns", res.data)
+        }
+      } catch (error) {
+        message.error("Error loading questions");
+        console.log("Error in fetching all questions of this type", error);
+      } finally {
+        setLoading(prev => ({ ...prev, questions: false }));
+      }
+    };
+
+    getAllQuestions();
+  }, [selectedType]);
+
   useEffect(() => {
     if (!selectedSubcategory) return;
     const fetchTypes = async () => {
@@ -214,15 +296,15 @@ const Calculator = () => {
   const handleGetLocation = () => {
     if (!navigator.geolocation) return message.error("Geolocation not supported");
     setLoading(prev => ({ ...prev, submitting: true, geocoding: true }));
-    
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-        
+
         try {
           const geo = await reverseGeocode(lat, lng);
-          
+
           setCoords({
             lat,
             lng,
@@ -232,7 +314,7 @@ const Calculator = () => {
             area: geo.area,
             address: geo.fullAddress
           });
-          
+
           message.success("Location synchronized!");
         } catch (error) {
           setCoords({
@@ -279,27 +361,33 @@ const Calculator = () => {
 
   const onFinalSubmit = async () => {
     // Validate form fields
+
+    const estimateAnswers = buildEstimateAnswersPayload();
+
+
     if (!firstName.trim() || !lastName.trim()) {
       message.error("Please enter both first and last name");
       return;
     }
-    
+
     if (!email.trim()) {
       message.error("Please enter your email");
       return;
     }
-    
+
     if (!phone.trim()) {
       message.error("Please enter your phone number");
       return;
     }
-    
-    if (!selectedPackage) {
-      message.error("Please select a package");
-      return;
-    }
+
+    // if (!selectedPackage) {
+    //   message.error("Please select a package");
+    //   return;
+    // }
 
     setLoading(prev => ({ ...prev, submitting: true }));
+
+  
 
     // Get selected type and subcategory details
     const selectedTypeData = types.find(t => t._id === selectedType);
@@ -332,7 +420,8 @@ const Calculator = () => {
         city: coords.city,
         area: coords.area,
         address: coords.address
-      }
+      },
+      answers:estimateAnswers
     };
 
     console.log("Submitting payload:", JSON.stringify(payload, null, 2)); // For debugging
@@ -340,10 +429,11 @@ const Calculator = () => {
     try {
       const response = await apiService.post("/estimates/submit", payload);
       console.log("API Response:", response);
-      
+
       if (response.success) {
         setActiveStep(6); // Move to success step
         message.success("Estimate submitted successfully!");
+        setEstimationValue(response.final_price)
       } else {
         message.error(response.message || "Submission failed");
       }
@@ -356,27 +446,28 @@ const Calculator = () => {
   };
 
   const handleNext = () => {
-    // If moving to contact step (step 5), validate and submit
-    if (activeStep === 5) {
+    console.log("activeSteeeeeeeeeeeeeeeeeeeppppppppppppppppp",activeStep)
+    if (activeStep > 3) {
       onFinalSubmit();
       return;
     }
-    
+
     setActiveStep(prev => prev + 1);
   };
 
   const handleBack = () => setActiveStep(prev => prev - 1);
 
   const validateStep = () => {
-    switch (activeStep) {
-      case 0: return !!coords.lat;
-      case 1: return !!selectedSubcategory;
-      case 2: return !!selectedType;
-      case 3: return areaSqFt >= 100;
-      case 4: return !!selectedPackage;
-      case 5: return firstName.trim() && lastName.trim() && email.trim() && phone.trim();
-      default: return true;
-    }
+    // switch (activeStep) {
+    //   case 0: return !!coords.lat;
+    //   case 1: return !!selectedSubcategory;
+    //   case 2: return !!selectedType;
+    //   case 3: return areaSqFt >= 100;
+    //   case 4: return !!selectedPackage;
+    //   case 5: return firstName.trim() && lastName.trim() && email.trim() && phone.trim();
+    //   default: return true;
+    // }
+    return true;
   };
 
   // --- UI COMPONENTS ---
@@ -416,19 +507,19 @@ const Calculator = () => {
             <Text className="text-lg text-gray-400 block mb-10">
               We use GPS coordinates for accurate site analysis. Click on the map to adjust your exact location.
             </Text>
-            
-            <Button 
-              size="large" 
-              type="primary" 
-              icon={<EnvironmentFilled />} 
-              onClick={handleGetLocation} 
+
+            <Button
+              size="large"
+              type="primary"
+              icon={<EnvironmentFilled />}
+              onClick={handleGetLocation}
               loading={loading.submitting}
               className="h-16 px-12 rounded-2xl text-lg shadow-lg mb-8"
               style={{ backgroundColor: BRAND_PURPLE }}
             >
               {coords.lat ? "Update My Location" : "Auto-Detect My Location"}
             </Button>
-            
+
             {coords.lat && (
               <div className="space-y-4">
                 <div className="mt-6">
@@ -436,7 +527,7 @@ const Calculator = () => {
                     Coordinates: {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}
                   </Tag>
                 </div>
-                
+
                 <div className="space-y-2">
                   {coords.country && (
                     <Tag color="purple" className="px-4 py-1 rounded-full">
@@ -454,13 +545,13 @@ const Calculator = () => {
                     </Tag>
                   )}
                 </div>
-                
+
                 {coords.address && (
                   <Text type="secondary" className="block mt-4 max-w-xl mx-auto">
                     <strong>Full Address:</strong> {coords.address}
                   </Text>
                 )}
-                
+
                 <div className="mt-8 max-w-2xl mx-auto">
                   {loading.geocoding ? (
                     <div className="h-64 flex items-center justify-center rounded-2xl bg-gray-100">
@@ -486,12 +577,12 @@ const Calculator = () => {
           <motion.div {...variants}>
             <Title level={2} className="text-center mb-10">What are we designing?</Title>
             <Row gutter={[24, 24]}>
-              {subcategories.map(sub => (
+            {[...subcategories].reverse().map(sub => (
                 <Col xs={24} sm={12} md={8} key={sub._id} className='p-10'>
-                  <SelectionCard 
-                    item={sub} 
-                    isSelected={selectedSubcategory === sub._id} 
-                    onClick={() => setSelectedSubcategory(sub._id)} 
+                  <SelectionCard
+                    item={sub}
+                    isSelected={selectedSubcategory === sub._id}
+                    onClick={() => setSelectedSubcategory(sub._id)}
                     colorClass="bg-blue-50 text-blue-600"
                   />
                 </Col>
@@ -508,10 +599,10 @@ const Calculator = () => {
               <Row gutter={[24, 24]}>
                 {types.map(t => (
                   <Col xs={24} sm={12} md={8} key={t._id}>
-                    <SelectionCard 
-                      item={t} 
-                      isSelected={selectedType === t._id} 
-                      onClick={() => setSelectedType(t._id)} 
+                    <SelectionCard
+                      item={t}
+                      isSelected={selectedType === t._id}
+                      onClick={() => setSelectedType(t._id)}
                       colorClass="bg-emerald-50 text-emerald-600"
                     />
                   </Col>
@@ -521,229 +612,279 @@ const Calculator = () => {
           </motion.div>
         );
 
+      // case 3:
+      //   return (
+      //     <motion.div {...variants} className="max-w-lg mx-auto py-10">
+      //       <Title level={2} className="text-center mb-10">Project Area</Title>
+      //       <Card className="rounded-[3rem] shadow-2xl overflow-hidden border-none">
+      //         <div className="p-12 text-center text-white" style={{ background: BRAND_PURPLE }}>
+      //           <Text className="text-purple-200 uppercase tracking-widest text-xs font-bold">Total Footprint</Text>
+      //           <div className="text-7xl font-bold my-4">{areaSqFt.toLocaleString()}</div>
+      //           <Text className="text-lg opacity-80">Square Feet</Text>
+      //         </div>
+      //         <div className="p-12 bg-white">
+      //           <Row gutter={24}>
+      //             <Col span={12}>
+      //               <Text strong className="text-gray-400 text-xs uppercase">Length (ft)</Text>
+      //               <Input
+      //                 size="large"
+      //                 type="number"
+      //                 value={length}
+      //                 onChange={e => setLength(e.target.value)}
+      //                 className="mt-3 h-14 rounded-2xl border-gray-100"
+      //                 placeholder="Enter length"
+      //                 min="1"
+      //               />
+      //             </Col>
+      //             <Col span={12}>
+      //               <Text strong className="text-gray-400 text-xs uppercase">Width (ft)</Text>
+      //               <Input
+      //                 size="large"
+      //                 type="number"
+      //                 value={width}
+      //                 onChange={e => setWidth(e.target.value)}
+      //                 className="mt-3 h-14 rounded-2xl border-gray-100"
+      //                 placeholder="Enter width"
+      //                 min="1"
+      //               />
+      //             </Col>
+      //           </Row>
+      //           {areaSqFt > 0 && (
+      //             <div className="mt-6 text-center">
+      //               <Text type={areaSqFt < 100 ? "danger" : "success"}>
+      //                 Minimum area required: 100 sqft (Current: {areaSqFt} sqft)
+      //               </Text>
+      //             </div>
+      //           )}
+      //         </div>
+      //       </Card>
+      //     </motion.div>
+      //   );
+
       case 3:
         return (
-          <motion.div {...variants} className="max-w-lg mx-auto py-10">
-            <Title level={2} className="text-center mb-10">Project Area</Title>
-            <Card className="rounded-[3rem] shadow-2xl overflow-hidden border-none">
-              <div className="p-12 text-center text-white" style={{ background: BRAND_PURPLE }}>
-                <Text className="text-purple-200 uppercase tracking-widest text-xs font-bold">Total Footprint</Text>
-                <div className="text-7xl font-bold my-4">{areaSqFt.toLocaleString()}</div>
-                <Text className="text-lg opacity-80">Square Feet</Text>
-              </div>
-              <div className="p-12 bg-white">
-                <Row gutter={24}>
-                  <Col span={12}>
-                    <Text strong className="text-gray-400 text-xs uppercase">Length (ft)</Text>
-                    <Input 
-                      size="large" 
-                      type="number" 
-                      value={length} 
-                      onChange={e => setLength(e.target.value)} 
-                      className="mt-3 h-14 rounded-2xl border-gray-100" 
-                      placeholder="Enter length"
-                      min="1"
-                    />
-                  </Col>
-                  <Col span={12}>
-                    <Text strong className="text-gray-400 text-xs uppercase">Width (ft)</Text>
-                    <Input 
-                      size="large" 
-                      type="number" 
-                      value={width} 
-                      onChange={e => setWidth(e.target.value)} 
-                      className="mt-3 h-14 rounded-2xl border-gray-100" 
-                      placeholder="Enter width"
-                      min="1"
-                    />
-                  </Col>
-                </Row>
-                {areaSqFt > 0 && (
-                  <div className="mt-6 text-center">
-                    <Text type={areaSqFt < 100 ? "danger" : "success"}>
-                      Minimum area required: 100 sqft (Current: {areaSqFt} sqft)
-                    </Text>
-                  </div>
-                )}
-              </div>
-            </Card>
+          <motion.div {...variants} className="py-10">
+            <div className="max-w-3xl mx-auto">
+
+              <Title level={3} className="text-center mb-8">
+                Project Details
+              </Title>
+
+              <Card className="rounded-xl shadow-sm">
+                <Form
+                  layout="vertical"
+                  className="space-y-6"
+                >
+                  {questions.map((q) => (
+                    <Form.Item
+                      key={q._id}
+                      label={q.question}
+                      required={false}
+                    >
+                      {/* TEXT */}
+                      {q.questionType === "text" && (
+                        <Input
+                          value={answers[q._id] || ""}
+                          onChange={e =>
+                            handleAnswerChange(q._id, e.target.value)
+                          }
+                          placeholder="Enter value"
+                        />
+                      )}
+
+                      {/* NUMBER */}
+                      {q.questionType === "number" && (
+                        <Input
+                          type="number"
+                          value={answers[q._id] || ""}
+                          onChange={e =>
+                            handleAnswerChange(q._id, e.target.value)
+                          }
+                          placeholder="Enter number"
+                          min={q.minValue || 0}
+                          max={q.maxValue || undefined}
+                        />
+                      )}
+
+                      {/* YES / NO */}
+                      {q.questionType === "yesorno" && (
+                        <Radio.Group
+                          value={answers[q._id]}
+                          onChange={e =>
+                            handleAnswerChange(q._id, e.target.value)
+                          }
+                        >
+                          <Space>
+                            {q.options.map(opt => (
+                              <Radio key={opt._id} value={opt.title}>
+                                {opt.title}
+                              </Radio>
+                            ))}
+                          </Space>
+                        </Radio.Group>
+                      )}
+
+                      {/* OPTIONS */}
+                      {q.questionType === "options" && (
+                        <Radio.Group
+                          value={answers[q._id]}
+                          onChange={e =>
+                            handleAnswerChange(q._id, e.target.value)
+                          }
+                        >
+                          <Space direction="vertical">
+                            {q.options.map(opt => (
+                              <Radio key={opt._id} value={opt.title}>
+                                {opt.title}
+                              </Radio>
+                            ))}
+                          </Space>
+                        </Radio.Group>
+                      )}
+                    </Form.Item>
+                  ))}
+                </Form>
+              </Card>
+            </div>
           </motion.div>
         );
+
+//       case 4:
+//         const selectedPkg = packages.find(p => p._id === selectedPackage);
+//         const selectedTypeData = types.find(t => t._id === selectedType);
+//         const selectedSubcat = subcategories.find(s => s._id === selectedSubcategory);
+
+//         return (
+//           <motion.div {...variants} className="max-w-5xl mx-auto">
+//             <Row gutter={48}>
+//               <Col xs={24} lg={10}>
+//                 <div className="rounded-[2.5rem] p-10 text-white h-full shadow-2xl" style={{ backgroundColor: BRAND_PURPLE }}>
+//                   <Title level={3} className="text-white mb-10">Design Summary</Title>
+//                   <div className="space-y-8">
+//                     <div>
+//                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Service Type</Text>
+//                       <Text strong className="text-white text-xl uppercase">
+//                         {selectedSubcat?.label || 'Landscaping'}
+//                       </Text>
+//                     </div>
+//                     <div>
+//                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Selected Style</Text>
+//                       <Text strong className="text-white text-xl">
+//                         {selectedTypeData?.label || 'Not selected'}
+//                       </Text>
+//                     </div>
+//                     <div>
+//                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Location</Text>
+//                       <Text strong className="text-white text-sm">
+//                         {coords.city ? `${coords.city}, ${coords.country}` : 'Location set'}
+//                       </Text>
+//                     </div>
+//                     <div>
+//                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Area Details</Text>
+//                       <Text strong className="text-white text-xl">{areaSqFt} SQ FT</Text>
+//                       <Text className="text-purple-300 text-xs">
+//                         ({length}ft × {width}ft)
+//                       </Text>
+//                     </div>
+//                     {/* <Divider className="border-purple-400 opacity-30" /> */}
+//                     {/* <div className="p-5 bg-white/10 rounded-2xl flex items-center justify-between border border-white/10">
+//                       <Text className="text-white">Tier Selection</Text>
+//                       <Tag color="gold" className="m-0 border-none font-bold px-3">
+//                         {selectedPkg?.name || 'Not selected'}
+//                       </Tag>
+//                     </div> */}
+//                   </div>
+//                 </div>
+//               </Col>
+//               <Col xs={24} lg={14}>
+//                 <Card className="rounded-[2.5rem] shadow-xl border-none p-6">
+//                   <div className="space-y-6">
+//                     <div>
+//                       <Text strong className="block mb-2">First Name *</Text>
+//                       <Input
+//                         size="large"
+//                         value={firstName}
+//                         onChange={e => setFirstName(e.target.value)}
+//                         prefix={<UserOutlined className="text-gray-300" />}
+//                         className="rounded-xl h-14"
+//                         placeholder="John"
+//                       />
+//                     </div>
+
+//                     <div>
+//                       <Text strong className="block mb-2">Last Name *</Text>
+//                       <Input
+//                         size="large"
+//                         value={lastName}
+//                         onChange={e => setLastName(e.target.value)}
+//                         prefix={<UserOutlined className="text-gray-300" />}
+//                         className="rounded-xl h-14"
+//                         placeholder="Doe"
+//                       />
+//                     </div>
+
+//                     <div>
+//                       <Text strong className="block mb-2">Email Address *</Text>
+//                       <Input
+//                         size="large"
+//                         value={email}
+//                         onChange={e => setEmail(e.target.value)}
+//                         prefix={<MailOutlined className="text-gray-300" />}
+//                         className="rounded-xl h-14"
+//                         placeholder="john@example.com"
+//                         type="email"
+//                       />
+//                     </div>
+
+//                     <div>
+//                       <Text strong className="block mb-2">Contact Number *</Text>
+//                       <Row gutter={8}>
+//                         <Col span={8}>
+//                           <Select
+//                             value={countryCode}
+//                             onChange={setCountryCode}
+//                             className="w-full rounded-xl h-14"
+//                             size="large"
+//                           >
+//                             {countryCodes.map(code => (
+//                               <Option key={code.value} value={code.value}>
+//                                 {code.label}
+//                               </Option>
+//                             ))}
+//                           </Select>
+//                         </Col>
+//                         <Col span={16}>
+//                           <Input
+//                             size="large"
+//                             value={phone}
+//                             onChange={e => setPhone(e.target.value)}
+//                             prefix={<PhoneFilled className="text-gray-300" />}
+//                             className="rounded-xl h-14"
+//                             placeholder="Phone number"
+//                           />
+//                         </Col>
+//                       </Row>
+//                     </div>
+// {/* 
+//                     <Button
+//                       type="primary"
+//                       onClick={onFinalSubmit}
+//                       loading={loading.submitting}
+//                       block
+//                       className="h-16 rounded-2xl text-lg mt-4 border-none shadow-xl"
+//                       style={{ backgroundColor: BRAND_PURPLE }}
+//                       disabled={!firstName || !lastName || !email || !phone}
+//                     >
+//                       Generate My Quotation
+//                     </Button> */}
+//                   </div>
+//                 </Card>
+//               </Col>
+//             </Row>
+//           </motion.div>
+//         );
 
       case 4:
-        return (
-          <motion.div {...variants}>
-            <Title level={2} className="text-center mb-10">Select Execution Package</Title>
-            <Row gutter={[24, 24]}>
-              {packages.map(pkg => (
-                <Col xs={24} md={8} key={pkg._id}>
-                  <div 
-                    onClick={() => setSelectedPackage(pkg._id)}
-                    className={`p-10 rounded-[2.5rem] border-2 h-full transition-all cursor-pointer relative
-                      ${selectedPackage === pkg._id ? 'bg-purple-50 shadow-xl' : 'border-gray-100 bg-white hover:border-gray-200'}`}
-                    style={{ borderColor: selectedPackage === pkg._id ? BRAND_PURPLE : 'transparent' }}
-                  >
-                    {pkg.popular && (
-                      <div 
-                        className="absolute top-0 right-0 text-white px-5 py-2 rounded-bl-2xl text-xs font-bold" 
-                        style={{ background: BRAND_PURPLE }}
-                      >
-                        RECOMMENDED
-                      </div>
-                    )}
-                    <Title level={3} style={{ color: selectedPackage === pkg._id ? BRAND_PURPLE : '#111' }}>
-                      {pkg.name}
-                    </Title>
-                    <div className="my-8 space-y-4">
-                      {pkg.features?.map((f, i) => (
-                        <div key={i} className="text-sm flex items-start">
-                          <CheckCircleOutlined className="text-green-500 mr-3 mt-1" /> {f}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Col>
-              ))}
-            </Row>
-          </motion.div>
-        );
-
-      case 5:
-        const selectedPkg = packages.find(p => p._id === selectedPackage);
-        const selectedTypeData = types.find(t => t._id === selectedType);
-        const selectedSubcat = subcategories.find(s => s._id === selectedSubcategory);
-
-        return (
-          <motion.div {...variants} className="max-w-5xl mx-auto">
-            <Row gutter={48}>
-              <Col xs={24} lg={10}>
-                <div className="rounded-[2.5rem] p-10 text-white h-full shadow-2xl" style={{ backgroundColor: BRAND_PURPLE }}>
-                  <Title level={3} className="text-white mb-10">Design Summary</Title>
-                  <div className="space-y-8">
-                    <div>
-                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Service Type</Text>
-                      <Text strong className="text-white text-xl uppercase">
-                        {selectedSubcat?.label || 'Landscaping'}
-                      </Text>
-                    </div>
-                    <div>
-                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Selected Style</Text>
-                      <Text strong className="text-white text-xl">
-                        {selectedTypeData?.label || 'Not selected'}
-                      </Text>
-                    </div>
-                    <div>
-                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Location</Text>
-                      <Text strong className="text-white text-sm">
-                        {coords.city ? `${coords.city}, ${coords.country}` : 'Location set'}
-                      </Text>
-                    </div>
-                    <div>
-                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Area Details</Text>
-                      <Text strong className="text-white text-xl">{areaSqFt} SQ FT</Text>
-                      <Text className="text-purple-300 text-xs">
-                        ({length}ft × {width}ft)
-                      </Text>
-                    </div>
-                    <Divider className="border-purple-400 opacity-30" />
-                    <div className="p-5 bg-white/10 rounded-2xl flex items-center justify-between border border-white/10">
-                      <Text className="text-white">Tier Selection</Text>
-                      <Tag color="gold" className="m-0 border-none font-bold px-3">
-                        {selectedPkg?.name || 'Not selected'}
-                      </Tag>
-                    </div>
-                  </div>
-                </div>
-              </Col>
-              <Col xs={24} lg={14}>
-                <Card className="rounded-[2.5rem] shadow-xl border-none p-6">
-                  <div className="space-y-6">
-                    <div>
-                      <Text strong className="block mb-2">First Name *</Text>
-                      <Input 
-                        size="large" 
-                        value={firstName}
-                        onChange={e => setFirstName(e.target.value)}
-                        prefix={<UserOutlined className="text-gray-300" />} 
-                        className="rounded-xl h-14" 
-                        placeholder="John"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Text strong className="block mb-2">Last Name *</Text>
-                      <Input 
-                        size="large" 
-                        value={lastName}
-                        onChange={e => setLastName(e.target.value)}
-                        prefix={<UserOutlined className="text-gray-300" />} 
-                        className="rounded-xl h-14" 
-                        placeholder="Doe"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Text strong className="block mb-2">Email Address *</Text>
-                      <Input 
-                        size="large" 
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        prefix={<MailOutlined className="text-gray-300" />} 
-                        className="rounded-xl h-14" 
-                        placeholder="john@example.com"
-                        type="email"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Text strong className="block mb-2">Contact Number *</Text>
-                      <Row gutter={8}>
-                        <Col span={8}>
-                          <Select
-                            value={countryCode}
-                            onChange={setCountryCode}
-                            className="w-full rounded-xl h-14"
-                            size="large"
-                          >
-                            {countryCodes.map(code => (
-                              <Option key={code.value} value={code.value}>
-                                {code.label}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Col>
-                        <Col span={16}>
-                          <Input 
-                            size="large" 
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
-                            prefix={<PhoneFilled className="text-gray-300" />} 
-                            className="rounded-xl h-14" 
-                            placeholder="Phone number"
-                          />
-                        </Col>
-                      </Row>
-                    </div>
-                    
-                    <Button 
-                      type="primary" 
-                      onClick={onFinalSubmit} 
-                      loading={loading.submitting} 
-                      block 
-                      className="h-16 rounded-2xl text-lg mt-4 border-none shadow-xl"
-                      style={{ backgroundColor: BRAND_PURPLE }}
-                      disabled={!firstName || !lastName || !email || !phone}
-                    >
-                      Generate My Quotation
-                    </Button>
-                  </div>
-                </Card>
-              </Col>
-            </Row>
-          </motion.div>
-        );
-
-      case 6:
         const pkg = packages.find(p => p._id === selectedPackage);
         return (
           <motion.div {...variants} className="text-center py-20">
@@ -753,17 +894,89 @@ const Calculator = () => {
               <div className="my-12">
                 <Text className="text-gray-400 uppercase tracking-widest block mb-3">Estimated Investment Range</Text>
                 <div className="text-8xl font-black text-gray-900">
-                  {pkg?.price ? pkg.price.toLocaleString() : '25,000'} <small className="text-3xl font-light">AED</small>
+                  {estimationValue || 0} <small className="text-3xl font-light">AED</small>
                 </div>
               </div>
             </div>
           </motion.div>
         );
 
-      default: 
+      default:
         return null;
     }
   };
+
+  const buildEstimatePayload = () => {
+    // ---- ESTIMATE OBJECT (matches Estimate schema) ----
+    const estimate = {
+      service_type: "landscape", // or derive dynamically
+      subcategory: selectedSubcategory || null,
+      type: selectedType,
+      package: selectedPackage || null,
+
+      area_length: length ? Number(length) : null,
+      area_width: width ? Number(width) : null,
+      area_sqft: Number(areaSqFt),
+
+      description: "Generated from estimator flow",
+
+      status: "pending",
+
+      customer: {
+        firstName,
+        lastName,
+        email,
+        phone: `${countryCode}${phone}`,
+        location: coords.address || null,
+        city: coords.city || null,
+        country: coords.country || null
+      }
+    };
+
+    // ---- ANSWERS ARRAY (matches EstimateAnswer schema) ----
+    const formattedAnswers = questions
+      .filter(q => answers[q._id] !== undefined && answers[q._id] !== "")
+      .map(q => {
+        const base = {
+          question: q._id,
+          questionText: q.question,
+          questionType: q.questionType,
+          includeInEstimate: q.includeInEstimate ?? true,
+          areaQuestion: q.areaQuestion ?? false
+        };
+
+        // TEXT / NUMBER / YESNO
+        if (q.questionType !== "options") {
+          return {
+            ...base,
+            answerValue: answers[q._id]
+          };
+        }
+
+        // OPTIONS
+        const selectedOpt = q.options.find(
+          opt => opt.title === answers[q._id]
+        );
+
+        return {
+          ...base,
+          selectedOption: selectedOpt
+            ? {
+              optionId: selectedOpt._id,
+              title: selectedOpt.title,
+              value: selectedOpt.value || 0,
+              valueSubType: selectedOpt.valueSubType || "flat"
+            }
+            : null
+        };
+      });
+
+    return {
+      estimate,
+      answers: formattedAnswers
+    };
+  };
+
 
   return (
     <div className="min-h-screen bg-[#F8F9FD] pb-40">
@@ -773,9 +986,9 @@ const Calculator = () => {
           <div className="hidden lg:flex items-center space-x-8">
             {steps.map((s, i) => (
               <div key={i} className={`flex items-center gap-3 transition-colors ${i <= activeStep ? 'text-black' : 'text-gray-300'}`}>
-                <div 
+                <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all
-                    ${i === activeStep ? 'text-white border-transparent' : 
+                    ${i === activeStep ? 'text-white border-transparent' :
                       i < activeStep ? 'bg-green-50 text-green-600 border-green-100' : 'border-gray-100'}`}
                   style={{ backgroundColor: i === activeStep ? BRAND_PURPLE : '' }}
                 >
@@ -803,13 +1016,14 @@ const Calculator = () => {
       </div>
 
       {/* Navigation Footer */}
-      {activeStep < 6 && activeStep !== 5 && (
+      {/* {activeStep < 6 && activeStep !== 5 && ( */}
+      {activeStep < 6 && (
         <div className="fixed bottom-0 left-0 right-0 p-8 z-50 pointer-events-none">
           <div className="max-w-4xl mx-auto flex justify-between items-center bg-white/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-2xl border border-white/50 pointer-events-auto">
-            <Button 
-              size="large" 
-              icon={<ArrowLeftOutlined />} 
-              onClick={handleBack} 
+            <Button
+              size="large"
+              icon={<ArrowLeftOutlined />}
+              onClick={handleBack}
               disabled={activeStep === 0}
               className="h-14 px-8 rounded-2xl border-none bg-gray-50 text-gray-400 hover:bg-gray-100"
             >
@@ -825,19 +1039,19 @@ const Calculator = () => {
                   </Text>
                 </div>
               )}
-              
-              <Button 
-                type="primary" 
-                size="large" 
-                onClick={handleNext} 
+
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleNext}
                 disabled={!validateStep()}
                 className="h-14 px-12 rounded-2xl border-none text-lg shadow-xl transition-all"
-                style={{ 
-                  backgroundColor: !validateStep() ? '#f5f5f5' : BRAND_PURPLE, 
-                  color: !validateStep() ? '#ccc' : 'white' 
+                style={{
+                  backgroundColor: !validateStep() ? '#f5f5f5' : BRAND_PURPLE,
+                  color: !validateStep() ? '#ccc' : 'white'
                 }}
               >
-                {activeStep === 4 ? 'Continue to Contact' : 'Continue'} 
+                {activeStep === 4 ? 'Continue to Contact' : 'Continue'}
                 <ArrowRightOutlined className="ml-2" />
               </Button>
             </div>

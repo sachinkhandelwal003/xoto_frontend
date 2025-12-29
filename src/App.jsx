@@ -6,7 +6,7 @@ import { Navigate } from "react-router-dom";
 import Navbar from "./components/navbar/index.jsx";
 import Footer from "./components/footer/footer";
 import FloatingIcons from "./components/FloatingIcons";
-import QuoteModal from "./components/modal/QuoteModal.jsx";
+import QuoteModal from "./components/modal/QuoteModal.jsx"; 
 import ScrollToTop from "./components/ScrollToTop.js";
 import Loader from "./components/Loader.jsx";
 import FreelancerNavbar from "./components/navbar/FreelancerNavbar.jsx";
@@ -55,6 +55,7 @@ import MainCalculatorPage from "./components/homepage/AiPlanner/MainCalculatorPa
 import CustomerLogin from "./components/login/CustomerLogin";
 import AIPlannerDemoPage from "./components/homepage/AiPlanner/AIPlannerDemoPage";
 import LocationCategoryModal from "./components/modal/LocationCategoryModal";
+import AITools from "./components/homepage/AiPlanner/AITools";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -133,6 +134,8 @@ function LayoutWrapper({ children }) {
     "/other/login",
     "/aiPlanner",
     "/aiPlanner/interior",
+        "/aiPlanner/landscape",
+
     "/estimate/calculator",
     "/estimate/calculator/interior",
     "/accountant/login",
@@ -166,6 +169,7 @@ function LayoutWrapper({ children }) {
     "/other/login",
         "/aiPlanner",
         "/aiPlanner/interior",
+                "/aiPlanner/landscape",
         "/estimate/calculator",
         "/estimate/calculator/interior",
     "/accountant/login",
@@ -197,6 +201,7 @@ function LayoutWrapper({ children }) {
     "/other/login",
         "/aiPlanner",
         "/aiPlanner/interior",
+                "/aiPlanner/landscape",
         "/estimate/calculator",
         "/estimate/calculator/interior",
     "/ecommerce/seller",
@@ -219,6 +224,7 @@ function LayoutWrapper({ children }) {
     "/other/login",
         "/aiPlanner",
         "/aiPlanner/interior",
+                "/aiPlanner/landscape",
         "/estimate/calculator",
         "/estimate/calculator/interior",
     "/accountant/login",
@@ -254,10 +260,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/landscaping" element={<Landspackng />} />
-                    <Route path="/aiPlanner" element={<AIPlanner />} />
+                    <Route path="/aiPlanner" element={<AITools />} />
                     <Route path="/aiPlanner/demo" element={<AIPlannerDemoPage />} />
 
                                         <Route path="/aiPlanner/interior" element={<InteriorPlanner />} />
+                                        <Route path="/aiPlanner/landscape" element={<AIPlanner />} />
 
                     <Route path="/estimate/calculator" element={<Calculator />} />
                     <Route path="/estimate/calculator/interior" element={<InteriorCalculator />} />

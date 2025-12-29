@@ -2,10 +2,9 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-// 1. Import Ant Design Notification
 import { notification } from 'antd';
+import { useTranslation } from "react-i18next"; // Added i18n hook
 import { apiService } from "../../manageApi/utils/custom.apiservice";
-// Removed sweetAlert import
 import helloImage from "../../assets/img/hello.jpg";
 
 const countryCodes = [
@@ -14,12 +13,12 @@ const countryCodes = [
   { value: "+966", label: "+966 Saudi Arabia" },
   { value: "+1", label: "+1 USA/Canada" },
   { value: "+44", label: "+44 UK" },
-  { value: "+61", label: "+61 Australia" },
+  { value: "+61", label: "+61 Australia" }
 ];
 
 export default function ConsultationSection() {
+  const { t } = useTranslation("book"); // Initialize translation hook
   const [loading, setLoading] = useState(false);
-  // 2. Initialize Ant Design Notification Hook
   const [api, contextHolder] = notification.useNotification();
 
   const [formData, setFormData] = useState({
@@ -45,7 +44,7 @@ export default function ConsultationSection() {
     setFormData((prev) => ({ ...prev, number: value }));
   };
 
-  // 3. Helper to trigger notification
+  // Helper to trigger notification
   const openNotification = (type, title, description) => {
     api[type]({
       message: title,
@@ -57,12 +56,12 @@ export default function ConsultationSection() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation using Notification instead of alert
-    if (!formData.first_name.trim()) return openNotification('error', 'Validation Error', "First name is required");
-    if (!formData.last_name.trim()) return openNotification('error', 'Validation Error', "Last name is required");
-    if (!formData.email.includes("@")) return openNotification('error', 'Validation Error', "Valid email is required");
-    if (formData.number.length < 8) return openNotification('error', 'Validation Error', "Mobile number must be at least 8 digits");
-    if (!formData.message.trim()) return openNotification('error', 'Validation Error', "Message is required");
+    // Validation using translation keys
+    if (!formData.first_name.trim()) return openNotification('error', 'Validation Error', t("errors.firstName"));
+    if (!formData.last_name.trim()) return openNotification('error', 'Validation Error', t("errors.lastName"));
+    if (!formData.email.includes("@")) return openNotification('error', 'Validation Error', t("errors.email"));
+    if (formData.number.length < 8) return openNotification('error', 'Validation Error', t("errors.mobile"));
+    if (!formData.message.trim()) return openNotification('error', 'Validation Error', t("errors.message"));
 
     setLoading(true);
 
@@ -84,11 +83,11 @@ export default function ConsultationSection() {
     try {
       await apiService.post("/property/lead", payload);
 
-      // 4. Success Notification
+      // Success Notification using translation keys
       openNotification(
         "success",
-        "Thank You!",
-        "Your consultation request for interior has been submitted successfully. We'll contact you within 24 hours!"
+        t("success.title"),
+        t("success.message")
       );
 
       setFormData({
@@ -100,8 +99,7 @@ export default function ConsultationSection() {
         message: "",
       });
     } catch (err) {
-      // Error Notification
-      openNotification("error", "Submission Failed", err.response?.data?.message || "Something went wrong.");
+      openNotification("error", "Submission Failed", err.response?.data?.message || t("errors.submit"));
     } finally {
       setLoading(false);
     }
@@ -109,12 +107,12 @@ export default function ConsultationSection() {
 
   return (
     <section className="relative w-full overflow-hidden bg-gray-900">
-      {/* 5. Render Notification Context */}
+      {/* Notification Context */}
       {contextHolder}
 
       <img
         src={helloImage}
-        alt="Luxury living room"
+        alt={t("imageAlt")} // Translated Alt text
         className="absolute inset-0 h-full w-full object-cover opacity-70"
       />
 
@@ -135,15 +133,14 @@ export default function ConsultationSection() {
           className="max-w-xl text-white text-center lg:text-left"
         >
           <h2 className="mt-9 text-3xl  sm:text-4xl md:text-5xl lg:text-6xl heading-dark-1 text-white">
-            Book Consultation
+            {t("title")}
           </h2>
           <p className="mt-5 text-xl md:text-2xl paragraph-light-1">
-            One simple form to connect with XOTO experts for tailored interior
-            design advice and project planning.
+            {t("description")}
           </p>
         </motion.div>
 
-        {/* Form */}
+        {/* FORM */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -156,31 +153,29 @@ export default function ConsultationSection() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    First Name <sup className="text-purple-600">*</sup>
+                    {t("form.firstName")} <sup className="text-purple-600">*</sup>
                   </label>
                   <input
-                    type="text"
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleChange}
                     required
                     className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-base focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition"
-                    placeholder="John"
+                    placeholder={t("form.firstName")}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Last Name <sup className="text-purple-600">*</sup>
+                    {t("form.lastName")} <sup className="text-purple-600">*</sup>
                   </label>
                   <input
-                    type="text"
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleChange}
                     required
                     className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-base focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition"
-                    placeholder="Doe"
+                    placeholder={t("form.lastName")}
                   />
                 </div>
               </div>
@@ -188,23 +183,22 @@ export default function ConsultationSection() {
               {/* Email */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Email Address <sup className="text-purple-600">*</sup>
+                  {t("form.email")} <sup className="text-purple-600">*</sup>
                 </label>
                 <input
-                  type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   required
                   className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-base focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition"
-                  placeholder="john@example.com"
+                  placeholder={t("form.email")}
                 />
               </div>
 
               {/* Mobile */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Mobile Number <sup className="text-purple-600">*</sup>
+                  {t("form.mobile")} <sup className="text-purple-600">*</sup>
                 </label>
                 <div className="flex gap-2">
                   <select
@@ -219,37 +213,20 @@ export default function ConsultationSection() {
                     ))}
                   </select>
                   <input
-                    type="text"
                     value={formData.number}
                     onChange={handleNumber}
                     required
                     maxLength={15}
-                    className="
-                    w-full
-                    flex-1
-                    rounded-xl
-                    border border-gray-300
-                    px-3 py-2
-                    sm:px-4 sm:py-2.5
-                    text-sm sm:text-base
-                    focus:border-purple-600
-                    focus:ring-4 focus:ring-purple-100
-                    transition
-                    "
-                    placeholder="501234567"
+                    className="w-full flex-1 rounded-xl border border-gray-300 px-3 py-2 sm:px-4 sm:py-2.5 text-sm sm:text-base focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition"
+                    placeholder={t("form.mobile")}
                   />
                 </div>
-                {formData.number && formData.number.length < 8 && (
-                  <p className="text-red-500 text-sm mt-1">
-                    Minimum 8 digits required
-                  </p>
-                )}
               </div>
 
               {/* Message */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Your Message <sup className="text-purple-600">*</sup>
+                  {t("form.message")} <sup className="text-purple-600">*</sup>
                 </label>
                 <textarea
                   name="message"
@@ -258,7 +235,7 @@ export default function ConsultationSection() {
                   required
                   rows={5}
                   className="w-full rounded-xl border border-gray-300 px-5 py-2 text-lg focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition resize-none"
-                  placeholder="Tell us about your project, budget, timeline, or any specific requirements..."
+                  placeholder={t("form.message")}
                 />
               </div>
 
@@ -270,12 +247,12 @@ export default function ConsultationSection() {
                 disabled={loading}
                 className="w-full rounded-xl bg-gradient-to-r from-purple-700 to-purple-900 py-3.5 text-lg font-bold text-white shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-70"
               >
-                {loading ? "Submitting Request..." : "Book Free Consultation"}
+                {loading ? t("buttons.submitting") : t("buttons.submit")}
               </motion.button>
             </form>
 
             <p className="text-center text-sm text-gray-500 mt-4">
-              We respect your privacy. Your information is safe with us.
+              {t("privacy")}
             </p>
           </div>
         </motion.div>

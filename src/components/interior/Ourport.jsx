@@ -16,7 +16,7 @@ export default function ServicesPortfolio() {
   const { t } = useTranslation("interior4");
 
   const scrollRef = useRef(null);
-  const [activeBtn, setActiveBtn] = useState("right");
+  const [activeBtn, setActiveBtn] = useState(0);
 
   const scrollLeft = () => {
     if (scrollRef.current) {

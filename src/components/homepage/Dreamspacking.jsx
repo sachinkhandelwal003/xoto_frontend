@@ -28,7 +28,7 @@ export default function DreamSpacesShowcase() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const autoSlideRef = useRef(null);
-  const [activeBtn, setActiveBtn] = useState("right");
+  const [activeBtn, setActiveBtn] = useState(0);
 
   const next = () =>
     setCurrentIndex((prev) => (prev + 1) % projects.length);

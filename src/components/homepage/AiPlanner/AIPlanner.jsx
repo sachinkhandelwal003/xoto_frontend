@@ -4,7 +4,7 @@ import {
   Home, LayoutDashboard, Compass, 
   Image as ImageIcon, Sparkles, Upload, 
   ChevronDown, X, ArrowRight, CheckCircle2,
-  Download, Coins, Crown, Loader2, Sun, Sprout, Info,ArrowLeft 
+  Download, Coins, Crown, Loader2, Sun, Sprout, Info, ArrowLeft ,Check 
 } from 'lucide-react';
 import { 
   Button, Modal, Progress, Card, Tag, Empty, 
@@ -74,13 +74,8 @@ const AIPlanner = () => {
   const [upgradeMessage, setUpgradeMessage] = useState('');
   const [currentResult, setCurrentResult] = useState({ url: '', desc: '' });
 
-  // Mobile Tabs (Optional if you want distinct tabs, currently using scroll)
+  // Mobile Tabs
   const [activeMobileTab, setActiveMobileTab] = useState('create');
-
-  // Check LocalStorage for Limit
-  const [hasUsedFreeCredit, setHasUsedFreeCredit] = useState(() => {
-    return localStorage.getItem('xoto_free_design_used') === 'true';
-  });
 
   const isCustomerLoggedIn = useMemo(() => {
     return user && (user.role?.name === 'Customer' || user.role?.name === 'SuperAdmin');
@@ -120,22 +115,14 @@ const AIPlanner = () => {
       return;
     }
 
-    if (hasUsedFreeCredit) {
-      setUpgradeMessage("You've used your free design. Upgrade to create more.");
-      setShowUpgradeModal(true);
-      return;
-    }
-
+    // Removed the hasUsedFreeCredit check. 
+    // We now let the backend decide if the user has reached their limit.
     generateAIDesigns(user);
   };
 
   const handleAuthSuccess = (userData) => {
     setShowAuthModal(false);
-    if (hasUsedFreeCredit) {
-        setShowUpgradeModal(true);
-    } else {
-        // generateAIDesigns(userData);
-    }
+    // You could trigger generateAIDesigns here automatically if desired
   };
 
   const generateAIDesigns = async (currentUser) => {
@@ -159,11 +146,7 @@ const AIPlanner = () => {
     formData.append('styleName', selectedStyles.length > 0 ? gardenStyles.find(s => s.value === selectedStyles[0])?.label : 'Modern Garden');
     formData.append('elements', selectedElements.map(e => gardenElements.find(el => el.value === e)?.label).join(', ') || 'Natural Landscaping');
     formData.append('description', specificRequirement || 'A professional landscaping design');
-    
-    if (currentUser) {
-        formData.append('user_id', currentUser._id); 
-    }
-
+ 
     const interval = setInterval(() => {
       setGenerationProgress(prev => (prev < 95 ? prev + (95 - prev) * 0.1 : 95));
     }, 500);
@@ -174,15 +157,17 @@ const AIPlanner = () => {
         timeout: 120000 
       });
 
-      const resData = response.data;
+      const resData = response;
 
+      // --- LOGIC: Check for Premium Restriction Response ---
       if (resData.status === false && resData.aiImageGeneration === false) {
         setIsGenerating(false);
-        setUpgradeMessage(resData.message || "Purchase premium to generate more images.");
+        setUpgradeMessage(resData.message || "Limit reached. Upgrade to continue.");
         setShowUpgradeModal(true);
         return; 
       }
 
+      // --- LOGIC: Check for Success Response ---
       if (resData.imageUrl && resData.imageUrl !== "") {
         const aiUrl = resData.imageUrl;
         const aiDesc = resData.message || "Garden generated successfully";
@@ -202,9 +187,6 @@ const AIPlanner = () => {
         setCurrentResult({ url: aiUrl, desc: aiDesc });
         setGenerationProgress(100);
         
-        setHasUsedFreeCredit(true);
-        localStorage.setItem('xoto_free_design_used', 'true');
-
         notification.success({ message: 'Design Generated!', duration: 2 });
         
         setTimeout(() => {
@@ -214,13 +196,16 @@ const AIPlanner = () => {
       }
     } catch (error) {
       console.error('❌ Generation failed:', error);
+      
+      // Handle Error Responses (e.g. 400 Bad Request which might also contain the limit logic)
       const errRes = error.response?.data;
-      if (errRes && errRes.aiImageGeneration === false) {
+      if (errRes && (errRes.aiImageGeneration === false || errRes.status === false)) {
          setIsGenerating(false);
-         setUpgradeMessage(errRes.message);
+         setUpgradeMessage(errRes.message || "Please upgrade to generate more images.");
          setShowUpgradeModal(true);
          return;
       }
+
       notification.error({ message: 'Generation failed', description: 'Please try again later.' });
       setIsGenerating(false);
     } finally {
@@ -252,96 +237,96 @@ const AIPlanner = () => {
     <div className="flex h-[100dvh] bg-[#F8F9FC] font-sans overflow-hidden">
       
       {/* --- DESKTOP SIDEBAR (Hidden on Mobile) --- */}
-     <div 
-  className="hidden lg:block fixed top-0 left-0 h-full bg-white border-r border-gray-300 z-50 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] shadow-sm hover:shadow-2xl overflow-hidden"
-  style={{ width: isSidebarHovered ? '280px' : '88px' }}
-  onMouseEnter={() => setIsSidebarHovered(true)}
-  onMouseLeave={() => setIsSidebarHovered(false)}
->
-  {/* Logo */}
-  <div className="h-24 flex items-center px-6 mb-4">
-    <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-110">
-      <div className="flex gap-1">
-        <div className="w-1 h-4 bg-white rounded-full"/>
-        <div className="w-1 h-6 bg-white rounded-full"/>
-        <div className="w-1 h-4 bg-white rounded-full"/>
-      </div>
-    </div>
-
-    {/* Logo Text */}
-    <span
-      className={`
-        ml-4 font-bold text-2xl tracking-tight
-        transition-all duration-300
-        ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
-      `}
-    >
-      Xoto.AI
-    </span>
-  </div>
-
-  {/* Menu */}
-  <div className="flex-1 flex flex-col gap-1">
-    
-    {/* Home */}
-    <div
-      onClick={() => navigate('/')}
-      className="flex items-center px-6 py-3.5 cursor-pointer hover:bg-gray-50 group relative"
-    >
-      {/* ICON FIXED SLOT */}
-      <div className="w-12 flex justify-center shrink-0">
-        <Home size={26} className="text-gray-500 group-hover:text-gray-900" />
-      </div>
-
-      {/* TEXT */}
-      <span
-        className={`
-          ml-2 text-base font-medium whitespace-nowrap
-          transition-all duration-300
-          ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
-        `}
+      <div 
+        className="hidden lg:block fixed top-0 left-0 h-full bg-white border-r border-gray-300 z-50 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] shadow-sm hover:shadow-2xl overflow-hidden"
+        style={{ width: isSidebarHovered ? '280px' : '88px' }}
+        onMouseEnter={() => setIsSidebarHovered(true)}
+        onMouseLeave={() => setIsSidebarHovered(false)}
       >
-        Home
-      </span>
-    </div>
+        {/* Logo */}
+        <div className="h-24 flex items-center px-6 mb-4">
+          <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-110">
+            <div className="flex gap-1">
+              <div className="w-1 h-4 bg-white rounded-full"/>
+              <div className="w-1 h-6 bg-white rounded-full"/>
+              <div className="w-1 h-4 bg-white rounded-full"/>
+            </div>
+          </div>
 
-    {/* Active */}
-    <div className="flex items-center px-6 py-3.5 bg-purple-50 text-purple-700 cursor-pointer relative">
-      
-      {/* Active Indicator */}
-      <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-700 rounded-r-full" />
+          {/* Logo Text */}
+          <span
+            className={`
+              ml-4 font-bold text-2xl tracking-tight
+              transition-all duration-300
+              ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
+            `}
+          >
+            Xoto.AI
+          </span>
+        </div>
 
-      {/* ICON FIXED SLOT */}
-      <div className="w-12 flex justify-center shrink-0">
-        <Sparkles size={26} />
+        {/* Menu */}
+        <div className="flex-1 flex flex-col gap-1">
+          
+          {/* Home */}
+          <div
+            onClick={() => navigate('/')}
+            className="flex items-center px-6 py-3.5 cursor-pointer hover:bg-gray-50 group relative"
+          >
+            {/* ICON FIXED SLOT */}
+            <div className="w-12 flex justify-center shrink-0">
+              <Home size={26} className="text-gray-500 group-hover:text-gray-900" />
+            </div>
+
+            {/* TEXT */}
+            <span
+              className={`
+                ml-2 text-base font-medium whitespace-nowrap
+                transition-all duration-300
+                ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
+              `}
+            >
+              Home
+            </span>
+          </div>
+
+          {/* Active */}
+          <div className="flex items-center px-6 py-3.5 bg-purple-50 text-purple-700 cursor-pointer relative">
+            
+            {/* Active Indicator */}
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-700 rounded-r-full" />
+
+            {/* ICON FIXED SLOT */}
+            <div className="w-12 flex justify-center shrink-0">
+              <Sparkles size={26} />
+            </div>
+
+            {/* TEXT */}
+            <span
+              className={`
+                ml-2 text-base font-medium whitespace-nowrap
+                transition-all duration-300
+                ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
+              `}
+            >
+              AI Landscaping
+            </span>
+          </div>
+        </div>
       </div>
-
-      {/* TEXT */}
-      <span
-        className={`
-          ml-2 text-base font-medium whitespace-nowrap
-          transition-all duration-300
-          ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
-        `}
-      >
-        AI Landscaping
-      </span>
-    </div>
-  </div>
-</div>
 
 
       {/* --- MAIN CONTENT AREA --- */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative lg:ml-[88px] transition-all duration-300 w-full">
         
-        {/* --- LEFT: CONFIGURATION PANEL (Scrollable on Mobile, Fixed Left on Desktop) --- */}
+        {/* --- LEFT: CONFIGURATION PANEL --- */}
         <div className="w-full lg:w-[460px] bg-white h-full  overflow-y-auto p-4 lg:p-6 border-r border-gray-400 shrink-0 z-10 custom-scrollbar pb-24 lg:pb-6">
           
           {/* Header Mobile Only */}
           <div className="lg:hidden flex items-center justify-between mb-6">
              <div className="flex items-center gap-2">
-                <Link to="/"><ArrowLeft className="text-gray-600" /></Link>
-                <span className="font-bold text-lg">AI Planner</span>
+               <Link to="/"><ArrowLeft className="text-gray-600" /></Link>
+               <span className="font-bold text-lg">AI Planner</span>
              </div>
              {isCustomerLoggedIn && <div className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold">Pro</div>}
           </div>
@@ -433,20 +418,20 @@ const AIPlanner = () => {
           >
              {isGenerating ? (
                  <>
-                    <Loader2 className="animate-spin w-5 h-5" />
-                    <span>Designing...</span>
+                   <Loader2 className="animate-spin w-5 h-5" />
+                   <span>Designing...</span>
                  </>
              ) : (
                  <>
-                    <span>{hasUsedFreeCredit && isCustomerLoggedIn ? 'Upgrade to Generate' : 'Generate Vision'}</span>
-                    <div className="bg-white/20 px-2 py-1 rounded-full flex items-center gap-1 text-xs font-normal backdrop-blur-sm border border-white/10">
-                      {hasUsedFreeCredit && isCustomerLoggedIn ? <Crown size={12} className="text-yellow-300" /> : <Sparkles size={12} className="text-white" />}
-                    </div>
+                   <span>Generate Vision</span>
+                   <div className="bg-white/20 px-2 py-1 rounded-full flex items-center gap-1 text-xs font-normal backdrop-blur-sm border border-white/10">
+                     <Sparkles size={12} className="text-white" />
+                   </div>
                  </>
              )}
           </button>
 
-          {/* Mobile Results Preview (Only shows if designs exist) */}
+          {/* Mobile Results Preview */}
           <div className="lg:hidden mt-10">
              {designs.length > 0 && (
                 <>
@@ -485,8 +470,8 @@ const AIPlanner = () => {
                </div>
                {isCustomerLoggedIn && (
                   <div className="px-4 py-2 bg-white rounded-full shadow-sm border border-green-100 flex items-center gap-2">
-                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                     <span className="text-sm font-bold text-gray-700">Logged In as {user?.name?.first_name}</span>
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-sm font-bold text-gray-700">Logged In as {user?.name?.first_name}</span>
                   </div>
                )}
              </div>
@@ -494,7 +479,7 @@ const AIPlanner = () => {
              {designs.length === 0 ? (
                <div className="flex flex-col items-center justify-center h-[50vh] border-2 border-dashed border-gray-200 rounded-[32px] bg-white/50">
                  <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                    <ImageIcon size={40} className="text-gray-300" />
+                   <ImageIcon size={40} className="text-gray-300" />
                  </div>
                  <h3 className="text-xl font-bold text-gray-400">No designs yet</h3>
                  <p className="text-gray-400 mt-2">Use the panel on the left to start.</p>
@@ -530,7 +515,7 @@ const AIPlanner = () => {
 
       </div>
 
-      {/* --- MOBILE BOTTOM NAVIGATION (Fixed) --- */}
+      {/* --- MOBILE BOTTOM NAVIGATION --- */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex justify-around py-2 pb-safe-area">
          <MobileTabItem icon={Home} label="Home" id="home" onClick={() => navigate('/')} />
          <MobileTabItem icon={Sparkles} label="Create" id="create" onClick={() => setActiveMobileTab('create')} />
@@ -561,7 +546,7 @@ const AIPlanner = () => {
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Unlock Limitless Creativity</h3>
             <p className="text-gray-500 mb-8 leading-relaxed px-4">
-                {upgradeMessage || "You've reached your free limit. Upgrade to Pro to continue designing."}
+                {upgradeMessage || "You've reached your limit. Upgrade to Pro to continue designing."}
             </p>
             <div className="space-y-3">
                 <Link to="/subscription/plans">
@@ -680,7 +665,7 @@ const AIPlanner = () => {
 
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
-  }.
+  }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: var(--color-primary);

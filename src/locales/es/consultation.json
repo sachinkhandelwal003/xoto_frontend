@@ -1,0 +1,34 @@
+{
+  "title": "Reservar consulta gratuita",
+  "description": "Conéctese con expertos de XOTO para una asesoría personalizada.",
+  "imageAlt": "Fondo de consulta",
+
+  "form": {
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "mobile": "Número móvil",
+    "message": "Tu mensaje"
+  },
+
+  "buttons": {
+    "submit": "Reservar consulta",
+    "submitting": "Enviando..."
+  },
+
+  "errors": {
+    "firstName": "El nombre es obligatorio",
+    "lastName": "El apellido es obligatorio",
+    "email": "Ingrese un correo válido",
+    "mobile": "El número debe tener al menos 8 dígitos",
+    "message": "El mensaje es obligatorio",
+    "submit": "Error al enviar"
+  },
+
+  "success": {
+    "title": "¡Gracias!",
+    "message": "Su solicitud de consulta ha sido enviada con éxito."
+  },
+
+  "privacy": "Respetamos su privacidad."
+}

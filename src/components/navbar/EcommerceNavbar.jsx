@@ -4,7 +4,7 @@ import { FaBars, FaTimes, FaSearch, FaMapMarkerAlt, FaChevronDown } from "react-
 import { FiUser } from "react-icons/fi";  // ✅ Correct package
 import { TbEye } from "react-icons/tb";
 import { BsTruck } from "react-icons/bs";
-import { CiShoppingCart } from "react-icons/ci";
+import { CiShoppingCart } from "react-icons/ci"; 
 import logoNew from "../../assets/img/logoNew.png";
 
 import { Link, useNavigate } from "react-router-dom";

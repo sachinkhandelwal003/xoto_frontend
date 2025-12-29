@@ -39,11 +39,15 @@ import enwhyPartner from './locales/en/whyPartner.json'
 import enstakeholders from './locales/en/stakeholders.json'
 import enpartnerForm from './locales/en/partnerForm.json'
 import enbuiltForEveryone from './locales/en/builtForEveryone.json'
+import enCta from './locales/en/cta.json'
 
 import enMort1 from "./locales/en/mort1.json";
 import enMort2 from "./locales/en/mort2.json";
 import enMort3 from "./locales/en/mort3.json";
 import enMort6 from "./locales/en/mort6.json";
+
+import enbook from './locales/en/book.json'
+import enconsultation from './locales/en/consultation.json'
 
 /* =========================
    HI
@@ -78,10 +82,14 @@ import hiwhyPartner from './locales/hi/whyPartner.json'
 import histakeholders from './locales/hi/stakeholders.json'
 import hipartnerForm from './locales/hi/partnerForm.json'
 import hibuiltForEveryone from './locales/hi/builtForEveryone.json'
+import hiCta from './locales/hi/cta.json'
 import hiMort1 from "./locales/hi/mort1.json";
 import hiMort2 from "./locales/hi/mort2.json";
 import hiMort3 from "./locales/hi/mort3.json";
 import hiMort6 from "./locales/hi/mort6.json";
+
+import hibook from './locales/hi/book.json'
+import hiconsultation from './locales/hi/consultation.json'
 
 /* =========================
    DE
@@ -116,10 +124,14 @@ import dewhyPartner from './locales/de/whyPartner.json'
 import destakeholders from './locales/de/stakeholders.json'
 import departnerForm from './locales/de/partnerForm.json'
 import debuiltForEveryone from './locales/de/builtForEveryone.json'
+import deCta from './locales/de/cta.json'
 import deMort1 from "./locales/de/mort1.json";
 import deMort2 from "./locales/de/mort2.json";
 import deMort3 from "./locales/de/mort3.json";
 import deMort6 from "./locales/de/mort6.json";
+
+import debook from './locales/de/book.json'
+import deconsultation from './locales/de/consultation.json'
 
 /* =========================
    ES
@@ -154,10 +166,14 @@ import eswhyPartner from './locales/es/whyPartner.json'
 import esstakeholders from './locales/es/stakeholders.json'
 import espartnerForm from './locales/es/partnerForm.json'
 import esbuiltForEveryone from './locales/es/builtForEveryone.json'
+import esCta from './locales/es/cta.json'
 import esMort1 from "./locales/es/mort1.json";
 import esMort2 from "./locales/es/mort2.json";
 import esMort3 from "./locales/es/mort3.json";
 import esMort6 from "./locales/es/mort6.json";
+
+import esbook from './locales/es/book.json'
+import esconsultation from './locales/es/consultation.json'
 
 /* =========================
    FR
@@ -192,10 +208,14 @@ import frwhyPartner from './locales/fr/whyPartner.json'
 import frstakeholders from './locales/fr/stakeholders.json'
 import frpartnerForm from './locales/fr/partnerForm.json'
 import frbuiltForEveryone from './locales/fr/builtForEveryone.json'
+import frCta from './locales/fr/cta.json'
 import frMort1 from "./locales/fr/mort1.json";
 import frMort2 from "./locales/fr/mort2.json";
 import frMort3 from "./locales/fr/mort3.json";
 import frMort6 from "./locales/fr/mort6.json";
+
+import frbook from './locales/fr/book.json'
+import frconsultation from './locales/fr/consultation.json'
 
 /* =========================
    RU
@@ -230,10 +250,14 @@ import ruwhyPartner from './locales/ru/whyPartner.json'
 import rustakeholders from './locales/ru/stakeholders.json'
 import rupartnerForm from './locales/ru/partnerForm.json'
 import rubuiltForEveryone from './locales/ru/builtForEveryone.json'
+import ruCta from './locales/ru/cta.json'
 import ruMort1 from "./locales/ru/mort1.json";
 import ruMort2 from "./locales/ru/mort2.json";
 import ruMort3 from "./locales/ru/mort3.json";
 import ruMort6 from "./locales/ru/mort6.json";
+
+import rubook from './locales/ru/book.json'
+import ruconsultation from './locales/ru/consultation.json'
 
 /* =========================
    TR
@@ -268,10 +292,14 @@ import trwhyPartner from './locales/tr/whyPartner.json'
 import trstakeholders from './locales/tr/stakeholders.json'
 import trpartnerForm from './locales/tr/partnerForm.json'
 import trbuiltForEveryone from './locales/tr/builtForEveryone.json'
+import trCta from './locales/tr/cta.json'
 import trMort1 from "./locales/tr/mort1.json";
 import trMort2 from "./locales/tr/mort2.json";
 import trMort3 from "./locales/tr/mort3.json";
 import trMort6 from "./locales/tr/mort6.json";
+
+import trbook from './locales/tr/book.json'
+import trconsultation from './locales/tr/consultation.json'
 
 /* =========================
    ZH
@@ -306,10 +334,14 @@ import zhwhyPartner from './locales/zh/whyPartner.json'
 import zhstakeholders from './locales/zh/stakeholders.json'
 import zhpartnerForm from './locales/zh/partnerForm.json'
 import zhbuiltForEveryone from './locales/zh/builtForEveryone.json'
+import zhCta from './locales/zh/cta.json'
 import zhMort1 from "./locales/zh/mort1.json";
 import zhMort2 from "./locales/zh/mort2.json";
 import zhMort3 from "./locales/zh/mort3.json";
 import zhMort6 from "./locales/zh/mort6.json";
+
+import zhbook from './locales/zh/book.json'
+import zhconsultation from './locales/zh/consultation.json'
 
 /* =========================
    TL
@@ -344,10 +376,14 @@ import tlwhyPartner from './locales/tl/whyPartner.json'
 import tlstakeholders from './locales/tl/stakeholders.json'
 import tlpartnerForm from './locales/tl/partnerForm.json'
 import tlbuiltForEveryone from './locales/tl/builtForEveryone.json'
+import tlCta from './locales/tl/cta.json'
+// import { from } from "gsap";
 import tlMort1 from "./locales/tl/mort1.json";
 import tlMort2 from "./locales/tl/mort2.json";
 import tlMort3 from "./locales/tl/mort3.json";
 import tlMort6 from "./locales/tl/mort6.json";
+import tlbook from './locales/tl/book.json'
+// import tlconsultation from './locales/tl/consultation.json'
 
 /* =========================
    FA
@@ -481,11 +517,13 @@ i18n
         whyPartner: enwhyPartner,
         stakeholders: enstakeholders,
         partnerForm: enpartnerForm,
-        builtForEveryone: enbuiltForEveryone,
+        builtForEveryone: enbuiltForEveryone, cta: enCta,
         mort1: enMort1,
         mort2: enMort2,
         mort3: enMort3,
-        mort6: enMort6
+        mort6: enMort6,
+        book: enbook,
+        consultation: enconsultation
       },
 
       hi: {
@@ -518,11 +556,13 @@ i18n
         whyPartner: hiwhyPartner,
         stakeholders: histakeholders,
         partnerForm: hipartnerForm,
-        builtForEveryone: hibuiltForEveryone,
+        builtForEveryone: hibuiltForEveryone, cta: hiCta,
         mort1: hiMort1,
         mort2: hiMort2,
         mort3: hiMort3,
-        mort6: hiMort6
+        mort6: hiMort6,
+        book: hibook,
+        consultation: hiconsultation
       },
 
       de: {
@@ -555,11 +595,13 @@ i18n
         whyPartner: dewhyPartner,
         stakeholders: destakeholders,
         partnerForm: departnerForm,
-        builtForEveryone: debuiltForEveryone,
+        builtForEveryone: debuiltForEveryone, cta: deCta,
         mort1: deMort1,
         mort2: deMort2,
         mort3: deMort3,
-        mort6: deMort6
+        mort6: deMort6,
+        book: debook,
+        consultation: deconsultation
       },
 
       es: {
@@ -592,11 +634,13 @@ i18n
         whyPartner: eswhyPartner,
         stakeholders: esstakeholders,
         partnerForm: espartnerForm,
-        builtForEveryone: esbuiltForEveryone,
+        builtForEveryone: esbuiltForEveryone, cta: esCta,
         mort1: esMort1,
         mort2: esMort2,
         mort3: esMort3,
-        mort6: esMort6
+        mort6: esMort6,
+        book: esbook,
+        consultation: esconsultation
       },
 
       fr: {
@@ -629,11 +673,13 @@ i18n
         whyPartner: frwhyPartner,
         stakeholders: frstakeholders,
         partnerForm: frpartnerForm,
-        builtForEveryone: frbuiltForEveryone,
+        builtForEveryone: frbuiltForEveryone, cta: frCta,
         mort1: frMort1,
         mort2: frMort2,
         mort3: frMort3,
-        mort6: frMort6
+        mort6: frMort6,
+        book: frbook,
+        consultation: frconsultation
       },
 
       ru: {
@@ -666,11 +712,13 @@ i18n
         whyPartner: ruwhyPartner,
         stakeholders: rustakeholders,
         partnerForm: rupartnerForm,
-        builtForEveryone: rubuiltForEveryone,
+        builtForEveryone: rubuiltForEveryone, cta: ruCta,
         mort1: ruMort1,
         mort2: ruMort2,
         mort3: ruMort3,
-        mort6: ruMort6
+        mort6: ruMort6,
+        book: rubook,
+        consultation: ruconsultation
       },
 
       tr: {
@@ -703,11 +751,13 @@ i18n
         whyPartner: trwhyPartner,
         stakeholders: trstakeholders,
         partnerForm: trpartnerForm,
-        builtForEveryone: trbuiltForEveryone,
+        builtForEveryone: trbuiltForEveryone, cta: trCta,
         mort1: trMort1,
         mort2: trMort2,
         mort3: trMort3,
-        mort6: trMort6
+        mort6: trMort6,
+        book: trbook,
+        consultation: trconsultation
       },
 
       zh: {
@@ -740,11 +790,13 @@ i18n
         whyPartner: zhwhyPartner,
         stakeholders: zhstakeholders,
         partnerForm: zhpartnerForm,
-        builtForEveryone: zhbuiltForEveryone,
+        builtForEveryone: zhbuiltForEveryone, cta: zhCta,
         mort1: zhMort1,
         mort2: zhMort2,
         mort3: zhMort3,
-        mort6: zhMort6
+        mort6: zhMort6,
+        book: zhbook,
+        consultation: zhconsultation
       },
 
       tl: {
@@ -777,11 +829,13 @@ i18n
         whyPartner: tlwhyPartner,
         stakeholders: tlstakeholders,
         partnerForm: tlpartnerForm,
-        builtForEveryone: tlbuiltForEveryone,
+        builtForEveryone: tlbuiltForEveryone, cta: tlCta,
         mort1: tlMort1,
         mort2: tlMort2,
         mort3: tlMort3,
-        mort6: tlMort6
+        mort6: tlMort6,
+        book: tlbook,
+        // consultation: tlconsultation
       },
 
       fa: {
@@ -805,8 +859,8 @@ i18n
       "scape1","scape2",
       "buy1","buy2","buy3","buy4","buy5","buy6","buy7",
       "page3","ecosystem","whyPartner","stakeholders",
-      "partnerForm","builtForEveryone",
-      "mort1","mort2","mort3","mort6"
+      "partnerForm","builtForEveryone", "cta",
+      "mort1","mort2","mort3","mort6", "book", "consultation"
     ],
 
     defaultNS: "common",

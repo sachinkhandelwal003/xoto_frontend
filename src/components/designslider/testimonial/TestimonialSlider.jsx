@@ -106,7 +106,7 @@ const EcosystemSlider = () => {
 
                   {/* Description */}
                   <div className="flex flex-col flex-1 mt-4 sm:mt-0 px-2 sm:px-4">
-                    <p className="leading-relaxed font-semibold text-[14px] sm:text-[15px] md:text-[16px]">
+                    <p className="leading-relaxed font-bold text-[14px] sm:text-[15px] md:text-[16px]">
                       {/* ⭐ dynamic translation → home4.json → descriptions.key */}
                       {t(`descriptions.${item.key}`)}
                     </p>

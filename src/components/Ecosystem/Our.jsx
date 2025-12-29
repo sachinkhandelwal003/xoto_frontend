@@ -57,7 +57,7 @@ const BuiltForEveryone = () => {
   }, [cardsToShow]);
 
   return (
-    <section className="relative bg-white overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
+    <section className="relative bg-white overflow-hidden py-16 px-4 sm:px-6 lg:px-8 ">
       <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] left-0 w-full z-20 pointer-events-none">
   <img
     src={wave1}
@@ -75,7 +75,7 @@ const BuiltForEveryone = () => {
           {t("title")}
         </h2>
 
-        <div className="flex flex-col lg:flex-row items-center justify-between">
+        <div className="flex flex-col lg:flex-row items-center justify-between ">
           <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-25">
             <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
               <video
@@ -104,7 +104,7 @@ const BuiltForEveryone = () => {
                 {cards.map((card, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 bg-white rounded-xl p-6 transition-all duration-300 ${
+                    className={`flex-shrink-0 bg-[var(--color-body)] rounded-xl p-6 transition-all duration-300 ${
                       index >= currentIndex &&
                       index < currentIndex + cardsToShow
                         ? "shadow-xl scale-100 opacity-100"
@@ -116,14 +116,14 @@ const BuiltForEveryone = () => {
                         : `calc(${100 / cardsToShow}% - 16px)`
                     }}
                   >
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex justify-between items-center mb-4 bg-[var(--color-body)]">
                       <h3 className="text-xl card-heading">{card.title}</h3>
                       <div className="bg-[var(--color-primary)] p-2 rounded-full">
                         <img src={card.icon} alt="" className="w-6 h-6" />
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 leading-relaxed">
+                    <p className="text-sm text-gray-600 leading-relaxed bg-[var(--color-body)]">
                       {card.desc}
                     </p>
                   </div>
@@ -131,7 +131,7 @@ const BuiltForEveryone = () => {
               </div>
             </div>
 
-            <div className="flex gap-3 mt-8">
+   <div className="relative z-30 flex gap-3 mt-8 mb-16 sm:mb-0">
   {/* LEFT */}
   <button
     onClick={prevSlide}
@@ -139,6 +139,7 @@ const BuiltForEveryone = () => {
       p-3 rounded-sm border border-gray-300
       bg-white text-black
       hover:bg-[#5c039b] hover:text-white
+      active:bg-[#5c039b] active:text-white
       transition
     "
   >
@@ -151,12 +152,14 @@ const BuiltForEveryone = () => {
     className="
       p-3 rounded-sm border border-[#5c039b]
       bg-[#5c039b] text-white
+      active:scale-95
       transition
     "
   >
     <ChevronRight className="w-5 h-5" />
   </button>
 </div>
+
 
           </div>
         </div>
