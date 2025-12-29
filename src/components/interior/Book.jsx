@@ -14,12 +14,11 @@ const countryCodes = [
   { value: "+966", label: "+966 Saudi Arabia" },
   { value: "+1", label: "+1 USA/Canada" },
   { value: "+44", label: "+44 UK" },
-  { value: "+61", label: "+61 Australia" },
+  { value: "+61", label: "+61 Australia" }
 ];
 
 export default function ConsultationSection() {
-  // 🔥 IMPORTANT: interior3 namespace
-  const { t } = useTranslation("interior3");
+  const { t } = useTranslation("book");
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -57,7 +56,7 @@ export default function ConsultationSection() {
     setLoading(true);
 
     const payload = {
-      type:"interior",
+      type: "interior",
       name: {
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim()
@@ -106,20 +105,21 @@ export default function ConsultationSection() {
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(180deg, rgba(92, 3, 155, 0.85) 20%, rgba(3, 164, 244, 0.85) 95%)",
+          background:
+            "linear-gradient(180deg, rgba(92, 3, 155, 0.85) 20%, rgba(3, 164, 244, 0.85) 95%)"
         }}
       />
 
-      <div className="relative z-10 mx-auto flex flex-col lg:flex-row items-start justify-start max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-16 gap-20">
+      <div className="relative z-10 mx-auto flex flex-col lg:flex-row items-start max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-16 gap-20">
 
-        {/* Heading */}
+        {/* LEFT CONTENT */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           className="max-w-xl text-white text-center lg:text-left"
         >
-          <h2 className="mt-9 text-3xl sm:text-4xl md:text-5xl lg:text-6xl heading-dark-1 text-white">
+          <h2 className="mt-9 text-3xl sm:text-4xl md:text-5xl lg:text-6xl heading-dark-1 ">
             {t("title")}
           </h2>
           <p className="mt-5 text-xl md:text-2xl paragraph-light-1">
@@ -127,7 +127,7 @@ export default function ConsultationSection() {
           </p>
         </motion.div>
 
-        {/* Form */}
+        {/* FORM */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -137,33 +137,31 @@ export default function ConsultationSection() {
           <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-2xl">
             <form onSubmit={onSubmit} className="space-y-4">
 
-              {/* First Name */}
+              {/* Names */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    {t("form.firstName")} <sup className="text-purple-600">*</sup>
+                    {t("form.firstName")} *
                   </label>
                   <input
-                    type="text"
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleChange}
+                    placeholder={t("form.firstName")}
                     className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
-                    // placeholder={t("form.firstNamePlaceholder")}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    {t("form.lastName")} <sup className="text-purple-600">*</sup>
+                    {t("form.lastName")} *
                   </label>
                   <input
-                    type="text"
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleChange}
+                    placeholder={t("form.lastName")}
                     className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
-                    // placeholder={t("form.lastNamePlaceholder")}
                   />
                 </div>
               </div>
@@ -171,22 +169,21 @@ export default function ConsultationSection() {
               {/* Email */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.email")} <sup className="text-purple-600">*</sup>
+                  {t("form.email")} *
                 </label>
                 <input
-                  type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  placeholder={t("form.email")}
                   className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
-                  // placeholder={t("form.emailPlaceholder")}
                 />
               </div>
 
               {/* Mobile */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.mobile")} <sup className="text-purple-600">*</sup>
+                  {t("form.mobile")} *
                 </label>
                 <div className="flex gap-2">
                   <select
@@ -199,11 +196,10 @@ export default function ConsultationSection() {
                     ))}
                   </select>
                   <input
-                    type="text"
                     value={formData.number}
                     onChange={handleNumber}
+                    placeholder={t("form.mobile")}
                     className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5"
-                    // placeholder={t("form.mobilePlaceholder")}
                   />
                 </div>
               </div>
@@ -211,15 +207,15 @@ export default function ConsultationSection() {
               {/* Message */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.message")} <sup className="text-purple-600">*</sup>
+                  {t("form.message")} *
                 </label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   rows={5}
+                  placeholder={t("form.message")}
                   className="w-full rounded-xl border border-gray-300 px-5 py-2"
-                  // placeholder={t("form.messagePlaceholder")}
                 />
               </div>
 

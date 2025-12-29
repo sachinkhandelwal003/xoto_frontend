@@ -46,6 +46,9 @@ import enMort2 from "./locales/en/mort2.json";
 import enMort3 from "./locales/en/mort3.json";
 import enMort6 from "./locales/en/mort6.json";
 
+import enbook from './locales/en/book.json'
+import enconsultation from './locales/en/consultation.json'
+
 /* =========================
    HI
 ========================= */
@@ -84,6 +87,9 @@ import hiMort1 from "./locales/hi/mort1.json";
 import hiMort2 from "./locales/hi/mort2.json";
 import hiMort3 from "./locales/hi/mort3.json";
 import hiMort6 from "./locales/hi/mort6.json";
+
+import hibook from './locales/hi/book.json'
+import hiconsultation from './locales/hi/consultation.json'
 
 /* =========================
    DE
@@ -124,6 +130,9 @@ import deMort2 from "./locales/de/mort2.json";
 import deMort3 from "./locales/de/mort3.json";
 import deMort6 from "./locales/de/mort6.json";
 
+import debook from './locales/de/book.json'
+import deconsultation from './locales/de/consultation.json'
+
 /* =========================
    ES
 ========================= */
@@ -162,6 +171,9 @@ import esMort1 from "./locales/es/mort1.json";
 import esMort2 from "./locales/es/mort2.json";
 import esMort3 from "./locales/es/mort3.json";
 import esMort6 from "./locales/es/mort6.json";
+
+import esbook from './locales/es/book.json'
+import esconsultation from './locales/es/consultation.json'
 
 /* =========================
    FR
@@ -202,6 +214,9 @@ import frMort2 from "./locales/fr/mort2.json";
 import frMort3 from "./locales/fr/mort3.json";
 import frMort6 from "./locales/fr/mort6.json";
 
+import frbook from './locales/fr/book.json'
+import frconsultation from './locales/fr/consultation.json'
+
 /* =========================
    RU
 ========================= */
@@ -240,6 +255,9 @@ import ruMort1 from "./locales/ru/mort1.json";
 import ruMort2 from "./locales/ru/mort2.json";
 import ruMort3 from "./locales/ru/mort3.json";
 import ruMort6 from "./locales/ru/mort6.json";
+
+import rubook from './locales/ru/book.json'
+import ruconsultation from './locales/ru/consultation.json'
 
 /* =========================
    TR
@@ -280,6 +298,9 @@ import trMort2 from "./locales/tr/mort2.json";
 import trMort3 from "./locales/tr/mort3.json";
 import trMort6 from "./locales/tr/mort6.json";
 
+import trbook from './locales/tr/book.json'
+import trconsultation from './locales/tr/consultation.json'
+
 /* =========================
    ZH
 ========================= */
@@ -318,6 +339,9 @@ import zhMort1 from "./locales/zh/mort1.json";
 import zhMort2 from "./locales/zh/mort2.json";
 import zhMort3 from "./locales/zh/mort3.json";
 import zhMort6 from "./locales/zh/mort6.json";
+
+import zhbook from './locales/zh/book.json'
+import zhconsultation from './locales/zh/consultation.json'
 
 /* =========================
    TL
@@ -358,6 +382,8 @@ import tlMort1 from "./locales/tl/mort1.json";
 import tlMort2 from "./locales/tl/mort2.json";
 import tlMort3 from "./locales/tl/mort3.json";
 import tlMort6 from "./locales/tl/mort6.json";
+import tlbook from './locales/tl/book.json'
+// import tlconsultation from './locales/tl/consultation.json'
 
 /* =========================
    FA
@@ -495,7 +521,9 @@ i18n
         mort1: enMort1,
         mort2: enMort2,
         mort3: enMort3,
-        mort6: enMort6
+        mort6: enMort6,
+        book: enbook,
+        consultation: enconsultation
       },
 
       hi: {
@@ -532,7 +560,9 @@ i18n
         mort1: hiMort1,
         mort2: hiMort2,
         mort3: hiMort3,
-        mort6: hiMort6
+        mort6: hiMort6,
+        book: hibook,
+        consultation: hiconsultation
       },
 
       de: {
@@ -569,7 +599,9 @@ i18n
         mort1: deMort1,
         mort2: deMort2,
         mort3: deMort3,
-        mort6: deMort6
+        mort6: deMort6,
+        book: debook,
+        consultation: deconsultation
       },
 
       es: {
@@ -606,7 +638,9 @@ i18n
         mort1: esMort1,
         mort2: esMort2,
         mort3: esMort3,
-        mort6: esMort6
+        mort6: esMort6,
+        book: esbook,
+        consultation: esconsultation
       },
 
       fr: {
@@ -643,7 +677,9 @@ i18n
         mort1: frMort1,
         mort2: frMort2,
         mort3: frMort3,
-        mort6: frMort6
+        mort6: frMort6,
+        book: frbook,
+        consultation: frconsultation
       },
 
       ru: {
@@ -680,7 +716,9 @@ i18n
         mort1: ruMort1,
         mort2: ruMort2,
         mort3: ruMort3,
-        mort6: ruMort6
+        mort6: ruMort6,
+        book: rubook,
+        consultation: ruconsultation
       },
 
       tr: {
@@ -717,7 +755,9 @@ i18n
         mort1: trMort1,
         mort2: trMort2,
         mort3: trMort3,
-        mort6: trMort6
+        mort6: trMort6,
+        book: trbook,
+        consultation: trconsultation
       },
 
       zh: {
@@ -754,7 +794,9 @@ i18n
         mort1: zhMort1,
         mort2: zhMort2,
         mort3: zhMort3,
-        mort6: zhMort6
+        mort6: zhMort6,
+        book: zhbook,
+        consultation: zhconsultation
       },
 
       tl: {
@@ -791,7 +833,9 @@ i18n
         mort1: tlMort1,
         mort2: tlMort2,
         mort3: tlMort3,
-        mort6: tlMort6
+        mort6: tlMort6,
+        book: tlbook,
+        // consultation: tlconsultation
       },
 
       fa: {
@@ -816,7 +860,7 @@ i18n
       "buy1","buy2","buy3","buy4","buy5","buy6","buy7",
       "page3","ecosystem","whyPartner","stakeholders",
       "partnerForm","builtForEveryone", "cta",
-      "mort1","mort2","mort3","mort6"
+      "mort1","mort2","mort3","mort6", "book", "consultation"
     ],
 
     defaultNS: "common",
