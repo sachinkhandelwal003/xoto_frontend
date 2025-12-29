@@ -17,6 +17,7 @@ import { apiService } from '../../../manageApi/utils/custom.apiservice';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { useNavigate } from 'react-router-dom';
 
 // Fix for default marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -114,7 +115,7 @@ const MapPicker = ({ coords, onChange }) => {
 const Calculator = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [form] = Form.useForm();
-    const [estimationValue,setEstimationValue] = useState(0);
+  const [estimationValue, setEstimationValue] = useState(0);
   // Data Collections
   const [subcategories, setSubcategories] = useState([]);
   const [types, setTypes] = useState([]);
@@ -184,13 +185,14 @@ const Calculator = () => {
 
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
+  const navigate = useNavigate();
 
   const buildEstimateAnswersPayload = () => {
     return questions.map(q => {
       const userAnswer = answers[q._id];
 
       // TEXT / NUMBER / YES-NO
-      if (q.questionType !== "options" && q.questionType !=="yesorno") {
+      if (q.questionType !== "options" && q.questionType !== "yesorno") {
         return {
           question: q._id,
           questionText: q.question,
@@ -201,7 +203,7 @@ const Calculator = () => {
         };
       }
 
-      
+
       // OPTIONS / yes or no 
       const selectedOpt = q.options.find(
         opt => opt.title === userAnswer
@@ -387,7 +389,7 @@ const Calculator = () => {
 
     setLoading(prev => ({ ...prev, submitting: true }));
 
-  
+
 
     // Get selected type and subcategory details
     const selectedTypeData = types.find(t => t._id === selectedType);
@@ -421,7 +423,7 @@ const Calculator = () => {
         area: coords.area,
         address: coords.address
       },
-      answers:estimateAnswers
+      answers: estimateAnswers
     };
 
     console.log("Submitting payload:", JSON.stringify(payload, null, 2)); // For debugging
@@ -431,7 +433,7 @@ const Calculator = () => {
       console.log("API Response:", response);
 
       if (response.success) {
-        setActiveStep(6); // Move to success step
+        setActiveStep(5); // Move to success step
         message.success("Estimate submitted successfully!");
         setEstimationValue(response.final_price)
       } else {
@@ -445,8 +447,14 @@ const Calculator = () => {
     }
   };
 
+
   const handleNext = () => {
-    console.log("activeSteeeeeeeeeeeeeeeeeeeppppppppppppppppp",activeStep)
+    console.log("activeSteeeeeeeeeeeeeeeeeeeppppppppppppppppp", activeStep)
+    if(activeStep==5){
+      navigate("/")
+    }
+
+
     if (activeStep > 3) {
       onFinalSubmit();
       return;
@@ -577,7 +585,7 @@ const Calculator = () => {
           <motion.div {...variants}>
             <Title level={2} className="text-center mb-10">What are we designing?</Title>
             <Row gutter={[24, 24]}>
-            {[...subcategories].reverse().map(sub => (
+              {[...subcategories].reverse().map(sub => (
                 <Col xs={24} sm={12} md={8} key={sub._id} className='p-10'>
                   <SelectionCard
                     item={sub}
@@ -749,142 +757,142 @@ const Calculator = () => {
           </motion.div>
         );
 
-//       case 4:
-//         const selectedPkg = packages.find(p => p._id === selectedPackage);
-//         const selectedTypeData = types.find(t => t._id === selectedType);
-//         const selectedSubcat = subcategories.find(s => s._id === selectedSubcategory);
-
-//         return (
-//           <motion.div {...variants} className="max-w-5xl mx-auto">
-//             <Row gutter={48}>
-//               <Col xs={24} lg={10}>
-//                 <div className="rounded-[2.5rem] p-10 text-white h-full shadow-2xl" style={{ backgroundColor: BRAND_PURPLE }}>
-//                   <Title level={3} className="text-white mb-10">Design Summary</Title>
-//                   <div className="space-y-8">
-//                     <div>
-//                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Service Type</Text>
-//                       <Text strong className="text-white text-xl uppercase">
-//                         {selectedSubcat?.label || 'Landscaping'}
-//                       </Text>
-//                     </div>
-//                     <div>
-//                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Selected Style</Text>
-//                       <Text strong className="text-white text-xl">
-//                         {selectedTypeData?.label || 'Not selected'}
-//                       </Text>
-//                     </div>
-//                     <div>
-//                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Location</Text>
-//                       <Text strong className="text-white text-sm">
-//                         {coords.city ? `${coords.city}, ${coords.country}` : 'Location set'}
-//                       </Text>
-//                     </div>
-//                     <div>
-//                       <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Area Details</Text>
-//                       <Text strong className="text-white text-xl">{areaSqFt} SQ FT</Text>
-//                       <Text className="text-purple-300 text-xs">
-//                         ({length}ft × {width}ft)
-//                       </Text>
-//                     </div>
-//                     {/* <Divider className="border-purple-400 opacity-30" /> */}
-//                     {/* <div className="p-5 bg-white/10 rounded-2xl flex items-center justify-between border border-white/10">
-//                       <Text className="text-white">Tier Selection</Text>
-//                       <Tag color="gold" className="m-0 border-none font-bold px-3">
-//                         {selectedPkg?.name || 'Not selected'}
-//                       </Tag>
-//                     </div> */}
-//                   </div>
-//                 </div>
-//               </Col>
-//               <Col xs={24} lg={14}>
-//                 <Card className="rounded-[2.5rem] shadow-xl border-none p-6">
-//                   <div className="space-y-6">
-//                     <div>
-//                       <Text strong className="block mb-2">First Name *</Text>
-//                       <Input
-//                         size="large"
-//                         value={firstName}
-//                         onChange={e => setFirstName(e.target.value)}
-//                         prefix={<UserOutlined className="text-gray-300" />}
-//                         className="rounded-xl h-14"
-//                         placeholder="John"
-//                       />
-//                     </div>
-
-//                     <div>
-//                       <Text strong className="block mb-2">Last Name *</Text>
-//                       <Input
-//                         size="large"
-//                         value={lastName}
-//                         onChange={e => setLastName(e.target.value)}
-//                         prefix={<UserOutlined className="text-gray-300" />}
-//                         className="rounded-xl h-14"
-//                         placeholder="Doe"
-//                       />
-//                     </div>
-
-//                     <div>
-//                       <Text strong className="block mb-2">Email Address *</Text>
-//                       <Input
-//                         size="large"
-//                         value={email}
-//                         onChange={e => setEmail(e.target.value)}
-//                         prefix={<MailOutlined className="text-gray-300" />}
-//                         className="rounded-xl h-14"
-//                         placeholder="john@example.com"
-//                         type="email"
-//                       />
-//                     </div>
-
-//                     <div>
-//                       <Text strong className="block mb-2">Contact Number *</Text>
-//                       <Row gutter={8}>
-//                         <Col span={8}>
-//                           <Select
-//                             value={countryCode}
-//                             onChange={setCountryCode}
-//                             className="w-full rounded-xl h-14"
-//                             size="large"
-//                           >
-//                             {countryCodes.map(code => (
-//                               <Option key={code.value} value={code.value}>
-//                                 {code.label}
-//                               </Option>
-//                             ))}
-//                           </Select>
-//                         </Col>
-//                         <Col span={16}>
-//                           <Input
-//                             size="large"
-//                             value={phone}
-//                             onChange={e => setPhone(e.target.value)}
-//                             prefix={<PhoneFilled className="text-gray-300" />}
-//                             className="rounded-xl h-14"
-//                             placeholder="Phone number"
-//                           />
-//                         </Col>
-//                       </Row>
-//                     </div>
-// {/* 
-//                     <Button
-//                       type="primary"
-//                       onClick={onFinalSubmit}
-//                       loading={loading.submitting}
-//                       block
-//                       className="h-16 rounded-2xl text-lg mt-4 border-none shadow-xl"
-//                       style={{ backgroundColor: BRAND_PURPLE }}
-//                       disabled={!firstName || !lastName || !email || !phone}
-//                     >
-//                       Generate My Quotation
-//                     </Button> */}
-//                   </div>
-//                 </Card>
-//               </Col>
-//             </Row>
-//           </motion.div>
-//         );
-
       case 4:
+        const selectedPkg = packages.find(p => p._id === selectedPackage);
+        const selectedTypeData = types.find(t => t._id === selectedType);
+        const selectedSubcat = subcategories.find(s => s._id === selectedSubcategory);
+
+        return (
+          <motion.div {...variants} className="max-w-5xl mx-auto">
+            <Row gutter={48}>
+              <Col xs={24} lg={10}>
+                <div className="rounded-[2.5rem] p-10 text-white h-full shadow-2xl" style={{ backgroundColor: BRAND_PURPLE }}>
+                  <Title level={3} className="text-white mb-10">Design Summary</Title>
+                  <div className="space-y-8">
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Service Type</Text>
+                      <Text strong className="text-white text-xl uppercase">
+                        {selectedSubcat?.label || 'Landscaping'}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Selected Style</Text>
+                      <Text strong className="text-white text-xl">
+                        {selectedTypeData?.label || 'Not selected'}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Location</Text>
+                      <Text strong className="text-white text-sm">
+                        {coords.city ? `${coords.city}, ${coords.country}` : 'Location set'}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text className="text-purple-300 block text-xs uppercase tracking-widest mb-1">Area Details</Text>
+                      <Text strong className="text-white text-xl">{areaSqFt} SQ FT</Text>
+                      <Text className="text-purple-300 text-xs">
+                        ({length}ft × {width}ft)
+                      </Text>
+                    </div>
+                    {/* <Divider className="border-purple-400 opacity-30" /> */}
+                    {/* <div className="p-5 bg-white/10 rounded-2xl flex items-center justify-between border border-white/10">
+                      <Text className="text-white">Tier Selection</Text>
+                      <Tag color="gold" className="m-0 border-none font-bold px-3">
+                        {selectedPkg?.name || 'Not selected'}
+                      </Tag>
+                    </div> */}
+                  </div>
+                </div>
+              </Col>
+              <Col xs={24} lg={14}>
+                <Card className="rounded-[2.5rem] shadow-xl border-none p-6">
+                  <div className="space-y-6">
+                    <div>
+                      <Text strong className="block mb-2">First Name *</Text>
+                      <Input
+                        size="large"
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
+                        prefix={<UserOutlined className="text-gray-300" />}
+                        className="rounded-xl h-14"
+                        placeholder="John"
+                      />
+                    </div>
+
+                    <div>
+                      <Text strong className="block mb-2">Last Name *</Text>
+                      <Input
+                        size="large"
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        prefix={<UserOutlined className="text-gray-300" />}
+                        className="rounded-xl h-14"
+                        placeholder="Doe"
+                      />
+                    </div>
+
+                    <div>
+                      <Text strong className="block mb-2">Email Address *</Text>
+                      <Input
+                        size="large"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        prefix={<MailOutlined className="text-gray-300" />}
+                        className="rounded-xl h-14"
+                        placeholder="john@example.com"
+                        type="email"
+                      />
+                    </div>
+
+                    <div>
+                      <Text strong className="block mb-2">Contact Number *</Text>
+                      <Row gutter={8}>
+                        <Col span={8}>
+                          <Select
+                            value={countryCode}
+                            onChange={setCountryCode}
+                            className="w-full rounded-xl h-14"
+                            size="large"
+                          >
+                            {countryCodes.map(code => (
+                              <Option key={code.value} value={code.value}>
+                                {code.label}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Col>
+                        <Col span={16}>
+                          <Input
+                            size="large"
+                            value={phone}
+                            onChange={e => setPhone(e.target.value)}
+                            prefix={<PhoneFilled className="text-gray-300" />}
+                            className="rounded-xl h-14"
+                            placeholder="Phone number"
+                          />
+                        </Col>
+                      </Row>
+                    </div>
+                    {/* 
+                    <Button
+                      type="primary"
+                      onClick={onFinalSubmit}
+                      loading={loading.submitting}
+                      block
+                      className="h-16 rounded-2xl text-lg mt-4 border-none shadow-xl"
+                      style={{ backgroundColor: BRAND_PURPLE }}
+                      disabled={!firstName || !lastName || !email || !phone}
+                    >
+                      Generate My Quotation
+                    </Button> */}
+                  </div>
+                </Card>
+              </Col>
+            </Row>
+          </motion.div>
+        );
+
+      case 5:
         const pkg = packages.find(p => p._id === selectedPackage);
         return (
           <motion.div {...variants} className="text-center py-20">
@@ -1034,8 +1042,14 @@ const Calculator = () => {
               {activeStep > 0 && (
                 <div className="hidden sm:block text-right">
                   <Text className="text-[10px] text-gray-400 uppercase font-black block tracking-widest">Progress</Text>
-                  <Text strong style={{ color: BRAND_PURPLE }}>
+                  {/* <Text strong style={{ color: BRAND_PURPLE }}>
                     {Math.round(((activeStep + 1) / steps.length) * 100)}% Complete
+                  </Text> */}
+                  <Text strong style={{ color: BRAND_PURPLE }}>
+                    {Math.min(
+                      Math.round(((activeStep + 1) / steps.length) * 100),
+                      100
+                    )}% Complete
                   </Text>
                 </div>
               )}
