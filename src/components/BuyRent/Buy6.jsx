@@ -6,7 +6,7 @@ import bgTestimonial from "../../assets/img/bgimage.png";
 export default function TestimonialsSection() {
   const { t } = useTranslation("buy6");
   const scrollContainerRef = useRef(null);
-  const [activeBtn, setActiveBtn] = useState("right");
+  const [activeBtn, setActiveBtn] = useState(0);
 
   const scroll = (direction) => {
     if (!scrollContainerRef.current) return;

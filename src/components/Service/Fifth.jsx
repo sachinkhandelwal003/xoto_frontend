@@ -6,7 +6,7 @@ import image from "../../assets/img/wave/wave2.png";
 export default function TestimonialsSection() {
   const { t } = useTranslation("interior6");
   const scrollRef = useRef(null);
-  const [activeBtn, setActiveBtn] = useState("right");
+  const [activeBtn, setActiveBtn] = useState(0);
 
   // ✅ ALL CARDS (none removed)
   const testimonials = [

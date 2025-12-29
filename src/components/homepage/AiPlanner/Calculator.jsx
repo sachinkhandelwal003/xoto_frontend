@@ -577,7 +577,7 @@ const Calculator = () => {
           <motion.div {...variants}>
             <Title level={2} className="text-center mb-10">What are we designing?</Title>
             <Row gutter={[24, 24]}>
-              {subcategories.map(sub => (
+            {[...subcategories].reverse().map(sub => (
                 <Col xs={24} sm={12} md={8} key={sub._id} className='p-10'>
                   <SelectionCard
                     item={sub}

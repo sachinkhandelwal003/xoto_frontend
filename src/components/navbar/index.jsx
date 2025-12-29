@@ -42,7 +42,7 @@ const navItems = [
     ],
   },
   { key: "store", path: "/ecommerce/b2c" },
-  {
+  {   
     key: "knowledgeHub",
     children: [
       { key: "blogs", path: "/explore" },

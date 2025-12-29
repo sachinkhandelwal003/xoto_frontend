@@ -12,7 +12,7 @@ const Servicelandspacing = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [cardsPerSlide, setCardsPerSlide] = useState(2);
-  const [activeBtn, setActiveBtn] = useState("right");
+  const [activeBtn, setActiveBtn] = useState(0);
 
  const services = [
   {
@@ -152,37 +152,38 @@ const Servicelandspacing = () => {
           </div>
 
           {/* Navigation (UNCHANGED) */}
-          <div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
-            <button
-              onClick={() => {
-                prevSlide();
-                setActiveBtn("left");
-              }}
-              className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center
-                ${
-                  activeBtn === "left"
-                    ? "bg-[var(--color-primary)] text-white border border-transparent"
-                    : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-                }`}
-            >
-              ‹
-            </button>
+         <div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
+  <button
+    onClick={() => {
+      prevSlide();
+      setActiveBtn("left");
+    }}
+    className={`w-20 h-20 md:w-12 md:h-12 rounded-md flex items-center justify-center text-2xl md:text-3xl
+      ${
+        activeBtn === "left"
+          ? "bg-[var(--color-primary)] text-white border border-transparent"
+          : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+      }`}
+  >
+    ‹
+  </button>
 
-            <button
-              onClick={() => {
-                nextSlide();
-                setActiveBtn("right");
-              }}
-              className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center
-                ${
-                  activeBtn === "right"
-                    ? "bg-[var(--color-primary)] text-white border border-transparent"
-                    : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-                }`}
-            >
-              ›
-            </button>
-          </div>
+  <button
+    onClick={() => {
+      nextSlide();
+      setActiveBtn("right");
+    }}
+    className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center text-2xl md:text-3xl
+      ${
+        activeBtn === "right"
+          ? "bg-[var(--color-primary)] text-white border border-transparent"
+          : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+      }`}
+  >
+    ›
+  </button>
+</div>
+
         </div>
       </div>
     </section>

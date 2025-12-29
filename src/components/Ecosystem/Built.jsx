@@ -78,7 +78,7 @@ const StakeholderSection = () => {
       </div>
 
       {/* Boxes */}
-      <div className="relative max-w-6xl mx-auto py-5 md:py-10 px-2 md:px-4">
+      <div className="relative max-w-6xl mx-auto py-5 md:py-10 px-2 md:px-4 ">
         <div className="grid grid-cols-2 gap-2 md:gap-4">
 
           {/* Box 1 */}
