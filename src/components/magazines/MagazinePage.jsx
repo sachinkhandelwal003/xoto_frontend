@@ -50,7 +50,7 @@ const BuiltForEveryone = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [cardsToShow, setCardsToShow] = useState(2);
-  const [activeBtn, setActiveBtn] = useState("right");
+  const [activeBtn, setActiveBtn] = useState(0);  
 
   useEffect(() => {
     const handleResize = () => {
@@ -160,33 +160,39 @@ const BuiltForEveryone = () => {
             </div>
 
             <div className="flex gap-3 mt-8">
-              <button
-                onClick={() => {
-                  prevSlide();
-                  setActiveBtn("left");
-                }}
-                className={`p-3 rounded-sm border transition ${
-                  activeBtn === "left"
-                    ? "bg-[var(--color-primary)] text-white border-transparent"
-                    : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-                }`}
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
+<button
+  onClick={() => {
+    prevSlide();
+    setActiveBtn("left");
+  }}
+  className={`p-3 rounded-sm border transition-all duration-300
+    ${
+      activeBtn === "left"
+        ? "bg-[var(--color-primary)] text-white border-transparent"
+        : "bg-white text-black border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+    }
+  `}
+>
+  <ChevronLeft className="w-5 h-5" />
+</button>
 
-              <button
-                onClick={() => {
-                  nextSlide();
-                  setActiveBtn("right");
-                }}
-                className={`p-3 rounded-sm transition ${
-                  activeBtn === "right"
-                    ? "bg-[var(--color-primary)] text-white"
-                    : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-                }`}
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+<button
+  onClick={() => {
+    nextSlide();
+    setActiveBtn("right");
+  }}
+  className={`p-3 rounded-sm border transition-all duration-300
+    ${
+      activeBtn === "right"
+        ? "bg-[var(--color-primary)] text-white border-transparent"
+        : "bg-white text-black border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+    }
+  `}
+>
+  <ChevronRight className="w-5 h-5" />
+</button>
+
+
             </div>
           </div>
         </div>

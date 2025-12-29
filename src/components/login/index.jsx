@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 // Assets
 import loginimage from "../../assets/img/one.png";
-import logoNew from "../../assets/img/logoNew.png";
+import logoNew from "../../assets/img/logooo.png";
 import { 
   ShopOutlined, 
   UserOutlined,
@@ -447,11 +447,20 @@ const Login = () => {
                 transition={{ duration: 0.8 }}
                 style={{ textAlign: isMobile ? 'center' : 'left' }}
               >
-                <img 
-                  src={logoNew} 
-                  alt="Logo" 
-                  style={{ width: isMobile ? 100 : 150, marginBottom: 24, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.3))" }} 
-                />
+              {/* <img 
+  src={logoNew} 
+  alt="Logo" 
+  style={{
+    width: isMobile ? 200 : 260,
+    height: isMobile ? 200 : 260,
+    marginBottom: 24,
+    marginLeft: isMobile ? "auto" : 0,
+    marginRight: isMobile ? "auto" : 0,
+    display: "block",
+    filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.3))"
+  }} 
+/>
+
                 
                 <Title style={{ color: '#fff', fontSize: isMobile ? 32 : 48, fontWeight: 800, margin: 0, lineHeight: 1.1 }}>
                   Partner <br/>
@@ -463,7 +472,56 @@ const Login = () => {
                     ? "Connect, Collaborate, and Grow with our extensive ecosystem."
                     : `Welcome back, ${getSelectedPartner().label}. Let's get to work.`
                   }
-                </Text>
+                </Text> */}
+   <img 
+  src={logoNew} 
+  alt="Logo" 
+  style={{
+    width: isMobile ? 200 : 260,
+    height: isMobile ? 200 : 260,
+    marginBottom: 4, // 👈 same for mobile & desktop
+    marginLeft: isMobile ? "auto" : 0,
+    marginRight: isMobile ? "auto" : 0,
+    // display: "block",
+ 
+    filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.3))"
+  }} 
+/>
+
+
+<Title
+  style={{
+    color: '#fff',
+    fontSize: isMobile ? 32 : 48,
+    fontWeight: 800,
+    marginTop: 0,   // 👈 remove default gap
+    marginBottom: 6,
+    lineHeight: 1.02,
+       whiteSpace:"nowrap",
+  }}
+>
+  Partner 
+  <span style={{ color: '#03A4F4' }}>Login</span>
+</Title>
+
+
+
+<Text
+  style={{
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 18,
+    marginTop: 0, // 👈 no extra space
+    display: 'block',
+    maxWidth: 400
+  }}
+>
+  {!selectedPartnerType 
+    ? "Connect, Collaborate, and Grow with our extensive ecosystem."
+    : `Welcome back, ${getSelectedPartner().label}. Let's get to work.`
+  }
+</Text>
+
+
               </motion.div>
             </Col>
 
