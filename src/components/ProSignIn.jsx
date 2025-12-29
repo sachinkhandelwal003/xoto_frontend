@@ -7,7 +7,7 @@ const ProSignIn = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" 
-         style={{
+         style={{ 
            background: 'linear-gradient(135deg, #D26D45 0%, #9C3A1E 100%)'
          }}>
       <div className={`w-full max-w-md transition-all duration-500 ${isFocused ? 'scale-105' : 'scale-100'}`}>

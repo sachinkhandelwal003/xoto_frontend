@@ -248,7 +248,7 @@ function LayoutWrapper({ children }) {
 function App() {
   return (
     <LayoutWrapper>
-      {/* <LocationCategoryModal /> */}
+      {/* <LocationCategoryModal />  vsvv*/}
       <ScrollToTop />
       <Suspense fallback={<Loader />}>
         <Routes>
