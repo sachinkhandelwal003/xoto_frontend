@@ -167,7 +167,7 @@ export default function Footer() {
           {/* Location + Email */}
           <div className="relative">
             <h4 className="font-semibold mb-4">Locations</h4>
-            <p className="text-purple-200">India | UAE | Saudi Arabia</p>
+            <p className="text-purple-200">UAE </p>
 
             <h4 className="font-semibold mt-6 mb-2">Email</h4>
             <p className="text-purple-200">For Partners: connect@xoto.ae</p>

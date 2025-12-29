@@ -12,7 +12,7 @@ const Servicelandspacing = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [cardsPerSlide, setCardsPerSlide] = useState(2);
-  const [activeBtn, setActiveBtn] = useState("right");
+  const [activeBtn, setActiveBtn] = useState(0);
 
  const services = [
   {
@@ -158,7 +158,7 @@ const Servicelandspacing = () => {
       prevSlide();
       setActiveBtn("left");
     }}
-    className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center text-2xl md:text-3xl
+    className={`w-20 h-20 md:w-12 md:h-12 rounded-md flex items-center justify-center text-2xl md:text-3xl
       ${
         activeBtn === "left"
           ? "bg-[var(--color-primary)] text-white border border-transparent"

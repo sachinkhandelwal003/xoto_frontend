@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useTranslation } from "react-i18next"; // ✅ ADD
+import { useTranslation } from "react-i18next";
 import wave1 from "../../assets/img/wave/wave1.png";
 import round from "../../assets/img/round23.mp4";
 import rating from "../../assets/icons/Homeicons/rating.png";
@@ -12,45 +12,21 @@ import finance from "../../assets/icons/Homeicons/finance.png";
 import target from "../../assets/icons/Homeicons/target.png";
 
 const BuiltForEveryone = () => {
-  const { t } = useTranslation("home3"); // ✅ i18n namespace
+  const { t } = useTranslation("home3");
 
   const cards = [
-    {
-      icon: rating,
-      titleKey: "customers.title",
-      descKey: "customers.desc",
-    },
-    {
-      icon: vector,
-      titleKey: "business.title",
-      descKey: "business.desc",
-    },
-    {
-      icon: partner,
-      titleKey: "execution.title",
-      descKey: "execution.desc",
-    },
-    {
-      icon: dollar,
-      titleKey: "alliances.title",
-      descKey: "alliances.desc",
-    },
-    {
-      icon: target,
-      titleKey: "developers.title",
-      descKey: "developers.desc",
-    },
-    {
-      icon: finance,
-      titleKey: "finance.title",
-      descKey: "finance.desc",
-    },
+    { icon: rating, titleKey: "customers.title", descKey: "customers.desc" },
+    { icon: vector, titleKey: "business.title", descKey: "business.desc" },
+    { icon: partner, titleKey: "execution.title", descKey: "execution.desc" },
+    { icon: dollar, titleKey: "alliances.title", descKey: "alliances.desc" },
+    { icon: target, titleKey: "developers.title", descKey: "developers.desc" },
+    { icon: finance, titleKey: "finance.title", descKey: "finance.desc" },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [cardsToShow, setCardsToShow] = useState(2);
-  const [activeBtn, setActiveBtn] = useState(0);  
+  const [activeBtn, setActiveBtn] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -58,6 +34,7 @@ const BuiltForEveryone = () => {
       setIsMobile(mobile);
       setCardsToShow(mobile ? 1 : 2);
     };
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -84,6 +61,7 @@ const BuiltForEveryone = () => {
 
   return (
     <section className="relative bg-white overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
+      {/* Wave */}
       <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0">
         <img
           src={wave1}
@@ -97,10 +75,11 @@ const BuiltForEveryone = () => {
           className="text-center mb-12 lg:mb-16 heading-light"
           style={{ color: "var(--color-black)" }}
         >
-          {t("title")} {/* ✅ i18n title */}
+          {t("title")}
         </h2>
 
         <div className="flex flex-col lg:flex-row items-center justify-between">
+          {/* Video */}
           <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-25">
             <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
               <video
@@ -114,6 +93,7 @@ const BuiltForEveryone = () => {
             </div>
           </div>
 
+          {/* Slider */}
           <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
             <div className="relative w-full max-w-sm lg:max-w-2xl overflow-hidden">
               <div
@@ -159,7 +139,8 @@ const BuiltForEveryone = () => {
               </div>
             </div>
 
-            <div className="flex gap-3 mt-8">
+            {/* Arrows */}
+               <div className="flex gap-3 mt-8">
 <button
   onClick={() => {
     prevSlide();
