@@ -37,7 +37,9 @@ const typeConfig = {
   investor: { label: 'Investor', color: 'gold', icon: <RiseOutlined /> },
   developer: { label: 'Developer', color: 'geekblue', icon: <BuildOutlined /> },
   consultation: { label: 'Consultation', color: 'volcano', icon: <SolutionOutlined /> },
-  enquiry: { label: 'Enquiry', color: 'magenta', icon: <QuestionCircleOutlined /> }
+  enquiry: { label: 'Enquiry', color: 'magenta', icon: <QuestionCircleOutlined /> },
+    ai_enquiry: { label: 'AI-Enquiry', color: 'magenta', icon: <QuestionCircleOutlined /> }
+
 };
 
 const statusConfig = {

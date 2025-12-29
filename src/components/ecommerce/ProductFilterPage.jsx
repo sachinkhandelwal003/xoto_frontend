@@ -219,7 +219,7 @@ const ProductFilterPage = () => {
         <div 
           className="relative rounded-2xl overflow-hidden mb-8 mt-6 shadow-2xl"
           style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #420183ff 0%, #764ba2 100%)',
             height: '400px',
           }}
         >
@@ -244,38 +244,51 @@ const ProductFilterPage = () => {
                   AI-curated furniture collections that blend modern design with timeless elegance.
                   Transform your home with pieces that tell your story.
                 </p>
-                <div className="flex flex-wrap gap-4">
-                  <Button 
-                    type="primary" 
-                    size="large"
-                    style={{
-                      background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                      border: 'none',
-                      fontWeight: 'bold',
-                      padding: '0 32px',
-                      height: '48px',
-                      borderRadius: '8px',
-                    }}
-                  >
-                    Shop New Arrivals
-                  </Button>
-                  <Button 
-                    size="large"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '2px solid rgba(255, 255, 255, 0.3)',
-                      color: 'white',
-                      fontWeight: 'bold',
-                      padding: '0 32px',
-                      height: '48px',
-                      borderRadius: '8px',
-                      backdropFilter: 'blur(10px)',
-                    }}
-                  >
-                    <VideoCameraOutlined className="mr-2" />
-                    AR Preview
-                  </Button>
-                </div>
+               <div className="flex flex-wrap gap-4">
+  {/* Button 1 — Primary CTA */}
+  <Button
+    size="large"
+    className="
+      !bg-white
+      !text-black
+      font-bold
+      px-8
+      h-12
+      rounded-lg
+      border-2 border-transparent
+      transition-all duration-300 ease-out
+      hover:!bg-transparent
+      hover:!backdrop-blur-md
+      hover:!text-white
+      hover:!border-white
+    "
+  >
+    Shop New Arrivals
+  </Button>
+
+  {/* Button 2 — Glass CTA */}
+  <Button
+    size="large"
+    className="
+      !bg-white/10 
+      !border-2 !border-white/30 
+      !text-white 
+      font-bold
+      px-8
+      h-12
+      rounded-lg
+      backdrop-blur-md
+      transition-all duration-300 ease-out
+      hover:!bg-white
+      hover:!text-black
+      hover:!border-white
+    "
+  >
+    <VideoCameraOutlined className="mr-2" />
+    AR Preview
+  </Button>
+</div>
+
               </motion.div>
             </div>
             

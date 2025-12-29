@@ -42,7 +42,7 @@
     },
 
     "sell": {
-      "listingType": "Type d’annonce (ex. : Appartement)",
+      "listing_type": "Type d’annonce (ex. : Appartement)",
       "city": "Ville",
       "area": "Quartier",
       "project_name": "Nom du projet",

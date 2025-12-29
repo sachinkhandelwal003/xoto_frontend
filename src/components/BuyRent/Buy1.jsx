@@ -1,7 +1,6 @@
-// src/components/home/HeroSection.jsx
 import React, { useState } from "react";
 import Imagemain from "../../assets/img/buy.jpg";
-import toast, { Toaster } from "react-hot-toast";
+import { notification } from 'antd';
 import { useTranslation } from "react-i18next";
 import { apiService } from "../../manageApi/utils/custom.apiservice";
 import {
@@ -10,6 +9,14 @@ import {
   Phone,
   Mail,
   MessageCircle,
+  Globe,
+  User,       // Added for Name
+  BedDouble,  // Added for Bedrooms
+  Home,       // Added for Listing Type
+  Building2,  // Added for City/Project
+  MapPin,     // Added for Area
+  Banknote,   // Added for Price
+  FileText    // Added for Description
 } from "lucide-react";
 
 export default function HeroSection() {
@@ -17,11 +24,21 @@ export default function HeroSection() {
   const [openModal, setOpenModal] = useState(false);
   const [actionType, setActionType] = useState("Buy");
   const [loading, setLoading] = useState(false);
+  
+  const [api, contextHolder] = notification.useNotification();
+
+  // Country codes for Dubai, India, Russia
+  const countryCodes = [
+    { code: "+971", country: "UAE" },
+    { code: "+91", country: "IN" },
+    { code: "+7", country: "RU" },
+  ];
 
   const [buyForm, setBuyForm] = useState({
     first_name: "",
     last_name: "",
     email: "",
+    country_code: "+971",
     mobile: "",
     desired_bedrooms: "",
     preferred_contact: "whatsapp",
@@ -31,6 +48,7 @@ export default function HeroSection() {
     first_name: "",
     last_name: "",
     email: "",
+    country_code: "+971",
     mobile: "",
     listing_type: "",
     city: "",
@@ -49,17 +67,43 @@ export default function HeroSection() {
 
   const handleBuyChange = (e) => {
     const { name, value } = e.target;
-    setBuyForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "mobile") {
+      const numericValue = value.replace(/\D/g, "");
+      setBuyForm((prev) => ({ ...prev, [name]: numericValue }));
+    } else {
+      setBuyForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSellChange = (e) => {
     const { name, value } = e.target;
-    setSellForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "mobile") {
+      const numericValue = value.replace(/\D/g, "");
+      setSellForm((prev) => ({ ...prev, [name]: numericValue }));
+    } else {
+      setSellForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const openNotification = (type, title, description) => {
+    api[type]({
+      message: title,
+      description: description,
+      placement: 'topRight',
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const currentForm = actionType === "Buy" ? buyForm : sellForm;
+    
+    if (!currentForm.mobile || currentForm.mobile.length < 5) {
+       openNotification('error', 'Validation Error', t("Please enter a valid mobile number"));
+       setLoading(false);
+       return;
+    }
 
     const payload =
       actionType === "Buy"
@@ -69,7 +113,10 @@ export default function HeroSection() {
               first_name: buyForm.first_name.trim(),
               last_name: buyForm.last_name.trim(),
             },
-            mobile: { number: buyForm.mobile.replace(/\D/g, "").slice(-10) },
+            mobile: { 
+                country_code: buyForm.country_code,
+                number: buyForm.mobile 
+            },
             email: buyForm.email.toLowerCase().trim(),
             desired_bedrooms: buyForm.desired_bedrooms,
             preferred_contact: buyForm.preferred_contact,
@@ -80,7 +127,10 @@ export default function HeroSection() {
               first_name: sellForm.first_name.trim(),
               last_name: sellForm.last_name.trim(),
             },
-            mobile: { number: sellForm.mobile.replace(/\D/g, "").slice(-10) },
+            mobile: { 
+                country_code: sellForm.country_code,
+                number: sellForm.mobile 
+            },
             email: sellForm.email.toLowerCase().trim(),
             listing_type: sellForm.listing_type,
             city: sellForm.city,
@@ -96,20 +146,20 @@ export default function HeroSection() {
       const response = await apiService.post("/property/lead", payload);
 
       if (response.success) {
-        toast.success(
-          t("toast.success", {
-            name: actionType === "Buy" ? buyForm.first_name : sellForm.first_name,
-          })
+        openNotification(
+            'success', 
+            'Request Submitted Successfully', 
+            t("toast.success", { name: actionType === "Buy" ? buyForm.first_name : sellForm.first_name })
         );
 
         setOpenModal(false);
 
-        // Reset forms
         if (actionType === "Buy") {
           setBuyForm({
             first_name: "",
             last_name: "",
             email: "",
+            country_code: "+971",
             mobile: "",
             desired_bedrooms: "",
             preferred_contact: "whatsapp",
@@ -119,6 +169,7 @@ export default function HeroSection() {
             first_name: "",
             last_name: "",
             email: "",
+            country_code: "+971",
             mobile: "",
             listing_type: "",
             city: "",
@@ -133,7 +184,7 @@ export default function HeroSection() {
       }
     } catch (err) {
       console.error("Lead submission error:", err);
-      toast.error(t("toast.error"));
+      openNotification('error', 'Submission Failed', t("toast.error"));
     } finally {
       setLoading(false);
     }
@@ -141,17 +192,7 @@ export default function HeroSection() {
 
   return (
     <>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            borderRadius: "12px",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-          },
-        }}
-      />
+      {contextHolder}
 
       {/* HERO SECTION */}
       <section className="relative w-full overflow-hidden font-dm h-140">
@@ -215,212 +256,236 @@ export default function HeroSection() {
             <div className="p-8 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 border-b border-white/10">
               <div className="flex flex-col items-center mb-6">
                 <div className="flex bg-gradient-to-r from-blue-600 to-purple-600 p-1 rounded-2xl shadow-lg mb-6">
-                  {["Buy", "Sell"].map((type) => (
+                {["Buy", "Sell"].map((type) => (
                     <button
-                      key={type}
-                      onClick={() => setActionType(type)}
-                      className={`px-10 py-4 rounded-xl font-bold transition-all duration-300 ${
+                    key={type}
+                    onClick={() => setActionType(type)}
+                    className={`px-10 py-4 rounded-xl font-bold transition-all duration-300 ${
                         actionType === type
-                          ? "bg-white text-gray-900 shadow-lg"
-                          : "text-white/80 hover:text-white hover:bg-white/10"
-                      }`}
+                        ? "bg-white text-gray-900 shadow-lg"
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
                     >
-                      {type.toUpperCase()}
+                    {type.toUpperCase()}
                     </button>
-                  ))}
+                ))}
                 </div>
 
                 <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-purple-700 bg-clip-text text-transparent mb-2">
                   {actionType === "Sell" ? t("modal.sell.title") : t("modal.buy.title")}
                 </h2>
                 <p className="text-gray-600 text-center text-lg font-medium max-w-2xl">
-                  {actionType === "Sell" ? t("modal.sell.desc") : t("modal.buy.desc")}
+                   {actionType === "Sell" ? t("modal.sell.desc") : t("modal.buy.desc")}
                 </p>
               </div>
             </div>
 
             <div className="p-8 overflow-y-auto max-h-[60vh] custom-scrollbar">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Name Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="relative">
-                    <input
-                      name="first_name"
-                      value={actionType === "Buy" ? buyForm.first_name : sellForm.first_name}
-                      onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
-                      placeholder={t("form.firstName")}
-                      required
-                      className="premium-input pl-12"
-                    />
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
-                      👤
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <input
-                      name="last_name"
-                      value={actionType === "Buy" ? buyForm.last_name : sellForm.last_name}
-                      onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
-                      placeholder={t("form.lastName")}
-                      required
-                      className="premium-input pl-12"
-                    />
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
-                      👤
-                    </div>
-                  </div>
-                </div>
-
-                <div className="relative">
-                  <input
-                    name="email"
-                    type="email"
-                    value={actionType === "Buy" ? buyForm.email : sellForm.email}
-                    onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
-                    placeholder={t("form.email")}
-                    required
-                    className="premium-input pl-12"
-                  />
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
-                    <Mail size={20} />
-                  </div>
-                </div>
-
-                <div className="relative">
-                  <input
-                    name="mobile"
-                    value={actionType === "Buy" ? buyForm.mobile : sellForm.mobile}
-                    onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
-                    placeholder={t("form.phone")}
-                    required
-                    className="premium-input pl-12"
-                  />
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
-                    <Phone size={20} />
-                  </div>
-                </div>
-
-                {actionType === "Buy" ? (
-                  <>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Name Fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative">
-                      <input
-                        name="desired_bedrooms"
-                        value={buyForm.desired_bedrooms}
-                        onChange={handleBuyChange}
-                        placeholder={t("form.bedrooms")}
+                        <input
+                        name="first_name"
+                        value={actionType === "Buy" ? buyForm.first_name : sellForm.first_name}
+                        onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                        placeholder={t("form.firstName")}
                         required
                         className="premium-input pl-12"
-                      />
-                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
-                        🛌
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-gray-700 font-semibold mb-4 text-lg">
-                        {t("form.preferredContactTitle")}
-                      </p>
-                      <div className="grid grid-cols-3 gap-4">
-                        {[
-                          { value: "call", icon: <Phone size={18} />, label: t("form.contact.call") },
-                          { value: "whatsapp", icon: <MessageCircle size={18} />, label: t("form.contact.whatsapp") },
-                          { value: "email", icon: <Mail size={18} />, label: t("form.contact.email") },
-                        ].map(({ value, icon, label }) => (
-                          <label key={value} className="relative">
-                            <input
-                              type="radio"
-                              name="preferred_contact"
-                              value={value}
-                              checked={buyForm.preferred_contact === value}
-                              onChange={handleBuyChange}
-                              className="sr-only peer"
-                            />
-                            <div className="p-4 rounded-xl border-2 border-gray-200 bg-white cursor-pointer transition-all duration-300 hover:border-blue-400 hover:shadow-md peer-checked:border-blue-600 peer-checked:bg-gradient-to-r peer-checked:from-blue-50 peer-checked:to-purple-50 peer-checked:shadow-lg">
-                              <div className="flex flex-col items-center gap-2">
-                                <div className={`p-2 rounded-full ${buyForm.preferred_contact === value ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-500"}`}>
-                                  {icon}
-                                </div>
-                                <span className="text-sm font-medium">{label}</span>
-                              </div>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {[
-                        { name: "listing_type", placeholder: t("form.sell.listing_type"), icon: "🏠" },
-                        { name: "city", placeholder: t("form.sell.city"), icon: "🌆" },
-                        { name: "area", placeholder: t("form.sell.area"), icon: "📍" },
-                        { name: "project_name", placeholder: t("form.sell.project_name"), icon: "🏢" },
-                        { name: "bedroom_config", placeholder: t("form.sell.bedroom_config"), icon: "🛏️" },
-                        { name: "price", placeholder: t("form.sell.price"), icon: "💰" },
-                      ].map(({ name, placeholder, icon }) => (
-                        <div key={name} className="relative">
-                          <input
-                            name={name}
-                            value={sellForm[name]}
-                            onChange={handleSellChange}
-                            placeholder={placeholder}
-                            className="premium-input pl-12"
-                          />
-                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
-                            {icon}
-                          </div>
+                        />
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                           <User size={20} />
                         </div>
-                      ))}
+                    </div>
+                    <div className="relative">
+                        <input
+                        name="last_name"
+                        value={actionType === "Buy" ? buyForm.last_name : sellForm.last_name}
+                        onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                        placeholder={t("form.lastName")}
+                        required
+                        className="premium-input pl-12"
+                        />
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                           <User size={20} />
+                        </div>
+                    </div>
                     </div>
 
                     <div className="relative">
-                      <textarea
-                        name="description"
-                        value={sellForm.description}
-                        onChange={handleSellChange}
-                        placeholder={t("form.sell.description")}
-                        rows={4}
-                        className="premium-input pl-12 pt-4 resize-none"
-                      />
-                      <div className="absolute left-4 top-6 transform text-blue-600">
-                        📝
-                      </div>
+                    <input
+                        name="email"
+                        type="email"
+                        value={actionType === "Buy" ? buyForm.email : sellForm.email}
+                        onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                        placeholder={t("form.email")}
+                        required
+                        className="premium-input pl-12"
+                    />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                        <Mail size={20} />
                     </div>
-                  </>
-                )}
+                    </div>
 
-                {/* Checkboxes - अब translation से */}
-                <div className="space-y-4 pt-4">
-                  <label className="flex items-start gap-3 text-gray-700 text-sm p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
-                    <input type="checkbox" className="mt-1" />
-                    <span>{t("checkbox.marketing")}</span>
-                  </label>
+                    {/* MOBILE INPUT WITH COUNTRY CODE */}
+                    <div className="flex gap-3">
+                        <div className="relative w-32">
+                            <select
+                                name="country_code"
+                                value={actionType === "Buy" ? buyForm.country_code : sellForm.country_code}
+                                onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                                className="premium-input pl-10 pr-2 appearance-none cursor-pointer"
+                                style={{ backgroundImage: 'none' }} 
+                            >
+                                {countryCodes.map((item) => (
+                                    <option key={item.code} value={item.code}>
+                                        {item.code} ({item.country})
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-600 pointer-events-none">
+                                <Globe size={18} />
+                            </div>
+                        </div>
 
-                  <label className="flex items-start gap-3 text-gray-700 text-sm p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
-                    <input type="checkbox" required className="mt-1" />
-                    <span>{t("checkbox.terms")}</span>
-                  </label>
-                </div>
+                        <div className="relative flex-1">
+                            <input
+                                name="mobile"
+                                type="text"
+                                inputMode="numeric"
+                                value={actionType === "Buy" ? buyForm.mobile : sellForm.mobile}
+                                onChange={actionType === "Buy" ? handleBuyChange : handleSellChange}
+                                placeholder={t("form.phone")}
+                                required
+                                className="premium-input pl-12"
+                            />
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                                <Phone size={20} />
+                            </div>
+                        </div>
+                    </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="group w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-xl text-xl font-bold hover:shadow-xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-                >
-                  {loading ? (
+                    {actionType === "Buy" ? (
                     <>
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                      {t("form.processing")}
+                        <div className="relative">
+                        <input
+                            name="desired_bedrooms"
+                            value={buyForm.desired_bedrooms}
+                            onChange={handleBuyChange}
+                            placeholder={t("form.bedrooms")}
+                            required
+                            className="premium-input pl-12"
+                        />
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                           <BedDouble size={20} />
+                        </div>
+                        </div>
+
+                        <div>
+                        <p className="text-gray-700 font-semibold mb-4 text-lg">
+                            {t("form.preferredContactTitle")}
+                        </p>
+                        <div className="grid grid-cols-3 gap-4">
+                            {[
+                            { value: "call", icon: <Phone size={18} />, label: t("form.contact.call") },
+                            { value: "whatsapp", icon: <MessageCircle size={18} />, label: t("form.contact.whatsapp") },
+                            { value: "email", icon: <Mail size={18} />, label: t("form.contact.email") },
+                            ].map(({ value, icon, label }) => (
+                            <label key={value} className="relative">
+                                <input
+                                type="radio"
+                                name="preferred_contact"
+                                value={value}
+                                checked={buyForm.preferred_contact === value}
+                                onChange={handleBuyChange}
+                                className="sr-only peer"
+                                />
+                                <div className="p-4 rounded-xl border-2 border-gray-200 bg-white cursor-pointer transition-all duration-300 hover:border-blue-400 hover:shadow-md peer-checked:border-blue-600 peer-checked:bg-gradient-to-r peer-checked:from-blue-50 peer-checked:to-purple-50 peer-checked:shadow-lg">
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className={`p-2 rounded-full ${buyForm.preferred_contact === value ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-500"}`}>
+                                    {icon}
+                                    </div>
+                                    <span className="text-sm font-medium">{label}</span>
+                                </div>
+                                </div>
+                            </label>
+                            ))}
+                        </div>
+                        </div>
                     </>
-                  ) : (
+                    ) : (
                     <>
-                      {actionType === "Buy" ? t("form.submit.buy") : t("form.submit.sell")}
-                      <ArrowRight className="group-hover:translate-x-2 transition-transform" size={20} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {[
+                            { name: "listing_type", placeholder: t("form.sell.listing_type"), icon: <Home size={20} /> },
+                            { name: "city", placeholder: t("form.sell.city"), icon: <Building2 size={20} /> },
+                            { name: "area", placeholder: t("form.sell.area"), icon: <MapPin size={20} /> },
+                            { name: "project_name", placeholder: t("form.sell.project_name"), icon: <Building2 size={20} /> },
+                            { name: "bedroom_config", placeholder: t("form.sell.bedroom_config"), icon: <BedDouble size={20} /> },
+                            { name: "price", placeholder: t("form.sell.price"), icon: <Banknote size={20} /> },
+                        ].map(({ name, placeholder, icon }) => (
+                            <div key={name} className="relative">
+                            <input
+                                name={name}
+                                value={sellForm[name]}
+                                onChange={handleSellChange}
+                                placeholder={placeholder}
+                                className="premium-input pl-12"
+                            />
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600">
+                                {icon}
+                            </div>
+                            </div>
+                        ))}
+                        </div>
+
+                        <div className="relative">
+                        <textarea
+                            name="description"
+                            value={sellForm.description}
+                            onChange={handleSellChange}
+                            placeholder={t("form.sell.description")}
+                            rows={4}
+                            className="premium-input pl-12 pt-4 resize-none"
+                        />
+                        <div className="absolute left-4 top-6 transform text-blue-600">
+                           <FileText size={20} />
+                        </div>
+                        </div>
                     </>
-                  )}
-                </button>
-              </form>
+                    )}
+
+                    {/* Checkboxes */}
+                    <div className="space-y-4 pt-4">
+                    <label className="flex items-start gap-3 text-gray-700 text-sm p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
+                        <input type="checkbox" className="mt-1" />
+                        <span>{t("checkbox.marketing")}</span>
+                    </label>
+
+                    <label className="flex items-start gap-3 text-gray-700 text-sm p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
+                        <input type="checkbox" required className="mt-1" />
+                        <span>{t("checkbox.terms")}</span>
+                    </label>
+                    </div>
+
+                    <button
+                    type="submit"
+                    disabled={loading}
+                    className="group w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-xl text-xl font-bold hover:shadow-xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                    >
+                    {loading ? (
+                        <>
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                        {t("form.processing")}
+                        </>
+                    ) : (
+                        <>
+                        {actionType === "Buy" ? t("form.submit.buy") : t("form.submit.sell")}
+                        <ArrowRight className="group-hover:translate-x-2 transition-transform" size={20} />
+                        </>
+                    )}
+                    </button>
+                </form>
             </div>
           </div>
         </div>

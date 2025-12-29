@@ -42,7 +42,7 @@
     },
 
     "sell": {
-      "listingType": "房源类型（例如：公寓）",
+      "listing_type": "房源类型（例如：公寓）",
       "city": "城市",
       "area": "区域",
       "project_name": "项目名称",

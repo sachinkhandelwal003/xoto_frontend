@@ -42,7 +42,7 @@
     },
 
     "sell": {
-      "listingType": "Art der Anzeige (z. B. Wohnung)",
+      "listing_type": "Art der Anzeige (z. B. Wohnung)",
       "city": "Stadt",
       "area": "Gebiet",
       "project_name": "Projektname",

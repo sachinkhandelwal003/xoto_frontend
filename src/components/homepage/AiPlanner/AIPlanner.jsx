@@ -252,42 +252,90 @@ const AIPlanner = () => {
     <div className="flex h-[100dvh] bg-[#F8F9FC] font-sans overflow-hidden">
       
       {/* --- DESKTOP SIDEBAR (Hidden on Mobile) --- */}
-      <div 
-        className="hidden lg:block fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] shadow-sm hover:shadow-2xl overflow-hidden"
-        style={{ width: isSidebarHovered ? '280px' : '88px' }}
-        onMouseEnter={() => setIsSidebarHovered(true)}
-        onMouseLeave={() => setIsSidebarHovered(false)}
-      >
-        <div className="h-24 flex items-center px-8 mb-4">
-          <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-110">
-             <div className="flex gap-1">
-               <div className="w-1 h-4 bg-white rounded-full"/>
-               <div className="w-1 h-6 bg-white rounded-full"/>
-               <div className="w-1 h-4 bg-white rounded-full"/>
-             </div>
-          </div>
-          <span className={`ml-4 font-bold text-2xl tracking-tight transition-opacity duration-300 ${isSidebarHovered ? 'opacity-100' : 'opacity-0'}`}>
-            Xoto.AI
-          </span>
-        </div>
-        <div className="flex-1 flex flex-col gap-1">
-           <div onClick={()=>{navigate('/')}} className="flex items-center gap-5 px-6 py-3.5 text-gray-500 hover:bg-gray-50 hover:text-gray-900 cursor-pointer group/item relative">
-              <Home size={26} className="shrink-0" />
-              <span className={`text-base font-medium whitespace-nowrap transition-all duration-300 ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>Home</span>
-           </div>
-           <div className="flex items-center gap-5 px-6 py-3.5 text-purple-700 bg-purple-50 cursor-pointer relative">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-700 rounded-r-full" />
-              <Sparkles size={26} className="shrink-0" />
-              <span className={`text-base font-medium whitespace-nowrap transition-all duration-300 ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>AI Landscaping</span>
-           </div>
-        </div>
+     <div 
+  className="hidden lg:block fixed top-0 left-0 h-full bg-white border-r border-gray-300 z-50 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] shadow-sm hover:shadow-2xl overflow-hidden"
+  style={{ width: isSidebarHovered ? '280px' : '88px' }}
+  onMouseEnter={() => setIsSidebarHovered(true)}
+  onMouseLeave={() => setIsSidebarHovered(false)}
+>
+  {/* Logo */}
+  <div className="h-24 flex items-center px-6 mb-4">
+    <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-110">
+      <div className="flex gap-1">
+        <div className="w-1 h-4 bg-white rounded-full"/>
+        <div className="w-1 h-6 bg-white rounded-full"/>
+        <div className="w-1 h-4 bg-white rounded-full"/>
       </div>
+    </div>
+
+    {/* Logo Text */}
+    <span
+      className={`
+        ml-4 font-bold text-2xl tracking-tight
+        transition-all duration-300
+        ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
+      `}
+    >
+      Xoto.AI
+    </span>
+  </div>
+
+  {/* Menu */}
+  <div className="flex-1 flex flex-col gap-1">
+    
+    {/* Home */}
+    <div
+      onClick={() => navigate('/')}
+      className="flex items-center px-6 py-3.5 cursor-pointer hover:bg-gray-50 group relative"
+    >
+      {/* ICON FIXED SLOT */}
+      <div className="w-12 flex justify-center shrink-0">
+        <Home size={26} className="text-gray-500 group-hover:text-gray-900" />
+      </div>
+
+      {/* TEXT */}
+      <span
+        className={`
+          ml-2 text-base font-medium whitespace-nowrap
+          transition-all duration-300
+          ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
+        `}
+      >
+        Home
+      </span>
+    </div>
+
+    {/* Active */}
+    <div className="flex items-center px-6 py-3.5 bg-purple-50 text-purple-700 cursor-pointer relative">
+      
+      {/* Active Indicator */}
+      <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-700 rounded-r-full" />
+
+      {/* ICON FIXED SLOT */}
+      <div className="w-12 flex justify-center shrink-0">
+        <Sparkles size={26} />
+      </div>
+
+      {/* TEXT */}
+      <span
+        className={`
+          ml-2 text-base font-medium whitespace-nowrap
+          transition-all duration-300
+          ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}
+        `}
+      >
+        AI Landscaping
+      </span>
+    </div>
+  </div>
+</div>
+
 
       {/* --- MAIN CONTENT AREA --- */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative lg:ml-[88px] transition-all duration-300 w-full">
         
         {/* --- LEFT: CONFIGURATION PANEL (Scrollable on Mobile, Fixed Left on Desktop) --- */}
-        <div className="w-full lg:w-[460px] bg-white h-full overflow-y-auto p-4 lg:p-6 border-r border-gray-100 shrink-0 z-10 custom-scrollbar pb-24 lg:pb-6">
+        <div className="w-full lg:w-[460px] bg-white h-full  overflow-y-auto p-4 lg:p-6 border-r border-gray-400 shrink-0 z-10 custom-scrollbar pb-24 lg:pb-6">
           
           {/* Header Mobile Only */}
           <div className="lg:hidden flex items-center justify-between mb-6">
@@ -328,7 +376,7 @@ const AIPlanner = () => {
                 </p>
                 <button 
                   onClick={() => setShowUploadModal(true)}
-                  className="bg-black text-white px-6 py-3 lg:px-8 lg:py-4 rounded-full font-bold flex items-center gap-2 hover:bg-gray-800 transition-all shadow-xl text-sm lg:text-base"
+                  className="bg-[var(--color-primary)] text-white px-6 py-3 lg:px-8 lg:py-4 rounded-full font-bold flex items-center gap-2 hover:bg-gray-800 transition-all shadow-xl text-sm lg:text-base"
                 >
                   <Upload size={16} />
                   Add a photo
@@ -366,7 +414,6 @@ const AIPlanner = () => {
           <div className="bg-[#F3F4F6] rounded-2xl p-4 lg:p-5 mb-6 lg:mb-8 border border-transparent hover:border-gray-200">
             <div className="flex justify-between items-center mb-2">
                <span className="font-bold text-gray-800 text-sm lg:text-base">Custom Instructions</span>
-               <ChevronDown size={18} className="text-gray-400" />
             </div>
             <textarea 
               className="w-full bg-transparent border-none outline-none text-sm text-gray-600 placeholder-gray-400 resize-none"
@@ -626,5 +673,29 @@ const AIPlanner = () => {
     </div>
   );
 };
+<style jsx>{`
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }.
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: 9999px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    opacity: 0.9;
+  }
+
+  /* Firefox support */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) transparent;
+  }
+`}</style>
 
 export default AIPlanner;

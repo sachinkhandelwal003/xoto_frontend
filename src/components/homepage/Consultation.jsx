@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+// 1. Import Ant Design Notification
+import { notification } from 'antd';
 import { apiService } from "../../manageApi/utils/custom.apiservice";
-import { showSuccessAlert } from "../../manageApi/utils/sweetAlert";
+// Removed sweetAlert import
 import helloImage from "../../assets/img/hello.jpg";
 
 const countryCodes = [
@@ -17,6 +19,9 @@ const countryCodes = [
 
 export default function Consultation() {
   const [loading, setLoading] = useState(false);
+  // 2. Initialize Ant Design Notification Hook
+  const [api, contextHolder] = notification.useNotification();
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -40,22 +45,30 @@ export default function Consultation() {
     setFormData((prev) => ({ ...prev, number: value }));
   };
 
+  // 3. Helper to trigger notification
+  const openNotification = (type, title, description) => {
+    api[type]({
+      message: title,
+      description: description,
+      placement: 'topRight',
+    });
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.first_name.trim()) return alert("First name is required");
-    if (!formData.last_name.trim()) return alert("Last name is required");
-    if (!formData.email.includes("@")) return alert("Valid email is required");
-    if (formData.number.length < 8)
-      return alert("Mobile number must be at least 8 digits");
-    if (!formData.message.trim()) return alert("Message is required");
+    // Validation using Notification instead of alert
+    if (!formData.first_name.trim()) return openNotification('error', 'Validation Error', "First name is required");
+    if (!formData.last_name.trim()) return openNotification('error', 'Validation Error', "Last name is required");
+    if (!formData.email.includes("@")) return openNotification('error', 'Validation Error', "Valid email is required");
+    if (formData.number.length < 8) return openNotification('error', 'Validation Error', "Mobile number must be at least 8 digits");
+    if (!formData.message.trim()) return openNotification('error', 'Validation Error', "Message is required");
 
     setLoading(true);
 
     const payload = {
       type: "consultation",
       consultant_type: "landscape",
-
       name: {
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim(),
@@ -71,9 +84,11 @@ export default function Consultation() {
     try {
       await apiService.post("/property/lead", payload);
 
-      showSuccessAlert(
+      // 4. Success Notification
+      openNotification(
+        "success",
         "Thank You!",
-        "Your consultation request has been submitted successfully. We'll contact you within 24 hours!"
+        "Your consultation request for landscaping  has been submitted successfully. We'll contact you within 24 hours!"
       );
 
       setFormData({
@@ -85,7 +100,8 @@ export default function Consultation() {
         message: "",
       });
     } catch (err) {
-      alert(err.response?.data?.message || "Submission failed");
+      // Error Notification
+      openNotification("error", "Submission Failed", err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -93,6 +109,9 @@ export default function Consultation() {
 
   return (
     <section className="relative w-full overflow-hidden bg-gray-900">
+      {/* 5. Render Notification Context */}
+      {contextHolder}
+
       <img
         src={helloImage}
         alt="Luxury living room"

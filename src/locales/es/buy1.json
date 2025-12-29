@@ -42,7 +42,7 @@
     },
 
     "sell": {
-      "listingType": "Tipo de anuncio (por ejemplo: Apartamento)",
+      "listing_type": "Tipo de anuncio (por ejemplo: Apartamento)",
       "city": "Ciudad",
       "area": "Zona",
       "project_name": "Nombre del proyecto",

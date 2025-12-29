@@ -42,7 +42,7 @@
     },
 
     "sell": {
-      "listingType": "İlan Türü (örn: Daire)",
+      "listing_type": "İlan Türü (örn: Daire)",
       "city": "Şehir",
       "area": "Bölge",
       "project_name": "Proje Adı",

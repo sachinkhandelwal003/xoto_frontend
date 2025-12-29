@@ -42,7 +42,7 @@
     },
 
     "sell": {
-      "listingType": "Listing Type (e.g. Apartment)",
+      "listing_type": "Listing Type (e.g. Apartment)",
       "city": "City",
       "area": "Area",
       "project_name": "Project Name",

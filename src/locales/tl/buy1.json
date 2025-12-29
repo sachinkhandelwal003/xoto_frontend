@@ -42,7 +42,7 @@
     },
 
     "sell": {
-      "listingType": "Uri ng Listing (hal. Apartment)",
+      "listing_type": "Uri ng Listing (hal. Apartment)",
       "city": "Lungsod",
       "area": "Lugar",
       "project_name": "Pangalan ng Proyekto",

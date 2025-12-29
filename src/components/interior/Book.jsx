@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-
+// 1. Import Ant Design Notification
+import { notification } from 'antd';
 import { apiService } from "../../manageApi/utils/custom.apiservice";
-import { showSuccessAlert } from "../../manageApi/utils/sweetAlert";
-import helloImage from "../../assets/img/hello.jpg"; 
+// Removed sweetAlert import
+import helloImage from "../../assets/img/hello.jpg";
 
 const countryCodes = [
   { value: "+91", label: "+91 India" },
@@ -18,65 +18,77 @@ const countryCodes = [
 ];
 
 export default function ConsultationSection() {
-  // 🔥 IMPORTANT: interior3 namespace
-  const { t } = useTranslation("interior3");
-
   const [loading, setLoading] = useState(false);
+  // 2. Initialize Ant Design Notification Hook
+  const [api, contextHolder] = notification.useNotification();
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     email: "",
     country_code: "+971",
     number: "",
-    message: ""
+    message: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCountryCode = (value) => {
-    setFormData(prev => ({ ...prev, country_code: value }));
+    setFormData((prev) => ({ ...prev, country_code: value }));
   };
 
   const handleNumber = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 15);
-    setFormData(prev => ({ ...prev, number: value }));
+    setFormData((prev) => ({ ...prev, number: value }));
+  };
+
+  // 3. Helper to trigger notification
+  const openNotification = (type, title, description) => {
+    api[type]({
+      message: title,
+      description: description,
+      placement: 'topRight',
+    });
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.first_name.trim()) return alert(t("errors.firstName"));
-    if (!formData.last_name.trim()) return alert(t("errors.lastName"));
-    if (!formData.email.includes("@")) return alert(t("errors.email"));
-    if (formData.number.length < 8) return alert(t("errors.mobile"));
-    if (!formData.message.trim()) return alert(t("errors.message"));
+    // Validation using Notification instead of alert
+    if (!formData.first_name.trim()) return openNotification('error', 'Validation Error', "First name is required");
+    if (!formData.last_name.trim()) return openNotification('error', 'Validation Error', "Last name is required");
+    if (!formData.email.includes("@")) return openNotification('error', 'Validation Error', "Valid email is required");
+    if (formData.number.length < 8) return openNotification('error', 'Validation Error', "Mobile number must be at least 8 digits");
+    if (!formData.message.trim()) return openNotification('error', 'Validation Error', "Message is required");
 
     setLoading(true);
 
     const payload = {
-      type:"interior",
+      type: "consultation",
+      consultant_type: "interior",
       name: {
         first_name: formData.first_name.trim(),
-        last_name: formData.last_name.trim()
+        last_name: formData.last_name.trim(),
       },
       mobile: {
         country_code: formData.country_code,
-        number: formData.number
+        number: formData.number,
       },
       email: formData.email.trim().toLowerCase(),
       message: formData.message.trim(),
-      status: "submitted"
     };
 
     try {
-      await apiService.post("/consult/", payload);
+      await apiService.post("/property/lead", payload);
 
-      showSuccessAlert(
-        t("success.title"),
-        t("success.message")
+      // 4. Success Notification
+      openNotification(
+        "success",
+        "Thank You!",
+        "Your consultation request for interior has been submitted successfully. We'll contact you within 24 hours!"
       );
 
       setFormData({
@@ -85,11 +97,11 @@ export default function ConsultationSection() {
         email: "",
         country_code: "+971",
         number: "",
-        message: ""
+        message: "",
       });
-
     } catch (err) {
-      alert(t("errors.submit"));
+      // Error Notification
+      openNotification("error", "Submission Failed", err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -97,33 +109,37 @@ export default function ConsultationSection() {
 
   return (
     <section className="relative w-full overflow-hidden bg-gray-900">
+      {/* 5. Render Notification Context */}
+      {contextHolder}
+
       <img
         src={helloImage}
-        alt={t("imageAlt")}
+        alt="Luxury living room"
         className="absolute inset-0 h-full w-full object-cover opacity-70"
       />
 
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(180deg, rgba(92, 3, 155, 0.85) 20%, rgba(3, 164, 244, 0.85) 95%)",
+          background:
+            "linear-gradient(180deg, rgba(92, 3, 155, 0.85) 20%, rgba(3, 164, 244, 0.85) 95%)",
         }}
       />
 
-      <div className="relative z-10 mx-auto flex flex-col lg:flex-row items-start justify-start max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-16 gap-20">
-
-        {/* Heading */}
+      <div className="relative z-10 mx-auto flex flex-col lg:flex-row items-start justify-start max-w-7xl px-4 sm:px-6 lg:px-8  pt-16 pb-16 gap-20">
+        {/* Heading & Description */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           className="max-w-xl text-white text-center lg:text-left"
         >
-          <h2 className="mt-9 text-3xl sm:text-4xl md:text-5xl lg:text-6xl heading-dark-1 text-white">
-            {t("title")}
+          <h2 className="mt-9 text-3xl  sm:text-4xl md:text-5xl lg:text-6xl heading-dark-1 text-white">
+            Book Consultation
           </h2>
           <p className="mt-5 text-xl md:text-2xl paragraph-light-1">
-            {t("description")}
+            One simple form to connect with XOTO experts for tailored interior
+            design advice and project planning.
           </p>
         </motion.div>
 
@@ -136,34 +152,35 @@ export default function ConsultationSection() {
         >
           <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-2xl">
             <form onSubmit={onSubmit} className="space-y-4">
-
-              {/* First Name */}
+              {/* Name Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    {t("form.firstName")} <sup className="text-purple-600">*</sup>
+                    First Name <sup className="text-purple-600">*</sup>
                   </label>
                   <input
                     type="text"
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
-                    // placeholder={t("form.firstNamePlaceholder")}
+                    required
+                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-base focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition"
+                    placeholder="John"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    {t("form.lastName")} <sup className="text-purple-600">*</sup>
+                    Last Name <sup className="text-purple-600">*</sup>
                   </label>
                   <input
                     type="text"
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
-                    // placeholder={t("form.lastNamePlaceholder")}
+                    required
+                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-base focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition"
+                    placeholder="Doe"
                   />
                 </div>
               </div>
@@ -171,70 +188,94 @@ export default function ConsultationSection() {
               {/* Email */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.email")} <sup className="text-purple-600">*</sup>
+                  Email Address <sup className="text-purple-600">*</sup>
                 </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
-                  // placeholder={t("form.emailPlaceholder")}
+                  required
+                  className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-base focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition"
+                  placeholder="john@example.com"
                 />
               </div>
 
               {/* Mobile */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.mobile")} <sup className="text-purple-600">*</sup>
+                  Mobile Number <sup className="text-purple-600">*</sup>
                 </label>
                 <div className="flex gap-2">
                   <select
                     value={formData.country_code}
                     onChange={(e) => handleCountryCode(e.target.value)}
-                    className="rounded-xl border border-gray-300 px-3 py-2.5"
+                    className="rounded-xl border border-gray-300 px-3 py-2.5 bg-white text-gray-700 focus:border-purple-600 focus:ring-4 focus:ring-purple-100"
                   >
-                    {countryCodes.map(c => (
-                      <option key={c.value} value={c.value}>{c.label}</option>
+                    {countryCodes.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.label}
+                      </option>
                     ))}
                   </select>
                   <input
                     type="text"
                     value={formData.number}
                     onChange={handleNumber}
-                    className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5"
-                    // placeholder={t("form.mobilePlaceholder")}
+                    required
+                    maxLength={15}
+                    className="
+                    w-full
+                    flex-1
+                    rounded-xl
+                    border border-gray-300
+                    px-3 py-2
+                    sm:px-4 sm:py-2.5
+                    text-sm sm:text-base
+                    focus:border-purple-600
+                    focus:ring-4 focus:ring-purple-100
+                    transition
+                    "
+                    placeholder="501234567"
                   />
                 </div>
+                {formData.number && formData.number.length < 8 && (
+                  <p className="text-red-500 text-sm mt-1">
+                    Minimum 8 digits required
+                  </p>
+                )}
               </div>
 
               {/* Message */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.message")} <sup className="text-purple-600">*</sup>
+                  Your Message <sup className="text-purple-600">*</sup>
                 </label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
+                  required
                   rows={5}
-                  className="w-full rounded-xl border border-gray-300 px-5 py-2"
-                  // placeholder={t("form.messagePlaceholder")}
+                  className="w-full rounded-xl border border-gray-300 px-5 py-2 text-lg focus:border-purple-600 focus:ring-4 focus:ring-purple-100 transition resize-none"
+                  placeholder="Tell us about your project, budget, timeline, or any specific requirements..."
                 />
               </div>
 
               {/* Submit */}
               <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-xl bg-gradient-to-r from-purple-700 to-purple-900 py-3.5 text-lg font-bold text-white"
+                className="w-full rounded-xl bg-gradient-to-r from-purple-700 to-purple-900 py-3.5 text-lg font-bold text-white shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-70"
               >
-                {loading ? t("buttons.submitting") : t("buttons.submit")}
+                {loading ? "Submitting Request..." : "Book Free Consultation"}
               </motion.button>
             </form>
 
             <p className="text-center text-sm text-gray-500 mt-4">
-              {t("privacy")}
+              We respect your privacy. Your information is safe with us.
             </p>
           </div>
         </motion.div>

@@ -151,22 +151,7 @@ const ProductGrid = ({
               Sort By <DownOutlined className="ml-2" />
             </Button>
           </Dropdown>
-          <Button
-            type="primary"
-            size="large"
-            icon={<VideoCameraOutlined />}
-            onClick={() => setShowDesignerModal(true)}
-            style={{
-              background: "linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)",
-              border: "none",
-              borderRadius: "8px",
-              padding: "8px 24px",
-              fontWeight: "600",
-              height: "auto",
-            }}
-          >
-            Consult Designer
-          </Button>
+       
         </Space>
       </div>
 
@@ -222,7 +207,7 @@ const ProductGrid = ({
                         : "opacity-0"
                     }`}
                   >
-                    <div className="p-4 w-full">
+                    {/* <div className="p-4 w-full">
                       <Button
                         type="primary"
                         icon={<EyeOutlined />}
@@ -241,7 +226,7 @@ const ProductGrid = ({
                       >
                         View Details
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -333,7 +318,7 @@ const ProductGrid = ({
                       style={{
                         flex: 1,
                         background:
-                          "linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)",
+                          "linear-gradient(135deg, #5C039B 0%, #6366f1 100%)",
                         border: "none",
                         borderRadius: "8px",
                         fontWeight: "600",

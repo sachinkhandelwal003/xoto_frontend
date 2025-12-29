@@ -323,7 +323,7 @@ const Products = () => {
       className="w-full h-full object-cover transform scale-110"
     />
     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/70 to-black/60"></div>
-    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+    {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div> */}
   </div>
   
   <div className="relative z-10 max-w-7xl mx-auto px-6">
@@ -335,7 +335,7 @@ const Products = () => {
       >
     
         
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+        <h1 className="heading-light ">
           The <span className="text-[var(--color-primary)]">XOTO</span> Experience
         </h1>
         <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed">
