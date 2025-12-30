@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import houseimage from "../../assets/img/home/houseimage1.png";
-import wave1 from "../../assets/img/wave/wave1.png";
+import wave1 from "../../assets/img/wave/waveint2.png";
+
+// Import your icons
 import interior from "../../assets/img/icons123/interior.png";
 import exterior from "../../assets/img/icons123/extterior.png";
 import landscaping from "../../assets/img/icons123/landscaping.png";
@@ -13,168 +15,160 @@ import smart from "../../assets/img/icons123/smart.png";
 
 const HomeDesign = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation("home1"); // ✅ FIXED
+  const { t } = useTranslation("home1");
 
-const hotspots = [
-  {
-    key: "exterior",
-    icon: exterior,
-    link: "/",
-    style: `
-      top-[20%] left-[50%] -translate-x-1/2
-      sm:top-[10%] sm:left-[60%]
-      md:top-[1%] md:left-[55%]
-      lg:top-[12%] lg:left-[75%]
-    `,
-  },
-  {
-    key: "interior",
-    icon: interior,
-    link: "/services/interior",
-    style: `
-      top-[35%] right-[5%]
-      sm:top-[32%] sm:right-[8%]
-      md:top-[27%] md:right-[14%]
-      lg:top-[33%] lg:right-[0%]
-    `,
-  },
-  {
-    key: "furniture",
-    icon: smart,
-    link: "/",
-    style: `
-      bottom-[35%] right-[8%]
-      sm:bottom-[33%] sm:right-[10%]
-      md:bottom-[27%] md:right-[18%]
-      lg:bottom-[33%] lg:right-[1%]
-    `,
-  },
-  {
-    key: "landscaping",
-    icon: landscaping,
-    link: "/landscaping",
-    style: `
-      bottom-[11%] left-[50%] -translate-x-1/2
-      sm:bottom-[2%] sm:left-[60%]
-      md:bottom-[-6%] md:left-[55%]
-      lg:bottom-[5%] lg:left-[65%]
-    `,
-  },
-  {
-    key: "image",
-    icon: image,
-    link: "/",
-    style: `
-      bottom-[33%] left-[7%]
-      sm:bottom-[22%] sm:left-[24%]
-      md:bottom-[23%] md:left-[15%]
-      lg:bottom-[30%] lg:left-[24%]
-    `,
-  },
-  {
-    key: "virtual",
-    icon: virtual,
-    link: "/",
-    style: `
-      top-[38%] left-[5%]
-      sm:top-[36%] sm:left-[25%]
-      md:top-[30%] md:left-[16%]
-      lg:top-[37%] lg:left-[34%]
-    `,
-  },
-];
-
+  // Configuration for the floating cards
+  // Note: Positions use percentages so they stay relative to the image size
+  const hotspots = [
+    {
+      key: "exterior",
+      icon: exterior,
+      link: "/",
+      position: "top-[10%] right-[10%] sm:right-[15%] lg:top-[10%] lg:right-[20%]", 
+    },
+    {
+      key: "interior",
+      icon: interior,
+      link: "/services/interior",
+      position: "top-[38%] right-[-5%] sm:right-[0%] lg:top-[30%] lg:-right-[5%]",
+    },
+    {
+      key: "furniture",
+      icon: smart,
+      link: "/",
+      position: "bottom-[22%] right-[2%] sm:right-[5%] lg:bottom-[30%] lg:-right-[1%]",
+    },
+    {
+      key: "landscaping",
+      icon: landscaping,
+      link: "/landscaping",
+      position: "bottom-[-2%] left-[50%] -translate-x-1/2 lg:bottom-[2%] lg:left-[50%]",
+    },
+    {
+      key: "image",
+      icon: image,
+      link: "/",
+      position: "bottom-[20%] left-[-2%] sm:left-[0%] lg:bottom-[30%] lg:-left-[4%]",
+    },
+    {
+      key: "virtual",
+      icon: virtual,
+      link: "/",
+      position: "top-[25%] left-[-2%] sm:left-[0%] lg:top-[35%] lg:-left-[1%]",
+    },
+  ];
 
   return (
-    <section className="relative bg-[var(--color-body)] overflow-hidden pb-10 sm:pt-24 sm:pb-12 lg:pt-32 lg:pb-20">
-      <div className="relative w-full">
-        {/* Wave */}
-        <div className="absolute bottom-[-180px] left-0 w-full z-0">
-          <img src={wave1} alt="" className="w-full scale-[1.3]" />
-        </div>
+    <section className="relative  bg-[var(--color-body)]  overflow-hidden pt-12  lg:pt-12">
+      
+      {/* Background Decor (Wave) - Kept exactly as requested */}
+  {/* WAVE BACKGROUND */}
+ <div
+    className="
+      absolute
+      left-0
+      right-0
+      -bottom-16
+      z-0
+      xl:block
+    "
+  >
+    <img
+      src={wave1}
+      alt="wave-bg"
+      className="
+        w-full
+        object-cover
+        pointer-events-none
+        select-none
+      "
+    />
+  </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-center relative z-10">
-          {/* LEFT */}
-          <div className="space-y-8 flex flex-col items-center lg:items-start text-center  lg:text-left px-20">
+
+      <div className="max-w-[1540px] mx-auto px-4 sm:px-12 lg:px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-10">
+          
+          {/* --- LEFT CONTENT --- */}
+          {/* Centered on mobile, Left aligned on Desktop */}
+          <div className="flex flex-col items-center lg:items-start lg:ps-10 text-center lg:text-left space-y-6 lg:space-y-8 z-20">
+            
+            {/* Responsive Title Font */}
             <h2 className="heading-light text-black ">
               {t("homeDesign.title1")} <br />
               <span>{t("homeDesign.title2")}</span>
             </h2>
 
-            <p className="paragraph-light-1 text-gray-600">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-lg lg:max-w-xl leading-relaxed">
               {t("homeDesign.description")}
             </p>
 
             <Link
               to="/schedule/estimate"
-              className="bg-[var(--color-primary)] text-white px-14 py-3 rounded-lg font-semibold"
+              className="bg-[var(--color-primary)] text-white px-10 py-3 sm:px-14 sm:py-3.5 text-base sm:text-lg rounded-xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
               {t("homeDesign.cta")}
             </Link>
           </div>
 
-          {/* RIGHT IMAGE */}
-          <div className="relative flex  lg:justify-center md:justify-center sm:justify-center px-10 mt-10">
-            <div>
-          <img
-  src={houseimage}
-  alt={t("homeDesign.title2")}
-  className="
-    h-[300px] sm:h-[400px] lg:h-[500px]
-    object-contain
-    drop-shadow-2xl
-    mx-auto
-    lg:translate-x-[110px]
-  "
-/>
+          {/* --- RIGHT IMAGE & HOTSPOTS --- */}
+          <div className="relative flex justify-center items-center mt-4 pb-10  lg:mt-0">
+            {/* Image Container */}
+            <div className="relative w-full max-w-[450px] sm:max-w-[500px] lg:max-w-[850px] aspect-square flex items-center justify-center">
+              
+              {/* Main House Image */}
+              <img
+                src={houseimage}
+                alt="3D House Model"
+                className="w-full h-full object-contain drop-shadow-2xl z-10 relative scale-110 lg:scale-135 transition-transform duration-700 hover:scale-[1.15] lg:hover:scale-[1.4]"
+              />
 
+              {/* Hotspot Buttons */}
+              {hotspots.map((spot, index) => (
+                <button
+                  key={spot.key}
+                  onClick={() => navigate(spot.link)}
+                  className={`
+                    absolute ${spot.position}
+                    z-20 flex items-center 
+                    gap-2 lg:gap-3 
+                    bg-white 
+                    
+                    /* Responsive Padding */
+                    pr-2 pl-1 py-1 
+                    sm:pr-3 sm:pl-1.5 sm:py-1.5
+                    lg:pr-4 lg:pl-1.5 lg:py-1.5 
+                    
+                    rounded-full shadow-[0_4px_15px_rgb(0,0,0,0.1)] lg:shadow-[0_8px_30px_rgb(0,0,0,0.12)] 
+                    border border-gray-100
+                    
+                    /* Scale down on mobile to fit screen */
+                    transform transition-all duration-300 hover:scale-110 hover:shadow-xl
+                    scale-[0.8] sm:scale-90 lg:scale-100
+                    
+                    group cursor-pointer animate-in fade-in zoom-in duration-500 fill-mode-both
+                  `}
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  {/* Icon Circle - Responsive Size */}
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-sm shrink-0 group-hover:rotate-12 transition-transform">
+                    <img
+                      src={spot.icon}
+                      alt={spot.key}
+                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 object-contain brightness-0 invert"
+                    />
+                  </div>
 
-{/* Hotspots */}
-{hotspots.map((spot) => (
-  <button
-    key={spot.key}
-    onClick={() => navigate(spot.link)}
-    className={`
-      absolute ${spot.style}
-      flex items-center gap-1 sm:gap-2
-      bg-white
-      px-2 sm:px-3 md:px-4
-      py-1 sm:py-1.5 md:py-2
-      rounded-md sm:rounded-lg
-      shadow-md sm:shadow-lg md:shadow-xl
-      hover:bg-[#5C039B] hover:text-white
-      transition-all duration-200
-      whitespace-nowrap
-      text-[10px] sm:text-xs md:text-sm lg:text-sm
-      scale-90 sm:scale-95 md:scale-100
-    `}
-  >
-    {/* Icon */}
-    <span
-      className="
-        bg-green-500
-        p-1 sm:p-1.5 md:p-2
-        rounded-full
-        flex items-center justify-center
-      "
-    >
-      <img
-        src={spot.icon}
-        alt={t(`homeDesign.hotspots.${spot.key}`)}
-        className="w-3 h-3 sm:w-4 sm:h-4"
-      />
-    </span>
-
-    {/* Text (always visible) */}
-    <span className="font-semibold leading-tight">
-      {t(`homeDesign.hotspots.${spot.key}`)}
-    </span>
-  </button>
-))}
-
+                  {/* Text - Responsive Font Size */}
+                  <span className="text-[10px] sm:text-xs lg:text-sm font-bold text-gray-800 whitespace-nowrap">
+                    {t(`homeDesign.hotspots.${spot.key}`, spot.key.charAt(0).toUpperCase() + spot.key.slice(1))}
+                  </span>
+                </button>
+              ))}
 
             </div>
           </div>
+
         </div>
       </div>
     </section>

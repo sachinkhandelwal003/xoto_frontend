@@ -72,7 +72,7 @@ const BuiltForEveryone = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto">
         <h2
-          className="text-center mb-12 lg:mb-16 heading-light"
+          className="text-center mb-6 lg:mb-16 heading-light"
           style={{ color: "var(--color-black)" }}
         >
           {t("title")}

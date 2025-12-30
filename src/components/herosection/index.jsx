@@ -47,7 +47,7 @@ const HeroSection = () => {
           <p className="paragraph-light-1 text-lg">{t("hero.description")}</p>
 
           {/* Buttons */}
-          <div className="flex flex-wrap gap-4 justify-center lg:justify-start pt-4">
+          <div className="flex flex-row gap-4 justify-center lg:justify-start pt-4">
             <Link
               to="/aiPlanner"
               className="bg-[var(--color-primary)] px-8 py-3 rounded-md shadow-lg"
@@ -64,9 +64,9 @@ const HeroSection = () => {
           </div>
 
           {/* Features */}
-          <div className="mt-6 max-w-[460px] grid grid-cols-2 gap-6">
+          <div className="mt-6 md:max-w-[460px] grid grid-cols-2 gap-6 ">
             {features.map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
+              <div key={i} className="flex items-center gap-3  ">
                 <div className="w-10 h-10 bg-[var(--color-primary)] rounded-full flex items-center justify-center">
                   <img src={icons[i]} className="w-5 h-5" alt="" />
                 </div>

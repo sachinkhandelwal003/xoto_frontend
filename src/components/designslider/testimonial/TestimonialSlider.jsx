@@ -57,7 +57,6 @@ const EcosystemSlider = () => {
           centeredSlides
           loop
           grabCursor
-          slidesPerView={1}
           breakpoints={{
             480: { slidesPerView: 1.05, spaceBetween: 2 },
             640: { slidesPerView: 1.12, spaceBetween: 3 },
@@ -75,7 +74,7 @@ const EcosystemSlider = () => {
                   className={`
                     group relative flex flex-col sm:flex-row items-center 
                     sm:items-center justify-center sm:justify-start text-center 
-                    sm:text-left rounded-3xl min-h-[240px] sm:min-h-[260px] 
+                    sm:text-left rounded-[4rem] min-h-[240px] sm:min-h-[260px] 
                     md:min-h-[280px] lg:min-h-[220px] w-full mx-auto 
                     max-w-[300px] xs:max-w-[380px] sm:max-w-[520px]
                     md:max-w-[700px] lg:max-w-[860px] xl:max-w-[900px]
@@ -105,7 +104,7 @@ const EcosystemSlider = () => {
                   </div>
 
                   {/* Description */}
-                  <div className="flex flex-col flex-1 mt-4 sm:mt-0 px-2 sm:px-4">
+                  <div className="flex flex-col flex-1 mt-4 ms-6 sm:mt-0 px-2 sm:px-4">
                     <p className="leading-relaxed font-bold text-[14px] sm:text-[15px] md:text-[16px]">
                       {/* ⭐ dynamic translation → home4.json → descriptions.key */}
                       {t(`descriptions.${item.key}`)}

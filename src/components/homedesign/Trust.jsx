@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 
-import wave1 from "../../assets/img/wave/wave1.png";
+import wave1 from "../../assets/img/wave/waveint2.png";
 import wave2 from "../../assets/img/wave/wave2.png";
 
 import building from "../../assets/icons/Homeicons/building.png";
@@ -44,7 +44,7 @@ export default function TrustPresenceSection() {
       </div>
 
       {/* Background Bottom Wave */}
-      <div className="absolute bottom-[-40px] sm:bottom-[-70px] md:bottom-[-100px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0 overflow-hidden">
+      <div className="absolute bottom-[-40px] sm:bottom-[-70px] md:bottom-[-100px] lg:bottom-[-100px] xl:bottom-[-100px] left-0 w-full z-0 overflow-hidden">
         <img
           src={wave1}
           alt=""
@@ -114,8 +114,8 @@ export default function TrustPresenceSection() {
             transition-all duration-300 hover:-translate-y-3 border border-white/50
           "
         >
-          <div className="w-16 h-16 mx-auto mb-6">
-            <img src={building} alt="" />
+          <div className="w-30 h-30  flex align-center justify-center mx-auto mb-4 ">
+            <img src={building} alt="" className="" />
           </div>
           <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 text-center">
             {t("cards.card1.title")}
@@ -134,7 +134,7 @@ export default function TrustPresenceSection() {
             transition-all duration-300 hover:-translate-y-3 border border-white/50
           "
         >
-          <div className="w-16 h-16 mx-auto mb-6">
+          <div className="w-30 h-30  flex align-center justify-center mx-auto mb-4">
             <img src={sale} alt="" />
           </div>
           <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 text-center">
@@ -154,7 +154,7 @@ export default function TrustPresenceSection() {
             transition-all duration-300 hover:-translate-y-3 border border-white/50
           "
         >
-          <div className="w-16 h-16 mx-auto mb-6">
+          <div className="w-30 h-30  flex align-center justify-center mx-auto mb-4 ">
             <img src={rental} alt="" />
           </div>
           <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 text-center">
