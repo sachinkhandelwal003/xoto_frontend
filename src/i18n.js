@@ -383,7 +383,7 @@ import tlMort2 from "./locales/tl/mort2.json";
 import tlMort3 from "./locales/tl/mort3.json";
 import tlMort6 from "./locales/tl/mort6.json";
 import tlbook from './locales/tl/book.json'
-// import tlconsultation from './locales/tl/consultation.json'
+import tlconsultation from './locales/tl/consultation.json'
 
 /* =========================
    FA
@@ -835,7 +835,7 @@ i18n
         mort3: tlMort3,
         mort6: tlMort6,
         book: tlbook,
-        // consultation: tlconsultation
+        consultation: tlconsultation
       },
 
       fa: {

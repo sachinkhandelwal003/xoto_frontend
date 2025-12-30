@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import image from "../../assets/img/wave/waveint2.png";
+import { MapPin } from "lucide-react";
 
 const projects = [
   {
@@ -30,8 +31,7 @@ export default function DreamSpacesShowcase() {
   const autoSlideRef = useRef(null);
   const [activeBtn, setActiveBtn] = useState(0);
 
-  const next = () =>
-    setCurrentIndex((prev) => (prev + 1) % projects.length);
+  const next = () => setCurrentIndex((prev) => (prev + 1) % projects.length);
 
   const prev = () =>
     setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length);
@@ -55,17 +55,26 @@ export default function DreamSpacesShowcase() {
       <div className="mx-auto pt-12 relative z-10 px-4">
         {/* Header */}
         <div className="flex flex-col lg:flex-row gap-8 px-6 lg:px-10 mb-16 text-center lg:text-left items-center lg:items-start w-full">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1 text-black max-w-xl">
+            {t("showcase.title")} <br />
+            <span>{t("showcase.subtitle")}</span>
+          </h1>
 
-<h1 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1 text-black max-w-xl">
-  {t("showcase.title")} <br />
-  <span>{t("showcase.subtitle")}</span>
-</h1>
-
-<p className="text-base sm:text-lg text-[#547593] max-w-xl lg:ml-auto">
-  {t("showcase.description")}
-</p>
-
-</div>
+          <p
+            className="
+    font-medium
+    text-[24px]
+    leading-[33px]
+    tracking-[0]
+    text-[#547593]
+    max-w-[567px]
+    text-left
+    ml-auto
+  "
+          >
+            {t("showcase.description")}
+          </p>
+        </div>
 
         {/* Slider */}
         <div
@@ -75,13 +84,14 @@ export default function DreamSpacesShowcase() {
         >
           <div className="relative flex justify-center items-center h-[450px]">
             {/* Left */}
-            <div className="hidden md:block absolute left-0 w-[350px] opacity-70">
-              <img
-                src={projects[getIndex(-1)].img}
-                alt={t(projects[getIndex(-1)].title)}
-                className="h-64 w-full object-cover rounded-2xl"
-              />
-            </div>
+          <div className="hidden md:block absolute -left-[5%] w-[350px] opacity-70 overflow-hidden">
+  <img
+    src={projects[getIndex(-1)].img}
+    alt={t(projects[getIndex(-1)].title)}
+    className="h-64 w-full object-cover rounded-r-2xl"
+  />
+</div>
+
 
             {/* Main */}
             <div className="absolute w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl z-30">
@@ -91,32 +101,74 @@ export default function DreamSpacesShowcase() {
                 className="h-[400px] w-full object-cover"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 p-6">
-                <h3 className="text-3xl font-bold text-white">
+                <h3
+                  className="
+                  font-semibold
+                  text-[40px]
+                  leading-[36px]
+                  tracking-[0px]
+                  text-white
+                  text-left"
+                >
                   {t(projects[currentIndex].title)}
                 </h3>
-                <p className="text-gray-300 mt-2">
+
+                <p
+                  className="
+                  flex items-center gap-2
+                  font-medium
+                  text-[24px]
+                  leading-[23px]
+                  text-white
+                  mt-2
+                  py-4              "
+                >
+                  <MapPin size={18} className="text-white shrink-0" />
                   {t(projects[currentIndex].location)}
                 </p>
               </div>
             </div>
 
             {/* Right */}
-            <div className="hidden md:block absolute right-0 w-[350px] opacity-70">
-              <img
-                src={projects[getIndex(1)].img}
-                alt={t(projects[getIndex(1)].title)}
-                className="h-64 w-full object-cover rounded-2xl"
-              />
-            </div>
+          <div className="hidden md:block absolute -right-[5%] w-[350px] opacity-70 overflow-hidden">
+  <img
+    src={projects[getIndex(1)].img}
+    alt={t(projects[getIndex(1)].title)}
+    className="h-64 w-full object-cover rounded-l-2xl"
+  />
+</div>
+
           </div>
 
           {/* Controls */}
           <div className="flex justify-center gap-3 mt-8">
-            <button onClick={prev} className="p-3 border rounded-sm bg-white">
+            <button
+              onClick={prev}
+              className="
+              p-3
+              border
+              rounded-sm
+              bg-white
+              text-[#5C039B]
+              transition-colors duration-200
+              hover:bg-[#5C039B]
+              hover:text-white "
+            >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button onClick={next} className="p-3 border rounded-sm bg-white">
-              <ChevronRight className="w-5 h-5" />
+
+            <button
+              onClick={next}
+              className="    p-3
+    border
+    rounded-sm
+    bg-white
+    text-[#5C039B]
+    transition-colors duration-200
+    hover:bg-[#5C039B]
+    hover:text-white"
+            >
+              <ChevronRight className="w-5 h-5 " />
             </button>
           </div>
         </div>

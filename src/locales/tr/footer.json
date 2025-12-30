@@ -1,60 +1,46 @@
 {
   "company": {
-    "slogan": "Birleşik bir ekosistem <br/> Ömür boyu <br/> mülk değeri yaratıyor.",
-    "description": "Ölçeklenebilir. Yapay zekâ destekli. Hafif yapı."
+    "slogan": "Ömür boyu gayrimenkul değeri <br/> yaratan birleşik bir ekosistem.",
+    "description": "Ölçeklenebilir. Yapay zekâ destekli. Hafif varlık yapısı."
   },
-
   "titles": {
     "offerings": "Hizmetlerimiz",
-    "resources": "Partner Ekosistemi",
+    "resources": "Ortak Ekosistemi",
     "knowledge": "Hakkımızda",
-    "location": "Konum",
-    "email": "E-posta",
-    "contact": "İletişim"
+    "location": "Lokasyonlar",
+    "email": "E-posta"
   },
-
   "offerings": [
-    { "label": "Peyzaj", "path": "/landscaping" },
-    { "label": "İç Mekan", "path": "/interiors" },
-    { "label": "Kiralık", "path": "/rentals" },
-    { "label": "Satın Al", "path": "/buy" },
-    { "label": "Sat", "path": "/sell" },
-    { "label": "Konut Kredileri", "path": "/mortgage/services" }
+    { "label": "Peyzaj" },
+    { "label": "İç Mekanlar" },
+    { "label": "Kiralama" },
+    { "label": "Satın Al" },
+    { "label": "Sat" },
+    { "label": "Mortgage" },
+    { "label": "Bakım" }
   ],
-
   "resources": [
-    { "label": "Xoto İlanları", "path": "/properties" },
-    { "label": "Xoto’yu Keşfet", "path": "/explore" },
-    { "label": "AI Destekli", "path": "/ai" },
-    { "label": "Ücretsiz Danışmanlık", "path": "/consultation" },
-    { "label": "Freelancer Kirala", "path": "/freelancers" }
+    { "label": "Stratejik Ortaklık" },
+    { "label": "İş Ortakları" },
+    { "label": "Uygulama Ortakları" },
+    { "label": "Geliştiriciler" },
+    { "label": "Finansal Kurumlar" }
   ],
-
   "knowledge": [
-    { "label": "Hakkımızda", "path": "/about" },
-    { "label": "Bilgi Merkezi", "path": "/knowledge-centre" },
-    { "label": "Sürdürülebilirlik Odağımız", "path": "/sustainability" },
-    { "label": "Geri Bildirim Gönder", "path": "/feedback" },
-    { "label": "Bize Ulaşın", "path": "/contact" },
-    { "label": "Gizlilik Politikası", "path": "/privacy" },
-    { "label": "Kullanım Şartları", "path": "/terms" }
+    { "label": "Bilgi Merkezi" },
+    { "label": "Sürdürülebilirliğimiz" },
+    { "label": "Odak" },
+    { "label": "Geri Bildirim Gönder" },
+    { "label": "Bize Ulaşın" },
+    { "label": "Gizlilik Politikası" },
+    { "label": "Kullanım Şartları" }
   ],
-
-  "location": "BAE",
-
+  "locations": "Hindistan | BAE | Suudi Arabistan",
   "email": {
     "partners": "Partnerler için:",
     "customers": "Müşteriler için:"
   },
-
-  "social": [
-    { "name": "Facebook", "url": "#" },
-    { "name": "Instagram", "url": "#" },
-    { "name": "Twitter", "url": "#" },
-    { "name": "Linkedin", "url": "#" }
-  ],
-
   "bottom": {
-    "copyright": "©2025 Xoto. Tüm hakları saklıdır."
+    "copyright": "©2021 XOTO. Tüm hakları saklıdır"
   }
 }

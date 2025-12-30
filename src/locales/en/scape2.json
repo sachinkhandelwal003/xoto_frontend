@@ -7,7 +7,7 @@
         "Paving (interlock, tiles, stone)",
         "Pergolas & gazebos",
         "Decking (Wood, WPC, Composite)",
-        "Boundary walls & retaining walls",
+        "Boundary walls & fencing  Retaining walls",
         "Outdoor kitchens & BBQ stations",
         "Water features (fountains, waterfalls)"
       ]
@@ -15,9 +15,10 @@
     "softscape": {
       "title": "Softscape",
       "items": [
+        "Paving (interlock, tiles, stone)",
         "Soil preparation & levelling",
         "Plantation (trees, shrubs, groundcover)",
-        "Grass & lawn installation",
+        "Grass/lawn installation (natural & artificial) Flower beds & vertical gardens",
         "Mulching & soil amendments",
         "Seasonal planting & color themes"
       ]
@@ -25,8 +26,8 @@
     "pool": {
       "title": "Swimming Pools",
       "items": [
-        "Pool design & construction",
-        "Jacuzzis, spas & filtration systems"
+        "Pool design & construction Jacuzzis & spas",
+        "Reflecting pools & koi ponds Filtration & circulation systems"
       ]
     },
     "other": {
