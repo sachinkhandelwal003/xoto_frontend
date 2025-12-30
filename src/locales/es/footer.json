@@ -1,60 +1,46 @@
 {
   "company": {
-    "slogan": "Un ecosistema unificado <br/> creando valor de propiedad <br/> para toda la vida.",
+    "slogan": "Un ecosistema unificado para crear <br/> valor inmobiliario de por vida.",
     "description": "Escalable. Impulsado por IA. Ligero en activos."
   },
-
   "titles": {
-    "offerings": "Nuestras Ofertas",
+    "offerings": "Nuestros Servicios",
     "resources": "Ecosistema de Socios",
     "knowledge": "Sobre Nosotros",
-    "location": "Ubicación",
-    "email": "Correo",
-    "contact": "Contacto"
+    "location": "Ubicaciones",
+    "email": "Correo electrónico"
   },
-
   "offerings": [
-    { "label": "Paisajismo", "path": "/landscaping" },
-    { "label": "Interiores", "path": "/interiors" },
-    { "label": "Alquileres", "path": "/rentals" },
-    { "label": "Comprar", "path": "/buy" },
-    { "label": "Vender", "path": "/sell" },
-    { "label": "Hipotecas", "path": "/mortgage/services" }
+    { "label": "Paisajismo" },
+    { "label": "Interiores" },
+    { "label": "Alquileres" },
+    { "label": "Comprar" },
+    { "label": "Vender" },
+    { "label": "Hipotecas" },
+    { "label": "Mantenimiento" }
   ],
-
   "resources": [
-    { "label": "Propiedades Xoto", "path": "/properties" },
-    { "label": "Explorar Xoto", "path": "/explore" },
-    { "label": "IA Avanzada", "path": "/ai" },
-    { "label": "Consulta Gratis", "path": "/consultation" },
-    { "label": "Contratar Freelancers", "path": "/freelancers" }
+    { "label": "Alianza Estratégica" },
+    { "label": "Asociados Comerciales" },
+    { "label": "Socios de Ejecución" },
+    { "label": "Desarrolladores" },
+    { "label": "Instituciones Financieras" }
   ],
-
   "knowledge": [
-    { "label": "Sobre Nosotros", "path": "/about" },
-    { "label": "Centro de Conocimiento", "path": "/knowledge-centre" },
-    { "label": "Nuestro Enfoque Sostenible", "path": "/sustainability" },
-    { "label": "Enviar Comentarios", "path": "/feedback" },
-    { "label": "Contáctanos", "path": "/contact" },
-    { "label": "Política de Privacidad", "path": "/privacy" },
-    { "label": "Términos de Uso", "path": "/terms" }
+    { "label": "Centro de Conocimiento" },
+    { "label": "Nuestra Sostenibilidad" },
+    { "label": "Enfoque" },
+    { "label": "Enviar Comentarios" },
+    { "label": "Contacto" },
+    { "label": "Política de Privacidad" },
+    { "label": "Términos de Uso" }
   ],
-
-  "location": "EAU",
-
+  "locations": "India | EAU | Arabia Saudita",
   "email": {
-    "partners": "Para socios:",
-    "customers": "Para clientes:"
+    "partners": "Para Socios:",
+    "customers": "Para Clientes:"
   },
-
-  "social": [
-    { "name": "Facebook", "url": "#" },
-    { "name": "Instagram", "url": "#" },
-    { "name": "Twitter", "url": "#" },
-    { "name": "Linkedin", "url": "#" }
-  ],
-
   "bottom": {
-    "copyright": "©2025 Xoto. Todos los derechos reservados"
+    "copyright": "©2021 XOTO. Todos los derechos reservados"
   }
 }

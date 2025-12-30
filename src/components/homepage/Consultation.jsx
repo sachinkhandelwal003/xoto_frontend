@@ -20,7 +20,13 @@ const countryCodes = [
 ];
 
 export default function Consultation() {
-  const { t } = useTranslation("consultation"); // 🔑 added
+  const { t, i18n } = useTranslation("consultation"); // 🔑 added
+
+  const isRU = i18n.language === "ru";
+  const isDE = i18n.language === "de";
+  const isHI = i18n.language === "hi";
+  const isZH = i18n.language === "zh";
+
 
   const [loading, setLoading] = useState(false);
   // 2. Initialize Ant Design Notification Hook
@@ -139,9 +145,21 @@ export default function Consultation() {
           className="max-w-xl text-white text-center lg:text-left"
         >
 
-          <h2 className="mt-9 text-3xl  sm:text-4xl md:text-5xl lg:text-6xl heading-dark-1 text-white whitespace-nowrap">
-            {t("title")}
-          </h2>
+        <h2
+  className={`
+    consultation-title
+    mt-9
+    text-white
+    text-3xl sm:text-4xl md:text-5xl lg:text-6xl
+    ${["ru", "tl", "es" , "fr", "de"].includes(i18n.language)
+      ? "whitespace-normal"
+      : "whitespace-nowrap"}
+  `}
+>
+  {t("title")}
+</h2>
+
+
           <p className="mt-5 text-xl md:text-2xl paragraph-light-1">
             {t("description")}
           </p>

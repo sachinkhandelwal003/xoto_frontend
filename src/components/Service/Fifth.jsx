@@ -85,6 +85,12 @@ export default function TestimonialsSection() {
                     />
                   ))}
                 </div>
+                  
+                 <div className="flex justify-center py-3 mt-1 mb-4">
+  <div className="h-[4px] w-[213px] rounded-full bg-gradient-to-r from-[#03A4F4] to-[#64EF0A]" />
+</div>
+
+
 
                 <p className="font-medium text-gray-900">{item.name}</p>
                 <p className="text-sm text-gray-500">{item.location}</p>
@@ -94,29 +100,40 @@ export default function TestimonialsSection() {
         </div>
 
         {/* BUTTONS – UNCHANGED */}
-        <div className="flex justify-center gap-3 sm:gap-6 mt-6 sm:mt-8 md:mt-12 mb-4 z-10 relative">
-          <button
-            onClick={() => { slide(-1); setActiveBtn("left"); }}
-            className={`p-3 rounded-sm border ${
-              activeBtn === "left"
-                ? "bg-[var(--color-primary)] text-white border-transparent"
-                : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-            }`}
-          >
-            <ChevronLeft className="w-5 sm:w-7 h-5 sm:h-7" />
-          </button>
+       <div className="flex justify-center gap-3 sm:gap-6 mt-6 sm:mt-8 md:mt-12 mb-4 z-10 relative">
+  <button
+    onClick={() => {
+      slide(-1);
+      setActiveBtn("left");
+    }}
+    onMouseLeave={() => setActiveBtn(null)}
+    className={`p-3 rounded-sm border transition
+      ${
+        activeBtn === "left"
+          ? "bg-[var(--color-primary)] text-white border-transparent"
+          : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+      }`}
+  >
+    <ChevronLeft className="w-5 sm:w-7 h-5 sm:h-7" />
+  </button>
 
-          <button
-            onClick={() => { slide(1); setActiveBtn("right"); }}
-            className={`p-3 rounded-sm border ${
-              activeBtn === "right"
-                ? "bg-[var(--color-primary)] text-white border-transparent"
-                : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-            }`}
-          >
-            <ChevronRight className="w-5 sm:w-7 h-5 sm:h-7" />
-          </button>
-        </div>
+  <button
+    onClick={() => {
+      slide(1);
+      setActiveBtn("right");
+    }}
+    onMouseLeave={() => setActiveBtn(null)}
+    className={`p-3 rounded-sm border transition
+      ${
+        activeBtn === "right"
+          ? "bg-[var(--color-primary)] text-white border-transparent"
+          : "bg-white border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
+      }`}
+  >
+    <ChevronRight className="w-5 sm:w-7 h-5 sm:h-7" />
+  </button>
+</div>
+
       </div>
     {/* WAVE */}
       <div className="absolute left-0 w-full z-0 -bottom-110">

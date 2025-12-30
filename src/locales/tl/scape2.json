@@ -1,45 +1,51 @@
 {
-  "heading": "Aming Portfolio ng Serbisyo",
+  "heading": "Aming Portfolio ng Mga Serbisyo",
   "services": {
     "hardscape": {
       "title": "Hardscape",
       "items": [
-        "Paving at bato",
-        "Pergola at gazebo",
-        "Decking",
-        "Mga pader at bakod",
-        "Outdoor kitchen at BBQ",
-        "Water features"
+        "Paving (interlock, tiles, bato)",
+        "Pergolas at gazebos",
+        "Decking (Kahoy, WPC, Composite)",
+        "Boundary walls, bakod at retaining walls",
+        "Outdoor kitchens at BBQ stations",
+        "Mga water feature (fountain, waterfalls)"
       ]
     },
     "softscape": {
       "title": "Softscape",
       "items": [
-        "Paghahanda ng lupa",
-        "Pagtatanim",
-        "Pag-install ng damuhan",
-        "Mulching",
-        "Seasonal planting"
+        "Paving (interlock, tiles, bato)",
+        "Paghahanda at pag-level ng lupa",
+        "Pagtatanim (mga puno, palumpong, groundcover)",
+        "Pag-install ng damo (natural at artificial), flower beds at vertical gardens",
+        "Mulching at soil improvement",
+        "Seasonal planting at color themes"
       ]
     },
     "pool": {
       "title": "Swimming Pools",
       "items": [
-        "Disenyo at konstruksyon ng pool",
-        "Jacuzzi at filtration system"
+        "Disenyo at konstruksyon ng pool, jacuzzis at spas",
+        "Reflecting pools at koi ponds, filtration systems"
       ]
     },
     "other": {
-      "title": "Iba pang Solusyon",
+      "title": "Iba Pang Solusyon",
       "items": [
         "Payong",
         "Decking",
-        "Gazebo",
+        "Gazebos",
         "Planters",
         "Flooring",
         "BBQ",
-        "Paso at fountain"
+        "Mga paso at fountain"
       ]
+    },
+    "builder": {
+      "title": "Bigyang-buhay ang iyong ideya gamit ang aming interactive builder",
+      "description": "I-upload ang iyong espasyo o pumili ng template at makakuha ng instant AI-powered previews.",
+      "button": "Simulan ang unang hakbang"
     }
   }
 }

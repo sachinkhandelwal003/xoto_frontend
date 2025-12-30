@@ -1,60 +1,46 @@
 {
   "company": {
-    "slogan": "एकीकृत इकोसिस्टम <br/> जीवनभर की <br/> प्रॉपर्टी वैल्यू बनाता है।",
-    "description": "स्केलेबल। एआई-संचालित। एसेट-लाइट।"
+    "slogan": "एक एकीकृत इकोसिस्टम जो <br/> आजीवन संपत्ति मूल्य बनाता है।",
+    "description": "स्केलेबल। AI-संचालित। एसेट-लाइट।"
   },
-
   "titles": {
-    "offerings": "हमारी सेवाएँ",
+    "offerings": "हमारी सेवाएं",
     "resources": "पार्टनर इकोसिस्टम",
     "knowledge": "हमारे बारे में",
     "location": "स्थान",
-    "email": "ईमेल",
-    "contact": "संपर्क"
+    "email": "ईमेल"
   },
-
   "offerings": [
-    { "label": "लैंडस्केपिंग", "path": "/landscaping" },
-    { "label": "इंटीरियर्स", "path": "/interiors" },
-    { "label": "किराया", "path": "/rentals" },
-    { "label": "खरीदें", "path": "/buy" },
-    { "label": "बेचें", "path": "/sell" },
-    { "label": "बंधक", "path": "/mortgage/services" }
+    { "label": "लैंडस्केपिंग" },
+    { "label": "इंटीरियर्स" },
+    { "label": "रेंटल्स" },
+    { "label": "खरीदें" },
+    { "label": "बेचें" },
+    { "label": "मॉर्गेज" },
+    { "label": "मेंटेनेंस" }
   ],
-
   "resources": [
-    { "label": "Xoto प्रॉपर्टीज़", "path": "/properties" },
-    { "label": "Xoto एक्सप्लोर करें", "path": "/explore" },
-    { "label": "AI संचालित", "path": "/ai" },
-    { "label": "नि:शुल्क परामर्श", "path": "/consultation" },
-    { "label": "फ्रीलांसर हायर करें", "path": "/freelancers" }
+    { "label": "रणनीतिक गठबंधन" },
+    { "label": "व्यावसायिक सहयोगी" },
+    { "label": "एक्ज़ीक्यूशन पार्टनर्स" },
+    { "label": "डेवलपर्स" },
+    { "label": "वित्तीय संस्थान" }
   ],
-
   "knowledge": [
-    { "label": "हमारे बारे में", "path": "/about" },
-    { "label": "नॉलेज सेंटर", "path": "/knowledge-centre" },
-    { "label": "सस्टेनेबिलिटी फोकस", "path": "/sustainability" },
-    { "label": "अपना फीडबैक दें", "path": "/feedback" },
-    { "label": "संपर्क करें", "path": "/contact" },
-    { "label": "गोपनीयता नीति", "path": "/privacy" },
-    { "label": "उपयोग की शर्तें", "path": "/terms" }
+    { "label": "नॉलेज सेंटर" },
+    { "label": "हमारी स्थिरता" },
+    { "label": "फोकस" },
+    { "label": "फीडबैक भेजें" },
+    { "label": "संपर्क करें" },
+    { "label": "प्राइवेसी पॉलिसी" },
+    { "label": "उपयोग की शर्तें" }
   ],
-
-  "location": "यूएई",
-
+  "locations": "भारत | यूएई | सऊदी अरब",
   "email": {
-    "partners": "साझेदारों के लिए:",
+    "partners": "पार्टनर्स के लिए:",
     "customers": "ग्राहकों के लिए:"
   },
-
-  "social": [
-    { "name": "Facebook", "url": "#" },
-    { "name": "Instagram", "url": "#" },
-    { "name": "Twitter", "url": "#" },
-    { "name": "Linkedin", "url": "#" }
-  ],
-
   "bottom": {
-    "copyright": "©2025 Xoto. सर्वाधिकार सुरक्षित"
+    "copyright": "©2021 XOTO. सर्वाधिकार सुरक्षित"
   }
 }

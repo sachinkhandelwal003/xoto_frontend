@@ -1,60 +1,46 @@
 {
   "company": {
-    "slogan": "Isang Pinag-isang Ecosystem <br/> Lumilikha ng Haba-buhay <br/> na Halaga sa Property.",
-    "description": "Scalable. Pinapagana ng AI. Magaang pamahalaan."
+    "slogan": "Isang pinag-isang ecosystem para sa <br/> panghabambuhay na halaga ng ari-arian.",
+    "description": "Nasusukat. Pinapagana ng AI. Asset-light."
   },
-
   "titles": {
-    "offerings": "Ating Mga Alok",
+    "offerings": "Aming Mga Serbisyo",
     "resources": "Partner Ecosystem",
-    "knowledge": "Tungkol sa Amin",
-    "location": "Lokasyon",
-    "email": "Email",
-    "contact": "Contact"
+    "knowledge": "Tungkol Sa Amin",
+    "location": "Mga Lokasyon",
+    "email": "Email"
   },
-
   "offerings": [
-    { "label": "Landscaping", "path": "/landscaping" },
-    { "label": "Interiors", "path": "/interiors" },
-    { "label": "Rentals", "path": "/rentals" },
-    { "label": "Buy", "path": "/buy" },
-    { "label": "Sell", "path": "/sell" },
-    { "label": "Mortgages", "path": "/mortgage/services" }
+    { "label": "Landscaping" },
+    { "label": "Interiors" },
+    { "label": "Rentals" },
+    { "label": "Bumili" },
+    { "label": "Magbenta" },
+    { "label": "Mortgage" },
+    { "label": "Maintenance" }
   ],
-
   "resources": [
-    { "label": "Xoto Properties", "path": "/properties" },
-    { "label": "Explore Xoto", "path": "/explore" },
-    { "label": "AI Driven", "path": "/ai" },
-    { "label": "Free Consultation", "path": "/consultation" },
-    { "label": "Hire Freelancers", "path": "/freelancers" }
+    { "label": "Strategic Alliance" },
+    { "label": "Business Associates" },
+    { "label": "Execution Partners" },
+    { "label": "Developers" },
+    { "label": "Financial Institutions" }
   ],
-
   "knowledge": [
-    { "label": "About Us", "path": "/about" },
-    { "label": "Knowledge Centre", "path": "/knowledge-centre" },
-    { "label": "Our Sustainability Focus", "path": "/sustainability" },
-    { "label": "Submit Your Feedback", "path": "/feedback" },
-    { "label": "Contact Us", "path": "/contact" },
-    { "label": "Privacy Policy", "path": "/privacy" },
-    { "label": "Terms Of Use", "path": "/terms" }
+    { "label": "Knowledge Centre" },
+    { "label": "Our Sustainability" },
+    { "label": "Focus" },
+    { "label": "Magpadala ng Feedback" },
+    { "label": "Makipag-ugnayan" },
+    { "label": "Patakaran sa Privacy" },
+    { "label": "Mga Tuntunin ng Paggamit" }
   ],
-
-  "location": "UAE",
-
+  "locations": "India | UAE | Saudi Arabia",
   "email": {
-    "partners": "Para sa Partners:",
-    "customers": "Para sa Customers:"
+    "partners": "Para sa Mga Partner:",
+    "customers": "Para sa Mga Customer:"
   },
-
-  "social": [
-    { "name": "Facebook", "url": "#" },
-    { "name": "Instagram", "url": "#" },
-    { "name": "Twitter", "url": "#" },
-    { "name": "Linkedin", "url": "#" }
-  ],
-
   "bottom": {
-    "copyright": "©2025 Xoto. Lahat ng karapatan ay nakalaan."
+    "copyright": "©2021 XOTO. Lahat ng karapatan ay nakalaan"
   }
 }

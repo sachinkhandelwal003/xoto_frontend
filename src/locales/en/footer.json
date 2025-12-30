@@ -1,6 +1,6 @@
 {
   "company": {
-    "slogan": "A Unified Ecosystem  Creating <br/> life time property Value.",
+    "slogan": "A Unified Ecosystem Creating <br/> life time property Value.",
     "description": "Scalable. AI–powered. Asset–light."
   },
 
@@ -8,9 +8,8 @@
     "offerings": "Our Offerings",
     "resources": "Partner Ecosystem",
     "knowledge": "About Us",
-    "location": "Location",
-    "email": "Email",
-    "contact": "Contact"
+    "location": "Locations",
+    "email": "Email"
   },
 
   "offerings": [
@@ -19,42 +18,43 @@
     { "label": "Rentals", "path": "/rentals" },
     { "label": "Buy", "path": "/buy" },
     { "label": "Sell", "path": "/sell" },
-    { "label": "Mortgages", "path": "/mortgage/services" }
+    { "label": "Mortgages", "path": "/mortgage/services" },
+    { "label": "Maintenance", "path": "/maintenance" }
   ],
 
   "resources": [
-    { "label": "Xoto Properties", "path": "/properties" },
-    { "label": "Explore Xoto", "path": "/explore" },
-    { "label": "AI Driven", "path": "/ai" },
-    { "label": "Free Consultation", "path": "/consultation" },
-    { "label": "Hire Freelancers", "path": "/freelancers" }
+    { "label": "Strategic Alliance", "path": "/strategic-alliance" },
+    { "label": "Business Associates", "path": "/business-associates" },
+    { "label": "Execution Partners", "path": "/execution-partners" },
+    { "label": "Developers", "path": "/developers" },
+    { "label": "Financial Institutions", "path": "/financial-institutions" }
   ],
 
   "knowledge": [
-    { "label": "About Us", "path": "/about" },
     { "label": "Knowledge Centre", "path": "/knowledge-centre" },
-    { "label": "Our Sustainability Focus", "path": "/sustainability" },
+    { "label": "Our Sustainability", "path": "/sustainability" },
+    { "label": "Focus", "path": "/focus" },
     { "label": "Submit Your Feedback", "path": "/feedback" },
     { "label": "Contact Us", "path": "/contact" },
     { "label": "Privacy Policy", "path": "/privacy" },
     { "label": "Terms Of Use", "path": "/terms" }
   ],
 
-  "location": "UAE",
+  "locations": "India | UAE | Saudi Arabia",
 
   "email": {
-    "partners": "For Partners:",
-    "customers": "For Customers:"
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
   },
 
   "social": [
     { "name": "Facebook", "url": "#" },
     { "name": "Instagram", "url": "#" },
     { "name": "Twitter", "url": "#" },
-    { "name": "Linkedin", "url": "#" }
+    { "name": "LinkedIn", "url": "#" }
   ],
 
   "bottom": {
-    "copyright": "©2025 Xoto. All rights reserved"
+    "copyright": "©2021 XOTO. All rights reserved"
   }
 }
