@@ -110,10 +110,10 @@ const AIPlanner = () => {
       return;
     }
 
-    // if (!isCustomerLoggedIn) {
-    //   setShowAuthModal(true);
-    //   return;
-    // }
+    if (!isCustomerLoggedIn) {
+      setShowAuthModal(true);
+      return;
+    }
 
     // Removed the hasUsedFreeCredit check. 
     // We now let the backend decide if the user has reached their limit.

@@ -142,6 +142,46 @@ const Calculator = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [selectedImages, setSelectedImages] = useState([]);
+
+
+  const toggleImageSelect = (img) => {
+    setSelectedImages((prev) => {
+      const exists = prev.some(i => i.id === img.id);
+
+      if (exists) {
+        // remove image
+        return prev.filter(i => i.id !== img.id);
+      }
+
+      // add image
+      return [...prev, img];
+    });
+  };
+
+  const getAllImages = async () => {
+    try {
+      const res = await fetch(
+        `https://xoto.ae/api/estimate/master/category/types/${selectedType}/gallery`
+      );
+
+      const data = await res.json();
+
+      console.log("We got this from galllery images", data);
+      // assuming res.data or res.gallery
+      setGalleryImages(data?.gallery?.moodboardImages || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedType) {
+      getAllImages();
+    }
+  }, [selectedType]);
+
 
   const [loading, setLoading] = useState({
     subcat: true,
@@ -450,7 +490,7 @@ const Calculator = () => {
 
   const handleNext = () => {
     console.log("activeSteeeeeeeeeeeeeeeeeeeppppppppppppppppp", activeStep)
-    if(activeStep==5){
+    if (activeStep == 5) {
       navigate("/")
     }
 
@@ -906,6 +946,52 @@ const Calculator = () => {
                 </div>
               </div>
             </div>
+
+            {/* IMAGE SELECTION SECTION */}
+            <div className="mt-16 max-w-6xl mx-auto">
+              <Text className="text-gray-400 uppercase tracking-widest block mb-6 text-center">
+                Select Applicable Design / Finish
+              </Text>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {galleryImages.map((img) => {
+                  const isSelected = selectedImages.some(i => i.id === img.id);
+
+                  return (
+                    <div
+                      key={img._id}
+                      onClick={() => toggleImageSelect(img)}
+                      className={`relative cursor-pointer rounded-2xl overflow-hidden border-4 transition-all
+            ${isSelected ? "border-purple-600 scale-105" : "border-transparent hover:scale-105"}
+          `}
+                    >
+                      <img
+                        src={`https://xoto.ae/api${img.url}`}
+                        alt={img.title}
+                        className="w-full h-48 object-cover"
+                      />
+
+                      {/* Overlay */}
+                      <div
+                        className={`absolute inset-0 bg-black/40 flex items-center justify-center
+              ${isSelected ? "opacity-100" : "opacity-0 hover:opacity-100"}
+            `}
+                      >
+                        <span className="text-white text-lg font-semibold">
+                          {isSelected ? "Selected" : "Select"}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <div className="absolute bottom-0 w-full bg-black/60 text-white text-sm px-3 py-2">
+                        {img.title}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
           </motion.div>
         );
 

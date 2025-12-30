@@ -291,13 +291,13 @@ const LeadGenerationModal = ({
               layout="vertical"
               onFinish={handleSubmit}
               className="flex-1 flex flex-col"
-              size="large"
+              size="sm"
               initialValues={{ country_code: '+91' }}
               requiredMark={false} 
             >
               {/* --- SIGN UP FIELDS --- */}
               {activeTab === 'signup' && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2">
                   <Form.Item 
                     label={<span className="font-semibold text-gray-700">First Name</span>}
                     name="first_name" 
@@ -346,7 +346,7 @@ const LeadGenerationModal = ({
               {activeTab === 'signup' && (
                  <div className="grid grid-cols-2 gap-4">
                   <Form.Item 
-                    label={<span className="font-semibold text-gray-700">State</span>}
+                    label={<span className="font-semibold text-gray-700">State/Emirate</span>}
                     name="state" 
                     rules={[{ required: true, message: 'Required' }]}
                   >

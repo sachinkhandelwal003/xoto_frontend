@@ -1,60 +1,46 @@
 {
   "company": {
-    "slogan": "Единая экосистема <br/> создающая пожизненную <br/> ценность недвижимости.",
-    "description": "Масштабируемо. На базе ИИ. Легкая инфраструктура."
+    "slogan": "Единая экосистема для создания <br/> пожизненной ценности недвижимости.",
+    "description": "Масштабируемо. На базе ИИ. Лёгкая модель."
   },
-
   "titles": {
-    "offerings": "Наши услуги",
-    "resources": "Партнёрская экосистема",
-    "knowledge": "О нас",
-    "location": "Локация",
-    "email": "Электронная почта",
-    "contact": "Контакты"
+    "offerings": "Наши Услуги",
+    "resources": "Партнёрская Экосистема",
+    "knowledge": "О Нас",
+    "location": "Локации",
+    "email": "Эл. почта"
   },
-
   "offerings": [
-    { "label": "Ландшафтный дизайн", "path": "/landscaping" },
-    { "label": "Интерьеры", "path": "/interiors" },
-    { "label": "Аренда", "path": "/rentals" },
-    { "label": "Покупка", "path": "/buy" },
-    { "label": "Продажа", "path": "/sell" },
-    { "label": "Ипотека", "path": "/mortgage/services" }
+    { "label": "Ландшафтный дизайн" },
+    { "label": "Интерьеры" },
+    { "label": "Аренда" },
+    { "label": "Покупка" },
+    { "label": "Продажа" },
+    { "label": "Ипотека" },
+    { "label": "Обслуживание" }
   ],
-
   "resources": [
-    { "label": "Недвижимость Xoto", "path": "/properties" },
-    { "label": "Исследовать Xoto", "path": "/explore" },
-    { "label": "На базе искусственного интеллекта", "path": "/ai" },
-    { "label": "Бесплатная консультация", "path": "/consultation" },
-    { "label": "Найм фрилансеров", "path": "/freelancers" }
+    { "label": "Стратегический альянс" },
+    { "label": "Бизнес-партнёры" },
+    { "label": "Исполнительные партнёры" },
+    { "label": "Девелоперы" },
+    { "label": "Финансовые институты" }
   ],
-
   "knowledge": [
-    { "label": "О компании", "path": "/about" },
-    { "label": "Центр знаний", "path": "/knowledge-centre" },
-    { "label": "Фокус на устойчивом развитии", "path": "/sustainability" },
-    { "label": "Оставить отзыв", "path": "/feedback" },
-    { "label": "Связаться с нами", "path": "/contact" },
-    { "label": "Политика конфиденциальности", "path": "/privacy" },
-    { "label": "Условия использования", "path": "/terms" }
+    { "label": "Центр знаний" },
+    { "label": "Наша устойчивость" },
+    { "label": "Фокус" },
+    { "label": "Отправить отзыв" },
+    { "label": "Связаться с нами" },
+    { "label": "Политика конфиденциальности" },
+    { "label": "Условия использования" }
   ],
-
-  "location": "ОАЭ",
-
+  "locations": "Индия | ОАЭ | Саудовская Аравия",
   "email": {
     "partners": "Для партнёров:",
     "customers": "Для клиентов:"
   },
-
-  "social": [
-    { "name": "Facebook", "url": "#" },
-    { "name": "Instagram", "url": "#" },
-    { "name": "Twitter", "url": "#" },
-    { "name": "Linkedin", "url": "#" }
-  ],
-
   "bottom": {
-    "copyright": "©2025 Xoto. Все права защищены."
+    "copyright": "©2021 XOTO. Все права защищены"
   }
 }

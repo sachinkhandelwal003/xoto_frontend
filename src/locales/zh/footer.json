@@ -1,60 +1,46 @@
 {
   "company": {
-    "slogan": "统一生态系统 <br/> 创造终身 <br/> 物业价值。",
-    "description": "可扩展 · AI 驱动 · 轻资产模式"
+    "slogan": "一个统一的生态系统，<br/> 创造终身房地产价值。",
+    "description": "可扩展。AI 驱动。轻资产。"
   },
-
   "titles": {
     "offerings": "我们的服务",
-    "resources": "合作生态系统",
+    "resources": "合作伙伴生态",
     "knowledge": "关于我们",
-    "location": "位置",
-    "email": "电子邮箱",
-    "contact": "联系方式"
+    "location": "地点",
+    "email": "电子邮件"
   },
-
   "offerings": [
-    { "label": "景观设计", "path": "/landscaping" },
-    { "label": "室内设计", "path": "/interiors" },
-    { "label": "租赁", "path": "/rentals" },
-    { "label": "购买", "path": "/buy" },
-    { "label": "出售", "path": "/sell" },
-    { "label": "贷款服务", "path": "/mortgage/services" }
+    { "label": "园林景观" },
+    { "label": "室内设计" },
+    { "label": "租赁" },
+    { "label": "购买" },
+    { "label": "出售" },
+    { "label": "抵押贷款" },
+    { "label": "维护" }
   ],
-
   "resources": [
-    { "label": "Xoto 物业", "path": "/properties" },
-    { "label": "探索 Xoto", "path": "/explore" },
-    { "label": "AI 驱动", "path": "/ai" },
-    { "label": "免费咨询", "path": "/consultation" },
-    { "label": "聘请自由职业者", "path": "/freelancers" }
+    { "label": "战略联盟" },
+    { "label": "商业合作伙伴" },
+    { "label": "执行合作伙伴" },
+    { "label": "开发商" },
+    { "label": "金融机构" }
   ],
-
   "knowledge": [
-    { "label": "关于我们", "path": "/about" },
-    { "label": "知识中心", "path": "/knowledge-centre" },
-    { "label": "可持续发展", "path": "/sustainability" },
-    { "label": "提交反馈", "path": "/feedback" },
-    { "label": "联系我们", "path": "/contact" },
-    { "label": "隐私政策", "path": "/privacy" },
-    { "label": "使用条款", "path": "/terms" }
+    { "label": "知识中心" },
+    { "label": "我们的可持续性" },
+    { "label": "重点" },
+    { "label": "提交反馈" },
+    { "label": "联系我们" },
+    { "label": "隐私政策" },
+    { "label": "使用条款" }
   ],
-
-  "location": "阿联酋",
-
+  "locations": "印度 | 阿联酋 | 沙特阿拉伯",
   "email": {
     "partners": "合作伙伴：",
     "customers": "客户："
   },
-
-  "social": [
-    { "name": "Facebook", "url": "#" },
-    { "name": "Instagram", "url": "#" },
-    { "name": "Twitter", "url": "#" },
-    { "name": "Linkedin", "url": "#" }
-  ],
-
   "bottom": {
-    "copyright": "©2025 Xoto. 版权所有"
+    "copyright": "©2021 XOTO。保留所有权利"
   }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import wave1 from "../../assets/img/wave/waveint2.png";
 import hardScape from "../../assets/img/landscap/hardscape.png";
@@ -35,7 +36,8 @@ const Servicelandspacing = () => {
       "services.softscape.items.1",
       "services.softscape.items.2",
       "services.softscape.items.3",
-      "services.softscape.items.4"
+      "services.softscape.items.4",
+      "services.softscape.items.5"
     ],
   },
   {
@@ -152,37 +154,43 @@ const Servicelandspacing = () => {
           </div>
 
           {/* Navigation (UNCHANGED) */}
-         <div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
+    <div className="flex justify-center items-center mt-8 md:mt-12 gap-6">
+  {/* LEFT BUTTON */}
   <button
     onClick={() => {
       prevSlide();
       setActiveBtn("left");
     }}
-    className={`w-20 h-20 md:w-12 md:h-12 rounded-md flex items-center justify-center text-2xl md:text-3xl
+    onMouseLeave={() => setActiveBtn(null)}
+    className={`w-12 h-12 rounded-md flex items-center justify-center transition
       ${
         activeBtn === "left"
           ? "bg-[var(--color-primary)] text-white border border-transparent"
           : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
       }`}
   >
-    ‹
+    <ChevronLeft className="w-6 h-6" />
   </button>
 
+  {/* RIGHT BUTTON */}
   <button
     onClick={() => {
       nextSlide();
       setActiveBtn("right");
     }}
-    className={`w-10 h-10 md:w-12 md:h-12 rounded-md flex items-center justify-center text-2xl md:text-3xl
+    onMouseLeave={() => setActiveBtn(null)}
+    className={`w-12 h-12 rounded-md flex items-center justify-center transition
       ${
         activeBtn === "right"
           ? "bg-[var(--color-primary)] text-white border border-transparent"
           : "bg-white text-black border border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
       }`}
   >
-    ›
+    <ChevronRight className="w-6 h-6" />
   </button>
 </div>
+
+
 
         </div>
       </div>

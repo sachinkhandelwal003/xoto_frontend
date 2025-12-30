@@ -70,11 +70,16 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  // NEW STATES FOR LOGIN DROPDOWN
+  const [loginMenuOpen, setLoginMenuOpen] = useState(false);
+  const [mobileLoginOpen, setMobileLoginOpen] = useState(false);
+
   const [openDropdown, setOpenDropdown] = useState(null);
   const [selectedLang, setSelectedLang] = useState(languages[0]);
 
   const langRef = useRef(null);
   const userMenuRef = useRef(null);
+  const loginMenuRef = useRef(null); // Ref for login dropdown
 
   // Helper to determine dashboard link based on role
   const getDashboardLink = () => {
@@ -99,7 +104,7 @@ const Navbar = () => {
     if (current) setSelectedLang(current);
   }, [i18n.language]);
 
-  // Click outside handler for Language and User Menu
+  // Click outside handler
   useEffect(() => {
     const close = e => {
       if (langRef.current && !langRef.current.contains(e.target)) {
@@ -107,6 +112,9 @@ const Navbar = () => {
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setUserMenuOpen(false);
+      }
+      if (loginMenuRef.current && !loginMenuRef.current.contains(e.target)) {
+        setLoginMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", close);
@@ -224,12 +232,12 @@ const Navbar = () => {
                   {userMenuOpen && (
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
                       <div className="px-4 py-2 border-b border-gray-100 mb-1">
-                         <p className="text-sm font-bold text-gray-800">{user.name}</p>
-                         <p className="text-xs text-gray-500">{user.email}</p>
+                          <p className="text-sm font-bold text-gray-800">{user.name}</p>
+                          <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
 
                       <Link to={getDashboardLink()} onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                         <FaTachometerAlt size={16} className="text-[#5C039B]" /> Dashboard
+                          <FaTachometerAlt size={16} className="text-[#5C039B]" /> Dashboard
                       </Link>
 
                       <div className="border-t border-gray-100 my-1"></div>
@@ -244,11 +252,35 @@ const Navbar = () => {
                   )}
                 </div>
               ) : (
-                <Link to="/login">
-                  <button className="px-4 py-2 border border-[#5C039B] text-[#5C039B] hover:bg-[#5C039B] hover:text-white rounded-lg transition-all font-medium">
+                /* LOGIN DROPDOWN (Desktop) */
+                <div ref={loginMenuRef} className="relative">
+                  <button 
+                    onClick={() => setLoginMenuOpen(!loginMenuOpen)}
+                    className="px-4 py-2 border border-[#5C039B] text-[#5C039B] hover:bg-[#5C039B] hover:text-white rounded-lg transition-all font-medium flex items-center gap-2"
+                  >
                     {t("nav.login")}
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${loginMenuOpen ? "rotate-180" : ""}`} />
                   </button>
-                </Link>
+                  
+                  {loginMenuOpen && (
+                     <div className="absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+                        <Link 
+                          to="/user/login" 
+                          onClick={() => setLoginMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-[#5C039B] transition-colors"
+                        >
+                          Customer
+                        </Link>
+                        <Link 
+                          to="/login" 
+                          onClick={() => setLoginMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-[#5C039B] transition-colors"
+                        >
+                          Partners
+                        </Link>
+                     </div>
+                  )}
+                </div>
               )}
             </div>
 
@@ -306,8 +338,8 @@ const Navbar = () => {
             {/* MOBILE AUTH & CONTACT */}
             <div className="pt-5 border-t space-y-3">
               {user ? (
-                 <>
-                   <div className="flex items-center gap-3 px-2 mb-2 bg-gray-50 p-3 rounded-lg">
+                  <>
+                    <div className="flex items-center gap-3 px-2 mb-2 bg-gray-50 p-3 rounded-lg">
                       <div className="w-10 h-10 rounded-full bg-[#5C039B] text-white flex items-center justify-center font-bold text-lg">
                         {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                       </div>
@@ -315,27 +347,52 @@ const Navbar = () => {
                         <p className="font-bold text-gray-800">{user.name}</p>
                         <p className="text-xs text-gray-500 capitalize">{user.role?.name}</p>
                       </div>
-                   </div>
+                    </div>
 
-                   <Link to={getDashboardLink()} onClick={() => setMobileOpen(false)} className="block">
-                     <button className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                       <FaTachometerAlt /> Dashboard
-                     </button>
-                   </Link>
+                    <Link to={getDashboardLink()} onClick={() => setMobileOpen(false)} className="block">
+                      <button className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <FaTachometerAlt /> Dashboard
+                      </button>
+                    </Link>
 
-                   <button 
-                     onClick={handleLogout}
-                     className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 transition-colors"
-                   >
-                     <LogOut size={16} /> Logout
-                   </button>
-                 </>
-              ) : (
-                 <Link to="/login" className="block" onClick={() => setMobileOpen(false)}>
-                    <button className="w-full px-4 py-2 border border-[#5C039B] text-[#5C039B] rounded-lg font-bold hover:bg-[#5C039B] hover:text-white transition-all">
-                      {t("nav.login")}
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 transition-colors"
+                    >
+                      <LogOut size={16} /> Logout
                     </button>
-                 </Link>
+                  </>
+              ) : (
+                 /* LOGIN DROPDOWN (Mobile) */
+                 <div className="w-full">
+                    <button 
+                      onClick={() => setMobileLoginOpen(!mobileLoginOpen)}
+                      className="w-full px-4 py-2 border border-[#5C039B] text-[#5C039B] rounded-lg font-bold hover:bg-[#5C039B] hover:text-white transition-all flex justify-center items-center gap-2"
+                    >
+                      {t("nav.login")}
+                      <ChevronDown size={14} className={`transition-transform duration-200 ${mobileLoginOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    
+                    {/* Expandable Mobile Menu for Login */}
+                    {mobileLoginOpen && (
+                       <div className="mt-2 space-y-2 pl-4 border-l-2 border-purple-100 ml-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                          <Link 
+                             to="/user/login" 
+                             onClick={() => setMobileOpen(false)}
+                             className="block py-2 text-gray-600 hover:text-[#5C039B] font-medium"
+                          >
+                             Customer
+                          </Link>
+                          <Link 
+                             to="/login" 
+                             onClick={() => setMobileOpen(false)}
+                             className="block py-2 text-gray-600 hover:text-[#5C039B] font-medium"
+                          >
+                             Partners
+                          </Link>
+                       </div>
+                    )}
+                 </div>
               )}
 
               <Link to="/contact" className="block" onClick={() => setMobileOpen(false)}>

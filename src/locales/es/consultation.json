@@ -1,6 +1,7 @@
 {
   "title": "Reservar consulta gratuita",
-  "description": "Conéctese con expertos de XOTO para una asesoría personalizada.",
+  "description": "Un formulario sencillo para conectar con los expertos de XOTO y recibir asesoramiento personalizado en paisajismo y planificación de proyectos."
+,
   "imageAlt": "Fondo de consulta",
 
   "form": {

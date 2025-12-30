@@ -50,20 +50,55 @@ export default function EcoSmartLiving() {
 
       {/* Content */}
       <div className="relative z-10 text-center mt-16 px-6">
-        <h1 className="text-4xl md:text-5xl card-heading-1 text-black">
-          EcoSmart Living
-        </h1>
+       <h1
+  className="
+    font-semibold
+    text-[60px]
+    leading-[48px]
+    tracking-[-0.03em]
+    text-[#020202]
+    text-center
+  "
+>
+  EcoSmart Living Interiors
+</h1>
 
-        <p className="mt-4 text-[#547593] paragraph-light-1 max-w-3xl mx-auto text-lg">
-          At XOTO, EcoSmart Living means creating landscapes that balance
-          beauty, sustainability, and technology. Our designs use smart
-          automation and eco-friendly solutions to make outdoor spaces
-          efficient, self-sustaining, and effortlessly modern.
-        </p>
 
-        <h2 className="text-3xl font-semibold mt-10 text-black leading-tight">
-          How We Bring It to Life
-        </h2>
+        <p
+  className="
+    mt-4
+    font-medium
+    text-[24px]
+    leading-[33px]
+    tracking-[0]
+    text-[#547593]
+    max-w-[968px]
+    mx-auto
+    text-center
+  "
+>
+  At XOTO, EcoSmart Living means creating landscapes that balance
+  beauty, sustainability, and technology. Our designs use smart
+  automation and eco-friendly solutions to make outdoor spaces
+  efficient, self-sustaining, and effortlessly modern.
+</p>
+
+
+      <h2
+  className="
+    font-[DM Sans]
+    font-semibold
+    text-[31px]
+    leading-[55px]
+    tracking-[-0.03em]
+    text-[#020202]
+    text-center
+    mt-10
+  "
+>
+  How We Bring It to Life
+</h2>
+
 
         {/* Features Grid */}
         <div className="mt-14 flex flex-col items-center gap-10">
