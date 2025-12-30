@@ -401,24 +401,52 @@ const TypesGallery = () => {
       valueType: "number",     // 🔒 fixed
       valueSubType: "persqm"
     }}
+    // onFinish={(values) => {
+    //   createEstimateQuestion({
+    //     ...values,
+    //     questionType,
+    //     valueType: "number",   // 🔒 enforce
+    //     options:
+    //       questionType === "options" || questionType === "yesorno"
+    //         ? options.map((opt, index) => ({
+    //             title: opt.title,
+    //             order: index + 1,
+    //             includeInEstimate: true,
+    //             valueType: "number",      // 🔒 enforce
+    //             valueSubType: opt.valueSubType,
+    //             value: opt.value ?? 0
+    //           }))
+    //         : []
+    //   });
+    // }}
     onFinish={(values) => {
-      createEstimateQuestion({
-        ...values,
-        questionType,
-        valueType: "number",   // 🔒 enforce
-        options:
-          questionType === "options" || questionType === "yesorno"
-            ? options.map((opt, index) => ({
-                title: opt.title,
-                order: index + 1,
-                includeInEstimate: true,
-                valueType: "number",      // 🔒 enforce
-                valueSubType: opt.valueSubType,
-                value: opt.value ?? 0
-              }))
-            : []
-      });
-    }}
+  const payload = {
+    type: selectedType, // 🔴 REQUIRED (you already have this somewhere)
+    question: values.question,
+    questionType,
+    isActive: values.isActive ?? true,
+    includeInEstimate: values.includeInEstimate ?? true,
+
+    // 🔒 ENFORCED (as per your rule)
+    valueType: "number",
+    valueSubType: values.valueSubType || "persqm",
+
+    options:
+      questionType === "options" || questionType === "yesorno"
+        ? options.map((opt, index) => ({
+            title: opt.title,
+            order: index + 1,
+            includeInEstimate: true,
+            valueType: "number",      // 🔒 always number
+            value: Number(opt.value) || 0,
+            valueSubType: opt.valueSubType || "persqm"
+          }))
+        : []
+  };
+
+  createEstimateQuestion(payload);
+}}
+
   >
     {/* Question */}
     <Form.Item
