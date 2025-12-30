@@ -23,37 +23,37 @@ const HomeDesign = () => {
     {
       key: "exterior",
       icon: exterior,
-      link: "/",
+      link: "/aiPlanner/exterior",
       position: "top-[10%] right-[10%] sm:right-[15%] lg:top-[10%] lg:right-[20%]", 
     },
     {
       key: "interior",
       icon: interior,
-      link: "/services/interior",
+      link: "/aiPlanner/interior",
       position: "top-[38%] right-[-5%] sm:right-[0%] lg:top-[30%] lg:-right-[5%]",
     },
     {
       key: "furniture",
       icon: smart,
-      link: "/",
+      link: "/aiPlanner/furniture",
       position: "bottom-[22%] right-[2%] sm:right-[5%] lg:bottom-[30%] lg:-right-[1%]",
     },
     {
       key: "landscaping",
       icon: landscaping,
-      link: "/landscaping",
+      link: "/aiPlanner/landscape",
       position: "bottom-[-2%] left-[50%] -translate-x-1/2 lg:bottom-[2%] lg:left-[50%]",
     },
     {
       key: "image",
       icon: image,
-      link: "/",
+      link: "/aiPlanner/image",
       position: "bottom-[20%] left-[-2%] sm:left-[0%] lg:bottom-[30%] lg:-left-[4%]",
     },
     {
       key: "virtual",
       icon: virtual,
-      link: "/",
+      link: "/aiPlanner/virtual",
       position: "top-[25%] left-[-2%] sm:left-[0%] lg:top-[35%] lg:-left-[1%]",
     },
   ];

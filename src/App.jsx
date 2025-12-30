@@ -56,6 +56,7 @@ import CustomerLogin from "./components/login/CustomerLogin";
 import AIPlannerDemoPage from "./components/homepage/AiPlanner/AIPlannerDemoPage";
 import LocationCategoryModal from "./components/modal/LocationCategoryModal";
 import AITools from "./components/homepage/AiPlanner/AITools";
+import ComingSoon from "./components/homepage/AiPlanner/ComingSoon";
 
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
@@ -263,8 +264,12 @@ function App() {
                     <Route path="/aiPlanner" element={<AITools />} />
                     <Route path="/aiPlanner/demo" element={<AIPlannerDemoPage />} />
 
-                                        <Route path="/aiPlanner/interior" element={<InteriorPlanner />} />
+                                        <Route path="/aiPlanner/interior" element={<ComingSoon />} />
                                         <Route path="/aiPlanner/landscape" element={<AIPlanner />} />
+                                        <Route path="/aiPlanner/exterior" element={<ComingSoon />} />
+                                        <Route path="/aiPlanner/furniture" element={<ComingSoon />} />
+                                        <Route path="/aiPlanner/image" element={<ComingSoon />} />
+                                        <Route path="/aiPlanner/virtual" element={<ComingSoon />} />
 
                     <Route path="/estimate/calculator" element={<Calculator />} />
                     <Route path="/estimate/calculator/interior" element={<InteriorCalculator />} />

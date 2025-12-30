@@ -18,7 +18,7 @@ export default function MainCalculatorPage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center">
               
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+              <h1 className="heading-light">
                 Plan Your Space with Confidence
               </h1>
               
@@ -59,7 +59,7 @@ export default function MainCalculatorPage() {
       <div className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="heading-light text-black">
               Start Estimating
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -70,8 +70,10 @@ export default function MainCalculatorPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl mx-auto">
             {/* Landscaping Estimator Card */}
             <div className="group relative overflow-hidden rounded-3xl shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-3xl border border-purple-100">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-700 opacity-95 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute -right-20 -top-20 w-72 h-72 bg-purple-400/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
+<div className="absolute inset-0 bg-gradient-to-br 
+  from-[#4A027C] via-[#5A1690] to-[#3A015F]
+  opacity-95 group-hover:opacity-100 transition-opacity duration-500" 
+/>
               
               <div className="relative z-10 p-10 h-full flex flex-col">
                 <div className="mb-8">
@@ -114,8 +116,10 @@ export default function MainCalculatorPage() {
 
             {/* Interior Estimator Card */}
             <div className="group relative overflow-hidden rounded-3xl shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-3xl border border-purple-100">
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-700 opacity-95 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-pink-400/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
+<div className="absolute inset-0 bg-gradient-to-br 
+  from-[#4A027C] via-[#5A1690] to-[#3A015F]
+  opacity-95 group-hover:opacity-100 transition-opacity duration-500" 
+/>             
               
               <div className="relative z-10 p-10 h-full flex flex-col">
                 <div className="mb-8">
@@ -157,8 +161,7 @@ export default function MainCalculatorPage() {
             </div>
           </div>
 
-          {/* Features Section */}
-          <div className="mt-20 text-center mb-16">
+          {/* <div className="mt-20 text-center mb-16">
             <h3 className="text-3xl font-bold text-gray-900 mb-12">
               Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-600">Our Estimators</span>
             </h3>
@@ -188,7 +191,7 @@ export default function MainCalculatorPage() {
                 <p className="text-gray-600">Trusted by property professionals and investors</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

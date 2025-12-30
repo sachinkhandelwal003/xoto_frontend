@@ -9,7 +9,6 @@ import {
 } from 'antd';
 import { AuthContext } from '../../manageApi/context/AuthContext';
 import { apiService } from '../../manageApi/utils/custom.apiservice';
-import { showToast } from '../../manageApi/utils/toast';
 
 const { Option } = Select;
 const { Text, Title } = Typography;
@@ -23,7 +22,7 @@ const LeadGenerationModal = ({
   onAuthSuccess 
 }) => {
   const [form] = Form.useForm();
-  const { login } = useContext(AuthContext); // Use context for Login
+  const { login } = useContext(AuthContext); 
   
   const [activeTab, setActiveTab] = useState('signin'); 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,25 +53,30 @@ const LeadGenerationModal = ({
     setIsSubmitting(true);
     try {
       
+      // ==========================
       // 1. SIGN IN LOGIC
+      // ==========================
       if (activeTab === 'signin') {
         const mobile = values.mobile.toString();
         
-        // Uses AuthContext logic
-        await login('/users/login/customer', { mobile });
+        // Login via Context
+        const loginData = await login('/users/login/customer', { mobile });
 
-        notification.success({
-          message: 'Welcome Back!',
-          description: 'Login successful. Preparing your vision...',
-          icon: <CheckCircle2 className="text-green-500" />,
-          placement: 'topRight'
-        });
+        // notification.success({
+        //   message: 'Welcome Back!',
+        //   description: 'Login successful. Preparing your vision...',
+        //   icon: <CheckCircle2 className="text-green-500" />,
+        //   placement: 'topRight'
+        // });
 
-        if (onAuthSuccess) onAuthSuccess();
+        // Pass data back to parent (AIPlanner) to update Redux/State immediately
+        if (onAuthSuccess) onAuthSuccess(loginData);
         onCancel();
       } 
       
-      // 2. SIGN UP LOGIC
+      // ==========================
+      // 2. SIGN UP LOGIC (+ AUTO LOGIN)
+      // ==========================
       else {
         const payload = {
           name: {
@@ -80,7 +84,7 @@ const LeadGenerationModal = ({
             last_name: values.last_name
           },
           email: values.email,
-          comingFromAiPage:true,
+          comingFromAiPage: true,
           mobile: {
             country_code: values.country_code,
             number: values.mobile.toString()
@@ -93,34 +97,49 @@ const LeadGenerationModal = ({
           }
         };
 
+        // A. Create Account
         const response = await apiService.post('/users/signup/customer', payload);
 
-        console.log(response)
-       if (response?.success) {
-  // 1️⃣ Show success toast
-  notification.success({
-    message: 'Account Created Successfully 🎉',
-    description: 'Please sign in with your mobile number to continue.',
-    icon: <CheckCircle2 className="text-green-500" />,
-    placement: 'topRight',
-    duration: 3,
-  });
+        if (response?.success) {
+          
+          notification.success({
+             message: 'Account Created!',
+             description: 'Logging you in automatically...',
+             duration: 2,
+          });
 
-  // 2️⃣ Reset FULL form
-  form.resetFields();
+          // B. Direct Login (Auto-Login)
+          // We immediately use the mobile number to log them in
+          try {
+              const mobile = values.mobile.toString();
+              const loginData = await login('/users/login/customer', { mobile });
 
-  // 3️⃣ Switch to Sign In tab
-  setActiveTab('signin');
+              // Success Notification
+              notification.success({
+                message: 'You are now logged in',
+                description: 'Starting your design generation...',
+                icon: <CheckCircle2 className="text-green-500" />,
+                placement: 'topRight'
+              });
 
-  // 4️⃣ (Optional) Prefill mobile & country code
-  setTimeout(() => {
-    form.setFieldsValue({
-      mobile: values.mobile,
-      country_code: values.country_code,
-    });
-  }, 0);
-}
+              // Pass data back to parent and close
+              if (onAuthSuccess) onAuthSuccess(loginData);
+              onCancel();
+              
+              // Clean up form
+              form.resetFields();
 
+          } catch (loginError) {
+              console.error("Auto-login failed:", loginError);
+              // Fallback: If signup worked but login failed, send them to signin tab
+              notification.warning({
+                  message: 'Account Created',
+                  description: 'Please sign in manually.',
+              });
+              setActiveTab('signin');
+              form.setFieldsValue({ mobile: values.mobile });
+          }
+        }
       }
 
     } catch (error) {
@@ -129,8 +148,8 @@ const LeadGenerationModal = ({
       
       if (error.response?.data?.errors) {
          const serverErrors = error.response.data.errors.map(err => ({
-            name: err.field === 'mobile.number' ? 'mobile' : err.field,
-            errors: [err.message]
+           name: err.field === 'mobile.number' ? 'mobile' : err.field,
+           errors: [err.message]
          }));
          form.setFields(serverErrors);
       } else {
@@ -151,7 +170,7 @@ const LeadGenerationModal = ({
         token: {
           colorPrimary: BRAND_PURPLE,
           borderRadius: 12,
-          controlHeight: 45, // Taller inputs
+          controlHeight: 45,
           fontFamily: "'Inter', sans-serif",
         },
         components: {
@@ -159,7 +178,7 @@ const LeadGenerationModal = ({
             colorBorder: '#E5E7EB',
             hoverBorderColor: BRAND_PURPLE,
             activeBorderColor: BRAND_PURPLE,
-            colorBgContainer: '#F9FAFB', // Light gray background for inputs
+            colorBgContainer: '#F9FAFB',
           },
           Button: {
             fontWeight: 600,
@@ -206,18 +225,18 @@ const LeadGenerationModal = ({
              </div>
 
              <div className="relative z-10 space-y-5">
-                {[
-                  "Unlimited AI Generations",
-                  "High-Resolution Downloads",
-                  "Save Your Designs"
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 text-sm font-medium text-white/90">
-                    <div className="bg-green-500/20 p-1 rounded-full">
-                      <CheckCircle2 size={14} className="text-green-400" />
-                    </div>
-                    <span>{item}</span>
-                  </div>
-                ))}
+               {[
+                 "Unlimited AI Generations",
+                 "High-Resolution Downloads",
+                 "Save Your Designs"
+               ].map((item, idx) => (
+                 <div key={idx} className="flex items-center gap-3 text-sm font-medium text-white/90">
+                   <div className="bg-green-500/20 p-1 rounded-full">
+                     <CheckCircle2 size={14} className="text-green-400" />
+                   </div>
+                   <span>{item}</span>
+                 </div>
+               ))}
              </div>
           </div>
 
@@ -274,7 +293,7 @@ const LeadGenerationModal = ({
               className="flex-1 flex flex-col"
               size="large"
               initialValues={{ country_code: '+91' }}
-              requiredMark={false} // Clean look, removes asterisk
+              requiredMark={false} 
             >
               {/* --- SIGN UP FIELDS --- */}
               {activeTab === 'signup' && (

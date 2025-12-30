@@ -23,32 +23,6 @@ const InteriorEstimatorComingSoon = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 font-sans flex items-center justify-center p-4 relative overflow-hidden">
 
-      {/* Back Button - TOP LEFT CORNER */}
-      <motion.button
-        onClick={() => window.history.back()}
-        initial={{ x: -40, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        whileHover={{ x: -6 }}
-        whileTap={{ scale: 0.95 }}
-        className="absolute top-6 left-6 z-50 flex items-center gap-2 bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-full border border-white/30 shadow-lg hover:bg-white/30 transition"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-        <span className="text-sm font-semibold">Back</span>
-      </motion.button>
 
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
