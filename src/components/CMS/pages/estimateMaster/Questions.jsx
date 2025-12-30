@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Card, Select, Button, Upload, Modal, message,
+  Card, Select, Button, Upload, Modal, message,Checkbox,
   Typography, Divider, Space, Empty, Spin, Popconfirm, Input, Image, Form, Row, Col, Avatar,InputNumber
 } from 'antd';
 import {
@@ -85,6 +85,8 @@ const TypesGallery = () => {
           order: index + 1
         })) || []
       };
+
+      console.log("this payloadddddddddddddddddddd cameeeeeeeeeeee",payload)
 
       await apiService.post(
         `${API_PREFIX}/types/${selectedType}/question/moodboard`,
@@ -364,7 +366,7 @@ const TypesGallery = () => {
 
 
 
-            <Modal
+<Modal
   title={
     <div className="flex items-center gap-3">
       <Avatar
@@ -382,10 +384,10 @@ const TypesGallery = () => {
     setQuestionModalOpen(false);
     form.resetFields();
     setQuestionType("text");
-    setOptions([""]);
+    setOptions([]);
   }}
   footer={null}
-  width={600}
+  width={650}
   centered
   destroyOnClose
   maskClosable={false}
@@ -393,13 +395,27 @@ const TypesGallery = () => {
   <Form
     form={form}
     layout="vertical"
+    initialValues={{
+      isActive: true,
+      includeInEstimate: true,
+      valueType: "number",     // 🔒 fixed
+      valueSubType: "persqm"
+    }}
     onFinish={(values) => {
       createEstimateQuestion({
         ...values,
         questionType,
+        valueType: "number",   // 🔒 enforce
         options:
-          questionType === "options"
-            ? options.map((opt) => ({ title: opt }))
+          questionType === "options" || questionType === "yesorno"
+            ? options.map((opt, index) => ({
+                title: opt.title,
+                order: index + 1,
+                includeInEstimate: true,
+                valueType: "number",      // 🔒 enforce
+                valueSubType: opt.valueSubType,
+                value: opt.value ?? 0
+              }))
             : []
       });
     }}
@@ -408,12 +424,9 @@ const TypesGallery = () => {
     <Form.Item
       label="Question"
       name="question"
-      rules={[{ required: true, message: "Please enter question" }]}
+      rules={[{ required: true }]}
     >
-      <Input.TextArea
-        rows={2}
-        placeholder="Type your question to add"
-      />
+      <Input.TextArea rows={2} />
     </Form.Item>
 
     {/* Question Type */}
@@ -423,212 +436,157 @@ const TypesGallery = () => {
         onChange={(val) => {
           setQuestionType(val);
 
-          // reset extra fields when type changes
-          if (val !== "text") {
-            form.setFieldsValue({
-              valueType: undefined,
-              minValue: undefined,
-              maxValue: undefined
-            });
+          if (val === "yesorno") {
+            setOptions([
+              { title: "Yes", valueSubType: "persqm", value: 0 },
+              { title: "No", valueSubType: "persqm", value: 0 }
+            ]);
+          }
+
+          if (val === "options") {
+            setOptions([
+              { title: "", valueSubType: "persqm", value: 0 }
+            ]);
+          }
+
+          if (val === "text" || val === "number") {
+            setOptions([]);
           }
         }}
       >
         <Select.Option value="text">Text</Select.Option>
         <Select.Option value="options">Options</Select.Option>
-        <Select.Option value="yesorno">Yes or No</Select.Option>
+        <Select.Option value="yesorno">Yes / No</Select.Option>
         <Select.Option value="number">Number</Select.Option>
       </Select>
     </Form.Item>
 
-    {/* EXTRA FIELDS FOR TEXT TYPE */}
-{questionType === "options" && (
-  <Form.Item label="Options" required>
-    <div className="flex flex-col gap-3">
-      {options.map((opt, index) => (
-        <div
-          key={index}
-          className="grid grid-cols-12 gap-2 items-center"
-        >
-          {/* Option Text */}
-          <div className="col-span-5">
-            <Input
-              placeholder={`Option ${index + 1}`}
-              value={opt.title}
-              onChange={(e) => {
-                const updated = [...options];
-                updated[index].title = e.target.value;
-                setOptions(updated);
-              }}
-            />
-          </div>
+    {/* Include In Estimate
+    <Form.Item name="includeInEstimate" valuePropName="checked">
+      <Checkbox>Include in Estimate</Checkbox>
+    </Form.Item> */}
 
-          {/* Value Type */}
-          <div className="col-span-3">
-            <Select
-              value={opt.valueType}
-              onChange={(val) => {
-                const updated = [...options];
-                updated[index].valueType = val;
-                setOptions(updated);
-              }}
-            >
-              <Select.Option value="percentage">%</Select.Option>
-              <Select.Option value="number">Number</Select.Option>
-            </Select>
-          </div>
+    {/* Value Sub Type (ONLY meaningful field now) */}
+    {questionType !== "text" && (
+      <Form.Item label="Value Sub Type" name="valueSubType">
+        <Select>
+          <Select.Option value="persqm">Per Sq.m</Select.Option>
+          <Select.Option value="flat">Flat</Select.Option>
+        </Select>
+      </Form.Item>
+    )}
 
-          {/* Value */}
-          <div className="col-span-3">
-            <InputNumber
-              style={{ width: "100%" }}
-              placeholder="Value"
-              value={opt.value}
-              onChange={(val) => {
-                const updated = [...options];
-                updated[index].value = val;
-                setOptions(updated);
-              }}
-            />
-          </div>
+    {/* OPTIONS TYPE */}
+    {questionType === "options" && (
+      <Form.Item label="Options">
+        <div className="flex flex-col gap-3">
+          {options.map((opt, index) => (
+            <div key={index} className="grid grid-cols-12 gap-2">
+              <div className="col-span-6">
+                <Input
+                  placeholder="Option title"
+                  value={opt.title}
+                  onChange={(e) => {
+                    const updated = [...options];
+                    updated[index].title = e.target.value;
+                    setOptions(updated);
+                  }}
+                />
+              </div>
 
-          {/* Delete */}
-          <div className="col-span-1 text-right">
-            {options.length > 1 && (
-              <Button
-                danger
-                type="text"
-                icon={<DeleteOutlined />}
-                onClick={() =>
-                  setOptions(options.filter((_, i) => i !== index))
-                }
-              />
-            )}
-          </div>
+              <div className="col-span-3">
+                <Select
+                  value={opt.valueSubType}
+                  onChange={(val) => {
+                    const updated = [...options];
+                    updated[index].valueSubType = val;
+                    setOptions(updated);
+                  }}
+                >
+                  <Select.Option value="persqm">Per Sq.m</Select.Option>
+                  <Select.Option value="flat">Flat</Select.Option>
+                </Select>
+              </div>
+
+              <div className="col-span-3">
+                <InputNumber
+                  style={{ width: "100%" }}
+                  value={opt.value}
+                  onChange={(val) => {
+                    const updated = [...options];
+                    updated[index].value = val;
+                    setOptions(updated);
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+
+          <Button
+            type="dashed"
+            icon={<PlusOutlined />}
+            onClick={() =>
+              setOptions([
+                ...options,
+                { title: "", valueSubType: "persqm", value: 0 }
+              ])
+            }
+          >
+            Add Option
+          </Button>
         </div>
-      ))}
+      </Form.Item>
+    )}
 
-      <Button
-        type="dashed"
-        icon={<PlusOutlined />}
-        onClick={() =>
-          setOptions([
-            ...options,
-            { title: "", valueType: "percentage", value: null }
-          ])
-        }
-        style={{ width: "fit-content" }}
-      >
-        Add Option
-      </Button>
-    </div>
-  </Form.Item>
-)}
+    {/* YES / NO TYPE */}
+    {questionType === "yesorno" && (
+      <Form.Item label="Yes / No Values">
+        <div className="flex flex-col gap-3">
+          {options.map((opt, index) => (
+            <div key={index} className="grid grid-cols-12 gap-2">
+              <div className="col-span-4">
+                <Input value={opt.title} disabled />
+              </div>
 
-{questionType === "text" && (
-  <>
-    {/* Value Type */}
-    <Form.Item
-      label="Value Type"
-      name="valueType"
-      initialValue="percentage"
-      rules={[{ required: true, message: "Please select value type" }]}
-    >
-      <Select>
-        <Select.Option value="percentage">Percentage (%)</Select.Option>
-        <Select.Option value="number">Number</Select.Option>
-      </Select>
-    </Form.Item>
+              <div className="col-span-4">
+                <Select
+                  value={opt.valueSubType}
+                  onChange={(val) => {
+                    const updated = [...options];
+                    updated[index].valueSubType = val;
+                    setOptions(updated);
+                  }}
+                >
+                  <Select.Option value="persqm">Per Sq.m</Select.Option>
+                  <Select.Option value="flat">Flat</Select.Option>
+                </Select>
+              </div>
 
-    {/* Minimum Value */}
-    <Form.Item
-      label="Minimum Value"
-      name="minValue"
-      rules={[{ required: true, message: "Please enter minimum value" }]}
-    >
-      <InputNumber
-        style={{ width: "100%" }}
-        placeholder="Enter minimum value"
-      />
-    </Form.Item>
-
-    {/* Maximum Value */}
-    <Form.Item
-      label="Maximum Value"
-      name="maxValue"
-      rules={[{ required: true, message: "Please enter maximum value" }]}
-    >
-      <InputNumber
-        style={{ width: "100%" }}
-        placeholder="Enter maximum value"
-      />
-    </Form.Item>
-  </>
-)}
-
-
-
-{questionType === "yesorno" && (
-  <Form.Item label="Options">
-    <div className="flex flex-col gap-3">
-      {options.map((opt, index) => (
-        <div
-          key={index}
-          className="grid grid-cols-12 gap-2 items-center"
-        >
-          {/* Fixed Option Title */}
-          <div className="col-span-5">
-            <Input value={index==0?"Yes":"No"} disabled />
-          </div>
-
-          {/* Value Type */}
-          <div className="col-span-3">
-            <Select
-              value={opt.valueType}
-              onChange={(val) => {
-                const updated = [...options];
-                updated[index].valueType = val;
-                setOptions(updated);
-              }}
-            >
-              <Select.Option value="percentage">%</Select.Option>
-              <Select.Option value="number">Number</Select.Option>
-            </Select>
-          </div>
-
-          {/* Value */}
-          <div className="col-span-4">
-            <InputNumber
-              style={{ width: "100%" }}
-              placeholder="Value"
-              disabled={opt.title === "No"}
-              value={opt.value}
-              onChange={(val) => {
-                const updated = [...options];
-                updated[index].value = val;
-                setOptions(updated);
-              }}
-            />
-          </div>
+              <div className="col-span-4">
+                <InputNumber
+                  style={{ width: "100%" }}
+                  value={opt.value}
+                  onChange={(val) => {
+                    const updated = [...options];
+                    updated[index].value = val;
+                    setOptions(updated);
+                  }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </Form.Item>
+    )}
 
-
-  </Form.Item>
-)}
-
-
-
-
-
-    {/* Actions */}
+    {/* ACTIONS */}
     <div className="flex justify-end gap-2 mt-4">
       <Button
         onClick={() => {
           setQuestionModalOpen(false);
           form.resetFields();
           setQuestionType("text");
-          setOptions([""]);
+          setOptions([]);
         }}
       >
         Cancel
@@ -638,17 +596,15 @@ const TypesGallery = () => {
         type="primary"
         htmlType="submit"
         icon={<PlusOutlined />}
-        style={{
-          background: THEME.primary,
-          borderRadius: 10,
-          border: "none"
-        }}
+        style={{ background: THEME.primary, border: "none" }}
       >
         Create Question
       </Button>
     </div>
   </Form>
 </Modal>
+
+
 
 
 
