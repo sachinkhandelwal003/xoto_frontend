@@ -51,7 +51,16 @@ export default function TestimonialsSection() {
                   className="w-20 h-20 rounded-full object-cover ring-4 ring-purple-100 mb-4"
                 />
 
-                {/* Stars */}
+           
+
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  {item.title}
+                </h3>
+
+                <p className="text-gray-700 text-sm leading-relaxed mb-6 flex-grow">
+                  {item.text}
+                </p>
+                     {/* Stars */}
                 <div className="flex gap-1 mb-5">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -64,16 +73,10 @@ export default function TestimonialsSection() {
                     />
                   ))}
                 </div>
-
-                <h3 className="text-lg font-bold text-gray-900 mb-3">
-                  {item.title}
-                </h3>
-
-                <p className="text-gray-700 text-sm leading-relaxed mb-6 flex-grow">
-                  {item.text}
-                </p>
-
-                <div className="border-t border-gray-200 pt-4 w-full">
+                              <div className="flex justify-center py-3 mt-1 mb-4">
+  <div className="h-[4px] w-[213px] rounded-full bg-gradient-to-r from-[#03A4F4] to-[#64EF0A]" />
+</div>
+                <div className=" border-gray-200 pt-1 w-full">
                   <p className="font-semibold text-gray-900">{item.name}</p>
                   <p className="text-sm text-gray-600">{item.location}</p>
                 </div>
@@ -84,33 +87,22 @@ export default function TestimonialsSection() {
 
         {/* Navigation */}
         <div className="flex justify-center gap-3 mt-10">
-          <button
-            onClick={() => {
-              scroll("left");
-              setActiveBtn("left");
-            }}
-            className={`p-3 rounded-sm transition ${
-              activeBtn === "left"
-                ? "bg-[var(--color-primary)] text-white"
-                : "bg-white hover:bg-[var(--color-primary)] hover:text-white"
-            }`}
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+         <button
+  onClick={() => scroll("left")}
+  className="p-3 rounded-sm bg-white transition
+             hover:bg-[var(--color-primary)] hover:text-white"
+>
+  <ChevronLeft className="w-5 h-5" />
+</button>
 
-          <button
-            onClick={() => {
-              scroll("right");
-              setActiveBtn("right");
-            }}
-            className={`p-3 rounded-sm transition ${
-              activeBtn === "right"
-                ? "bg-[var(--color-primary)] text-white"
-                : "bg-white hover:bg-[var(--color-primary)] hover:text-white"
-            }`}
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+<button
+  onClick={() => scroll("right")}
+  className="p-3 rounded-sm bg-white transition
+             hover:bg-[var(--color-primary)] hover:text-white"
+>
+  <ChevronRight className="w-5 h-5" />
+</button>
+
         </div>
       </div>
     </section>

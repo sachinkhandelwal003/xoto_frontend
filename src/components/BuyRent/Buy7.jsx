@@ -10,17 +10,17 @@ import image from "../../assets/img/bggg.png";
 export default function HeroSection() {
   const { t, i18n } = useTranslation("buy7");
 
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    countryCode: "",
-    phone: "",
-    country: "",
-    lookingFor: "",
-    city: "",
-    budget: "",
-  });
+ const [form, setForm] = useState({
+  firstName: "",
+  lastName: "",
+  email: "",
+  countryCode: "+971",   // ✅ default UAE
+  phone: "",
+  country: "",     // ✅ preferred state / city
+  lookingFor: "",
+  city: "Dubai",        // ✅ preferred city
+  budget: "",
+});
 
   const [loading, setLoading] = useState(false);
 
@@ -99,15 +99,43 @@ export default function HeroSection() {
 
         <div className="max-w-8xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* LEFT CONTENT */}
-          <div className="space-y-10 z-20">
-            <h1 className="text-5xl card-heading-1 text-gray-900 ps-20 leading-tight">
-              {t("heroTitle")}
-            </h1>
-            <p className="text-lg text-gray-600 ps-20">
-              {t("heroSub")}
-            </p>
-            <img src={image} alt="" className="w-full max-w-3xl mt-8" />
-          </div>
+        <div className="z-20 flex  flex-col gap-[20px]">
+  <h1
+    className="
+      font-['DM_Sans']
+      font-semibold
+      text-[60px]
+      leading-[48px]
+      tracking-[-0.03em]
+      text-[#020202]
+      max-w-[494px]
+      ml-20
+    "
+  >
+    {t("heroTitle")}
+  </h1>
+
+  <p
+    className="
+      font-['DM_Sans']
+      font-semibold
+      text-[24px]
+      leading-[33px]
+      text-[#547593]
+      max-w-[482px]
+      ml-20
+    "
+  >
+    {t("heroSub")}
+  </p>
+
+  <img
+    src={image}
+    alt=""
+    className="w-full max-w-[590px] mt-[24px]"
+  />
+</div>
+
 
           {/* RIGHT FORM */}
           <div className="z-20">
@@ -181,7 +209,7 @@ export default function HeroSection() {
                   >
                     <option value="">{t("country")}</option>
                     <option value="India">India</option>
-                    <option value="Dubai">UAE / Dubai</option>
+                    <option value="Dubai">UAE </option>
                   </select>
 
                   <select
