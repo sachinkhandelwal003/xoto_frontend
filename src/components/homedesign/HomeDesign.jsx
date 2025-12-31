@@ -19,44 +19,88 @@ const HomeDesign = () => {
 
   // Configuration for the floating cards
   // Note: Positions use percentages so they stay relative to the image size
-  const hotspots = [
-    {
-      key: "exterior",
-      icon: exterior,
-      link: "/aiPlanner/exterior",
-      position: "top-[10%] right-[10%] sm:right-[15%] lg:top-[10%] lg:right-[20%]", 
-    },
-    {
-      key: "interior",
-      icon: interior,
-      link: "/aiPlanner/interior",
-      position: "top-[38%] right-[-5%] sm:right-[0%] lg:top-[30%] lg:-right-[5%]",
-    },
-    {
-      key: "furniture",
-      icon: smart,
-      link: "/aiPlanner/furniture",
-      position: "bottom-[22%] right-[2%] sm:right-[5%] lg:bottom-[30%] lg:-right-[1%]",
-    },
-    {
-      key: "landscaping",
-      icon: landscaping,
-      link: "/aiPlanner/landscape",
-      position: "bottom-[-2%] left-[50%] -translate-x-1/2 lg:bottom-[2%] lg:left-[50%]",
-    },
-    {
-      key: "image",
-      icon: image,
-      link: "/aiPlanner/image",
-      position: "bottom-[20%] left-[-2%] sm:left-[0%] lg:bottom-[30%] lg:-left-[4%]",
-    },
-    {
-      key: "virtual",
-      icon: virtual,
-      link: "/aiPlanner/virtual",
-      position: "top-[25%] left-[-2%] sm:left-[0%] lg:top-[35%] lg:-left-[1%]",
-    },
-  ];
+  // const hotspots = [
+  //   {
+  //     key: "exterior",
+  //     icon: exterior,
+  //     link: "/aiPlanner/exterior",
+  //     position: "top-[10%] right-[10%] sm:right-[20%]  s lg:top-[10%] lg:right-[20%]", 
+  //   },
+  //   {
+  //     key: "interior",
+  //     icon: interior,
+  //     link: "/aiPlanner/interior",
+  //     position: "top-[42%] right-[-5%] sm:right-[0%] lg:top-[37%] lg:-right-[5%]",
+  //   },
+  //   {
+  //     key: "furniture",
+  //     icon: smart,
+  //     link: "/aiPlanner/furniture",
+  //     position: "bottom-[22%] right-[2%] sm:right-[5%] lg:bottom-[33%] lg:-right-[-5%]",
+  //   },
+  //   {
+  //     key: "landscaping",
+  //     icon: landscaping,
+  //     link: "/aiPlanner/landscape",
+  //     position: "bottom-[-2%] left-[50%] -translate-x-1/2 lg:bottom-[2%] lg:left-[50%]",
+  //   },
+  //   {
+  //     key: "image",
+  //     icon: image,
+  //     link: "/aiPlanner/image",
+  //     position: "bottom-[20%] left-[-2%] sm:left-[0%] lg:bottom-[28%] lg:-left-[2%]",
+  //   },
+  //   {
+  //     key: "virtual",
+  //     icon: virtual,
+  //     link: "/aiPlanner/virtual",
+  //     position: "top-[25%] left-[-2%] sm:left-[0%] lg:top-[36%] lg:-left-[-2%]",
+  //   },
+  // ];
+const hotspots = [
+  {
+    key: "exterior",
+    icon: exterior,
+    link: "/aiPlanner/exterior",
+    position:
+      "top-[16%] right-[18%] sm:top-[10%] sm:right-[12%] lg:top-[12%] lg:right-[18%]",
+  },
+  {
+    key: "interior",
+    icon: interior,
+    link: "/aiPlanner/interior",
+    position:
+      "top-[40%] right-[0%] sm:top-[38%] sm:right-[5%] lg:top-[36%] lg:right-[5%]",
+  },
+  {
+    key: "furniture",
+    icon: smart,
+    link: "/aiPlanner/furniture",
+    position:
+      "bottom-[34%] right-[2%] sm:bottom-[28%] sm:right-[8%] lg:bottom-[32%] lg:right-[12%]",
+  },
+  {
+    key: "landscaping",
+    icon: landscaping,
+    link: "/aiPlanner/landscape",
+    position:
+      "bottom-[7%] left-1/2 -translate-x-1/2 sm:bottom-[8%] lg:bottom-[2%]",
+  },
+  {
+    key: "image",
+    icon: image,
+    link: "/aiPlanner/image",
+    position:
+      "bottom-[30%] left-[-2%] sm:bottom-[30%] sm:left-[8%] lg:bottom-[28%] lg:left-[-2%]",
+  },
+  {
+    key: "virtual",
+    icon: virtual,
+    link: "/aiPlanner/virtual",
+    position:
+      "top-[36%] left-[-1%] sm:top-[30%] sm:left-[8%] lg:top-[38%] lg:left-[6%]",
+  },
+];
 
   return (
     <section className="relative  bg-[var(--color-body)]  overflow-hidden pt-12  lg:pt-12">

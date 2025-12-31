@@ -37,7 +37,7 @@ const Article3 = () => {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[var(--color-body)] pb-20">
+    <section className="relative overflow-hidden bg-[var(--color-body)] pb-10">
       {/* Toggle Buttons */}
       <div className="absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-lg bg-gradient-to-b from-[#03A4F4] to-[#64EF0A] p-2 shadow-xl">
         <div className="flex gap-3">
@@ -45,7 +45,7 @@ const Article3 = () => {
             <button
               key={item}
               onClick={() => setActive(item)}
-              className={`min-w-[120px] rounded-lg border border-white px-6 py-3 text-sm font-medium uppercase tracking-wide text-white transition
+              className={`min-w-[150px] rounded-lg border border-white px-10 py-3 text-sm font-medium uppercase tracking-wide text-white transition
                 ${
                   active === item
                     ? "bg-[#5C039B]"

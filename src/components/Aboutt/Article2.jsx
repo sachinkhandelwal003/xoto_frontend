@@ -44,8 +44,8 @@ const Article2 = () => {
               <p
                 className="
     font-dmSans 
-    font-medium 
-    text-[24px] 
+    font-semibold
+    text-[20px] 
     leading-[33px] 
     tracking-[0em]
     text-[#547593]

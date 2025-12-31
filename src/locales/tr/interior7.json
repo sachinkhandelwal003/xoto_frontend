@@ -1,31 +1,31 @@
 {
   "heading": "EcoSmart Yaşam",
-  "description": "XOTO'da EcoSmart Living; estetik, sürdürülebilirlik ve teknolojiyi birleştirir.",
-  "subheading": "Nasıl Hayata Geçiriyoruz",
+  "description": "XOTO’da EcoSmart Living, stil, sürdürülebilirlik ve akıllı teknolojiyi bir araya getiren yaşam alanları tasarlamak anlamına gelir.",
+  "subheading": "Bunu Nasıl Hayata Geçiriyoruz",
   "features": {
     "smartClimate": {
       "title": "Akıllı İklim Kontrolü",
-      "text": "Enerji tasarrufu sağlayan otomatik sistemler."
+      "text": "Enerji tasarrufu için otomatik sıcaklık ve havalandırma sistemleri."
     },
     "lighting": {
       "title": "LED ve Güneş Aydınlatması",
-      "text": "Düşük enerji tüketimli çözümler."
+      "text": "Ev genelinde düşük enerjili aydınlatma çözümleri."
     },
     "materials": {
       "title": "Sürdürülebilir Malzemeler",
-      "text": "Çevre dostu yüzeyler."
+      "text": "Düşük karbon ayak izine sahip çevre dostu malzemeler."
     },
     "water": {
-      "title": "Su Tasarruflu Donanımlar",
-      "text": "Daha az su tüketimi için tasarlandı."
+      "title": "Su Tasarruflu Armatürler",
+      "text": "Su kullanımını azaltan modern armatürler."
     },
     "automation": {
       "title": "Otomatik Ev Yönetimi",
-      "text": "Uygulama veya sesle kontrol."
+      "text": "Uygulama veya sesli komutla kontrol."
     },
     "future": {
       "title": "Geleceğe Hazır İç Mekanlar",
-      "text": "Yeşil teknolojilere uyumlu tasarımlar."
+      "text": "Yeşil teknolojilere uyumlu modüler tasarımlar."
     }
   }
 }

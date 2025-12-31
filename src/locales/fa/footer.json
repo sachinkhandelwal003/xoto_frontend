@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "یک اکوسیستم یکپارچه که <br/> ارزش مادام‌العمر دارایی ایجاد می‌کند.",
+    "description": "مقیاس‌پذیر. مبتنی بر هوش مصنوعی. سبک‌دارایی."
+  },
+
+  "titles": {
+    "offerings": "خدمات ما",
+    "resources": "اکوسیستم شرکا",
+    "knowledge": "درباره ما",
+    "location": "موقعیت‌ها",
+    "email": "ایمیل"
+  },
+
+  "offerings": [
+    { "label": "محوطه‌سازی", "path": "/landscaping" },
+    { "label": "طراحی داخلی", "path": "/interiors" },
+    { "label": "اجاره", "path": "/rentals" },
+    { "label": "خرید", "path": "/buy" },
+    { "label": "فروش", "path": "/sell" },
+    { "label": "وام مسکن", "path": "/mortgage/services" },
+    { "label": "نگهداری و تعمیرات", "path": "/maintenance" }
+  ],
+
+  "resources": [
+    { "label": "اتحاد راهبردی", "path": "/strategic-alliance" },
+    { "label": "همکاران تجاری", "path": "/business-associates" },
+    { "label": "شرکای اجرایی", "path": "/execution-partners" },
+    { "label": "توسعه‌دهندگان", "path": "/developers" },
+    { "label": "مؤسسات مالی", "path": "/financial-institutions" }
+  ],
+
+  "knowledge": [
+    { "label": "مرکز دانش", "path": "/knowledge-centre" },
+    { "label": "پایداری ما", "path": "/sustainability" },
+    { "label": "تمرکز", "path": "/focus" },
+    { "label": "ارسال بازخورد", "path": "/feedback" },
+    { "label": "تماس با ما", "path": "/contact" },
+    { "label": "سیاست حفظ حریم خصوصی", "path": "/privacy" },
+    { "label": "شرایط استفاده", "path": "/terms" }
+  ],
+
+  "locations": "هند | امارات متحده عربی | عربستان سعودی",
+
+  "email": {
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
+  },
+
+  "social": [
+    { "name": "فیسبوک", "url": "#" },
+    { "name": "اینستاگرام", "url": "#" },
+    { "name": "توییتر", "url": "#" },
+    { "name": "لینکدین", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "© 2021 XOTO. کلیه حقوق محفوظ است"
+  }
+}
