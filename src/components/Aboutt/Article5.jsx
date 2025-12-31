@@ -10,7 +10,7 @@ const Article5 = () => {
         src={waveBottom}
         alt=""
         className="absolute bottom-0 left-0 w-full pointer-events-none opacity-70 z-10
-                   translate-y-32 sm:translate-y-48 lg:translate-y-[600px]"
+                   translate-y-32 sm:translate-y-48 lg:translate-y-[500px]"
       />
 
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">

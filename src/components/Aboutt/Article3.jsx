@@ -39,24 +39,35 @@ const Article3 = () => {
   return (
     <section className="relative overflow-hidden bg-[var(--color-body)] pb-20">
       {/* Toggle Buttons */}
-      <div className="absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-lg bg-gradient-to-b from-[#03A4F4] to-[#64EF0A] p-2 shadow-xl">
-        <div className="flex gap-3">
-          {["vision", "mission"].map((item) => (
-            <button
-              key={item}
-              onClick={() => setActive(item)}
-              className={`min-w-[120px] rounded-lg border border-white px-6 py-3 text-sm font-medium uppercase tracking-wide text-white transition
-                ${
-                  active === item
-                    ? "bg-[#5C039B]"
-                    : "bg-transparent hover:bg-[#5C039B]/70"
-                }`}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-lg bg-gradient-to-b from-[#03A4F4] to-[#64EF0A] p-2 shadow-xl">
+  <div className="flex gap-3">
+    {["vision", "mission"].map((item) => (
+      <button
+        key={item}
+        onClick={() => setActive(item)}
+        className={`
+          min-w-[120px]
+          rounded-lg
+          px-6 py-3
+          text-sm
+          font-medium
+          uppercase
+          tracking-wide
+          text-white
+          transition
+          ${
+            active === item
+              ? "bg-[#5C039B]"
+              : "border border-white bg-transparent hover:bg-[#5C039B]/70 hover:border-transparent"
+          }
+        `}
+      >
+        {item}
+      </button>
+    ))}
+  </div>
+</div>
+
 
       {/* Wave */}
       <div className="pointer-events-none absolute bottom-[-100px] left-0 w-full">

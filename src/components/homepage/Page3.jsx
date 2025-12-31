@@ -12,6 +12,7 @@ import Blogimg6 from "../../assets/img/pexels-fotoaibe-1571460.jpg";
 import Blogimg7 from "../../assets/img/4-min-800x450.jpg";
 import Blogimg8 from "../../assets/img/cozy-modern-living-room-interior-600nw-2449524995.webp";
 import Blogimg9 from "../../assets/img/beige_living_room.webp";
+import { FiSearch } from "react-icons/fi";
 
 import i1 from "../../assets/icons/Homeicons/xx1.png";
 import i2 from "../../assets/icons/Homeicons/xx2.png";
@@ -63,24 +64,68 @@ const Page3 = () => {
 
         <div className="absolute inset-0 bg-black/40"></div>
 
-        <div className="relative z-10 text-center px-6 max-w-3xl w-full">
+        <div className="relative z-10 text-center px-6 max-w-5xl w-full">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-snug break-words">
             {t("hero.title")}
           </h1>
 
-          <p className="mt-6 text-sm sm:text-lg md:text-xl text-gray-200 leading-relaxed">
+          <p className="mt-6 text-sm max-w-2xl mx-auto w-full sm:text-lg md:text-xl text-gray-200 leading-relaxed">
             {t("hero.subtitle")}
           </p>
 
-          <div className="mt-10 flex justify-center gap-4 flex-wrap w-full">
-            <button className="bg-[#5C039B] px-8 py-3 rounded-md font-semibold text-lg sm:text-xl transition w-full sm:w-auto">
+          <div className="mt-8 flex justify-center">
+           
+               <div
+      className="
+        flex flex-row items-center
+        justify-center
+        gap-3 sm:gap-4
+        w-full max-w-full
+      "
+    >
+      {/* PRIMARY BUTTON */}
+      <button
+        className="
+          flex-1 sm:flex-none
+          px-3 sm:px-8
+          py-2.5 sm:py-3
+          bg-[var(--color-primary)]
+          text-white
+          rounded-lg
+          shadow-md
+          transition-all duration-300
+          whitespace-nowrap
+        "
+      >
               {t("hero.buttons.categories")}
-            </button>
+      </button>
 
-            <a className="border border-white px-8 py-3 rounded-md text-lg sm:text-xl hover:bg-[#5C039B] transition w-full sm:w-auto text-center">
+      {/* OUTLINE BUTTON */}
+      <button
+        className="
+          flex-1 sm:flex-none
+          px-3 sm:px-8
+          py-2.5 sm:py-3
+          border-1 border-white/70
+          text-white
+          rounded-lg
+          transition-all duration-300
+          hover:bg-[var(--color-primary)]
+          hover:border-[#5C039B]
+          hover:shadow-lg
+          whitespace-nowrap
+        "
+      >
               {t("hero.buttons.ai")}
-            </a>
+      </button>
+    </div>
           </div>
+
+
+
+
+
+          
         </div>
       </section>
 
@@ -93,21 +138,40 @@ const Page3 = () => {
           </h2>
 
           {/* Search */}
-          <div className="flex justify-center mb-10">
-            <div className="relative w-full max-w-xl">
-              <input
-                type="text"
-                placeholder={t("search.placeholder")}
-                className="w-full pl-6 pr-12 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 shadow-md"
-              />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#5C039B] w-10 h-10 flex items-center justify-center rounded-md text-white">
-                🔍
-              </button>
-            </div>
-          </div>
+         {/* Search */}
+<div className="flex justify-center mb-10">
+  <div className="relative w-full max-w-6xl">
+    <input
+      type="text"
+      placeholder={t("search.placeholder")}
+      className="
+        w-full
+        pl-6 pr-12 py-3
+        border border-gray-300
+        rounded-md
+        focus:ring-2 focus:ring-purple-500
+        shadow-md
+      "
+    />
+
+    <button
+      className="
+        absolute right-2 top-1/2 -translate-y-1/2
+        bg-[#5C039B]
+        w-10 h-10
+        flex items-center justify-center
+        rounded-md
+        text-white
+      "
+    >
+      <FiSearch className="text-lg" />
+    </button>
+  </div>
+</div>
+
 
           {/* Blog Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
             {blogPosts.map((post) => (
               <div key={post.id} className="flex gap-5 p-4 bg-white rounded-xl shadow hover:shadow-lg transition w-full">
                 <img src={post.image} alt={post.title} className="w-32 h-28 sm:w-40 sm:h-32 rounded-lg object-cover flex-shrink-0" />
@@ -135,18 +199,18 @@ const Page3 = () => {
       </section>
 
       {/* CATEGORY SECTION */}
-      <section className="relative py-20 px-4 md:px-8 bg-gradient-to-tl from-green-200 to-purple-300 overflow-hidden">
-        <div className="absolute bottom-0 left-0 w-full sm:-bottom-40 md:-bottom-72 lg:-bottom-96 overflow-hidden">
+      <section className="relative py-20 px-4 md:px-8 bg-[var(--color-body)]  overflow-hidden">
+        <div className="absolute bottom-0 left-0 w-full sm:-bottom-40 md:-bottom-72 lg:-bottom-130 overflow-hidden">
           <img src={wave2} alt="" className="w-full pointer-events-none opacity-90" />
         </div>
 
         <div className="max-w-6xl mx-auto relative z-10 w-full">
           <div className="text-center">
-            <h2 className="text-3xl md:text-5xl font-bold text-black leading-snug break-words">
+            <h2 className="text-3xl md:text-5xl max-w-3xl mx-auto font-semibold text-black leading-snug break-words">
               {t("categories.title")}
             </h2>
 
-            <p className="text-gray-700 text-sm sm:text-lg md:text-2xl mt-8 max-w-3xl mx-auto break-words">
+            <p className="text-[#547593] text-sm sm:text-lg md:text-2xl mt-8 max-w-3xl mx-auto break-words">
               {t("categories.subtitle")}
             </p>
           </div>

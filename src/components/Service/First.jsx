@@ -60,9 +60,10 @@ export default function HomeLoanHero() {
           </p>
 
           {/* CTA */}
-          <div className="mt-8 flex justify-center gap-4 flex-wrap">
-            <CTAButtons />
-          </div>
+         <div className="mt-8 flex justify-center">
+  <CTAButtons />
+</div>
+
         </div>
       </div>
     </section>

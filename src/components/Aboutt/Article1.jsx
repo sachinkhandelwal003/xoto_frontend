@@ -7,7 +7,7 @@ const Article1 = () => {
       className="
         relative
         w-full
-        min-h-[70vh] lg:min-h-screen
+        min-h-[70vh] lg:min-h-[80vh]
         bg-cover bg-center
         flex items-center justify-center
         overflow-hidden
@@ -21,7 +21,7 @@ const Article1 = () => {
       <div className="relative z-10 text-center px-6">
         <h1
           className="
-            text-white font-extrabold
+            text-white font-bold
             text-3xl sm:text-4xl md:text-5xl lg:text-[50px]
             leading-tight lg:leading-[76px]
             drop-shadow-xl

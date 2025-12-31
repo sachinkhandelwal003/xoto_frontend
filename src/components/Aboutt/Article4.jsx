@@ -3,7 +3,7 @@ import roomImage from "../../assets/img/ui-ux-design_1197721-139046 1.png";
 
 const Article4 = () => {
   return (
-    <section className="w-full overflow-hidden bg-gradient-to-b from-[#00A7FF] via-[#296EF0] to-[#5C1BB0] py-16 sm:py-20">
+    <section className="w-full overflow-hidden bg-gradient-to-b from-[#00A7FF] via-[#296EF0] to-[#5C1BB0] py-10 sm:py-10">
       <div
         className="
           mx-auto max-w-7xl
