@@ -4,7 +4,8 @@ import LanguageDetector from "i18next-browser-languagedetector";
 /* =========================
    AR
 ========================= */
-import arCommon from "./locales/ar/common.json";
+import arCommon from "./locales/Ar/common.json";
+import arbuy1 from './locales/Ar/buy1.json'
 
 /* =========================
    EN
@@ -393,6 +394,7 @@ import faMort1 from "./locales/fa/mort1.json";
 import faMort2 from "./locales/fa/mort2.json";
 import faMort3 from "./locales/fa/mort3.json";
 import faMort6 from "./locales/fa/mort6.json";
+
 
 /* =========================
    INIT
@@ -844,12 +846,17 @@ i18n
         mort2: faMort2,
         mort3: faMort3,
         mort6: faMort6
+      },
+
+      Ar: {
+        common: arCommon,
+        buy1: arbuy1
       }
     },
 
     fallbackLng: "en",
 
-    supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa"],
+    supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa", "Ar"],
 
     ns: [
       "common","home","home1","home2","home3","home4","home5",

@@ -1,7 +1,7 @@
 {
   "heading": {
     "title": "Hot Property Deals",
-    "subtitle": "Discover exclusive properties with the best value in Dubai"
+    "subtitle": "Discover exclusive properties with the best value in Dubai's premium locations."
   },
   "modal": {
     "title": "Schedule Property Visit",
@@ -35,5 +35,11 @@
   "toast": {
     "success": "Visit scheduled! We'll contact you shortly.",
     "error": "Failed to schedule visit. Try again."
+  },
+  "card": {
+    "beds": "Beds",
+    "bathrooms": "Bathrooms",
+    "perMonth": "/month",
+    "showDetails": "Show Details"
   }
 }

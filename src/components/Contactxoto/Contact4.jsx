@@ -232,7 +232,7 @@ export default function PartnerForm() {
       </div>
 
       {/* WAVE */}
-      <div className="absolute bottom-[-100px] md:bottom-[-200px] left-0 w-full z-0 pointer-events-none">
+      <div className="absolute bottom-[-400px] md:bottom-[-600px] left-0 w-full z-0 pointer-events-none">
         <img
           src={wave2}
           alt=""
