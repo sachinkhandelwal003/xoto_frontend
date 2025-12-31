@@ -1,7 +1,7 @@
 {
   "heading": {
     "title": "Offres Immobilières Chaudes",
-    "subtitle": "Découvrez des propriétés exclusives au meilleur prix à Dubaï"
+    "subtitle": "Découvrez des propriétés exclusives offrant le meilleur rapport qualité-prix dans les quartiers premium de Dubaï."
   },
   "modal": {
     "title": "Planifier une Visite",
@@ -35,5 +35,11 @@
   "toast": {
     "success": "Visite planifiée ! Nous vous contacterons bientôt.",
     "error": "Impossible de planifier la visite. Veuillez réessayer."
+  },
+   "card": {
+    "beds": "Chambres",
+    "bathrooms": "Salles de bain",
+    "perMonth": "/mois",
+    "showDetails": "Voir les détails"
   }
 }

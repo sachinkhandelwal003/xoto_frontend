@@ -13,6 +13,9 @@ import arhome3 from "./locales/ar/home3.json"
 import arhome4 from "./locales/ar/home4.json"
 import arhome5 from "./locales/ar/home5.json"
 import arfooter from "./locales/ar/footer.json"
+import arCommon from "./locales/Ar/common.json";
+import arbuy1 from './locales/Ar/buy1.json'
+
 /* =========================
    EN
 ========================= */
@@ -412,6 +415,7 @@ import   urhome2 from "./locales/ur/home2.json";
 import  urhome3 from "./locales/ur/home3.json";
 import  urhome4 from "./locales/ur/home4.json";
 import  urhome5 from "./locales/ur/home5.json";
+
 
 /* =========================
    INIT
