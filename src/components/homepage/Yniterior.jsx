@@ -26,6 +26,7 @@ import Fifth from "../Service/Fifth";
 import Builder from "../interior/Builder";
 import Book from "../interior/Book";
 import Ourport from "../interior/Ourport";
+import Consultation from "./Consultation";
 import yyyImage from "../../assets/img/yyy.png";
 import HeroSectionInterior from "../interior/HeroSectionInterior";
 export default function App() {
@@ -38,7 +39,8 @@ export default function App() {
       <Builder />
 
       {/* ────────────────────── BOOK CONSULTATION ────────────────────── */}
-      <Book />
+      {/* <Book /> */}
+           <Consultation />
       {/* ────────────────────── OUR SERVICES PORTFOLIO ────────────────────── */}
       <Ourport />
 

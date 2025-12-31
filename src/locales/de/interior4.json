@@ -3,9 +3,11 @@
   "services": {
     "kitchen": "Modulare Küchen",
     "wardrobe": "Modulare Kleiderschränke",
-    "electrical": "Elektrik",
+    "electrical": "Elektroarbeiten",
     "civil": "Bauarbeiten",
     "lighting": "Beleuchtung",
-    "wall": "Wanddekoration"
+    "wall": "Wanddesign, Malerarbeiten & Tapeten",
+    "frushing": "Innenausstattung",
+    "falsi": "Abgehängte Decken"
   }
 }

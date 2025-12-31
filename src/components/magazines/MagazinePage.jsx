@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import wave1 from "../../assets/img/wave/wave1.png";
-import round from "../../assets/img/round23.mp4";
+import round from "../../assets/img/round231.mp4";
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/icons/Homeicons/partners.png";
 import vector from "../../assets/icons/Homeicons/Vector.png";
@@ -60,9 +60,9 @@ const BuiltForEveryone = () => {
   }, [cardsToShow]);
 
   return (
-    <section className="relative bg-white overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
+    <section className="relative  overflow-hidden py-16 px-4 sm:px-6 lg:px-8 bg-[var(--color-body)]">
       {/* Wave */}
-      <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0">
+      <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] xl:bottom-[-160px] left-0 w-full z-0  ">
         <img
           src={wave1}
           alt=""
@@ -70,7 +70,7 @@ const BuiltForEveryone = () => {
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <div className="relative z-10 max-w-7xl mx-auto  ">
         <h2
           className="text-center mb-6 lg:mb-16 heading-light"
           style={{ color: "var(--color-black)" }}
@@ -109,7 +109,7 @@ const BuiltForEveryone = () => {
                 {cards.map((card, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 bg-[var(--color-body)] rounded-xl p-6 transition-all duration-300 ${
+                    className={`flex-shrink-0 bg-white rounded-xl p-6 transition-all duration-300 ${
                       index >= currentIndex &&
                       index < currentIndex + cardsToShow
                         ? "shadow-xl scale-100 opacity-100"

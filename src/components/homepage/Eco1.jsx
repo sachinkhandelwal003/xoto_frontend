@@ -15,8 +15,8 @@ export default function EcoSmartLiving() {
   const features = [
     { title: "features.smartClimate.title", text: "features.smartClimate.text", gradient: true },
     { title: "features.lighting.title", text: "features.lighting.text", image: solarLighting },
-    { title: "features.materials.title", text: "features.materials.text", image: ecoMaterials },
-    { title: "features.water.title", text: "features.water.text", image: lowWaterPlant },
+    { title: "features.materials.title", text: "features.materials.text", image: lowWaterPlant },
+    { title: "features.water.title", text: "features.water.text", image:  ecoMaterials },
     { title: "features.automation.title", text: "features.automation.text", image: automatedControl },
     { title: "features.future.title", text: "features.future.text", image: futureReady }
   ];
@@ -62,8 +62,8 @@ export default function EcoSmartLiving() {
                   style={{ backgroundImage: `url(${item.image})` }}
                 >
                   <div className="bg-black/50 w-full h-full rounded-full flex flex-col items-center justify-center px-4 text-center text-white">
-                    <span className="text-sm font-semibold">{t(item.title)}</span>
-                    <span className="text-[11px] mt-2 opacity-90">{t(item.text)}</span>
+                    <span className="text-xl font-semibold">{t(item.title)}</span>
+                    {/* <span className="text-[11px] mt-2 opacity-90">{t(item.text)}</span> */}
                   </div>
                 </div>
               </div>
@@ -79,8 +79,8 @@ export default function EcoSmartLiving() {
                   style={{ backgroundImage: `url(${item.image})` }}
                 >
                   <div className="bg-black/50 w-full h-full rounded-full flex flex-col items-center justify-center px-4 text-center text-white">
-                    <span className="text-sm font-semibold">{t(item.title)}</span>
-                    <span className="text-[11px] mt-2 opacity-90">{t(item.text)}</span>
+                    <span className="text-xl font-semibold">{t(item.title)}</span>
+                    {/* <span className="text-[11px] mt-2 opacity-90">{t(item.text)}</span> */}
                   </div>
                 </div>
               </div>

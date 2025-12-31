@@ -1,19 +1,16 @@
 {
-
-  
-    "hero": {
-      "title": "Transforming Homes With Premium",
-      "subtitle": "Outdoor Solutions"
+  "heading": "EcoSmart Living",
+  "description": "At XOTO, EcoSmart Living means creating landscapes that balance beauty, sustainability, and technology.",
+  "subheading": "How We Bring It to Life",
+  "features": {
+    "smartIrrigation": {
+      "title": "Smart Irrigation",
+      "text": "Sensor-based irrigation systems that conserve water."
     },
-    "services": {
-      "design": "Landscape Design & Execution",
-      "hardscape": "Hardscaping & Surface Works",
-      "pool": "Swimming Pools & Water Features",
-      "outdoor": "Outdoor Structures & Living Spaces"
-    },
-    "cta": {
-      "estimate": "Get a free estimate"
-    }
-  
-  
+    "solarLighting": "Solar Lighting",
+    "lowWaterPlant": "Low-Water Plants",
+    "ecoMaterials": "Eco-Friendly Materials",
+    "automatedControl": "Automated Control",
+    "futureReady": "Future-Ready Design"
+  }
 }

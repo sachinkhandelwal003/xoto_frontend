@@ -1,31 +1,31 @@
 {
-  "heading": "EcoSmart 生活",
-  "description": "在 XOTO，EcoSmart Living 融合美学、可持续性与科技。",
+  "heading": "EcoSmart 智能生活",
+  "description": "在 XOTO，EcoSmart Living 意味着打造融合美学、可持续性与智能科技的家居空间。",
   "subheading": "我们如何实现",
   "features": {
     "smartClimate": {
       "title": "智能气候控制",
-      "text": "自动化系统节能环保。"
+      "text": "自动化温控与通风系统，实现节能。"
     },
     "lighting": {
       "title": "LED 与太阳能照明",
-      "text": "低能耗照明解决方案。"
+      "text": "全屋低能耗氛围照明方案。"
     },
     "materials": {
       "title": "可持续材料",
-      "text": "环保木材和饰面。"
+      "text": "环保木材、石材及低碳饰面。"
     },
     "water": {
-      "title": "节水设备",
-      "text": "减少用水的现代设备。"
+      "title": "节水型设备",
+      "text": "减少用水的现代卫浴与家电。"
     },
     "automation": {
       "title": "智能家居管理",
-      "text": "通过应用或语音控制。"
+      "text": "通过应用或语音控制家居系统。"
     },
     "future": {
       "title": "面向未来的室内设计",
-      "text": "为绿色技术做好准备。"
+      "text": "适配绿色科技的模块化设计。"
     }
   }
 }

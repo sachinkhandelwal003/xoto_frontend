@@ -1,31 +1,31 @@
 {
-  "heading": "EcoSmart Pamumuhay",
-  "description": "Sa XOTO, ang EcoSmart Living ay pinagsasama ang ganda, sustainability, at teknolohiya.",
-  "subheading": "Paano Namin Ito Isinasagawa",
+  "heading": "EcoSmart na Pamumuhay",
+  "description": "Sa XOTO, ang EcoSmart Living para sa interiors ay ang pagdidisenyo ng mga tahanan na pinagsasama ang istilo, sustainability, at smart technology.",
+  "subheading": "Paano Namin Ito Isinasakatuparan",
   "features": {
     "smartClimate": {
       "title": "Smart Climate Control",
-      "text": "Automated systems para makatipid sa enerhiya."
+      "text": "Awtomatikong sistema ng temperatura at bentilasyon para sa pagtitipid ng enerhiya."
     },
     "lighting": {
-      "title": "LED at Solar Lighting",
-      "text": "Mababang konsumo ng enerhiya."
+      "title": "LED at Solar na Ilaw",
+      "text": "Mababang konsumo ng enerhiya na ilaw sa buong bahay."
     },
     "materials": {
-      "title": "Sustainable Materials",
-      "text": "Eco-friendly na materyales."
+      "title": "Sustainable na Materyales",
+      "text": "Eco-friendly na kahoy, bato, at finishing."
     },
     "water": {
-      "title": "Water-Efficient Fixtures",
-      "text": "Dinisenyo para sa mas kaunting paggamit ng tubig."
+      "title": "Water-Efficient na Fixtures",
+      "text": "Modernong gripo at appliances na nagbabawas ng gamit ng tubig."
     },
     "automation": {
       "title": "Automated Home Management",
-      "text": "Kontrolin gamit ang app o boses."
+      "text": "Kontrolin ang ilaw at appliances gamit ang app o boses."
     },
     "future": {
-      "title": "Future-Ready Interiors",
-      "text": "Handa para sa green technologies."
+      "title": "Handa sa Hinaharap na Interiors",
+      "text": "Flexible at modular na disenyo para sa green technologies."
     }
   }
 }

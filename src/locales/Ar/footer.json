@@ -1,0 +1,60 @@
+{
+  "company": {
+    "slogan": "منظومة موحدة تخلق <br/> قيمة عقارية مدى الحياة.",
+    "description": "قابلة للتوسع. مدعومة بالذكاء الاصطناعي. خفيفة الأصول."
+  },
+
+  "titles": {
+    "offerings": "عروضنا",
+    "resources": "منظومة الشركاء",
+    "knowledge": "من نحن",
+    "location": "المواقع",
+    "email": "البريد الإلكتروني"
+  },
+
+  "offerings": [
+    { "label": "تنسيق الحدائق", "path": "/landscaping" },
+    { "label": "التصميم الداخلي", "path": "/interiors" },
+    { "label": "الإيجارات", "path": "/rentals" },
+    { "label": "شراء", "path": "/buy" },
+    { "label": "بيع", "path": "/sell" },
+    { "label": "الرهون العقارية", "path": "/mortgage/services" },
+    { "label": "الصيانة", "path": "/maintenance" }
+  ],
+
+  "resources": [
+    { "label": "التحالفات الاستراتيجية", "path": "/strategic-alliance" },
+    { "label": "شركاء الأعمال", "path": "/business-associates" },
+    { "label": "شركاء التنفيذ", "path": "/execution-partners" },
+    { "label": "المطورون", "path": "/developers" },
+    { "label": "المؤسسات المالية", "path": "/financial-institutions" }
+  ],
+
+  "knowledge": [
+    { "label": "مركز المعرفة", "path": "/knowledge-centre" },
+    { "label": "استدامتنا", "path": "/sustainability" },
+    { "label": "التركيز", "path": "/focus" },
+    { "label": "أرسل ملاحظاتك", "path": "/feedback" },
+    { "label": "اتصل بنا", "path": "/contact" },
+    { "label": "سياسة الخصوصية", "path": "/privacy" },
+    { "label": "شروط الاستخدام", "path": "/terms" }
+  ],
+
+  "locations": "الهند | الإمارات العربية المتحدة | المملكة العربية السعودية",
+
+  "email": {
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
+  },
+
+  "social": [
+    { "name": "فيسبوك", "url": "#" },
+    { "name": "إنستغرام", "url": "#" },
+    { "name": "تويتر", "url": "#" },
+    { "name": "لينكدإن", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "© 2021 XOTO. جميع الحقوق محفوظة"
+  }
+}

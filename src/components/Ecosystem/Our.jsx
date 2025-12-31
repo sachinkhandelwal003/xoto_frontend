@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import wave1 from "../../assets/img/wave/waveint2.png";
-import round from "../../assets/img/round23.mp4";
+import round from "../../assets/img/round231.mp4";
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/icons/Homeicons/partners.png";
 import vector from "../../assets/icons/Homeicons/Vector.png";
@@ -57,7 +57,7 @@ const BuiltForEveryone = () => {
   }, [cardsToShow]);
 
   return (
-    <section className="relative bg-white overflow-hidden py-16 px-4 sm:px-6 lg:px-8 ">
+    <section className="relative bg-[var(--color-body)] overflow-hidden py-3 px-4 sm:px-6 lg:px-8   ">
       <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] left-0 w-full z-20 pointer-events-none">
   <img
     src={wave1}
@@ -104,7 +104,7 @@ const BuiltForEveryone = () => {
                 {cards.map((card, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 bg-[var(--color-body)] rounded-xl p-6 transition-all duration-300 ${
+                    className={`flex-shrink-0 bg-white rounded-xl p-6 transition-all duration-300 ${
                       index >= currentIndex &&
                       index < currentIndex + cardsToShow
                         ? "shadow-xl scale-100 opacity-100"
@@ -116,14 +116,14 @@ const BuiltForEveryone = () => {
                         : `calc(${100 / cardsToShow}% - 16px)`
                     }}
                   >
-                    <div className="flex justify-between items-center mb-4 bg-[var(--color-body)]">
+                    <div className="flex justify-between items-center mb-4 ">
                       <h3 className="text-xl card-heading">{card.title}</h3>
                       <div className="bg-[var(--color-primary)] p-2 rounded-full">
                         <img src={card.icon} alt="" className="w-6 h-6" />
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 leading-relaxed bg-[var(--color-body)]">
+                    <p className="text-sm text-gray-600 leading-relaxed ">
                       {card.desc}
                     </p>
                   </div>

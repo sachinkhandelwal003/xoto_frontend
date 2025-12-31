@@ -8,7 +8,8 @@ import kitchen from "../../assets/img/service/kitchen123.png";
 import lamp from "../../assets/img/service/lamp.png";
 import wall from "../../assets/img/service/wall.png";
 import wardrobe from "../../assets/img/service/wardrobe123.png";
-
+import frushing from "../../assets/img/service/furshing.png";
+import falsi from "../../assets/img/service/falsi.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ServicesPortfolio() {
@@ -42,10 +43,13 @@ export default function ServicesPortfolio() {
   const services = [
     { title: "services.kitchen", icon: kitchen },
     { title: "services.wardrobe", icon: wardrobe },
+      { title: "services.lighting", icon: lamp },
     { title: "services.electrical", icon: electrical },
     { title: "services.civil", icon: construction },
-    { title: "services.lighting", icon: lamp },
+     { title: "services.falsi", icon: falsi },
     { title: "services.wall", icon: wall },
+        { title: "services.frushing", icon: frushing },
+         
   ];
 
   return (

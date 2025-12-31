@@ -1,10 +1,18 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
+
 /* =========================
    AR
 ========================= */
-import arCommon from "./locales/Ar/common.json";
+import arCommon from "./locales/ar/common.json";
+import arhome from "./locales/ar/home.json"
+import arhome1 from "./locales/ar/home1.json"
+import arhome2 from "./locales/ar/home2.json"
+import arhome3 from "./locales/ar/home3.json"
+import arhome4 from "./locales/ar/home4.json"
+import arhome5 from "./locales/ar/home5.json"
+import arfooter from "./locales/ar/footer.json"
 import arbuy1 from './locales/Ar/buy1.json'
 
 /* =========================
@@ -27,28 +35,26 @@ import enInterior6 from "./locales/en/interior6.json";
 import enInterior7 from "./locales/en/interior7.json";
 import enScape1 from "./locales/en/scape1.json";
 import enScape2 from "./locales/en/scape2.json";
-import enbuy1 from './locales/en/buy1.json'
-import enbuy2 from './locales/en/buy2.json'
-import enbuy3 from './locales/en/buy3.json'
-import enbuy4 from './locales/en/buy4.json'
-import enbuy5 from './locales/en/buy5.json'
-import enbuy6 from './locales/en/buy6.json'
-import enbuy7 from './locales/en/buy7.json'
-import enpage3 from './locales/en/page3.json'
-import enecosystem from './locales/en/ecosystem.json'
-import enwhyPartner from './locales/en/whyPartner.json'
-import enstakeholders from './locales/en/stakeholders.json'
-import enpartnerForm from './locales/en/partnerForm.json'
-import enbuiltForEveryone from './locales/en/builtForEveryone.json'
-import enCta from './locales/en/cta.json'
-
+import enbuy1 from "./locales/en/buy1.json";
+import enbuy2 from "./locales/en/buy2.json";
+import enbuy3 from "./locales/en/buy3.json";
+import enbuy4 from "./locales/en/buy4.json";
+import enbuy5 from "./locales/en/buy5.json";
+import enbuy6 from "./locales/en/buy6.json";
+import enbuy7 from "./locales/en/buy7.json";
+import enpage3 from "./locales/en/page3.json";
+import enecosystem from "./locales/en/ecosystem.json";
+import enwhyPartner from "./locales/en/whyPartner.json";
+import enstakeholders from "./locales/en/stakeholders.json";
+import enpartnerForm from "./locales/en/partnerForm.json";
+import enbuiltForEveryone from "./locales/en/builtForEveryone.json";
+import enCta from "./locales/en/cta.json";
 import enMort1 from "./locales/en/mort1.json";
 import enMort2 from "./locales/en/mort2.json";
 import enMort3 from "./locales/en/mort3.json";
 import enMort6 from "./locales/en/mort6.json";
-
-import enbook from './locales/en/book.json'
-import enconsultation from './locales/en/consultation.json'
+import enbook from "./locales/en/book.json";
+import enconsultation from "./locales/en/consultation.json";
 
 /* =========================
    HI
@@ -70,27 +76,26 @@ import hiInterior6 from "./locales/hi/interior6.json";
 import hiInterior7 from "./locales/hi/interior7.json";
 import hiScape1 from "./locales/hi/scape1.json";
 import hiScape2 from "./locales/hi/scape2.json";
-import hibuy1 from './locales/hi/buy1.json'
-import hibuy2 from './locales/hi/buy2.json'
-import hibuy3 from './locales/hi/buy3.json'
-import hibuy4 from './locales/hi/buy4.json'
-import hibuy5 from './locales/hi/buy5.json'
-import hibuy6 from './locales/hi/buy6.json'
-import hibuy7 from './locales/hi/buy7.json'
-import hipage3 from './locales/hi/page3.json'
-import hiecosystem from './locales/hi/ecosystem.json'
-import hiwhyPartner from './locales/hi/whyPartner.json'
-import histakeholders from './locales/hi/stakeholders.json'
-import hipartnerForm from './locales/hi/partnerForm.json'
-import hibuiltForEveryone from './locales/hi/builtForEveryone.json'
-import hiCta from './locales/hi/cta.json'
+import hibuy1 from "./locales/hi/buy1.json";
+import hibuy2 from "./locales/hi/buy2.json";
+import hibuy3 from "./locales/hi/buy3.json";
+import hibuy4 from "./locales/hi/buy4.json";
+import hibuy5 from "./locales/hi/buy5.json";
+import hibuy6 from "./locales/hi/buy6.json";
+import hibuy7 from "./locales/hi/buy7.json";
+import hipage3 from "./locales/hi/page3.json";
+import hiecosystem from "./locales/hi/ecosystem.json";
+import hiwhyPartner from "./locales/hi/whyPartner.json";
+import histakeholders from "./locales/hi/stakeholders.json";
+import hipartnerForm from "./locales/hi/partnerForm.json";
+import hibuiltForEveryone from "./locales/hi/builtForEveryone.json";
+import hiCta from "./locales/hi/cta.json";
 import hiMort1 from "./locales/hi/mort1.json";
 import hiMort2 from "./locales/hi/mort2.json";
 import hiMort3 from "./locales/hi/mort3.json";
 import hiMort6 from "./locales/hi/mort6.json";
-
-import hibook from './locales/hi/book.json'
-import hiconsultation from './locales/hi/consultation.json'
+import hibook from "./locales/hi/book.json";
+import hiconsultation from "./locales/hi/consultation.json";
 
 /* =========================
    DE
@@ -390,10 +395,25 @@ import tlconsultation from './locales/tl/consultation.json'
    FA
 ========================= */
 import faCommon from "./locales/fa/common.json";
-import faMort1 from "./locales/fa/mort1.json";
-import faMort2 from "./locales/fa/mort2.json";
-import faMort3 from "./locales/fa/mort3.json";
-import faMort6 from "./locales/fa/mort6.json";
+import fahome from "./locales/fa/home.json";
+import fahome1 from "./locales/fa/home1.json";
+import fahome2 from "./locales/fa/home";
+import fahome3 from "./locales/fa/home3.json";
+import fahome4 from "./locales/fa/home4.json";
+import fahome5 from "./locales/fa/home5.json";
+import fafooter from "./locales/fa/footer.json"
+
+/* =========================
+   UR
+========================= */
+import urcommon  from "./locales/ur/common.json";
+import  urfooter from "./locales/ur/footer.json";
+import   urhome from "./locales/ur/home.json";
+import   urhome1 from "./locales/ur/home1.json";
+import   urhome2 from "./locales/ur/home2.json";
+import  urhome3 from "./locales/ur/home3.json";
+import  urhome4 from "./locales/ur/home4.json";
+import  urhome5 from "./locales/ur/home5.json";
 
 
 /* =========================
@@ -842,32 +862,34 @@ i18n
 
       fa: {
         common: faCommon,
-        mort1: faMort1,
-        mort2: faMort2,
-        mort3: faMort3,
-        mort6: faMort6
+home:fahome,
+        home1: fahome1,
+        home2: fahome2,
+        home3: fahome3,
+        home4: fahome4,
+        home5:fahome5,
+        footer:fafooter,
+        
       },
-
-      Ar: {
-        common: arCommon,
-        buy1: arbuy1
-      }
-    },
+            ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   ,    },
+       ur: { common: urcommon , home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   ,    },
+    
+          },
 
     fallbackLng: "en",
 
-    supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa", "Ar"],
+ supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa","ur","ar"],
 
     ns: [
       "common","home","home1","home2","home3","home4","home5",
-      "footer",
-      "interior1","interior2","interior3","interior4",
+      "footer","interior1","interior2","interior3","interior4",
       "interior5","interior6","interior7",
       "scape1","scape2",
       "buy1","buy2","buy3","buy4","buy5","buy6","buy7",
       "page3","ecosystem","whyPartner","stakeholders",
-      "partnerForm","builtForEveryone", "cta",
-      "mort1","mort2","mort3","mort6", "book", "consultation"
+      "partnerForm","builtForEveryone","cta",
+      "mort1","mort2","mort3","mort6",
+      "book","consultation"
     ],
 
     defaultNS: "common",

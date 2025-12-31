@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ArrowRight } from "lucide-react";
-import mainbgImage from "../../assets/img/mainbg.jpg";
+import mainbgImage from "../../assets/img/logo/mainbgg.png";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -11,10 +11,10 @@ export default function HeroSectionInterior() {
 
   return (
     <div
-      className="relative w-full bg-cover bg-center bg-no-repeat"
+      className="relative w-full bg-cover bg-center bg-no-repeat "
       style={{ backgroundImage: `url(${mainbgImage})` }}
     >
-      <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-16 py-28 md:py-40">
+      <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-16 py-28 md:py-40 ">
         <div className="max-w-4xl text-center mx-auto">
           
           <h1 className="mb-6 heading-light">
@@ -39,8 +39,8 @@ export default function HeroSectionInterior() {
               </button>
             </Link>
           </div>
- <div className="absolute bottom-0 left-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-left-shape border-none "></div>
-        <div className="absolute bottom-0 right-0 w-70 h-10 bg-[#f5f5f5] z-[5] clip-right-shape border-none"></div>
+ <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape border-none "></div>
+        <div className="absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape border-none"></div>
 
         {/* Custom clip paths */}
         <style>{`
