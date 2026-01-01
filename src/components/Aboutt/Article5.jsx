@@ -1,8 +1,11 @@
 import React from "react";
 import greenHouse from "../../assets/img/house-with-lot-windows-bed-with-sofa-it_1103290-30179 1.png";
 import waveBottom from "../../assets/img/1.png";
+import { useTranslation } from "react-i18next";
 
 const Article5 = () => {
+  const { t } = useTranslation("article5");
+
   return (
     <section className="relative bg-gradient-to-b from-white to-[#F8FDF8] overflow-hidden">
       {/* Green wave */}
@@ -17,9 +20,9 @@ const Article5 = () => {
         {/* HEADING */}
         <div className="text-center mt-10">
           <h2 className="font-semibold text-black heading-dark-1 mt-5">
-            Building a Greener Tomorrow,
+            {t("title.line1")}
             <br className="hidden lg:block" />
-            <span className="block mt-2">One Space at a Time</span>
+            <span className="block mt-2">{t("title.line2")}</span>
           </h2>
         </div>
 
@@ -31,7 +34,7 @@ const Article5 = () => {
                      max-w-6xl mx-auto
                      my-16 sm:my-20"
         >
-          {/* IMAGE – mobile centered & larger */}
+          {/* IMAGE */}
           <div className="flex justify-center">
             <img
               src={greenHouse}
@@ -46,33 +49,24 @@ const Article5 = () => {
             />
           </div>
 
-          {/* TEXT – centered on mobile, left on desktop */}
-          {/* TEXT – responsive & readable */}
+          {/* TEXT */}
           <div
             className="
-    w-full
-    max-w-none sm:max-w-xl
-    mx-auto lg:mx-0
-    text-center lg:text-left
-    space-y-5
-    font-medium
-    text-[#547593]
-  "
+              w-full
+              max-w-none sm:max-w-xl
+              mx-auto lg:mx-0
+              text-center lg:text-left
+              space-y-5
+              font-medium
+              text-[#547593]
+            "
           >
             <p className="text-sm leading-relaxed sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
-              At XOTO, we believe sustainability isn’t a choice — it’s the
-              foundation of future living. In a world where conscious living
-              defines progress, embracing sustainable practices means creating
-              spaces that thrive in harmony with nature and innovation. From
-              eco-friendly landscaping and energy-efficient interiors to
-              responsible partnerships and mindful material sourcing,
+              {t("paragraphs.p1")}
             </p>
 
             <p className="text-sm leading-relaxed sm:text-base sm:leading-7 lg:text-lg lg:leading-8">
-              Through our integrated approach, we help property owners,
-              developers, and partners align with global sustainability goals —
-              enhancing not just aesthetics, but long-term property worth and
-              community wellbeing.
+              {t("paragraphs.p2")}
             </p>
           </div>
         </div>

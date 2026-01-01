@@ -1,7 +1,10 @@
 import React from "react";
 import roomImage from "../../assets/img/ui-ux-design_1197721-139046 1.png";
+import { useTranslation } from "react-i18next";
 
 const Article4 = () => {
+  const { t } = useTranslation("article4");
+
   return (
     <section className="w-full overflow-hidden bg-gradient-to-b from-[#00A7FF] via-[#296EF0] to-[#5C1BB0] py-10 sm:py-10">
       <div
@@ -23,7 +26,7 @@ const Article4 = () => {
               leading-tight lg:leading-[55px]
             "
           >
-            AI In Our DNA
+            {t("title")}
           </h2>
 
           <p
@@ -35,9 +38,7 @@ const Article4 = () => {
               max-w-[520px]
             "
           >
-            At XOTO, artificial intelligence powers every touchpoint, making
-            property discovery, design, financing, and management smarter,
-            faster, and more personalized for every stakeholder.
+            {t("description")}
           </p>
         </div>
 

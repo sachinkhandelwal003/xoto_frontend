@@ -1,7 +1,10 @@
 import React from "react";
 import bgImage from "../../assets/img/top-view-dubai 2.jpg";
+import { useTranslation } from "react-i18next";
 
 const Article1 = () => {
+  const { t } = useTranslation("article1");
+
   return (
     <section
       className="
@@ -27,9 +30,9 @@ const Article1 = () => {
             drop-shadow-xl
           "
         >
-          AI-Powered Disruptor In
+          {t("title.line1")}
           <br />
-          Property Lifecycle
+          {t("title.line2")}
         </h1>
 
         <p
@@ -39,9 +42,10 @@ const Article1 = () => {
             drop-shadow-lg
           "
         >
-          Driven by AI. Built for Everyone
+          {t("subtitle")}
         </p>
       </div>
+
       {/* Bottom clipping shapes */}
       <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
       <div className="absolute bottom-0 right-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-right-shape" />
