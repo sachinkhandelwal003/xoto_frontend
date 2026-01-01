@@ -13,7 +13,14 @@ import arhome3 from "./locales/ar/home3.json"
 import arhome4 from "./locales/ar/home4.json"
 import arhome5 from "./locales/ar/home5.json"
 import arfooter from "./locales/ar/footer.json"
+
 import arbuy1 from './locales/Ar/buy1.json'
+import ararticle1 from './locales/ar/article1.json'
+import ararticle2 from "./locales/Ar/article2.json"
+import ararticle3 from "./locales/Ar/article3.json"
+import ararticle4 from "./locales/Ar/article4.json"
+import ararticle5 from "./locales/Ar/article5.json"
+
 
 /* =========================
    EN
@@ -55,6 +62,11 @@ import enMort3 from "./locales/en/mort3.json";
 import enMort6 from "./locales/en/mort6.json";
 import enbook from "./locales/en/book.json";
 import enconsultation from "./locales/en/consultation.json";
+import enarticle1 from './locales/en/article1.json'
+import enarticle2 from "./locales/en/article2.json"
+import enarticle3 from "./locales/en/article3.json"
+import enarticle4 from "./locales/en/article4.json"
+import enarticle5 from "./locales/en/article5.json"
 
 /* =========================
    HI
@@ -96,6 +108,12 @@ import hiMort3 from "./locales/hi/mort3.json";
 import hiMort6 from "./locales/hi/mort6.json";
 import hibook from "./locales/hi/book.json";
 import hiconsultation from "./locales/hi/consultation.json";
+import hiarticle1 from './locales/hi/article1.json'
+import hiarticle2 from "./locales/hi/article2.json"
+import hiarticle3 from "./locales/hi/article3.json"
+import hiarticle4 from "./locales/hi/article4.json"
+import hiarticle5 from "./locales/hi/article5.json"
+
 
 /* =========================
    DE
@@ -138,6 +156,11 @@ import deMort6 from "./locales/de/mort6.json";
 
 import debook from './locales/de/book.json'
 import deconsultation from './locales/de/consultation.json'
+import dearticle1 from './locales/de/article1.json'
+import dearticle2 from "./locales/de/article2.json"
+import dearticle3 from "./locales/de/article3.json"
+import dearticle4 from "./locales/de/article4.json"
+import dearticle5 from "./locales/de/article5.json"
 
 /* =========================
    ES
@@ -180,6 +203,11 @@ import esMort6 from "./locales/es/mort6.json";
 
 import esbook from './locales/es/book.json'
 import esconsultation from './locales/es/consultation.json'
+import esarticle1 from './locales/es/article1.json'
+import esarticle2 from "./locales/es/article2.json"
+import esarticle3 from "./locales/es/article3.json"
+import esarticle4 from "./locales/es/article4.json"
+import esarticle5 from "./locales/es/article5.json"
 
 /* =========================
    FR
@@ -222,6 +250,11 @@ import frMort6 from "./locales/fr/mort6.json";
 
 import frbook from './locales/fr/book.json'
 import frconsultation from './locales/fr/consultation.json'
+import frarticle1 from './locales/fr/article1.json'
+import frarticle2 from "./locales/fr/article2.json"
+import frarticle3 from "./locales/fr/article3.json"
+import frarticle4 from "./locales/fr/article4.json"
+import frarticle5 from "./locales/fr/article5.json"
 
 /* =========================
    RU
@@ -264,6 +297,11 @@ import ruMort6 from "./locales/ru/mort6.json";
 
 import rubook from './locales/ru/book.json'
 import ruconsultation from './locales/ru/consultation.json'
+import ruarticle1 from './locales/ru/article1.json'
+import ruarticle2 from "./locales/ru/article2.json"
+import ruarticle3 from "./locales/ru/article3.json"
+import ruarticle4 from "./locales/ru/article4.json"
+import ruarticle5 from "./locales/ru/article5.json"
 
 /* =========================
    TR
@@ -306,6 +344,11 @@ import trMort6 from "./locales/tr/mort6.json";
 
 import trbook from './locales/tr/book.json'
 import trconsultation from './locales/tr/consultation.json'
+import trarticle1 from './locales/tr/article1.json'
+import trarticle2 from "./locales/tr/article2.json"
+import trarticle3 from "./locales/tr/article3.json"
+import trarticle4 from "./locales/tr/article4.json"
+import trarticle5 from "./locales/tr/article5.json"
 
 /* =========================
    ZH
@@ -348,6 +391,11 @@ import zhMort6 from "./locales/zh/mort6.json";
 
 import zhbook from './locales/zh/book.json'
 import zhconsultation from './locales/zh/consultation.json'
+import zharticle1 from './locales/zh/article1.json'
+import zharticle2 from "./locales/zh/article2.json"
+import zharticle3 from "./locales/zh/article3.json"
+import zharticle4 from "./locales/zh/article4.json"
+import zharticle5 from "./locales/zh/article5.json"
 
 /* =========================
    TL
@@ -390,6 +438,11 @@ import tlMort3 from "./locales/tl/mort3.json";
 import tlMort6 from "./locales/tl/mort6.json";
 import tlbook from './locales/tl/book.json'
 import tlconsultation from './locales/tl/consultation.json'
+import tlarticle1 from './locales/tl/article1.json'
+import tlarticle2 from "./locales/tl/article2.json"
+import tlarticle3 from "./locales/tl/article3.json"
+import tlarticle4 from "./locales/tl/article4.json"
+import tlarticle5 from "./locales/tl/article5.json"
 
 /* =========================
    FA
@@ -402,6 +455,11 @@ import fahome3 from "./locales/fa/home3.json";
 import fahome4 from "./locales/fa/home4.json";
 import fahome5 from "./locales/fa/home5.json";
 import fafooter from "./locales/fa/footer.json"
+import faarticle1 from './locales/fa/article1.json'
+import faarticle2 from "./locales/fa/article2.json"
+import faarticle3 from "./locales/fa/article3.json"
+import faarticle4 from "./locales/fa/article4.json"
+import faarticle5 from "./locales/fa/article5.json"
 
 /* =========================
    UR
@@ -414,6 +472,11 @@ import   urhome2 from "./locales/ur/home2.json";
 import  urhome3 from "./locales/ur/home3.json";
 import  urhome4 from "./locales/ur/home4.json";
 import  urhome5 from "./locales/ur/home5.json";
+import urarticle1 from './locales/ur/article1.json'
+import urarticle2 from "./locales/ur/article2.json"
+import urarticle3 from "./locales/ur/article3.json"
+import urarticle4 from "./locales/ur/article4.json"
+import urarticle5 from "./locales/ur/article5.json"
 
 
 /* =========================
@@ -545,7 +608,12 @@ i18n
         mort3: enMort3,
         mort6: enMort6,
         book: enbook,
-        consultation: enconsultation
+        consultation: enconsultation,
+        article1: enarticle1,
+        article2: enarticle2,
+        article3: enarticle3,
+        article4: enarticle4,
+        article5: enarticle5
       },
 
       hi: {
@@ -584,7 +652,12 @@ i18n
         mort3: hiMort3,
         mort6: hiMort6,
         book: hibook,
-        consultation: hiconsultation
+        consultation: hiconsultation,
+        article1: hiarticle1,
+        article2: hiarticle2,
+        article3: hiarticle3,
+        article4: hiarticle4,
+        article5: hiarticle5
       },
 
       de: {
@@ -623,7 +696,12 @@ i18n
         mort3: deMort3,
         mort6: deMort6,
         book: debook,
-        consultation: deconsultation
+        consultation: deconsultation,
+        article1: dearticle1,
+        article2: dearticle2,
+        article3: dearticle3,
+        article4: dearticle4,
+        article5: dearticle5
       },
 
       es: {
@@ -662,7 +740,12 @@ i18n
         mort3: esMort3,
         mort6: esMort6,
         book: esbook,
-        consultation: esconsultation
+        consultation: esconsultation,
+        article1: esarticle1,
+        article2: esarticle2,
+        article3: esarticle3,
+        article4: esarticle4,
+        article5: esarticle5
       },
 
       fr: {
@@ -701,7 +784,12 @@ i18n
         mort3: frMort3,
         mort6: frMort6,
         book: frbook,
-        consultation: frconsultation
+        consultation: frconsultation,
+        article1: frarticle1,
+        article2: frarticle2,
+        article3: frarticle3,
+        article4: frarticle4,
+        article5: frarticle5
       },
 
       ru: {
@@ -740,7 +828,12 @@ i18n
         mort3: ruMort3,
         mort6: ruMort6,
         book: rubook,
-        consultation: ruconsultation
+        consultation: ruconsultation,
+        article1: ruarticle1,
+        article2: ruarticle2,
+        article3: ruarticle3,
+        article4: ruarticle4,
+        article5: ruarticle5
       },
 
       tr: {
@@ -779,7 +872,12 @@ i18n
         mort3: trMort3,
         mort6: trMort6,
         book: trbook,
-        consultation: trconsultation
+        consultation: trconsultation,
+        article1: trarticle1,
+        article2: trarticle2,
+        article3: trarticle3,
+        article4: trarticle4,
+        article5: trarticle5
       },
 
       zh: {
@@ -818,7 +916,12 @@ i18n
         mort3: zhMort3,
         mort6: zhMort6,
         book: zhbook,
-        consultation: zhconsultation
+        consultation: zhconsultation,
+        article1: zharticle1,
+        article2: zharticle2,
+        article3: zharticle3,
+        article4: zharticle4,
+        article5: zharticle5
       },
 
       tl: {
@@ -857,11 +960,21 @@ i18n
         mort3: tlMort3,
         mort6: tlMort6,
         book: tlbook,
-        consultation: tlconsultation
+        consultation: tlconsultation,
+        article1: tlarticle1,
+        article2: tlarticle2,
+        article3: tlarticle3,
+        article4: tlarticle4,
+        article5: tlarticle5
       },
 
       fa: {
         common: faCommon,
+        article1:faarticle1,
+        article2: faarticle2,
+        article3: faarticle3,
+        article4: faarticle4,
+        article5: faarticle5,
 home:fahome,
         home1: fahome1,
         home2: fahome2,
@@ -869,10 +982,11 @@ home:fahome,
         home4: fahome4,
         home5:fahome5,
         footer:fafooter,
+
         
       },
-            ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   ,    },
-       ur: { common: urcommon , home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   ,    },
+            ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   , buy1: arbuy1, article1: ararticle1, article2: ararticle2 , article3: ararticle3, article4: ararticle4, article5: ararticle5   },
+       ur: { common: urcommon , home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5  },
     
           },
 
@@ -889,7 +1003,7 @@ home:fahome,
       "page3","ecosystem","whyPartner","stakeholders",
       "partnerForm","builtForEveryone","cta",
       "mort1","mort2","mort3","mort6",
-      "book","consultation"
+      "book","consultation", "article1","article2", "article3", "article4", "article5"
     ],
 
     defaultNS: "common",
