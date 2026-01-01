@@ -32,16 +32,38 @@ export default function Testimonialpage() {
 
     
 
-      <div className="absolute bottom-[-20px] lg:bottom-[-130px] left-0 w-full z-0 overflow-hidden">
-        <img
-          src={wave1}
-          alt=""
-          className="w-full min-w-[140%] -ml-[20%] scale-[1.8] lg:scale-100 lg:min-w-full lg:ml-0 pointer-events-none select-none"
-        />
-      </div>
+   <div
+  className="
+    absolute
+    bottom-[-10px]
+    md:bottom-[-60px]
+    lg:bottom-[-80px]
+
+    sm:right-[-200px]     /* mobile shift */
+    md:left-0          /* center on md+ */
+
+    w-full
+    overflow-hidden
+    z-0
+    pointer-events-none
+    select-none
+  "
+>
+  <img
+    src={wave1}
+    alt=""
+    className="
+      w-full
+      h-auto
+      object-cover
+      scale-x-125 md:scale-x-110 lg:scale-x-100
+    "
+  />
+</div>
+
 
       {/* Title */}
-      <h2 className="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-12 md:mb-16 relative z-20">
+      <h2 className="text-center text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 mb-12 md:mb-16 relative z-20">
 Our Partners      </h2>
 
       {/* Swiper */}

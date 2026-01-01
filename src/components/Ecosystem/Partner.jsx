@@ -30,7 +30,7 @@ const WhyPartnerSection = () => {
 
       {/* HEADING */}
       <div className="text-center mb-10 relative z-10">
-        <h2 className="text-4xl md:text-5xl font-bold text-black heading-dark-1">
+        <h2 className="text-4xl md:text-5xl font-semibold text-black heading-dark-1">
           {t("title")} <span className="text-black">XOTO?</span>
         </h2>
       </div>
@@ -70,7 +70,7 @@ const WhyPartnerSection = () => {
               className={`text-2xl font-bold transition-all duration-300 ${
                 active === item.id
                   ? "text-[var(--color-text-secondary)]"
-                  : "text-gray-800"
+                  : "text-gray-400"
               }`}
             >
               {item.title}
@@ -78,7 +78,7 @@ const WhyPartnerSection = () => {
 
             <p
               className={`text-md mt-2 transition-opacity duration-300 ${
-                active === item.id ? "text-gray-600" : "text-gray-500"
+                active === item.id ? "text-slate-600" : "text-gray-300"
               }`}
             >
               {item.desc}
@@ -92,10 +92,11 @@ const WhyPartnerSection = () => {
         <div className="flex gap-5">
           {/* VERTICAL PROGRESS (LEFT) */}
           <div className="relative w-[6px] bg-gray-200 rounded-full">
-            <div
-              className="absolute left-0 bottom-0 w-full bg-gradient-to-b from-green-400 to-green-500 rounded-full transition-all duration-500"
-              style={{ height: progressHeight }}
-            />
+           <div
+  className="absolute left-0 top-0 w-full bg-gradient-to-b from-green-400 to-green-500 rounded-full transition-all duration-500"
+  style={{ height: progressHeight }}
+/>
+
           </div>
 
           {/* FEATURES */}
@@ -111,18 +112,18 @@ const WhyPartnerSection = () => {
                 </p>
 
                 <h3
-                  className={`text-xl font-bold transition-all duration-300 ${
+                  className={`text-xl font-bold mb-2 transition-colors duration-300 ${
                     active === item.id
                       ? "text-[var(--color-text-secondary)]"
-                      : "text-gray-800"
+                      : "text-gray-400"
                   }`}
                 >
                   {item.title}
                 </h3>
 
                 <p
-                  className={`text-sm mt-2 transition-opacity duration-300 ${
-                    active === item.id ? "text-gray-600" : "text-gray-500"
+                  className={`text-sm leading-relaxed transition-colors duration-300 ${
+                    active === item.id ? "text-slate-600" : "text-gray-300"
                   }`}
                 >
                   {item.desc}

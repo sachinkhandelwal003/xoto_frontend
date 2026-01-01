@@ -16,6 +16,8 @@
         "phone": "Phone Number",
     
         "lookingFor": "I am Looking to",
+            "select": "Select an option", 
+
         "city": "Preferred City",
         "budget": "Budget",
     

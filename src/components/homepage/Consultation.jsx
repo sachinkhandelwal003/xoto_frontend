@@ -67,13 +67,7 @@ export default function Consultation() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation using Notification instead of alert
-    if (!formData.first_name.trim()) return openNotification('error', 'Validation Error', "First name is required");
-    if (!formData.last_name.trim()) return openNotification('error', 'Validation Error', "Last name is required");
-    if (!formData.email.includes("@")) return openNotification('error', 'Validation Error', "Valid email is required");
-    if (formData.number.length < 8) return openNotification('error', 'Validation Error', "Mobile number must be at least 8 digits");
-    if (!formData.message.trim()) return openNotification('error', 'Validation Error', "Message is required");
-
+   
     setLoading(true);
 
     const payload = {

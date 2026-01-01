@@ -1,7 +1,7 @@
 import emailIcon from "../../assets/icons/Homeicons/email.png";
 import addressIcon from "../../assets/icons/Homeicons/Career.png";
 import phoneIcon from "../../assets/icons/Homeicons/phone.png";
-import wave1 from "../../assets/img/wave/wave1.png";
+import wave1 from "../../assets/img/wave/waveint2.png";
 
 export default function ContactSection() {
   return (
@@ -29,7 +29,7 @@ export default function ContactSection() {
       {/* Content on top of wave */}
       <div className="relative z-10">
         {/* Heading */}
-        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-center text-black mb-10 sm:mb-14 md:mb-16">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-semibold text-center text-black mb-10 sm:mb-14 md:mb-16">
           Contact Information
         </h2>
 

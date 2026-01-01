@@ -74,7 +74,7 @@ export default function XotoLandingPage() {
 
         {/* Content */}
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center h-full px-6 text-center text-white">
-          <h1 className="heading-light font-bold">
+          <h1 className="heading-light font-semibold">
             {t("hero.title")}
           </h1>
 
@@ -84,7 +84,7 @@ export default function XotoLandingPage() {
 
           <Link
             to="/login"
-            className="mt-8 px-8 py-3 bg-[var(--color-primary)] text-white font-semibold rounded-lg shadow-lg transition-all duration-300 flex items-center gap-2"
+            className="mt-8 px-8 py-3 bg-[var(--color-primary)] text-white  rounded-lg shadow-lg transition-all duration-300 flex items-center gap-2"
           >
             {t("hero.cta")}
           </Link>

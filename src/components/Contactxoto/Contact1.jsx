@@ -4,7 +4,7 @@ import Picture from "../../assets/img/contactheroo.png";
 const ContactHero = () => {
   return (
     <section
-      className="relative bg-cover bg-center min-h-[450px] sm:min-h-[550px] md:min-h-[650px] lg:min-h-[720px] flex items-center justify-center text-white"
+      className="relative bg-cover bg-center min-h-[450px] sm:min-h-[550px] md:min-h-[650px] lg:min-h-[600px] flex items-center justify-center text-white"
       style={{ backgroundImage: `url(${Picture})` }}
     >
       {/* Overlay for better text visibility */}

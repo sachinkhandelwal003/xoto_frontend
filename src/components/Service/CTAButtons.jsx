@@ -3,27 +3,31 @@ import { useTranslation } from "react-i18next";
 
 export default function CTAButtons() {
   const { t, i18n } = useTranslation("mort1");
-
   const isRTL = i18n.language === "fa";
 
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
-      className={`flex items-center gap-4 flex-wrap ${
-        isRTL ? "justify-end" : "justify-center"
-      }`}
+      className="
+        flex flex-row items-center
+        justify-center
+        gap-3 sm:gap-4
+        w-full max-w-full
+      "
     >
       {/* PRIMARY BUTTON */}
       <button
         onClick={() => alert(t("cta.preApprovedAlert"))}
         className="
-          px-8 py-3
+          flex-1 sm:flex-none
+          px-3 sm:px-8
+          py-2.5 sm:py-3
           bg-[var(--color-primary)]
           text-white
-          font-semibold
           rounded-lg
           shadow-md
           transition-all duration-300
+          whitespace-nowrap
         "
       >
         {t("cta.preApproved")}
@@ -33,16 +37,17 @@ export default function CTAButtons() {
       <button
         onClick={() => alert(t("cta.calculateAlert"))}
         className="
-          px-8 py-3
-          border-2 border-white/70
+          flex-1 sm:flex-none
+          px-3 sm:px-8
+          py-2.5 sm:py-3
+          border-1 border-white/70
           text-white
-          font-semibold
           rounded-lg
-          backdrop-blur-sm
           transition-all duration-300
           hover:bg-[var(--color-primary)]
           hover:border-[#5C039B]
           hover:shadow-lg
+          whitespace-nowrap
         "
       >
         {t("cta.calculate")}

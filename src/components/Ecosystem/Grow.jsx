@@ -38,7 +38,9 @@ const CtaSection = () => {
 
   return (
     <>
-      <section className="relative w-full flex justify-center items-center py-12 px-6 md:h-[450px]">
+      <section className="relative w-full flex justify-center items-center py-12 px-4 sm:px-6 md:h-[450px]">
+        
+        {/* BACKGROUND WAVE */}
         <div className="absolute bottom-[-20px] lg:bottom-[-70px] left-0 w-full z-0 overflow-hidden">
           <img
             src={wave1}
@@ -47,49 +49,62 @@ const CtaSection = () => {
           />
         </div>
 
-        <div className="max-w-6xl relative banner-gradient-color rounded-2xl text-white flex flex-col md:flex-row justify-between items-center md:items-start p-8 md:p-14 gap-6 text-center md:text-left">
-          <div className="md:w-2/3 relative z-10">
+        {/* MAIN BANNER CONTAINER 
+            Responsive Layout:
+            - Mobile: flex-col (Vertical stack: Text -> Button -> Image)
+            - Desktop: md:block (allows absolute positioning of image on right)
+        */}
+        <div className="max-w-6xl w-full relative banner-gradient-color1 rounded-2xl text-white flex flex-col md:block items-center p-8 md:p-14 shadow-2xl overflow-hidden z-10">
+          
+          {/* CONTENT (Text & Button) */}
+          <div className="w-full md:w-2/3 relative z-10 text-center md:text-left">
             <h2 className="text-3xl md:text-5xl font-extrabold leading-snug heading-light mb-6">
               {t("title")}
             </h2>
 
             <button
               onClick={() => setOpenModal(true)}
-              className="bg-[#5C039B] px-6 py-3 rounded-md font-semibold text-white shadow-md transition"
+              className="bg-[#5C039B] px-8 py-4 rounded-lg font-bold text-white shadow-lg hover:bg-[#4a027d] transition-transform transform hover:scale-105"
             >
               {t("ctaButton")}
             </button>
           </div>
 
-          <div className="mt-6 md:mt-0 md:absolute md:bottom-0 md:right-0">
+          {/* IMAGE CONTAINER
+             - Mobile: Relative flow (mt-8), Centered (mx-auto). Matches your mobile screenshot.
+             - Desktop: Absolute position (bottom-0 right-0).
+          */}
+          <div className="mt-8 md:mt-0 md:absolute md:bottom-0 md:right-0 z-0 w-full md:w-auto flex justify-center md:block">
             <img
               src={GrowImage}
-              alt=""
-              className="object-contain h-56 md:h-80 drop-shadow-2xl"
+              alt="Growth"
+              className="object-contain h-56 md:h-[350px] drop-shadow-2xl md:translate-y-2" 
             />
           </div>
+
         </div>
       </section>
 
+      {/* MODAL */}
       {openModal && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[999]">
-          <div className="bg-white w-[90%] max-w-md p-6 rounded-xl shadow-xl relative">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[9999] p-4">
+          <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl relative animate-fadeIn">
             <button
               onClick={() => setOpenModal(false)}
-              className="absolute right-3 top-3 text-gray-500 hover:text-black text-xl"
+              className="absolute right-4 top-4 text-gray-400 hover:text-red-500 text-2xl transition-colors"
             >
               ×
             </button>
 
-            <h2 className="text-2xl font-bold mb-4 text-center">
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
               {t("modal.title")}
             </h2>
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
-                <label className="text-sm font-medium">{t("form.name")} *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">{t("form.name")} *</label>
                 <input
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition"
                   placeholder={t("form.namePlaceholder")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -97,40 +112,40 @@ const CtaSection = () => {
               </div>
 
               <div>
-                <label className="text-sm font-medium">{t("form.email")}</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">{t("form.email")}</label>
                 <input
                   type="email"
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition"
                   placeholder={t("form.emailPlaceholder")}
                 />
               </div>
 
               <div>
-                <label className="text-sm font-medium">{t("form.phone")}</label>
-                <div className="flex gap-2">
-                  <select className="border px-3 py-2 rounded-md">
-                    <option value="+971">🇦🇪 UAE +971</option>
-                    <option value="+91">🇮🇳 India +91</option>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">{t("form.phone")}</label>
+                <div className="flex gap-3">
+                  <select className="border border-gray-300 px-3 py-3 rounded-lg bg-white focus:ring-2 focus:ring-purple-500 outline-none">
+                    <option value="+971">🇦🇪 +971</option>
+                    <option value="+91">🇮🇳 +91</option>
                   </select>
                   <input
                     type="tel"
-                    className="w-full border px-3 py-2 rounded-md"
+                    className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition"
                     placeholder={t("form.phonePlaceholder")}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   {t("form.inquiry")} *
                 </label>
                 <select
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg bg-white focus:ring-2 focus:ring-purple-500 outline-none"
                   value={inquiryType}
                   onChange={(e) => setInquiryType(e.target.value)}
                 >
                   <option value="">{t("form.select")}</option>
-                  {t("form.options", { returnObjects: true }).map((o) => (
+                  {(t("form.options", { returnObjects: true }) || []).map((o) => (
                     <option key={o} value={o}>
                       {o}
                     </option>
@@ -139,19 +154,19 @@ const CtaSection = () => {
               </div>
 
               <div>
-                <label className="text-sm font-medium">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   {t("form.message")}
                 </label>
                 <textarea
-                  className="w-full border px-3 py-2 rounded-md"
-                  rows="4"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"
+                  rows="3"
                   placeholder={t("form.messagePlaceholder")}
                 />
               </div>
 
               <button
                 type="submit"
-                className="bg-[#5C039B] w-full py-3 rounded-md text-white font-semibold"
+                className="w-full bg-[#5C039B] hover:bg-[#4a027d] py-4 rounded-lg text-white font-bold text-lg shadow-lg transition-colors"
               >
                 {t("form.submit")}
               </button>
@@ -161,7 +176,7 @@ const CtaSection = () => {
       )}
 
       {toast && (
-        <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-[#5C039B] text-white px-5 py-4 rounded-lg shadow-lg whitespace-pre-line text-sm font-medium z-[9999]">
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 bg-[#5C039B] text-white px-6 py-4 rounded-xl shadow-2xl whitespace-pre-line text-sm font-medium z-[9999] animate-bounce">
           {toast}
         </div>
       )}

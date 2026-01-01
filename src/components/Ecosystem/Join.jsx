@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import toast, { Toaster } from "react-hot-toast";
+import { notification } from "antd"; // Import Ant Design notification
 import { apiService } from "../../manageApi/utils/custom.apiservice";
 
 import joinImage from "../../assets/img/join.png";
@@ -8,6 +8,9 @@ import wave1 from "../../assets/img/wave/waveint5.png";
 
 const PartnerEcosystemSection = () => {
   const { t } = useTranslation("partnerForm");
+  
+  // 1. Initialize Ant Design Notification
+  const [api, contextHolder] = notification.useNotification();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -21,6 +24,17 @@ const PartnerEcosystemSection = () => {
   });
 
   const [loading, setLoading] = useState(false);
+
+  // 2. Helper to trigger notification
+  const openNotification = (type, title, description) => {
+    api[type]({
+      message: title,
+      description: description,
+      placement: "topRight",
+      showProgress: true,
+      pauseOnHover: true,
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,7 +57,7 @@ const PartnerEcosystemSection = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error(t("toast.invalid"));
+      openNotification("error", "Validation Error", t("toast.invalid"));
       return;
     }
 
@@ -68,7 +82,13 @@ const PartnerEcosystemSection = () => {
     try {
       const res = await apiService.post("/property/lead", payload);
       if (res.success) {
-        toast.success(t("toast.success"));
+        // 3. Success Notification
+        openNotification(
+          "success",
+          "Thank You!",
+          "Your request to join the XOTO Partner Ecosystem has been submitted successfully. Our team will contact you shortly."
+        );
+
         setFormData({
           firstName: "",
           lastName: "",
@@ -81,7 +101,11 @@ const PartnerEcosystemSection = () => {
         });
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || t("toast.error"));
+      openNotification(
+        "error",
+        "Submission Failed",
+        err.response?.data?.message || t("toast.error")
+      );
     } finally {
       setLoading(false);
     }
@@ -89,10 +113,13 @@ const PartnerEcosystemSection = () => {
 
   return (
     <>
-      <Toaster position="top-center" />
+      {/* 4. Render the notification context holder */}
+      {contextHolder}
 
-      <section className="w-full relative bg-[var(--color-body)] py-16 md:py-20 px-6 md:px-12 z-10">
-        <div className="absolute top-[-40px] sm:top-[-80px] lg:top-[-150px] left-0 w-full z-0 overflow-hidden">
+      <section className="w-full relative bg-[var(--color-body)] py-16 md:py-20 px-4 md:px-12 z-10 overflow-hidden">
+        
+        {/* WAVE BACKGROUND */}
+        <div className="absolute top-[-40px] sm:top-[-80px] lg:top-[-150px] left-0 w-full z-0 ">
           <img
             src={wave1}
             alt=""
@@ -100,110 +127,161 @@ const PartnerEcosystemSection = () => {
           />
         </div>
 
-        <div className="relative z-20 max-w-7xl mx-auto grid md:grid-cols-2 items-center">
-          {/* LEFT */}
-          <div className="flex flex-col items-center">
-            <h2 className="hidden lg:block text-2xl md:text-5xl font-semibold text-black mb-6">
+        <div className="relative z-20 max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+          
+          {/* LEFT CONTENT */}
+          <div className="flex flex-col">
+            {/* Desktop Title */}
+            <h2 className="hidden lg:block text-2xl md:text-5xl font-semibold text-black">
               {t("hero.titleDesktop")}
             </h2>
 
-            <h2 className="block lg:hidden text-3xl md:text-4xl font-bold text-black mb-6">
+            {/* Mobile Title (Centered) */}
+            <h2 className="block lg:hidden text-3xl font-semibold text-black mb-6 text-center">
               {t("hero.titleMobile")}
             </h2>
 
+            {/* Image (Hidden on Mobile) */}
             <img
               src={joinImage}
               alt="People collaborating"
-              className="w-full max-w-md mt-4 md:mt-8"
+              className="hidden md:block w-full max-w-md mt-4 md:mt-8 mx-auto md:mx-0"
             />
           </div>
 
-          {/* FORM */}
-          <div className="bg-white shadow-2xl rounded-2xl md:p-10 p-4 w-full mx-auto">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  name="firstName"
-                  placeholder={t("form.firstName")}
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
-                />
-                <input
-                  name="lastName"
-                  placeholder={t("form.lastName")}
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
+          {/* FORM CONTAINER */}
+          <div className="bg-white shadow-2xl rounded-2xl md:p-10 p-5 w-full max-w-full">
+            <form className="space-y-4 md:space-y-5" onSubmit={handleSubmit}>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  name="email"
-                  type="email"
-                  placeholder={t("form.email")}
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
-                />
-                <input
-                  name="company"
-                  placeholder={t("form.company")}
-                  value={formData.company}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <select
-                  name="stakeholder"
-                  value={formData.stakeholder}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="">{t("form.stakeholder.select")}</option>
-                  <option value="Business Associate">{t("form.stakeholder.business")}</option>
-                  <option value="Execution Partner">{t("form.stakeholder.execution")}</option>
-                  <option value="Developer">{t("form.stakeholder.developer")}</option>
-                  <option value="Investor">{t("form.stakeholder.investor")}</option>
-                </select>
-
-                <div className="grid grid-cols-[90px_1fr] gap-2">
-                  <select
-                    name="countryCode"
-                    value={formData.countryCode}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-md px-2 py-2 focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="+971">+971 (UAE)</option>
-                    <option value="+91">+91 (India)</option>
-                  </select>
-
+              {/* FIRST & LAST NAME (Always 2 Columns) */}
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
+                <div className="w-full min-w-0">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                    {t("form.firstName.label")} *
+                  </label>
                   <input
-                    name="contact"
-                    placeholder={t("form.phone")}
-                    value={formData.contact}
+                    name="firstName"
+                    placeholder={t("form.firstName.placeholder")}
+                    value={formData.firstName}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
+                    className="w-full border border-gray-300 rounded-md px-2 py-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                  />
+                </div>
+
+                <div className="w-full min-w-0">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                    {t("form.lastName.label")} *
+                  </label>
+                  <input
+                    name="lastName"
+                    placeholder={t("form.lastName.placeholder")}
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md px-2 py-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none"
                   />
                 </div>
               </div>
 
-              <textarea
-                name="message"
-                rows="3"
-                placeholder={t("form.message")}
-                value={formData.message}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-purple-500"
-              />
+              {/* EMAIL & COMPANY (Always 2 Columns) */}
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
+                <div className="w-full min-w-0">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                    {t("form.email.label")} *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder={t("form.email.placeholder")}
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md px-2 py-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                  />
+                </div>
 
+                <div className="w-full min-w-0">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                    {t("form.company.label")} *
+                  </label>
+                  <input
+                    name="company"
+                    placeholder={t("form.company.placeholder")}
+                    value={formData.company}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md px-2 py-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* STAKEHOLDER & CONTACT (Always 2 Columns) */}
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
+                <div className="w-full min-w-0">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                    {t("form.stakeholder.label")} *
+                  </label>
+                  <select
+                    name="stakeholder"
+                    value={formData.stakeholder}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md px-1 py-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none bg-white"
+                  >
+                    <option value="">{t("form.stakeholder.select")}</option>
+                    <option value="Business Associate">{t("form.stakeholder.business")}</option>
+                    <option value="Execution Partner">{t("form.stakeholder.execution")}</option>
+                    <option value="Developer">{t("form.stakeholder.developer")}</option>
+                    <option value="Investor">{t("form.stakeholder.investor")}</option>
+                  </select>
+                </div>
+
+                <div className="w-full min-w-0">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                    {t("form.phone.label")} *
+                  </label>
+
+                  {/* Phone Input Group */}
+                  <div className="flex gap-1 md:gap-2">
+                    {/* COUNTRY CODE - Smaller on mobile */}
+                    <select
+                      name="countryCode"
+                      value={formData.countryCode}
+                      onChange={handleChange}
+                      className="w-[70px] md:w-[80px] h-[38px] md:h-10 border border-gray-300 rounded-md px-1 text-sm focus:ring-2 focus:ring-purple-500 outline-none bg-white"
+                    >
+                      <option value="+971">+971</option>
+                      <option value="+91">+91</option>
+                    </select>
+
+                    {/* PHONE NUMBER */}
+                    <input
+                      name="contact"
+                      placeholder={t("form.phone.placeholder")}
+                      value={formData.contact}
+                      onChange={handleChange}
+                      className="w-full h-[38px] md:h-10 border border-gray-300 rounded-md px-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* MESSAGE */}
+              <div className="w-full min-w-0">
+                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                  {t("form.message.label")} *
+                </label>
+                <textarea
+                  name="message"
+                  rows="3"
+                  placeholder={t("form.message.placeholder")}
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                />
+              </div>
+
+              {/* SUBMIT */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-[var(--color-primary)] text-white font-semibold rounded-md shadow-md flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[var(--color-primary)] text-white font-semibold rounded-md shadow-md hover:bg-purple-800 transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -214,8 +292,10 @@ const PartnerEcosystemSection = () => {
                   t("form.submit")
                 )}
               </button>
+
             </form>
           </div>
+
         </div>
       </section>
     </>

@@ -13,7 +13,6 @@ import arhome3 from "./locales/ar/home3.json"
 import arhome4 from "./locales/ar/home4.json"
 import arhome5 from "./locales/ar/home5.json"
 import arfooter from "./locales/ar/footer.json"
-// import arCommon from "./locales/Ar/common.json";
 import arbuy1 from './locales/Ar/buy1.json'
 
 /* =========================
