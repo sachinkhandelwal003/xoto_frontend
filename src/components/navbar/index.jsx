@@ -96,7 +96,7 @@ const Navbar = () => {
     dispatch(logoutUser());
     setMobileOpen(false);
     setUserMenuOpen(false);
-    navigate(-1);
+    navigate("/");
   };
 
   useEffect(() => {

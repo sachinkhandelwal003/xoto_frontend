@@ -114,7 +114,7 @@ const Login = () => {
   const partnerTypes = [
     {
       value: 'freelancer',
-      label: 'Execution Partner',
+      label: 'Execution Partners',
       desc: 'For Service Providers',
       icon: <UserOutlined style={{ fontSize: "28px" }} />,
       color: "#5C039B",
@@ -122,7 +122,7 @@ const Login = () => {
     },
     {
       value: 'vendor-b2c',
-      label: 'Strategic Alliance',
+      label: 'Strategic Alliances',
       desc: 'For Product Sellers',
       icon: <ShopOutlined style={{ fontSize: "28px" }} />,
       color: "#03A4F4",
@@ -130,7 +130,7 @@ const Login = () => {
     },
     {
       value: 'business-association',
-      label: 'Business Association',
+      label: 'Business Associates',
       desc: 'For Business Networks',
       icon: <TeamOutlined style={{ fontSize: "28px" }} />,
       color: "#10B981",
@@ -280,7 +280,7 @@ const Login = () => {
               <UserOutlined style={{ fontSize: "28px" }} />
             </div>
             <div>
-              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Execution Partner</div>
+              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Execution Partners</div>
               <div style={{ fontSize: 14, color: '#888' }}>For Service Providers</div>
             </div>
           </SelectionCard>
@@ -301,14 +301,14 @@ const Login = () => {
               <ShopOutlined style={{ fontSize: "28px" }} />
             </div>
             <div>
-              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Strategic Alliance</div>
+              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Strategic Alliances</div>
               <div style={{ fontSize: 14, color: '#888' }}>For Product Sellers</div>
             </div>
           </SelectionCard>
         </Col>
       </Row>
 
-      {/* Second Row: Business Association box centered */}
+      {/* Second Row: Business Associates box centered */}
       <Row justify="center">
         <Col xs={24} sm={12} md={12}>
           <SelectionCard 
@@ -325,7 +325,7 @@ const Login = () => {
               <TeamOutlined style={{ fontSize: "28px" }} />
             </div>
             <div>
-              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Business Association</div>
+              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Business Associates</div>
               <div style={{ fontSize: 14, color: '#888' }}>For Business Networks</div>
             </div>
           </SelectionCard>
