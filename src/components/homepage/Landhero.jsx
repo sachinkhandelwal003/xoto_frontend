@@ -1,20 +1,22 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { TreePine, Home, Droplets, Tent } from "lucide-react"; // Updated icons
+import { TreePine, Home, Droplets, Tent } from "lucide-react";
 import interiorImage from "../../assets/img/interior.jpg";
+import { useTranslation } from "react-i18next";
 
 export default function HeroSection() {
+  const { t } = useTranslation("landhero"); // Make sure this namespace matches your i18n config
 
   // Top Row Data (Narrower Width)
   const servicesTop = [
-    { icon: <TreePine className="w-5 h-5" />, title: "Landscape Design & Execution" },
-    { icon: <Home className="w-5 h-5" />, title: "Hardscaping & Surface Works" },
+    { icon: <TreePine className="w-5 h-5" />, title: t("services.design") },
+    { icon: <Home className="w-5 h-5" />, title: t("services.hardscape") },
   ];
 
   // Bottom Row Data (Wider Width)
   const servicesBottom = [
-    { icon: <Tent className="w-5 h-5" />, title: "Outdoor Structures & Living Spaces" },
-    { icon: <Droplets className="w-5 h-5" />, title: "Swimming Pools & Water Feature" },
+    { icon: <Tent className="w-5 h-5" />, title: t("services.outdoor") },
+    { icon: <Droplets className="w-5 h-5" />, title: t("services.pool") },
   ];
 
   // Reusable Pill Component
@@ -23,7 +25,7 @@ export default function HeroSection() {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay }}
-      className="bg-white/10 backdrop-blur-md rounded-[15px] p-1 flex items-center justify-center shadow-lg hover:bg-white/30 transition-all cursor-default min-h-[40px]"
+      className="bg-white/10 backdrop-blur-md rounded-md p-1 flex items-center justify-center shadow-lg hover:bg-white/30 transition-all cursor-default min-h-[40px]"
     >
       <h3 className="text-[10px] sm:text-sm md:text-lg font-medium text-white tracking-wide whitespace-normal text-center leading-tight">
         {title}
@@ -38,23 +40,22 @@ export default function HeroSection() {
       <div className="absolute inset-0">
         <img
           src={interiorImage}
-          alt="Premium Outdoor Solution"
+          alt={t("hero.subtitle")}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
       </div>
 
       {/* Decorative Bottom Clips */}
-     <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape border-none "></div>
-      <div className="absolute bottom-0 right-0 w-70 h-10  bg-[var(--color-body)] z-[5] clip-right-shape border-none"></div>
+      <div className="absolute bottom-0 left-0 w-40 h-12 bg-[var(--color-body)] z-[5] clip-left-shape hidden md:block" />
+      <div className="absolute bottom-0 right-0 w-40 h-12 bg-[var(--color-body)] z-[5] clip-right-shape hidden md:block" />
 
-      {/* Custom clip paths */}
       <style>{`
         .clip-left-shape {
-          clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
+          clip-path: polygon(0 0, 100% 100%, 0% 100%);
         }
         .clip-right-shape {
-          clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
+          clip-path: polygon(100% 0, 100% 100%, 0% 100%);
         }
       `}</style>
 
@@ -67,8 +68,8 @@ export default function HeroSection() {
           transition={{ duration: 0.8 }}
           className="mb-6 heading-light"
         >
-          Transforming Homes With Premium <br />
-          <span className="text-white">Outdoor Solution</span>
+          {t("hero.title")} <br />
+          <span className="text-white">{t("hero.subtitle")}</span>
         </motion.h1>
 
         {/* Feature Pills Container */}
@@ -110,7 +111,7 @@ export default function HeroSection() {
             whileTap={{ scale: 0.95 }}
             className="bg-[var(--color-primary)] text-white px-12 py-4 rounded-lg text-lg shadow-xl"
           >
-            Get a free estimate
+            {t("cta.estimate")}
           </motion.button>
         </Link>
 

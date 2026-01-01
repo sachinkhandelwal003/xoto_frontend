@@ -54,7 +54,10 @@ import enMort2 from "./locales/en/mort2.json";
 import enMort3 from "./locales/en/mort3.json";
 import enMort6 from "./locales/en/mort6.json";
 import enbook from "./locales/en/book.json";
+import enlandhero from "./locales/en/landhero.json";
+
 import enconsultation from "./locales/en/consultation.json";
+import eninteractive from "./locales/en/interactive.json";
 
 /* =========================
    HI
@@ -96,6 +99,8 @@ import hiMort3 from "./locales/hi/mort3.json";
 import hiMort6 from "./locales/hi/mort6.json";
 import hibook from "./locales/hi/book.json";
 import hiconsultation from "./locales/hi/consultation.json";
+import hilandhero from "./locales/hi/landhero.json";
+import hiinteractive from "./locales/hi/interactive.json";
 
 /* =========================
    DE
@@ -138,6 +143,7 @@ import deMort6 from "./locales/de/mort6.json";
 
 import debook from './locales/de/book.json'
 import deconsultation from './locales/de/consultation.json'
+import delandhero from "./locales/de/landhero.json";
 
 /* =========================
    ES
@@ -180,6 +186,7 @@ import esMort6 from "./locales/es/mort6.json";
 
 import esbook from './locales/es/book.json'
 import esconsultation from './locales/es/consultation.json'
+import eslandhero from "./locales/es/landhero.json";
 
 /* =========================
    FR
@@ -222,6 +229,7 @@ import frMort6 from "./locales/fr/mort6.json";
 
 import frbook from './locales/fr/book.json'
 import frconsultation from './locales/fr/consultation.json'
+import frlandhero from "./locales/fr/landhero.json";
 
 /* =========================
    RU
@@ -264,6 +272,8 @@ import ruMort6 from "./locales/ru/mort6.json";
 
 import rubook from './locales/ru/book.json'
 import ruconsultation from './locales/ru/consultation.json'
+import rulandhero from "./locales/ru/landhero.json";
+import ruinteractive from "./locales/ru/interactive.json";
 
 /* =========================
    TR
@@ -306,6 +316,7 @@ import trMort6 from "./locales/tr/mort6.json";
 
 import trbook from './locales/tr/book.json'
 import trconsultation from './locales/tr/consultation.json'
+import trlandhero from "./locales/tr/landhero.json";
 
 /* =========================
    ZH
@@ -348,6 +359,7 @@ import zhMort6 from "./locales/zh/mort6.json";
 
 import zhbook from './locales/zh/book.json'
 import zhconsultation from './locales/zh/consultation.json'
+import zhlandhero from "./locales/zh/landhero.json";
 
 /* =========================
    TL
@@ -390,6 +402,7 @@ import tlMort3 from "./locales/tl/mort3.json";
 import tlMort6 from "./locales/tl/mort6.json";
 import tlbook from './locales/tl/book.json'
 import tlconsultation from './locales/tl/consultation.json'
+import tllandhero from "./locales/tl/landhero.json";
 
 /* =========================
    FA
@@ -402,6 +415,7 @@ import fahome3 from "./locales/fa/home3.json";
 import fahome4 from "./locales/fa/home4.json";
 import fahome5 from "./locales/fa/home5.json";
 import fafooter from "./locales/fa/footer.json"
+import falandhero from "./locales/fa/landhero.json";
 
 /* =========================
    UR
@@ -414,6 +428,7 @@ import   urhome2 from "./locales/ur/home2.json";
 import  urhome3 from "./locales/ur/home3.json";
 import  urhome4 from "./locales/ur/home4.json";
 import  urhome5 from "./locales/ur/home5.json";
+import urlandhero from "./locales/ur/landhero.json";
 
 
 /* =========================
@@ -545,7 +560,9 @@ i18n
         mort3: enMort3,
         mort6: enMort6,
         book: enbook,
-        consultation: enconsultation
+        consultation: enconsultation,
+        landhero:enlandhero,
+        interactive:eninteractive
       },
 
       hi: {
@@ -584,7 +601,11 @@ i18n
         mort3: hiMort3,
         mort6: hiMort6,
         book: hibook,
-        consultation: hiconsultation
+        consultation: hiconsultation,
+                landhero:hilandhero,
+                        interactive:hiinteractive
+
+
       },
 
       de: {
@@ -623,7 +644,9 @@ i18n
         mort3: deMort3,
         mort6: deMort6,
         book: debook,
-        consultation: deconsultation
+        consultation: deconsultation,
+                landhero:delandhero
+
       },
 
       es: {
@@ -662,7 +685,9 @@ i18n
         mort3: esMort3,
         mort6: esMort6,
         book: esbook,
-        consultation: esconsultation
+        consultation: esconsultation,
+                landhero:eslandhero
+
       },
 
       fr: {
@@ -701,7 +726,9 @@ i18n
         mort3: frMort3,
         mort6: frMort6,
         book: frbook,
-        consultation: frconsultation
+        consultation: frconsultation,
+                landhero:frlandhero
+
       },
 
       ru: {
@@ -740,7 +767,11 @@ i18n
         mort3: ruMort3,
         mort6: ruMort6,
         book: rubook,
-        consultation: ruconsultation
+        consultation: ruconsultation,
+                landhero:rulandhero,
+                        interactive:ruinteractive
+
+
       },
 
       tr: {
@@ -779,7 +810,9 @@ i18n
         mort3: trMort3,
         mort6: trMort6,
         book: trbook,
-        consultation: trconsultation
+        consultation: trconsultation,
+                landhero:trlandhero
+
       },
 
       zh: {
@@ -818,7 +851,9 @@ i18n
         mort3: zhMort3,
         mort6: zhMort6,
         book: zhbook,
-        consultation: zhconsultation
+        consultation: zhconsultation,
+                landhero:zhlandhero
+
       },
 
       tl: {
@@ -857,7 +892,9 @@ i18n
         mort3: tlMort3,
         mort6: tlMort6,
         book: tlbook,
-        consultation: tlconsultation
+        consultation: tlconsultation,
+                landhero:tllandhero
+
       },
 
       fa: {
@@ -869,10 +906,13 @@ home:fahome,
         home4: fahome4,
         home5:fahome5,
         footer:fafooter,
+                landhero:falandhero
+
         
       },
             ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   ,    },
-       ur: { common: urcommon , home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   ,    },
+       ur: { common: urcommon ,         landhero:urlandhero,
+ home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   ,    },
     
           },
 
