@@ -935,7 +935,40 @@ const Calculator = () => {
       case 5:
         const pkg = packages.find(p => p._id === selectedPackage);
         return (
-          <motion.div {...variants} className="text-center py-20">
+          <motion.div {...variants} className="text-center ">
+            {/* RESPONSIVE DISCLAIMER */}
+<div className="max-w-5xl mx-auto mb-8 px-4">
+  <div
+    className="
+      flex flex-col sm:flex-row
+      items-start sm:items-center
+      gap-3 sm:gap-4
+      bg-red-50
+      border border-red-200
+      text-red-700
+      px-4 sm:px-6
+      py-4
+      rounded-2xl
+      shadow-sm
+    "
+  >
+    {/* Icon */}
+    <div className="flex-shrink-0">
+      <EnvironmentOutlined className="text-red-500 text-xl sm:text-2xl" />
+    </div>
+
+    {/* Text */}
+    <div className="text-left">
+      <Text className="block font-semibold text-red-700 text-sm sm:text-base">
+       DISCLAIMER:
+      </Text>
+      <Text className="block text-xs sm:text-sm text-red-600 leading-relaxed">
+        This estimate is meant to give you a rough idea of costs. The final amount
+        may change once details are finalized and the site is reviewed.
+      </Text>
+    </div>
+  </div>
+</div>
             <div className="bg-white p-16 rounded-[4rem] shadow-2xl inline-block border border-gray-50">
               <SmileOutlined style={{ color: BRAND_PURPLE, fontSize: '5rem' }} className="mb-8" />
               <Title level={1} style={{ color: BRAND_PURPLE }} className="m-0">Valuation Ready</Title>
