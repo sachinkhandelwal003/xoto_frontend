@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "leaflet/dist/leaflet.css";
-
+import MetaPixel from "./MetaPixel";
 import "./index.css";
 // ✅ Then Tailwind + custom styles
 // main.jsx or index.js
@@ -42,6 +42,7 @@ createRoot(document.getElementById("root")).render(
         <AuthProvider>
           <BrowserRouter>
             <PersistLogin>
+              <MetaPixel/>
               <App />
               <ToastContainer position="top-right" autoClose={3000} />
             </PersistLogin>
