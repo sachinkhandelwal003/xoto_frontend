@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next"; // ✅ Added i18n hook
 
 import Pool from "./../assets/img/home/Pool.png";
-import wavemap from "./../assets/img/home/wavemap1.png";
+import wavemap from "./../assets/img/wavee.png";
 
 export default function HomeJourneySection() {
   const [mobileView, setMobileView] = useState("both");
