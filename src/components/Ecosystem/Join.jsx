@@ -8,6 +8,10 @@ import wave1 from "../../assets/img/wave/waveint5.png";
 
 const PartnerEcosystemSection = () => {
   const { t } = useTranslation("partnerForm");
+  const COUNTRY_CONFIG = {
+  "+971": { country: "UAE", digits: 9, startsWith: /^5/ },
+  "+91": { country: "India", digits: 10, startsWith: /^[6-9]/ },
+};
   
   // 1. Initialize Ant Design Notification
   const [api, contextHolder] = notification.useNotification();
@@ -36,31 +40,51 @@ const PartnerEcosystemSection = () => {
     });
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "contact" && value && !/^\d*$/.test(value)) return;
-    setFormData({ ...formData, [name]: value });
-  };
+ const handleChange = (e) => {
+  const { name, value } = e.target;
 
-  const validateForm = () => {
-    if (!formData.firstName.trim()) return false;
-    if (!formData.lastName.trim()) return false;
-    if (!formData.company.trim()) return false;
-    if (!formData.stakeholder) return false;
-    if (!formData.message.trim()) return false;
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) return false;
-    if (!formData.contact || !/^[0-9]{8,10}$/.test(formData.contact)) return false;
-    return true;
-  };
+  // ✅ CONTACT: digits-only + max length per country
+  if (name === "contact") {
+    const digitsOnly = value.replace(/\D/g, "");
+    const maxDigits = COUNTRY_CONFIG[formData.countryCode].digits;
 
+    if (digitsOnly.length > maxDigits) return;
+
+    setFormData((prev) => ({ ...prev, contact: digitsOnly }));
+    return;
+  }
+
+  setFormData((prev) => ({ ...prev, [name]: value }));
+};
+
+
+ const validateForm = () => {
+  const config = COUNTRY_CONFIG[formData.countryCode];
+
+  if (!formData.firstName.trim()) return false;
+  if (!formData.lastName.trim()) return false;
+  if (!formData.company.trim()) return false;
+  if (!formData.stakeholder) return false;
+  if (!formData.message.trim()) return false;
+
+  if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) return false;
+
+  // ✅ phone length check
+  if (!formData.contact || formData.contact.length !== config.digits)
+    return false;
+
+  // ✅ phone starting digit check
+  if (!config.startsWith.test(formData.contact)) return false;
+
+  return true;
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      openNotification("error", "Validation Error", t("toast.invalid"));
-      return;
-    }
-
+   if (!validateForm()) {
+  openNotification("error", "Validation Error", t("toast.invalid"));
+  return;
+}
     setLoading(true);
 
     const payload = {
