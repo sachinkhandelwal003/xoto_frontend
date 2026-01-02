@@ -11,12 +11,24 @@ export default function HeroSectionInterior() {
 
   return (
     <div
-      className="relative w-full bg-cover bg-center bg-no-repeat "
+      className="relative w-full bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${mainbgImage})` }}
     >
-      <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-16 py-28 md:py-40 ">
+      {/* Bottom clipping shapes */}
+      <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
+      <div className="absolute bottom-0 right-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-right-shape" />
+
+      <style>{`
+        .clip-left-shape {
+          clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
+        }
+        .clip-right-shape {
+          clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+      `}</style>
+      <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-16 py-28 md:py-40">
         <div className="max-w-4xl text-center mx-auto">
-          
+
           <h1 className="mb-6 heading-light">
             {t("title")}
           </h1>
@@ -39,18 +51,7 @@ export default function HeroSectionInterior() {
               </button>
             </Link>
           </div>
- <div className="absolute bottom-0 left-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-left-shape border-none "></div>
-        <div className="absolute bottom-0 right-0 w-70 h-10 bg-[var(--color-body)] z-[5] clip-right-shape border-none"></div>
 
-        {/* Custom clip paths */}
-        <style>{`
-        .clip-left-shape {
-          clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
-        }
-        .clip-right-shape {
-          clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
-        }
-      `}</style>
         </div>
       </div>
     </div>

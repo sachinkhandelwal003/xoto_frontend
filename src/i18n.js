@@ -28,6 +28,17 @@ import arscape1 from './locales/Ar/scape1.json'
 import arinterior5 from "./locales/Ar/interior5.json"
 import arinterior6 from "./locales/Ar/interior6.json"
 
+import arInterior1 from "./locales/ar/interior1.json";
+import arInterior2 from "./locales/ar/interior2.json";
+import arInterior3 from "./locales/ar/interior3.json";
+import arInterior4 from "./locales/ar/interior4.json";
+import arInterior7 from "./locales/ar/interior7.json";
+
+
+
+
+
+
 
 /* =========================
    EN
@@ -494,6 +505,14 @@ import fascape2 from "./locales/fa/scape2.json"
 import fascape1 from "./locales/fa/scape1.json"
 import fainterior5 from "./locales/fa/interior5.json"
 import fainterior6 from "./locales/fa/interior6.json"
+import faInterior1 from "./locales/fa/interior1.json";
+import faInterior2 from "./locales/fa/interior2.json";
+import faInterior3 from "./locales/fa/interior3.json";
+import faInterior4 from "./locales/fa/interior4.json";
+import faInterior7 from "./locales/fa/interior7.json";
+
+
+
 
 /* =========================
    UR
@@ -517,7 +536,14 @@ import urconsultation from "./locales/ur/consultation.json"
 import urscape2 from "./locales/ur/scape2.json"
 import urscape1 from "./locales/ur/scape1.json"
 import urinterior5 from "./locales/ur/interior5.json"
-import urinterior6 from "./locales/ur/interior6.json"
+import urinterior6 from "./locales/ur/interior6.json"import urInterior1 from "./locales/ur/interior1.json";
+import urInterior2 from "./locales/ur/interior2.json";
+import urInterior3 from "./locales/ur/interior3.json";
+import urInterior4 from "./locales/ur/interior4.json";
+import urInterior7 from "./locales/ur/interior7.json";
+
+
+
 
 /* =========================
    PAN
@@ -972,6 +998,11 @@ i18n
         article4: faarticle4,
         article5: faarticle5,
         home:fahome,
+ interior1: faInterior1,   
+  interior2: faInterior2,
+  interior3: faInterior3,
+  interior4: faInterior4,
+  interior7: faInterior7,
         home1: fahome1,
         home2: fahome2,
         home3: fahome3,
@@ -988,8 +1019,26 @@ i18n
 
         
       },
-            ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   , buy1: arbuy1, article1: ararticle1, article2: ararticle2 , article3: ararticle3, article4: ararticle4, article5: ararticle5, landhero: arlandhero, interactive: arinteractive, consultation: arconsultation, scape2: arscape2, scape1: arscape1, interior5: arinterior5, interior6: arinterior6   },
-       ur: { common: urcommon ,         landhero:urlandhero,
+            ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,footer:arfooter ,
+              interior1: arInterior1,
+              interior2: arInterior2,
+              interior3: arInterior3,
+              interior4: arInterior4,
+              interior7: arInterior7,
+
+
+              buy1: arbuy1,
+              article1: ararticle1,
+               article2: ararticle2 ,
+                article3: ararticle3,
+                 article4: ararticle4,
+                  article5: ararticle5, landhero: arlandhero, interactive: arinteractive, consultation: arconsultation, scape2: arscape2, scape1: arscape1, interior5: arinterior5, interior6: arinterior6   },
+       ur: { common: urcommon ,interior1: urInterior1,
+  interior2: urInterior2,
+  interior3: urInterior3,
+  interior4: urInterior4,
+  interior7: urInterior7,
+landhero:urlandhero,
  home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5, interactive: urinteractive, consultation: urconsultation, scape2: urscape2,scape1: urscape1, interior5: urinterior5, interior6: urinterior6  },
     pa:{common:pacommon , home:pahome , home1:pahome1 , home2:pahome2 , home3:pahome3 , home4:pahome4 , home5:pahome5 , footer:pafooter , article1:paarticle1, article2:paarticle2, article3:paarticle3 , article4:paarticle4, article5:paarticle5}
           },
