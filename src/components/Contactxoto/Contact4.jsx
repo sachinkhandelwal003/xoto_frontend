@@ -214,7 +214,7 @@ export default function PartnerForm() {
               </p>
               <div>
                 <button className="bg-[#5C039B] border border-white/20 px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-[#5C039B] transition-colors shadow-lg">
-                  Chat With Xobia
+                  Talk With Xobia
                 </button>
               </div>
             </div>
