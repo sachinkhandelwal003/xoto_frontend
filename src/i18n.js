@@ -536,7 +536,8 @@ import urconsultation from "./locales/ur/consultation.json"
 import urscape2 from "./locales/ur/scape2.json"
 import urscape1 from "./locales/ur/scape1.json"
 import urinterior5 from "./locales/ur/interior5.json"
-import urinterior6 from "./locales/ur/interior6.json"import urInterior1 from "./locales/ur/interior1.json";
+import urinterior6 from "./locales/ur/interior6.json"
+import urInterior1 from "./locales/ur/interior1.json";
 import urInterior2 from "./locales/ur/interior2.json";
 import urInterior3 from "./locales/ur/interior3.json";
 import urInterior4 from "./locales/ur/interior4.json";
