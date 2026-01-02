@@ -1,46 +1,64 @@
 {
   "company": {
-    "slogan": "一个统一的生态系统，<br/> 创造终身房地产价值。",
+    "slogan": "一个统一的生态系统，创造 <br/> 终身物业价值。",
     "description": "可扩展。AI 驱动。轻资产。"
   },
+
   "titles": {
     "offerings": "我们的服务",
     "resources": "合作伙伴生态",
     "knowledge": "关于我们",
-    "location": "地点",
+    "location": "地区",
     "email": "电子邮件"
   },
+
   "offerings": [
-    { "label": "园林景观" },
-    { "label": "室内设计" },
-    { "label": "租赁" },
-    { "label": "购买" },
-    { "label": "出售" },
-    { "label": "抵押贷款" },
-    { "label": "维护" }
+    { "label": "园林景观", "path": "/landscaping" },
+    { "label": "室内设计", "path": "/interiors" },
+    { "label": "租赁", "path": "/rentals" },
+    { "label": "购买", "path": "/buy" },
+    { "label": "出售", "path": "/sell" },
+    { "label": "房贷", "path": "/mortgage/services" },
+    { "label": "维护", "path": "/maintenance" }
   ],
+
   "resources": [
-    { "label": "战略联盟" },
-    { "label": "商业合作伙伴" },
-    { "label": "执行合作伙伴" },
-    { "label": "开发商" },
-    { "label": "金融机构" }
+    { "label": "战略联盟", "path": "/strategic-alliance" },
+    { "label": "商业合作伙伴", "path": "/business-associates" },
+    { "label": "执行伙伴", "path": "/execution-partners" },
+    { "label": "开发商", "path": "/developers" },
+    { "label": "金融机构", "path": "/financial-institutions" }
   ],
+
   "knowledge": [
-    { "label": "知识中心" },
-    { "label": "我们的可持续性" },
-    { "label": "重点" },
-    { "label": "提交反馈" },
-    { "label": "联系我们" },
-    { "label": "隐私政策" },
-    { "label": "使用条款" }
+    { "label": "知识中心", "path": "/knowledge-centre" },
+    { "label": "我们的可持续性", "path": "/sustainability" },
+    { "label": "重点", "path": "/focus" },
+    { "label": "提交反馈", "path": "/feedback" },
+    { "label": "联系我们", "path": "/contact" },
+    { "label": "隐私政策", "path": "/privacy" },
+    { "label": "使用条款", "path": "/terms" }
   ],
+
   "locations": "印度 | 阿联酋 | 沙特阿拉伯",
+
   "email": {
-    "partners": "合作伙伴：",
-    "customers": "客户："
+    "labels": {
+      "partners": "合作伙伴",
+      "customers": "客户"
+    },
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
   },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "LinkedIn", "url": "#" }
+  ],
+
   "bottom": {
-    "copyright": "©2021 XOTO。保留所有权利"
+    "copyright": "©2021 XOTO. 版权所有"
   }
 }

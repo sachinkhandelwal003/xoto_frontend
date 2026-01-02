@@ -1,45 +1,63 @@
 {
   "company": {
-    "slogan": "Единая экосистема для создания <br/> пожизненной ценности недвижимости.",
-    "description": "Масштабируемо. На базе ИИ. Лёгкая модель."
+    "slogan": "Единая экосистема, создающая <br/> пожизненную ценность недвижимости.",
+    "description": "Масштабируемая. На базе ИИ. Лёгкая по активам."
   },
+
   "titles": {
-    "offerings": "Наши Услуги",
-    "resources": "Партнёрская Экосистема",
-    "knowledge": "О Нас",
+    "offerings": "Наши услуги",
+    "resources": "Партнёрская экосистема",
+    "knowledge": "О нас",
     "location": "Локации",
-    "email": "Эл. почта"
+    "email": "Электронная почта"
   },
+
   "offerings": [
-    { "label": "Ландшафтный дизайн" },
-    { "label": "Интерьеры" },
-    { "label": "Аренда" },
-    { "label": "Покупка" },
-    { "label": "Продажа" },
-    { "label": "Ипотека" },
-    { "label": "Обслуживание" }
+    { "label": "Ландшафтный дизайн", "path": "/landscaping" },
+    { "label": "Интерьеры", "path": "/interiors" },
+    { "label": "Аренда", "path": "/rentals" },
+    { "label": "Покупка", "path": "/buy" },
+    { "label": "Продажа", "path": "/sell" },
+    { "label": "Ипотека", "path": "/mortgage/services" },
+    { "label": "Обслуживание", "path": "/maintenance" }
   ],
+
   "resources": [
-    { "label": "Стратегический альянс" },
-    { "label": "Бизнес-партнёры" },
-    { "label": "Исполнительные партнёры" },
-    { "label": "Девелоперы" },
-    { "label": "Финансовые институты" }
+    { "label": "Стратегические альянсы", "path": "/strategic-alliance" },
+    { "label": "Бизнес-партнёры", "path": "/business-associates" },
+    { "label": "Партнёры по реализации", "path": "/execution-partners" },
+    { "label": "Застройщики", "path": "/developers" },
+    { "label": "Финансовые учреждения", "path": "/financial-institutions" }
   ],
+
   "knowledge": [
-    { "label": "Центр знаний" },
-    { "label": "Наша устойчивость" },
-    { "label": "Фокус" },
-    { "label": "Отправить отзыв" },
-    { "label": "Связаться с нами" },
-    { "label": "Политика конфиденциальности" },
-    { "label": "Условия использования" }
+    { "label": "Центр знаний", "path": "/knowledge-centre" },
+    { "label": "Наша устойчивость", "path": "/sustainability" },
+    { "label": "Фокус", "path": "/focus" },
+    { "label": "Отправить отзыв", "path": "/feedback" },
+    { "label": "Связаться с нами", "path": "/contact" },
+    { "label": "Политика конфиденциальности", "path": "/privacy" },
+    { "label": "Условия использования", "path": "/terms" }
   ],
+
   "locations": "Индия | ОАЭ | Саудовская Аравия",
+
   "email": {
-    "partners": "Для партнёров:",
-    "customers": "Для клиентов:"
+    "labels": {
+      "partners": "Для партнёров",
+      "customers": "Для клиентов"
+    },
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
   },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "LinkedIn", "url": "#" }
+  ],
+
   "bottom": {
     "copyright": "©2021 XOTO. Все права защищены"
   }

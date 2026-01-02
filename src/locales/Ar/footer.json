@@ -5,7 +5,7 @@
   },
 
   "titles": {
-    "offerings": "عروضنا",
+    "offerings": "خدماتنا",
     "resources": "منظومة الشركاء",
     "knowledge": "من نحن",
     "location": "المواقع",
@@ -34,15 +34,19 @@
     { "label": "مركز المعرفة", "path": "/knowledge-centre" },
     { "label": "استدامتنا", "path": "/sustainability" },
     { "label": "التركيز", "path": "/focus" },
-    { "label": "أرسل ملاحظاتك", "path": "/feedback" },
+    { "label": "إرسال ملاحظاتك", "path": "/feedback" },
     { "label": "اتصل بنا", "path": "/contact" },
     { "label": "سياسة الخصوصية", "path": "/privacy" },
     { "label": "شروط الاستخدام", "path": "/terms" }
   ],
 
-  "locations": "الهند | الإمارات العربية المتحدة | المملكة العربية السعودية",
+  "locations": "الهند | الإمارات | السعودية",
 
   "email": {
+    "labels": {
+      "partners": "للشركاء",
+      "customers": "للعملاء"
+    },
     "partners": "connect@xoto.ae",
     "customers": "care@xoto.ae"
   },
@@ -55,6 +59,6 @@
   ],
 
   "bottom": {
-    "copyright": "© 2021 XOTO. جميع الحقوق محفوظة"
+    "copyright": "©2021 XOTO. جميع الحقوق محفوظة"
   }
 }

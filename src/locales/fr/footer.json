@@ -1,45 +1,63 @@
 {
   "company": {
-    "slogan": "Un écosystème unifié pour créer <br/> une valeur immobilière à vie.",
+    "slogan": "Un écosystème unifié créant <br/> une valeur immobilière à vie.",
     "description": "Évolutif. Alimenté par l’IA. Léger en actifs."
   },
+
   "titles": {
     "offerings": "Nos Offres",
-    "resources": "Écosystème de Partenaires",
-    "knowledge": "À Propos",
-    "location": "Localisations",
-    "email": "E-mail"
+    "resources": "Écosystème Partenaire",
+    "knowledge": "À propos",
+    "location": "Emplacements",
+    "email": "Email"
   },
+
   "offerings": [
-    { "label": "Aménagement paysager" },
-    { "label": "Intérieurs" },
-    { "label": "Locations" },
-    { "label": "Acheter" },
-    { "label": "Vendre" },
-    { "label": "Hypothèques" },
-    { "label": "Maintenance" }
+    { "label": "Aménagement Paysager", "path": "/landscaping" },
+    { "label": "Intérieurs", "path": "/interiors" },
+    { "label": "Locations", "path": "/rentals" },
+    { "label": "Acheter", "path": "/buy" },
+    { "label": "Vendre", "path": "/sell" },
+    { "label": "Hypothèques", "path": "/mortgage/services" },
+    { "label": "Maintenance", "path": "/maintenance" }
   ],
+
   "resources": [
-    { "label": "Alliance Stratégique" },
-    { "label": "Associés Commerciaux" },
-    { "label": "Partenaires d’Exécution" },
-    { "label": "Développeurs" },
-    { "label": "Institutions Financières" }
+    { "label": "Alliance Stratégique", "path": "/strategic-alliance" },
+    { "label": "Associés Commerciaux", "path": "/business-associates" },
+    { "label": "Partenaires d’Exécution", "path": "/execution-partners" },
+    { "label": "Développeurs", "path": "/developers" },
+    { "label": "Institutions Financières", "path": "/financial-institutions" }
   ],
+
   "knowledge": [
-    { "label": "Centre de Connaissance" },
-    { "label": "Notre Durabilité" },
-    { "label": "Focus" },
-    { "label": "Soumettre un Avis" },
-    { "label": "Contactez-nous" },
-    { "label": "Politique de Confidentialité" },
-    { "label": "Conditions d’Utilisation" }
+    { "label": "Centre de Connaissance", "path": "/knowledge-centre" },
+    { "label": "Notre Durabilité", "path": "/sustainability" },
+    { "label": "Focus", "path": "/focus" },
+    { "label": "Envoyer des Commentaires", "path": "/feedback" },
+    { "label": "Nous Contacter", "path": "/contact" },
+    { "label": "Politique de Confidentialité", "path": "/privacy" },
+    { "label": "Conditions d’Utilisation", "path": "/terms" }
   ],
+
   "locations": "Inde | EAU | Arabie Saoudite",
+
   "email": {
-    "partners": "Pour les partenaires :",
-    "customers": "Pour les clients :"
+    "labels": {
+      "partners": "Pour les partenaires",
+      "customers": "Pour les clients"
+    },
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
   },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "LinkedIn", "url": "#" }
+  ],
+
   "bottom": {
     "copyright": "©2021 XOTO. Tous droits réservés"
   }

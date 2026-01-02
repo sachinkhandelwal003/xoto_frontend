@@ -1,45 +1,63 @@
 {
   "company": {
     "slogan": "एक एकीकृत इकोसिस्टम जो <br/> आजीवन संपत्ति मूल्य बनाता है।",
-    "description": "स्केलेबल। AI-संचालित। एसेट-लाइट।"
+    "description": "स्केलेबल। एआई-संचालित। एसेट-लाइट।"
   },
+
   "titles": {
-    "offerings": "हमारी सेवाएं",
-    "resources": "पार्टनर इकोसिस्टम",
+    "offerings": "हमारी सेवाएँ",
+    "resources": "साझेदार इकोसिस्टम",
     "knowledge": "हमारे बारे में",
     "location": "स्थान",
     "email": "ईमेल"
   },
+
   "offerings": [
-    { "label": "लैंडस्केपिंग" },
-    { "label": "इंटीरियर्स" },
-    { "label": "रेंटल्स" },
-    { "label": "खरीदें" },
-    { "label": "बेचें" },
-    { "label": "मॉर्गेज" },
-    { "label": "मेंटेनेंस" }
+    { "label": "लैंडस्केपिंग", "path": "/landscaping" },
+    { "label": "इंटीरियर्स", "path": "/interiors" },
+    { "label": "किराये", "path": "/rentals" },
+    { "label": "खरीदें", "path": "/buy" },
+    { "label": "बेचें", "path": "/sell" },
+    { "label": "होम लोन", "path": "/mortgage/services" },
+    { "label": "मेंटेनेंस", "path": "/maintenance" }
   ],
+
   "resources": [
-    { "label": "रणनीतिक गठबंधन" },
-    { "label": "व्यावसायिक सहयोगी" },
-    { "label": "एक्ज़ीक्यूशन पार्टनर्स" },
-    { "label": "डेवलपर्स" },
-    { "label": "वित्तीय संस्थान" }
+    { "label": "रणनीतिक साझेदारी", "path": "/strategic-alliance" },
+    { "label": "व्यावसायिक सहयोगी", "path": "/business-associates" },
+    { "label": "कार्यान्वयन साझेदार", "path": "/execution-partners" },
+    { "label": "डेवलपर्स", "path": "/developers" },
+    { "label": "वित्तीय संस्थान", "path": "/financial-institutions" }
   ],
+
   "knowledge": [
-    { "label": "नॉलेज सेंटर" },
-    { "label": "हमारी स्थिरता" },
-    { "label": "फोकस" },
-    { "label": "फीडबैक भेजें" },
-    { "label": "संपर्क करें" },
-    { "label": "प्राइवेसी पॉलिसी" },
-    { "label": "उपयोग की शर्तें" }
+    { "label": "ज्ञान केंद्र", "path": "/knowledge-centre" },
+    { "label": "हमारी स्थिरता", "path": "/sustainability" },
+    { "label": "फोकस", "path": "/focus" },
+    { "label": "प्रतिक्रिया भेजें", "path": "/feedback" },
+    { "label": "संपर्क करें", "path": "/contact" },
+    { "label": "गोपनीयता नीति", "path": "/privacy" },
+    { "label": "उपयोग की शर्तें", "path": "/terms" }
   ],
+
   "locations": "भारत | यूएई | सऊदी अरब",
+
   "email": {
-    "partners": "पार्टनर्स के लिए:",
-    "customers": "ग्राहकों के लिए:"
+    "labels": {
+      "partners": "साझेदारों के लिए",
+      "customers": "ग्राहकों के लिए"
+    },
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
   },
+
+  "social": [
+    { "name": "फेसबुक", "url": "#" },
+    { "name": "इंस्टाग्राम", "url": "#" },
+    { "name": "ट्विटर", "url": "#" },
+    { "name": "लिंक्डइन", "url": "#" }
+  ],
+
   "bottom": {
     "copyright": "©2021 XOTO. सर्वाधिकार सुरक्षित"
   }

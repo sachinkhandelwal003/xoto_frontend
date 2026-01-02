@@ -1,17 +1,16 @@
 {
-  "hero": {
-    "title1": "Redefiniendo la vida",
-    "title2": "De paisajes a hogares",
-    "description": "Descubre diseños impulsados por IA y propiedades seleccionadas que elevan cada rincón de tu mundo.",
-    "buttons": {
-      "design": "Diseñar mi espacio",
-      "explore": "Explorar hogares"
-    },
-    "features": [
-      { "line1": "Solución", "line2": "Integral" },
-      { "line1": "Tiempo de", "line2": "Entrega Rápido" },
-      { "line1": "Equipos", "line2": "Profesionales" },
-      { "line1": "Presencia", "line2": "EN TODO EAU" }
-    ]
+  "homeDesign": {
+    "title1": "Tu espacio,",
+    "title2": "redefinido al instante.",
+    "description": "Sube el plano de tu villa y deja que Xoto AI cree impresionantes opciones de diseño exterior e interior, adaptadas a tu estilo.",
+    "cta": "Obtén una estimación gratuita ahora",
+    "hotspots": {
+      "exterior": "Mejora exterior",
+      "interior": "Transformación interior",
+      "furniture": "Cambio inteligente de mobiliario",
+      "landscaping": "Paisajismo",
+      "image": "Perfección de imagen",
+      "virtual": "Estudio de diseño virtual"
+    }
   }
 }

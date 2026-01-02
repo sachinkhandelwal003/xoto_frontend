@@ -463,7 +463,8 @@ import tllandhero from "./locales/tl/landhero.json";
 import faCommon from "./locales/fa/common.json";
 import fahome from "./locales/fa/home.json";
 import fahome1 from "./locales/fa/home1.json";
-import fahome2 from "./locales/fa/home";
+import fahome2 from "./locales/fa/home2.json";
+
 import fahome3 from "./locales/fa/home3.json";
 import fahome4 from "./locales/fa/home4.json";
 import fahome5 from "./locales/fa/home5.json";
@@ -493,95 +494,22 @@ import urarticle4 from "./locales/ur/article4.json"
 import urarticle5 from "./locales/ur/article5.json"
 import urlandhero from "./locales/ur/landhero.json";
 
-
 /* =========================
-   INIT
+   PAN
 ========================= */
-
-// i18n
-//   .use(LanguageDetector)
-//   .use(initReactI18next)
-//   .init({
-//     resources: {
-//       en: { common: enCommon, home: enHome, home1: enHome1, home2: enHome2, home3: enHome3, home4: enHome4, home5: enHome5, footer: enFooter, interior1: enInterior1, interior2: enInterior2, interior3: enInterior3, interior4: enInterior4, interior5: enInterior5, interior6: enInterior6, interior7: enInterior7, scape1: enScape1, scape2: enScape2, buy1: enbuy1, buy2: enbuy2, buy3: enbuy3, buy4: enbuy4, buy5: enbuy5, buy6: enbuy6, buy7: enbuy7, page3: enpage3, ecosystem: enecosystem, whyPartner: enwhyPartner, stakeholders: enstakeholders, partnerForm: enpartnerForm, builtForEveryone: enbuiltForEveryone  },
-//       hi: { common: hiCommon, home: hiHome, home1: hiHome1, home2: hiHome2, home3: hiHome3, home4: hiHome4, home5: hiHome5, footer: hiFooter, interior1: hiInterior1, interior2: hiInterior2, interior3: hiInterior3, interior4: hiInterior4, interior5: hiInterior5, interior6: hiInterior6, interior7: hiInterior7, scape1: hiScape1, scape2: hiScape2, buy1: hibuy1, buy2: hibuy2, buy3: hibuy3, buy4: hibuy4, buy5: hibuy5, buy6: hibuy6, buy7: hibuy7, page3: hipage3, ecosystem: hiecosystem, whyPartner: hiwhyPartner, stakeholders: histakeholders, partnerForm: hipartnerForm, builtForEveryone: hibuiltForEveryone  },
-//       de: { common: deCommon, home: deHome, home1: deHome1, home2: deHome2, home3: deHome3, home4: deHome4, home5: deHome5, footer: deFooter, interior1: deInterior1, interior2: deInterior2, interior3: deInterior3, interior4: deInterior4, interior5: deInterior5, interior6: deInterior6, interior7: deInterior7, scape1: deScape1, scape2: deScape2, buy1: debuy1, buy2: debuy2, buy3: debuy3, buy4: debuy4, buy5: debuy5, buy6: debuy6, buy7: debuy7, page3: depage3, ecosystem: deecosystem, whyPartner: dewhyPartner, stakeholders: destakeholders, partnerForm: departnerForm, builtForEveryone: debuiltForEveryone  },
-//       es: { common: esCommon, home: esHome, home1: esHome1, home2: esHome2, home3: esHome3, home4: esHome4, home5: esHome5, footer: esFooter, interior1: esInterior1, interior2: esInterior2, interior3: esInterior3, interior4: esInterior4, interior5: esInterior5, interior6: esInterior6, interior7: esInterior7, scape1: esScape1, scape2: esScape2, buy1: esbuy1, buy2: esbuy2, buy3: esbuy3, buy4: esbuy4, buy5: esbuy5, buy6: esbuy6, buy7: esbuy7, page3: espage3, ecosystem: esecosystem, whyPartner: eswhyPartner, stakeholders: esstakeholders, partnerForm: espartnerForm, builtForEveryone: esbuiltForEveryone  },
-//       fr: { common: frCommon, home: frHome, home1: frHome1, home2: frHome2, home3: frHome3, home4: frHome4, home5: frHome5, footer: frFooter, interior1: frInterior1, interior2: frInterior2, interior3: frInterior3, interior4: frInterior4, interior5: frInterior5, interior6: frInterior6, interior7: frInterior7, scape1: frScape1, scape2: frScape2, buy1: frbuy1, buy2: frbuy2, buy3: frbuy3, buy4: frbuy4, buy5: frbuy5, buy6: frbuy6, buy7: frbuy7, page3: frpage3, ecosystem: frecosystem, whyPartner: frwhyPartner, stakeholders: frstakeholders, partnerForm: frpartnerForm, builtForEveryone: frbuiltForEveryone  },
-//       ru: { common: ruCommon, home: ruHome, home1: ruHome1, home2: ruHome2, home3: ruHome3, home4: ruHome4, home5: ruHome5, footer: ruFooter, interior1: ruInterior1, interior2: ruInterior2, interior3: ruInterior3, interior4: ruInterior4, interior5: ruInterior5, interior6: ruInterior6, interior7: ruInterior7, scape1: ruScape1, scape2: ruScape2, buy1: rubuy1, buy2: rubuy2, buy3: rubuy3, buy4: rubuy4, buy5: rubuy5, buy6: rubuy6, buy7: rubuy7, page3: rupage3, ecosystem: ruecosystem, whyPartner: ruwhyPartner, stakeholders: rustakeholders, partnerForm: rupartnerForm, builtForEveryone: rubuiltForEveryone  },
-//       tr: { common: trCommon, home: trHome, home1: trHome1, home2: trHome2, home3: trHome3, home4: trHome4, home5: trHome5, footer: trFooter, interior1: trInterior1, interior2: trInterior2, interior3: trInterior3, interior4: trInterior4, interior5: trInterior5, interior6: trInterior6, interior7: trInterior7, scape1: trScape1, scape2: trScape2, buy1: trbuy1, buy2: trbuy2, buy3: trbuy3, buy4: trbuy4, buy5: trbuy5, buy6: trbuy6, buy7: trbuy7, page3: trpage3, ecosystem: trecosystem, whyPartner: trwhyPartner, stakeholders: trstakeholders, partnerForm: trpartnerForm, builtForEveryone: trbuiltForEveryone  },
-//       zh: { common: zhCommon, home: zhHome, home1: zhHome1, home2: zhHome2, home3: zhHome3, home4: zhHome4, home5: zhHome5, footer: zhFooter, interior1: zhInterior1, interior2: zhInterior2, interior3: zhInterior3, interior4: zhInterior4, interior5: zhInterior5, interior6: zhInterior6, interior7: zhInterior7, scape1: zhScape1, scape2: zhScape2, buy1: zhbuy1, buy2: zhbuy2, buy3: zhbuy3, buy4: zhbuy4, buy5: zhbuy5, buy6: zhbuy6, buy7: zhbuy7, page3: zhpage3, ecosystem: zhecosystem, whyPartner: zhwhyPartner, stakeholders: zhstakeholders, partnerForm: zhpartnerForm, builtForEveryone: zhbuiltForEveryone  },
-//       tl: { common: tlCommon, home: tlHome, home1: tlHome1, home2: tlHome2, home3: tlHome3, home4: tlHome4, home5: tlHome5, footer: tlFooter, interior1: tlInterior1, interior2: tlInterior2, interior3: tlInterior3, interior4: tlInterior4, interior5: tlInterior5, interior6: tlInterior6, interior7: tlInterior7, scape1: tlScape1, scape2: tlScape2, buy1: tlbuy1, buy2: tlbuy2, buy3: tlbuy3, buy4: tlbuy4, buy5: tlbuy5, buy6: tlbuy6, buy7: tlbuy7, page3: tlpage3, ecosystem: tlecosystem, whyPartner: tlwhyPartner, stakeholders: tlstakeholders, partnerForm: tlpartnerForm, builtForEveryone: tlbuiltForEveryone  }
-//     },
-//     fallbackLng: "en",
-//     supportedLngs: ["en", "hi", "de", "es", "fr", "ru", "tr", "zh", "tl"],
-//     ns: [
-//   "common","home","home1","home2","home3","home4","home5",
-//   "footer",
-//   "interior1","interior2","interior3","interior4",
-//   "interior5","interior6","interior7",
-//   "scape1","scape2",
-//   "buy1","buy2","buy3","buy4","buy5","buy6","buy7", "page3", "ecosystem", "whyPartner.json", "stakeholders", "partnerForm", "builtForEveryone"
-// ],
-//       en: { common: enCommon, home: enHome, home1: enHome1, home2: enHome2, home3: enHome3, home4: enHome4, home5: enHome5, footer: enFooter, interior1: enInterior1, interior2: enInterior2, interior3: enInterior3, interior4: enInterior4, interior5: enInterior5, interior6: enInterior6, interior7: enInterior7, scape1: enScape1, scape2: enScape2, mort1: enMort1, mort2: enMort2, mort3: enMort3,  mort6: enMort6 },
-//       hi: { common: hiCommon, home: hiHome, home1: hiHome1, home2: hiHome2, home3: hiHome3, home4: hiHome4, home5: hiHome5, footer: hiFooter, interior1: hiInterior1, interior2: hiInterior2, interior3: hiInterior3, interior4: hiInterior4, interior5: hiInterior5, interior6: hiInterior6, interior7: hiInterior7, scape1: hiScape1, scape2: hiScape2, mort1: hiMort1, mort2: hiMort2, mort3: hiMort3, mort6: hiMort6 },
-//       de: { common: deCommon, home: deHome, home1: deHome1, home2: deHome2, home3: deHome3, home4: deHome4, home5: deHome5, footer: deFooter, interior1: deInterior1, interior2: deInterior2, interior3: deInterior3, interior4: deInterior4, interior5: deInterior5, interior6: deInterior6, interior7: deInterior7, scape1: deScape1, scape2: deScape2, mort1: deMort1, mort2: deMort2, mort3: deMort3, mort6: deMort6 },
-//       es: { common: esCommon, home: esHome, home1: esHome1, home2: esHome2, home3: esHome3, home4: esHome4, home5: esHome5, footer: esFooter, interior1: esInterior1, interior2: esInterior2, interior3: esInterior3, interior4: esInterior4, interior5: esInterior5, interior6: esInterior6, interior7: esInterior7, scape1: esScape1, scape2: esScape2, mort1: esMort1, mort2: esMort2, mort3: esMort3, mort6: esMort6 },
-//       fr: { common: frCommon, home: frHome, home1: frHome1, home2: frHome2, home3: frHome3, home4: frHome4, home5: frHome5, footer: frFooter, interior1: frInterior1, interior2: frInterior2, interior3: frInterior3, interior4: frInterior4, interior5: frInterior5, interior6: frInterior6, interior7: frInterior7, scape1: frScape1, scape2: frScape2, mort1: frMort1, mort2: frMort2, mort3: frMort3, mort6: frMort6 },
-//       ru: { common: ruCommon, home: ruHome, home1: ruHome1, home2: ruHome2, home3: ruHome3, home4: ruHome4, home5: ruHome5, footer: ruFooter, interior1: ruInterior1, interior2: ruInterior2, interior3: ruInterior3, interior4: ruInterior4, interior5: ruInterior5, interior6: ruInterior6, interior7: ruInterior7, scape1: ruScape1, scape2: ruScape2, mort1: ruMort1, mort2: ruMort2, mort3: ruMort3, mort6: ruMort6 },
-//       tr: { common: trCommon, home: trHome, home1: trHome1, home2: trHome2, home3: trHome3, home4: trHome4, home5: trHome5, footer: trFooter, interior1: trInterior1, interior2: trInterior2, interior3: trInterior3, interior4: trInterior4, interior5: trInterior5, interior6: trInterior6, interior7: trInterior7, scape1: trScape1, scape2: trScape2, mort1: trMort1, mort2: trMort2, mort3: trMort3, mort6: trMort6 },
-//       zh: { common: zhCommon, home: zhHome, home1: zhHome1, home2: zhHome2, home3: zhHome3, home4: zhHome4, home5: zhHome5, footer: zhFooter, interior1: zhInterior1, interior2: zhInterior2, interior3: zhInterior3, interior4: zhInterior4, interior5: zhInterior5, interior6: zhInterior6, interior7: zhInterior7, scape1: zhScape1, scape2: zhScape2, mort1: zhMort1, mort2: zhMort2, mort3: zhMort3, mort6: zhMort6 },
-//       tl: { common: tlCommon, home: tlHome, home1: tlHome1, home2: tlHome2, home3: tlHome3, home4: tlHome4, home5: tlHome5, footer: tlFooter, interior1: tlInterior1, interior2: tlInterior2, interior3: tlInterior3, interior4: tlInterior4, interior5: tlInterior5, interior6: tlInterior6, interior7: tlInterior7, scape1: tlScape1, scape2: tlScape2, mort1: tlMort1, mort2: tlMort2, mort3: tlMort3, mort6: tlMort6 },
-//       fa: {
-//          common: faCommon,
-//          mort1: faMort1,
-//          mort2: faMort2,
-//          mort3: faMort3,
-//          mort6: faMort6
-//        }   },
-   
-//    fallbackLng: "en",
-   
-//    supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa"],
-//    detection: {
-//       order: ["localStorage", "navigator"],
-//       caches: ["localStorage"],
-//     },
-
-//     ns: [
-//       "common",
-//       "home",
-//       "home1",
-//       "home2",
-//       "home3",
-//       "home4",
-//       "home5",
-//       "footer",
-//       "interior1",
-//       "interior2",
-//       "interior3",
-//       "interior4",
-//       "interior5",
-//       "interior6",
-//       "interior7",
-//       "scape1",
-//       "scape2",
-//       "mort1",
-//       "mort2",
-//       "mort3",
-//       "buy5",
-//       "mort6"
-//     ],
-
-//     defaultNS: "common",
-
-//     interpolation: {
-//       escapeValue: false
-//     }
-//   });
-
-// export default i18n;
-
+import pacommon from "./locales/pa/common.json"
+import pahome from "./locales/pa/home.json"
+import pahome1 from "./locales/pa/home1.json"
+import pahome2 from "./locales/pa/home2.json"
+import pahome3 from "./locales/pa/home3.json" 
+import pahome4 from "./locales/pa/home4.json"
+import pahome5 from "./locales/pa/home5.json"
+import pafooter from "./locales/pa/footer.json"
+import paarticle1 from "./locales/pa/article1.json"
+import paarticle2 from "./locales/pa/article2.json"
+import paarticle3 from "./locales/pa/article3.json"
+import paarticle4 from "./locales/pa/article4.json"
+import paarticle5 from "./locales/pa/article5.json"
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -1027,12 +955,12 @@ home:fahome,
             ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   , buy1: arbuy1, article1: ararticle1, article2: ararticle2 , article3: ararticle3, article4: ararticle4, article5: ararticle5   },
        ur: { common: urcommon ,         landhero:urlandhero,
  home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5  },
-    
+    pa:{common:pacommon , home:pahome , home1:pahome1 , home2:pahome2 , home3:pahome3 , home4:pahome4 , home5:pahome5 , footer:pafooter , article1:paarticle1, article2:paarticle2, article3:paarticle3 , article4:paarticle4, article5:paarticle5}
           },
 
     fallbackLng: "en",
 
- supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa","ur","ar"],
+ supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa","ur","ar" , "pa"],
 
     ns: [
       "common","home","home1","home2","home3","home4","home5",

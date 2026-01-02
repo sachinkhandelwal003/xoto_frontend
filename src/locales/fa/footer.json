@@ -1,6 +1,6 @@
 {
   "company": {
-    "slogan": "یک اکوسیستم یکپارچه که <br/> ارزش مادام‌العمر دارایی ایجاد می‌کند.",
+    "slogan": "یک اکوسیستم یکپارچه که <br/> ارزش مادام‌العمر ملک ایجاد می‌کند.",
     "description": "مقیاس‌پذیر. مبتنی بر هوش مصنوعی. سبک‌دارایی."
   },
 
@@ -19,7 +19,7 @@
     { "label": "خرید", "path": "/buy" },
     { "label": "فروش", "path": "/sell" },
     { "label": "وام مسکن", "path": "/mortgage/services" },
-    { "label": "نگهداری و تعمیرات", "path": "/maintenance" }
+    { "label": "نگهداری", "path": "/maintenance" }
   ],
 
   "resources": [
@@ -40,9 +40,13 @@
     { "label": "شرایط استفاده", "path": "/terms" }
   ],
 
-  "locations": "هند | امارات متحده عربی | عربستان سعودی",
+  "locations": "هند | امارات | عربستان سعودی",
 
   "email": {
+    "labels": {
+      "partners": "برای شرکا",
+      "customers": "برای مشتریان"
+    },
     "partners": "connect@xoto.ae",
     "customers": "care@xoto.ae"
   },
@@ -55,6 +59,6 @@
   ],
 
   "bottom": {
-    "copyright": "© 2021 XOTO. کلیه حقوق محفوظ است"
+    "copyright": "©2021 XOTO. کلیه حقوق محفوظ است"
   }
 }

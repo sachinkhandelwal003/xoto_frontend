@@ -43,6 +43,10 @@
   "locations": "India | UAE | Saudi Arabia",
 
   "email": {
+    "labels": {
+      "partners": "For Partners",
+      "customers": "For Customers"
+    },
     "partners": "connect@xoto.ae",
     "customers": "care@xoto.ae"
   },

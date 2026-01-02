@@ -1,45 +1,63 @@
 {
   "company": {
-    "slogan": "Isang pinag-isang ecosystem para sa <br/> panghabambuhay na halaga ng ari-arian.",
-    "description": "Nasusukat. Pinapagana ng AI. Asset-light."
+    "slogan": "Isang pinag-isang ecosystem na <br/> lumilikha ng panghabambuhay na halaga ng ari-arian.",
+    "description": "Nasusukat. Pinapagana ng AI. Magaang sa asset."
   },
+
   "titles": {
     "offerings": "Aming Mga Serbisyo",
-    "resources": "Partner Ecosystem",
-    "knowledge": "Tungkol Sa Amin",
+    "resources": "Ecosystem ng Kasosyo",
+    "knowledge": "Tungkol sa Amin",
     "location": "Mga Lokasyon",
     "email": "Email"
   },
+
   "offerings": [
-    { "label": "Landscaping" },
-    { "label": "Interiors" },
-    { "label": "Rentals" },
-    { "label": "Bumili" },
-    { "label": "Magbenta" },
-    { "label": "Mortgage" },
-    { "label": "Maintenance" }
+    { "label": "Landscaping", "path": "/landscaping" },
+    { "label": "Interiors", "path": "/interiors" },
+    { "label": "Rentals", "path": "/rentals" },
+    { "label": "Bumili", "path": "/buy" },
+    { "label": "Magbenta", "path": "/sell" },
+    { "label": "Mortgage", "path": "/mortgage/services" },
+    { "label": "Maintenance", "path": "/maintenance" }
   ],
+
   "resources": [
-    { "label": "Strategic Alliance" },
-    { "label": "Business Associates" },
-    { "label": "Execution Partners" },
-    { "label": "Developers" },
-    { "label": "Financial Institutions" }
+    { "label": "Strategic Alliance", "path": "/strategic-alliance" },
+    { "label": "Business Associates", "path": "/business-associates" },
+    { "label": "Execution Partners", "path": "/execution-partners" },
+    { "label": "Developers", "path": "/developers" },
+    { "label": "Financial Institutions", "path": "/financial-institutions" }
   ],
+
   "knowledge": [
-    { "label": "Knowledge Centre" },
-    { "label": "Our Sustainability" },
-    { "label": "Focus" },
-    { "label": "Magpadala ng Feedback" },
-    { "label": "Makipag-ugnayan" },
-    { "label": "Patakaran sa Privacy" },
-    { "label": "Mga Tuntunin ng Paggamit" }
+    { "label": "Knowledge Centre", "path": "/knowledge-centre" },
+    { "label": "Our Sustainability", "path": "/sustainability" },
+    { "label": "Focus", "path": "/focus" },
+    { "label": "Submit Feedback", "path": "/feedback" },
+    { "label": "Contact Us", "path": "/contact" },
+    { "label": "Privacy Policy", "path": "/privacy" },
+    { "label": "Terms of Use", "path": "/terms" }
   ],
+
   "locations": "India | UAE | Saudi Arabia",
+
   "email": {
-    "partners": "Para sa Mga Partner:",
-    "customers": "Para sa Mga Customer:"
+    "labels": {
+      "partners": "Para sa Partners",
+      "customers": "Para sa Customers"
+    },
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
   },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "LinkedIn", "url": "#" }
+  ],
+
   "bottom": {
     "copyright": "©2021 XOTO. Lahat ng karapatan ay nakalaan"
   }

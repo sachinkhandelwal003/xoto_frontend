@@ -1,8 +1,9 @@
 {
   "company": {
-    "slogan": "Ömür boyu gayrimenkul değeri <br/> yaratan birleşik bir ekosistem.",
+    "slogan": "Yaşam boyu mülk değeri yaratan <br/> birleşik bir ekosistem.",
     "description": "Ölçeklenebilir. Yapay zekâ destekli. Hafif varlık yapısı."
   },
+
   "titles": {
     "offerings": "Hizmetlerimiz",
     "resources": "Ortak Ekosistemi",
@@ -10,36 +11,53 @@
     "location": "Lokasyonlar",
     "email": "E-posta"
   },
+
   "offerings": [
-    { "label": "Peyzaj" },
-    { "label": "İç Mekanlar" },
-    { "label": "Kiralama" },
-    { "label": "Satın Al" },
-    { "label": "Sat" },
-    { "label": "Mortgage" },
-    { "label": "Bakım" }
+    { "label": "Peyzaj", "path": "/landscaping" },
+    { "label": "İç Mekanlar", "path": "/interiors" },
+    { "label": "Kiralama", "path": "/rentals" },
+    { "label": "Satın Alma", "path": "/buy" },
+    { "label": "Satış", "path": "/sell" },
+    { "label": "Konut Kredileri", "path": "/mortgage/services" },
+    { "label": "Bakım", "path": "/maintenance" }
   ],
+
   "resources": [
-    { "label": "Stratejik Ortaklık" },
-    { "label": "İş Ortakları" },
-    { "label": "Uygulama Ortakları" },
-    { "label": "Geliştiriciler" },
-    { "label": "Finansal Kurumlar" }
+    { "label": "Stratejik Ortaklıklar", "path": "/strategic-alliance" },
+    { "label": "İş Ortakları", "path": "/business-associates" },
+    { "label": "Uygulama Ortakları", "path": "/execution-partners" },
+    { "label": "Geliştiriciler", "path": "/developers" },
+    { "label": "Finansal Kurumlar", "path": "/financial-institutions" }
   ],
+
   "knowledge": [
-    { "label": "Bilgi Merkezi" },
-    { "label": "Sürdürülebilirliğimiz" },
-    { "label": "Odak" },
-    { "label": "Geri Bildirim Gönder" },
-    { "label": "Bize Ulaşın" },
-    { "label": "Gizlilik Politikası" },
-    { "label": "Kullanım Şartları" }
+    { "label": "Bilgi Merkezi", "path": "/knowledge-centre" },
+    { "label": "Sürdürülebilirliğimiz", "path": "/sustainability" },
+    { "label": "Odak", "path": "/focus" },
+    { "label": "Geri Bildirim Gönder", "path": "/feedback" },
+    { "label": "Bize Ulaşın", "path": "/contact" },
+    { "label": "Gizlilik Politikası", "path": "/privacy" },
+    { "label": "Kullanım Şartları", "path": "/terms" }
   ],
+
   "locations": "Hindistan | BAE | Suudi Arabistan",
+
   "email": {
-    "partners": "Partnerler için:",
-    "customers": "Müşteriler için:"
+    "labels": {
+      "partners": "Ortaklar için",
+      "customers": "Müşteriler için"
+    },
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
   },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "LinkedIn", "url": "#" }
+  ],
+
   "bottom": {
     "copyright": "©2021 XOTO. Tüm hakları saklıdır"
   }

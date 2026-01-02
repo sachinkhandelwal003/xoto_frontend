@@ -1,8 +1,9 @@
 {
   "company": {
-    "slogan": "Un ecosistema unificado para crear <br/> valor inmobiliario de por vida.",
+    "slogan": "Un ecosistema unificado que crea <br/> valor inmobiliario de por vida.",
     "description": "Escalable. Impulsado por IA. Ligero en activos."
   },
+
   "titles": {
     "offerings": "Nuestros Servicios",
     "resources": "Ecosistema de Socios",
@@ -10,36 +11,53 @@
     "location": "Ubicaciones",
     "email": "Correo electrónico"
   },
+
   "offerings": [
-    { "label": "Paisajismo" },
-    { "label": "Interiores" },
-    { "label": "Alquileres" },
-    { "label": "Comprar" },
-    { "label": "Vender" },
-    { "label": "Hipotecas" },
-    { "label": "Mantenimiento" }
+    { "label": "Paisajismo", "path": "/landscaping" },
+    { "label": "Interiores", "path": "/interiors" },
+    { "label": "Alquileres", "path": "/rentals" },
+    { "label": "Comprar", "path": "/buy" },
+    { "label": "Vender", "path": "/sell" },
+    { "label": "Hipotecas", "path": "/mortgage/services" },
+    { "label": "Mantenimiento", "path": "/maintenance" }
   ],
+
   "resources": [
-    { "label": "Alianza Estratégica" },
-    { "label": "Asociados Comerciales" },
-    { "label": "Socios de Ejecución" },
-    { "label": "Desarrolladores" },
-    { "label": "Instituciones Financieras" }
+    { "label": "Alianzas Estratégicas", "path": "/strategic-alliance" },
+    { "label": "Socios Comerciales", "path": "/business-associates" },
+    { "label": "Socios de Ejecución", "path": "/execution-partners" },
+    { "label": "Desarrolladores", "path": "/developers" },
+    { "label": "Instituciones Financieras", "path": "/financial-institutions" }
   ],
+
   "knowledge": [
-    { "label": "Centro de Conocimiento" },
-    { "label": "Nuestra Sostenibilidad" },
-    { "label": "Enfoque" },
-    { "label": "Enviar Comentarios" },
-    { "label": "Contacto" },
-    { "label": "Política de Privacidad" },
-    { "label": "Términos de Uso" }
+    { "label": "Centro de Conocimiento", "path": "/knowledge-centre" },
+    { "label": "Nuestra Sostenibilidad", "path": "/sustainability" },
+    { "label": "Enfoque", "path": "/focus" },
+    { "label": "Enviar Comentarios", "path": "/feedback" },
+    { "label": "Contáctanos", "path": "/contact" },
+    { "label": "Política de Privacidad", "path": "/privacy" },
+    { "label": "Términos de Uso", "path": "/terms" }
   ],
+
   "locations": "India | EAU | Arabia Saudita",
+
   "email": {
-    "partners": "Para Socios:",
-    "customers": "Para Clientes:"
+    "labels": {
+      "partners": "Para socios",
+      "customers": "Para clientes"
+    },
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
   },
+
+  "social": [
+    { "name": "Facebook", "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Twitter", "url": "#" },
+    { "name": "LinkedIn", "url": "#" }
+  ],
+
   "bottom": {
     "copyright": "©2021 XOTO. Todos los derechos reservados"
   }

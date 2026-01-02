@@ -1,0 +1,64 @@
+{
+  "company": {
+    "slogan": "ਇੱਕ ਇਕੱਠਾ ਇਕੋਸਿਸਟਮ ਜੋ <br/> ਆਜੀਵਨ ਜਾਇਦਾਦ ਮੁੱਲ ਬਣਾਉਂਦਾ ਹੈ।",
+    "description": "ਸਕੇਲੇਬਲ। ਏਆਈ ਨਾਲ ਸੰਚਾਲਿਤ। ਐਸੈਟ-ਲਾਈਟ।"
+  },
+
+  "titles": {
+    "offerings": "ਸਾਡੀਆਂ ਸੇਵਾਵਾਂ",
+    "resources": "ਸਾਥੀ ਇਕੋਸਿਸਟਮ",
+    "knowledge": "ਸਾਡੇ ਬਾਰੇ",
+    "location": "ਥਾਵਾਂ",
+    "email": "ਈਮੇਲ"
+  },
+
+  "offerings": [
+    { "label": "ਲੈਂਡਸਕੇਪਿੰਗ", "path": "/landscaping" },
+    { "label": "ਇੰਟੀਰੀਅਰਜ਼", "path": "/interiors" },
+    { "label": "ਕਿਰਾਏ", "path": "/rentals" },
+    { "label": "ਖਰੀਦੋ", "path": "/buy" },
+    { "label": "ਵੇਚੋ", "path": "/sell" },
+    { "label": "ਘਰ ਦੇ ਕਰਜ਼ੇ", "path": "/mortgage/services" },
+    { "label": "ਮੈਂਟੇਨੈਂਸ", "path": "/maintenance" }
+  ],
+
+  "resources": [
+    { "label": "ਰਣਨੀਤਿਕ ਸਾਂਝ", "path": "/strategic-alliance" },
+    { "label": "ਵਪਾਰਕ ਸਾਥੀ", "path": "/business-associates" },
+    { "label": "ਕਾਰਜਾਨਵਿਤ ਸਾਥੀ", "path": "/execution-partners" },
+    { "label": "ਡਿਵੈਲਪਰ", "path": "/developers" },
+    { "label": "ਵਿੱਤੀ ਸੰਸਥਾਵਾਂ", "path": "/financial-institutions" }
+  ],
+
+  "knowledge": [
+    { "label": "ਗਿਆਨ ਕੇਂਦਰ", "path": "/knowledge-centre" },
+    { "label": "ਸਾਡੀ ਟਿਕਾਊਤਾ", "path": "/sustainability" },
+    { "label": "ਫੋਕਸ", "path": "/focus" },
+    { "label": "ਫੀਡਬੈਕ ਭੇਜੋ", "path": "/feedback" },
+    { "label": "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ", "path": "/contact" },
+    { "label": "ਪਰਦੇਦਾਰੀ ਨੀਤੀ", "path": "/privacy" },
+    { "label": "ਵਰਤੋਂ ਦੀਆਂ ਸ਼ਰਤਾਂ", "path": "/terms" }
+  ],
+
+  "locations": "ਭਾਰਤ | UAE | ਸਾਊਦੀ ਅਰਬ",
+
+  "email": {
+    "labels": {
+      "partners": "ਸਾਥੀਆਂ ਲਈ",
+      "customers": "ਗਾਹਕਾਂ ਲਈ"
+    },
+    "partners": "connect@xoto.ae",
+    "customers": "care@xoto.ae"
+  },
+
+  "social": [
+    { "name": "ਫੇਸਬੁੱਕ", "url": "#" },
+    { "name": "ਇੰਸਟਾਗ੍ਰਾਮ", "url": "#" },
+    { "name": "ਟਵਿੱਟਰ", "url": "#" },
+    { "name": "ਲਿੰਕਡਇਨ", "url": "#" }
+  ],
+
+  "bottom": {
+    "copyright": "©2021 XOTO. ਸਭ ਹੱਕ ਰਾਖਵੇਂ ਹਨ"
+  }
+}

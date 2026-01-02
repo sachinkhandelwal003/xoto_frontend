@@ -1,12 +1,12 @@
 {
   "company": {
-    "slogan": "ایک متحد ایکو سسٹم جو <br/> زندگی بھر کی جائیدادی قدر پیدا کرتا ہے۔",
-    "description": "قابلِ توسیع۔ مصنوعی ذہانت پر مبنی۔ کم اثاثہ جاتی۔"
+    "slogan": "ایک متحدہ ماحولیاتی نظام جو <br/> تاحیات جائیداد کی قدر پیدا کرتا ہے۔",
+    "description": "قابلِ توسیع۔ اے آئی پر مبنی۔ ہلکے اثاثے۔"
   },
 
   "titles": {
     "offerings": "ہماری خدمات",
-    "resources": "پارٹنر ایکو سسٹم",
+    "resources": "شراکتی ماحولیاتی نظام",
     "knowledge": "ہمارے بارے میں",
     "location": "مقامات",
     "email": "ای میل"
@@ -14,27 +14,27 @@
 
   "offerings": [
     { "label": "لینڈ اسکیپنگ", "path": "/landscaping" },
-    { "label": "انٹیریئر ڈیزائن", "path": "/interiors" },
+    { "label": "انٹیریئرز", "path": "/interiors" },
     { "label": "کرایہ", "path": "/rentals" },
-    { "label": "خرید", "path": "/buy" },
-    { "label": "فروخت", "path": "/sell" },
-    { "label": "ہاؤسنگ لون", "path": "/mortgage/services" },
-    { "label": "دیکھ بھال اور مرمت", "path": "/maintenance" }
+    { "label": "خریدیں", "path": "/buy" },
+    { "label": "فروخت کریں", "path": "/sell" },
+    { "label": "رہن", "path": "/mortgage/services" },
+    { "label": "دیکھ بھال", "path": "/maintenance" }
   ],
 
   "resources": [
     { "label": "اسٹریٹجک اتحاد", "path": "/strategic-alliance" },
     { "label": "کاروباری شراکت دار", "path": "/business-associates" },
-    { "label": "عملی شراکت دار", "path": "/execution-partners" },
+    { "label": "عملدرآمد شراکت دار", "path": "/execution-partners" },
     { "label": "ڈیولپرز", "path": "/developers" },
-    { "label": "مالیاتی ادارے", "path": "/financial-institutions" }
+    { "label": "مالی ادارے", "path": "/financial-institutions" }
   ],
 
   "knowledge": [
-    { "label": "مرکزِ علم", "path": "/knowledge-centre" },
+    { "label": "علمی مرکز", "path": "/knowledge-centre" },
     { "label": "ہماری پائیداری", "path": "/sustainability" },
     { "label": "فوکس", "path": "/focus" },
-    { "label": "اپنی رائے دیں", "path": "/feedback" },
+    { "label": "فیڈبیک بھیجیں", "path": "/feedback" },
     { "label": "ہم سے رابطہ کریں", "path": "/contact" },
     { "label": "رازداری کی پالیسی", "path": "/privacy" },
     { "label": "استعمال کی شرائط", "path": "/terms" }
@@ -43,6 +43,10 @@
   "locations": "بھارت | متحدہ عرب امارات | سعودی عرب",
 
   "email": {
+    "labels": {
+      "partners": "شراکت داروں کے لیے",
+      "customers": "صارفین کے لیے"
+    },
     "partners": "connect@xoto.ae",
     "customers": "care@xoto.ae"
   },
@@ -50,11 +54,11 @@
   "social": [
     { "name": "فیس بک", "url": "#" },
     { "name": "انسٹاگرام", "url": "#" },
-    { "name": "ٹویٹر", "url": "#" },
+    { "name": "ٹوئٹر", "url": "#" },
     { "name": "لنکڈ اِن", "url": "#" }
   ],
 
   "bottom": {
-    "copyright": "© 2021 XOTO۔ جملہ حقوق محفوظ ہیں"
+    "copyright": "©2021 XOTO. جملہ حقوق محفوظ ہیں"
   }
 }

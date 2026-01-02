@@ -179,14 +179,16 @@ export default function Footer() {
               {t("titles.email")}
             </h4>
 
-            <p>
-              {t("For Partners")}:{" "}
-              <strong>{t("email.partners")}</strong>
-            </p>
-            <p>
-              {t("For Customers")}:{" "}
-              <strong>{t("email.customers")}</strong>
-            </p>
+           <p>
+  {t("email.labels.partners")}:{" "}
+  <strong>{t("email.partners")}</strong>
+</p>
+
+<p>
+  {t("email.labels.customers")}:{" "}
+  <strong>{t("email.customers")}</strong>
+</p>
+
 
             {/* Floating Icons */}
             <div className="flex flex-col gap-4 mt-6 items-end">
