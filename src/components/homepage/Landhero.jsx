@@ -46,16 +46,16 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
       </div>
 
-      {/* Decorative Bottom Clips */}
-      <div className="absolute bottom-0 left-0 w-40 h-12 bg-[var(--color-body)] z-[5] clip-left-shape hidden md:block" />
-      <div className="absolute bottom-0 right-0 w-40 h-12 bg-[var(--color-body)] z-[5] clip-right-shape hidden md:block" />
+     {/* Bottom clipping shapes */}
+      <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
+      <div className="absolute bottom-0 right-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-right-shape" />
 
       <style>{`
         .clip-left-shape {
-          clip-path: polygon(0 0, 100% 100%, 0% 100%);
+          clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
         }
         .clip-right-shape {
-          clip-path: polygon(100% 0, 100% 100%, 0% 100%);
+          clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
         }
       `}</style>
 
