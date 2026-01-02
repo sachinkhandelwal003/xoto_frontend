@@ -33,6 +33,8 @@ import arInterior2 from "./locales/ar/interior2.json";
 import arInterior3 from "./locales/ar/interior3.json";
 import arInterior4 from "./locales/ar/interior4.json";
 import arInterior7 from "./locales/ar/interior7.json";
+import arbook from "./locales/ar/book.json";
+import arbuy2 from './locales/Ar/buy2.json'
 
 
 
@@ -510,6 +512,9 @@ import faInterior2 from "./locales/fa/interior2.json";
 import faInterior3 from "./locales/fa/interior3.json";
 import faInterior4 from "./locales/fa/interior4.json";
 import faInterior7 from "./locales/fa/interior7.json";
+import fabook from "./locales/fa/book.json";
+import fabuy2 from './locales/fa/buy2.json'
+import fabuy1 from './locales/fa/buy1.json'
 
 
 
@@ -542,6 +547,9 @@ import urInterior2 from "./locales/ur/interior2.json";
 import urInterior3 from "./locales/ur/interior3.json";
 import urInterior4 from "./locales/ur/interior4.json";
 import urInterior7 from "./locales/ur/interior7.json";
+import urbook from "./locales/ur/book.json";
+import urbuy2 from './locales/ur/buy2.json'
+import urbuy1 from './locales/ur/buy1.json'
 
 
 
@@ -562,6 +570,18 @@ import paarticle2 from "./locales/pa/article2.json"
 import paarticle3 from "./locales/pa/article3.json"
 import paarticle4 from "./locales/pa/article4.json"
 import paarticle5 from "./locales/pa/article5.json"
+import palandhero from "./locales/pa/landhero.json"
+import painteractive from "./locales/pa/interactive.json"
+import paconsultation from "./locales/pa/consultation.json"
+import pascape2 from "./locales/pa/scape2.json"
+import pascape1 from "./locales/pa/scape1.json"
+import painterior5 from "./locales/pa/interior5.json"
+import painterior6 from "./locales/pa/interior6.json"
+import paInterior1 from "./locales/pa/interior1.json";
+import pabook from "./locales/pa/book.json";
+import pabuy2 from './locales/pa/buy2.json'
+import pabuy1 from './locales/pa/buy1.json'
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -1016,7 +1036,10 @@ i18n
         scape2: fascape2,
         scape1: fascape1,
         interior5: fainterior5,
-        interior6: fainterior6
+        interior6: fainterior6,
+        book: fabook,
+        buy2: fabuy2,
+        buy1: fabuy1
 
         
       },
@@ -1026,6 +1049,7 @@ i18n
               interior3: arInterior3,
               interior4: arInterior4,
               interior7: arInterior7,
+              buy2: arbuy2,
 
 
               buy1: arbuy1,
@@ -1033,15 +1057,15 @@ i18n
                article2: ararticle2 ,
                 article3: ararticle3,
                  article4: ararticle4,
-                  article5: ararticle5, landhero: arlandhero, interactive: arinteractive, consultation: arconsultation, scape2: arscape2, scape1: arscape1, interior5: arinterior5, interior6: arinterior6   },
-       ur: { common: urcommon ,interior1: urInterior1,
+                  article5: ararticle5, landhero: arlandhero, interactive: arinteractive, consultation: arconsultation, scape2: arscape2, scape1: arscape1, interior5: arinterior5, interior6: arinterior6, book: arbook  },
+       ur: { common: urcommon ,interior1: urInterior1, buy2: urbuy2, buy1: urbuy1,
   interior2: urInterior2,
   interior3: urInterior3,
   interior4: urInterior4,
   interior7: urInterior7,
 landhero:urlandhero,
- home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5, interactive: urinteractive, consultation: urconsultation, scape2: urscape2,scape1: urscape1, interior5: urinterior5, interior6: urinterior6  },
-    pa:{common:pacommon , home:pahome , home1:pahome1 , home2:pahome2 , home3:pahome3 , home4:pahome4 , home5:pahome5 , footer:pafooter , article1:paarticle1, article2:paarticle2, article3:paarticle3 , article4:paarticle4, article5:paarticle5}
+ home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5, interactive: urinteractive, consultation: urconsultation, scape2: urscape2,scape1: urscape1, interior5: urinterior5, interior6: urinterior6, book: urbook  },
+    pa:{common:pacommon , home:pahome , home1:pahome1 , home2:pahome2 , home3:pahome3 , home4:pahome4 , home5:pahome5 , footer:pafooter , article1:paarticle1, article2:paarticle2, article3:paarticle3 , article4:paarticle4, article5:paarticle5, landhero:palandhero, interactive:painteractive, consultation:paconsultation, scape2: pascape2, scape1: pascape1, interior5: painterior5, interior6: painterior6, interior1: paInterior1, book: pabook, buy2: pabuy2, buy1: pabuy1  }
           },
 
     fallbackLng: "en",

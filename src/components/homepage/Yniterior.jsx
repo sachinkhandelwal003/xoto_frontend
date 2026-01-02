@@ -24,7 +24,7 @@ import Eco1 from "./Eco1";
 import bbImage from "../../assets/img/bb.png";
 import Fifth from "../Service/Fifth";
 import Builder from "../interior/Builder";
-import Book from "../interior/Book";
+import Book from "../interior/Book"
 import Ourport from "../interior/Ourport";
 import Consultation from "./Consultation";
 import yyyImage from "../../assets/img/yyy.png";
@@ -40,7 +40,7 @@ export default function App() {
 
       {/* ────────────────────── BOOK CONSULTATION ────────────────────── */}
       {/* <Book /> */}
-           <Consultation />
+            <Book />
       {/* ────────────────────── OUR SERVICES PORTFOLIO ────────────────────── */}
       <Ourport />
 
