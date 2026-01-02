@@ -7,38 +7,79 @@ import waveint6 from "../../assets/img/wave/waveint6.png";
 import waveint from "../../assets/img/wave/waveint4.png";
 import image from "../../assets/img/bggg.png";
 
-export default function HeroSection() {
-  const { t, i18n } = useTranslation("buy7");
+/* ---------------- COUNTRY CONFIG ---------------- */
 
- const [form, setForm] = useState({
-  firstName: "",
-  lastName: "",
-  email: "",
-  countryCode: "+971",   // ✅ default UAE
-  phone: "",
-  country: "",     // ✅ preferred state / city
-  lookingFor: "",
-  city: "Dubai",        // ✅ preferred city
-  budget: "",
-});
+const COUNTRY_CONFIG = {
+  "+971": { country: "UAE", digits: 9, startsWith: /^5/ },
+  "+91": { country: "India", digits: 10, startsWith: /^[6-9]/ },
+};
+
+
+export default function HeroSection() {
+  const { t } = useTranslation("buy7");
+
+  /* ---------------- STATE ---------------- */
+
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    countryCode: "+971", // ✅ DEFAULT UAE
+    phone: "",
+    country: "",
+    lookingFor: "",
+    city: "Dubai",
+    budget: "",
+  });
 
   const [loading, setLoading] = useState(false);
+
+  /* ---------------- HANDLERS ---------------- */
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // allow digits only for phone
-    if (name === "phone" && value && !/^\d*$/.test(value)) return;
+    // ✅ VALIDATION 1: digits only for phone
+  if (name === "phone") {
+    const digitsOnly = value.replace(/\D/g, "");
+    const maxDigits = COUNTRY_CONFIG[form.countryCode].digits;
 
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+    // block extra digits
+    if (digitsOnly.length > maxDigits) return;
 
+    setForm((prev) => ({ ...prev, phone: digitsOnly }));
+    return;
+  }
+
+  setForm((prev) => ({ ...prev, [name]: value }));
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // validate all fields
-    if (Object.values(form).some((v) => !v.trim())) {
+    const { countryCode, phone } = form;
+    const config = COUNTRY_CONFIG[countryCode];
+
+    // ✅ VALIDATION 2: empty fields
+    if (Object.values(form).some((v) => !v.toString().trim())) {
       toast.error(t("error"));
+      return;
+    }
+
+    // ✅ VALIDATION 3: length check
+    if (phone.length !== config.digits) {
+      toast.error(
+        `${config.country} phone number must be ${config.digits} digits`
+      );
+      return;
+    }
+
+    // ✅ VALIDATION 4: starting digit check
+    if (!config.startsWith.test(phone)) {
+      toast.error(
+        countryCode === "+971"
+          ? "UAE numbers must start with 5"
+          : "Indian numbers must start with 6, 7, 8, or 9"
+      );
       return;
     }
 
@@ -61,17 +102,17 @@ export default function HeroSection() {
         budget: form.budget,
       });
 
-      if (res.success) {
+      if (res?.success) {
         toast.success(t("success"));
         setForm({
           firstName: "",
           lastName: "",
           email: "",
-          countryCode: "",
+          countryCode: "+971", // reset to UAE
           phone: "",
           country: "",
           lookingFor: "",
-          city: "",
+          city: "Dubai",
           budget: "",
         });
       }
@@ -82,11 +123,11 @@ export default function HeroSection() {
     }
   };
 
+  /* ---------------- UI ---------------- */
+
   return (
     <>
       <Toaster position="top-center" />
-
- 
 
       <section className="relative w-full bg-[var(--color-body)] py-16 overflow-hidden">
         {/* Background waves */}
@@ -99,43 +140,17 @@ export default function HeroSection() {
 
         <div className="max-w-8xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* LEFT CONTENT */}
-        <div className="z-20 flex  flex-col gap-[20px]">
-  <h1
-    className="
-      font-['DM_Sans']
-      font-semibold
-      text-[60px]
-      leading-[48px]
-      tracking-[-0.03em]
-      text-[#020202]
-      max-w-[494px]
-      ml-20
-    "
-  >
-    {t("heroTitle")}
-  </h1>
+          <div className="z-20 flex flex-col gap-[20px]">
+            <h1 className="font-['DM_Sans'] font-semibold text-[60px] leading-[48px] tracking-[-0.03em] text-[#020202] max-w-[494px] ml-20">
+              {t("heroTitle")}
+            </h1>
 
-  <p
-    className="
-      font-['DM_Sans']
-      font-semibold
-      text-[24px]
-      leading-[33px]
-      text-[#547593]
-      max-w-[482px]
-      ml-20
-    "
-  >
-    {t("heroSub")}
-  </p>
+            <p className="font-['DM_Sans'] font-semibold text-[24px] leading-[33px] text-[#547593] max-w-[482px] ml-20">
+              {t("heroSub")}
+            </p>
 
-  <img
-    src={image}
-    alt=""
-    className="w-full max-w-[590px] mt-[24px]"
-  />
-</div>
-
+            <img src={image} alt="" className="w-full max-w-[590px] mt-[24px]" />
+          </div>
 
           {/* RIGHT FORM */}
           <div className="z-20">
@@ -149,20 +164,18 @@ export default function HeroSection() {
                 {/* Name */}
                 <div className="grid grid-cols-2 gap-4">
                   <input
-                    type="text"
                     name="firstName"
                     value={form.firstName}
                     onChange={handleChange}
                     placeholder={t("firstName")}
-                    className="w-full px-5 py-4 rounded-xl border border-gray-300 focus:ring-4 focus:ring-purple-100"
+                    className="w-full px-5 py-4 rounded-xl border border-gray-300"
                   />
                   <input
-                    type="text"
                     name="lastName"
                     value={form.lastName}
                     onChange={handleChange}
                     placeholder={t("lastName")}
-                    className="w-full px-5 py-4 rounded-xl border border-gray-300 focus:ring-4 focus:ring-purple-100"
+                    className="w-full px-5 py-4 rounded-xl border border-gray-300"
                   />
                 </div>
 
@@ -173,18 +186,23 @@ export default function HeroSection() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder={t("email")}
-                  className="w-full px-5 py-4 rounded-xl border border-gray-300 focus:ring-4 focus:ring-purple-100"
+                  className="w-full px-5 py-4 rounded-xl border border-gray-300"
                 />
 
                 {/* Phone */}
                 <div className="grid grid-cols-3 gap-3">
                   <select
                     name="countryCode"
-                    value={form.countryCode}
-                    onChange={handleChange}
+                    value={form.countryCode} // ✅ controlled
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        countryCode: e.target.value,
+                        phone: "",
+                      })
+                    }
                     className="px-4 py-4 rounded-xl border border-gray-300"
                   >
-                    <option value="">{t("countryCode")}</option>
                     <option value="+91">+91</option>
                     <option value="+971">+971</option>
                   </select>
@@ -194,7 +212,11 @@ export default function HeroSection() {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    placeholder={t("phone")}
+                    placeholder={
+                      form.countryCode === "+971"
+                        ? "9 digit number"
+                        : "10 digit number"
+                    }
                     className="col-span-2 px-5 py-4 rounded-xl border border-gray-300"
                   />
                 </div>
@@ -209,7 +231,7 @@ export default function HeroSection() {
                   >
                     <option value="">{t("country")}</option>
                     <option value="India">India</option>
-                    <option value="Dubai">UAE </option>
+                    <option value="Dubai">UAE</option>
                   </select>
 
                   <select
@@ -242,7 +264,6 @@ export default function HeroSection() {
 
                 {/* Budget */}
                 <input
-                  type="text"
                   name="budget"
                   value={form.budget}
                   onChange={handleChange}

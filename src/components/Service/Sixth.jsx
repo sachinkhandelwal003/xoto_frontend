@@ -5,6 +5,10 @@ import wave1 from "../../assets/img/wave/waveint2.png";
 import wave2 from "../../assets/img/wave/wave2.png";
 
 const dmSans = { fontFamily: "'DM Sans', sans-serif" };
+const COUNTRY_CONFIG = {
+  "+971": { country: "UAE", digits: 9 },
+  "+91": { country: "India", digits: 10 },
+};
 
 export default function Sixth() {
   const { t } = useTranslation("mort6");
@@ -13,7 +17,7 @@ export default function Sixth() {
     firstName: "",
     lastName: "",
     email: "",
-    countryCode: "+91",
+    countryCode: "+971",
     phone: "",
     lookingFor: "",
     city: "",
@@ -23,10 +27,24 @@ export default function Sixth() {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-  };
+ const handleSubmit = (e) => {
+  e.preventDefault();
+
+  const { countryCode, phone } = formData;
+  const { digits } = COUNTRY_CONFIG[countryCode];
+
+  if (phone.length !== digits) {
+    alert(`Phone number must be ${digits} digits`);
+    return;
+  }
+
+  const fullMobile = countryCode + phone;
+
+  console.log("Form submitted:");
+  console.log("Country code:", countryCode);
+  console.log("Phone:", phone);
+  console.log("Full mobile:", fullMobile);
+};
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-[#F8F4FF] via-[#F4EEFF] to-[#E9F1FF] overflow-hidden" style={dmSans}>
@@ -119,21 +137,36 @@ export default function Sixth() {
                   {t("form.phone")}*
                 </label>
                 <div className="flex gap-1 md:gap-2">
-                  <select
-                    name="countryCode"
-                    onChange={handleChange}
-                    className="px-1 py-2 md:px-3 md:py-3 text-sm md:text-base border border-gray-300 rounded-xl w-[70px] md:w-24 outline-none"
-                  >
-                    <option value="+91">+91</option>
-                    <option value="+971">+971</option>
-                  </select>
+                 <select
+  name="countryCode"
+  value={formData.countryCode}   // ✅ THIS LINE FIXES IT
+  onChange={(e) => {
+    setFormData({
+      ...formData,
+      countryCode: e.target.value,
+      phone: "",
+    });
+  }}
+  className="px-1 py-2 md:px-3 md:py-3 text-sm md:text-base border border-gray-300 rounded-xl w-[70px] md:w-24 outline-none"
+>
+  <option value="+91">+91</option>
+  <option value="+971">+971</option>
+</select>
 
-                  <input
-                    name="phone"
-                    onChange={handleChange}
-                    required
-                    className="w-full px-2 py-2 md:px-4 md:py-3 text-sm md:text-base border border-gray-300 rounded-xl outline-none"
-                  />
+                 <input
+  name="phone"
+  value={formData.phone}
+  onChange={(e) => {
+    const digits = COUNTRY_CONFIG[formData.countryCode].digits;
+    const value = e.target.value.replace(/\D/g, "");
+
+    if (value.length <= digits) {
+      setFormData({ ...formData, phone: value });
+    }
+  }}
+  required
+  className="w-full px-2 py-2 md:px-4 md:py-3 text-sm md:text-base border border-gray-300 rounded-xl outline-none"
+/>
                 </div>
               </div>
             </div>
