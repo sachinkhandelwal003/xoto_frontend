@@ -180,11 +180,11 @@ export default function Footer() {
             </h4>
 
             <p>
-              {t("for.partners")}:{" "}
+              {t("For Partners")}:{" "}
               <strong>{t("email.partners")}</strong>
             </p>
             <p>
-              {t("for.customers")}:{" "}
+              {t("For Customers")}:{" "}
               <strong>{t("email.customers")}</strong>
             </p>
 
