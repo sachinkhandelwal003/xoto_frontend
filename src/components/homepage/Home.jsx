@@ -1,3 +1,4 @@
+// In your Home.jsx file
 import React, { useState } from "react";
 import HeroSection from "../herosection";
 import TestimonialSlider from "../designslider/testimonial/TestimonialSlider";
@@ -6,26 +7,14 @@ import Trust from "../homedesign/Trust";
 import AIPoweredEcosystemSection from "../AIPoweredEcosystemSection";
 import MagazineSlider from "../magazines/MagazinePage";
 import Moduleboat from "./Moduleboat";
-import XobiaChatbot from "./XobiaChatbot";
+import XobiaChatbot from "./XobiaChatbot"; // Import this component
 import { motion } from "framer-motion";
-import LocationCategoryModal from "../modal/LocationCategoryModal";
-import { useEffect } from "react";
 
 const Home = () => {
   const [isModuleOpen, setIsModuleOpen] = useState(false);
-    // const [showLocationModal, setShowLocationModal] = useState(false);
 
-  // useEffect(() => {
-  //   setShowLocationModal(true);
-  // }, []);
   return (
     <>
-
-{/* 
-         {showLocationModal && (
-        <LocationCategoryModal />
-      )} */}
-
       <HeroSection />
       <HomeDesign />
       <AIPoweredEcosystemSection />
@@ -33,10 +22,10 @@ const Home = () => {
       <TestimonialSlider />
       <Trust />
 
-      {/* ✅ Xobia AI Widget */}
+      {/* ✅ Add Xobia Chatbot Widget Here */}
       <XobiaChatbot />
 
-      {/* MODULE MODAL (UNCHANGED) */}  
+      {/* Your existing Module Modal */}
       {isModuleOpen && (
         <>
           <div
@@ -57,7 +46,6 @@ const Home = () => {
               >
                 ×
               </button>
-
               <Moduleboat />
             </motion.div>
           </div>
