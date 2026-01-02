@@ -61,12 +61,15 @@ import enMort2 from "./locales/en/mort2.json";
 import enMort3 from "./locales/en/mort3.json";
 import enMort6 from "./locales/en/mort6.json";
 import enbook from "./locales/en/book.json";
+import enlandhero from "./locales/en/landhero.json";
+
 import enconsultation from "./locales/en/consultation.json";
 import enarticle1 from './locales/en/article1.json'
 import enarticle2 from "./locales/en/article2.json"
 import enarticle3 from "./locales/en/article3.json"
 import enarticle4 from "./locales/en/article4.json"
 import enarticle5 from "./locales/en/article5.json"
+import eninteractive from "./locales/en/interactive.json";
 
 /* =========================
    HI
@@ -114,6 +117,8 @@ import hiarticle3 from "./locales/hi/article3.json"
 import hiarticle4 from "./locales/hi/article4.json"
 import hiarticle5 from "./locales/hi/article5.json"
 
+import hilandhero from "./locales/hi/landhero.json";
+import hiinteractive from "./locales/hi/interactive.json";
 
 /* =========================
    DE
@@ -161,6 +166,7 @@ import dearticle2 from "./locales/de/article2.json"
 import dearticle3 from "./locales/de/article3.json"
 import dearticle4 from "./locales/de/article4.json"
 import dearticle5 from "./locales/de/article5.json"
+import delandhero from "./locales/de/landhero.json";
 
 /* =========================
    ES
@@ -208,6 +214,7 @@ import esarticle2 from "./locales/es/article2.json"
 import esarticle3 from "./locales/es/article3.json"
 import esarticle4 from "./locales/es/article4.json"
 import esarticle5 from "./locales/es/article5.json"
+import eslandhero from "./locales/es/landhero.json";
 
 /* =========================
    FR
@@ -255,6 +262,7 @@ import frarticle2 from "./locales/fr/article2.json"
 import frarticle3 from "./locales/fr/article3.json"
 import frarticle4 from "./locales/fr/article4.json"
 import frarticle5 from "./locales/fr/article5.json"
+import frlandhero from "./locales/fr/landhero.json";
 
 /* =========================
    RU
@@ -302,6 +310,8 @@ import ruarticle2 from "./locales/ru/article2.json"
 import ruarticle3 from "./locales/ru/article3.json"
 import ruarticle4 from "./locales/ru/article4.json"
 import ruarticle5 from "./locales/ru/article5.json"
+import rulandhero from "./locales/ru/landhero.json";
+import ruinteractive from "./locales/ru/interactive.json";
 
 /* =========================
    TR
@@ -349,6 +359,7 @@ import trarticle2 from "./locales/tr/article2.json"
 import trarticle3 from "./locales/tr/article3.json"
 import trarticle4 from "./locales/tr/article4.json"
 import trarticle5 from "./locales/tr/article5.json"
+import trlandhero from "./locales/tr/landhero.json";
 
 /* =========================
    ZH
@@ -396,6 +407,7 @@ import zharticle2 from "./locales/zh/article2.json"
 import zharticle3 from "./locales/zh/article3.json"
 import zharticle4 from "./locales/zh/article4.json"
 import zharticle5 from "./locales/zh/article5.json"
+import zhlandhero from "./locales/zh/landhero.json";
 
 /* =========================
    TL
@@ -443,6 +455,7 @@ import tlarticle2 from "./locales/tl/article2.json"
 import tlarticle3 from "./locales/tl/article3.json"
 import tlarticle4 from "./locales/tl/article4.json"
 import tlarticle5 from "./locales/tl/article5.json"
+import tllandhero from "./locales/tl/landhero.json";
 
 /* =========================
    FA
@@ -460,6 +473,7 @@ import faarticle2 from "./locales/fa/article2.json"
 import faarticle3 from "./locales/fa/article3.json"
 import faarticle4 from "./locales/fa/article4.json"
 import faarticle5 from "./locales/fa/article5.json"
+import falandhero from "./locales/fa/landhero.json";
 
 /* =========================
    UR
@@ -477,6 +491,7 @@ import urarticle2 from "./locales/ur/article2.json"
 import urarticle3 from "./locales/ur/article3.json"
 import urarticle4 from "./locales/ur/article4.json"
 import urarticle5 from "./locales/ur/article5.json"
+import urlandhero from "./locales/ur/landhero.json";
 
 
 /* =========================
@@ -609,6 +624,8 @@ i18n
         mort6: enMort6,
         book: enbook,
         consultation: enconsultation,
+        landhero:enlandhero,
+        interactive:eninteractive,
         article1: enarticle1,
         article2: enarticle2,
         article3: enarticle3,
@@ -653,6 +670,10 @@ i18n
         mort6: hiMort6,
         book: hibook,
         consultation: hiconsultation,
+                landhero:hilandhero,
+                        interactive:hiinteractive
+
+,
         article1: hiarticle1,
         article2: hiarticle2,
         article3: hiarticle3,
@@ -697,6 +718,8 @@ i18n
         mort6: deMort6,
         book: debook,
         consultation: deconsultation,
+                landhero:delandhero
+,
         article1: dearticle1,
         article2: dearticle2,
         article3: dearticle3,
@@ -741,6 +764,8 @@ i18n
         mort6: esMort6,
         book: esbook,
         consultation: esconsultation,
+                landhero:eslandhero
+,
         article1: esarticle1,
         article2: esarticle2,
         article3: esarticle3,
@@ -785,6 +810,8 @@ i18n
         mort6: frMort6,
         book: frbook,
         consultation: frconsultation,
+                landhero:frlandhero
+,
         article1: frarticle1,
         article2: frarticle2,
         article3: frarticle3,
@@ -829,6 +856,10 @@ i18n
         mort6: ruMort6,
         book: rubook,
         consultation: ruconsultation,
+                landhero:rulandhero,
+                        interactive:ruinteractive
+
+,
         article1: ruarticle1,
         article2: ruarticle2,
         article3: ruarticle3,
@@ -873,6 +904,8 @@ i18n
         mort6: trMort6,
         book: trbook,
         consultation: trconsultation,
+                landhero:trlandhero
+,
         article1: trarticle1,
         article2: trarticle2,
         article3: trarticle3,
@@ -917,6 +950,8 @@ i18n
         mort6: zhMort6,
         book: zhbook,
         consultation: zhconsultation,
+                landhero:zhlandhero
+,
         article1: zharticle1,
         article2: zharticle2,
         article3: zharticle3,
@@ -961,6 +996,8 @@ i18n
         mort6: tlMort6,
         book: tlbook,
         consultation: tlconsultation,
+                landhero:tllandhero
+,
         article1: tlarticle1,
         article2: tlarticle2,
         article3: tlarticle3,
@@ -983,10 +1020,13 @@ home:fahome,
         home5:fahome5,
         footer:fafooter,
 
+                landhero:falandhero
+
         
       },
             ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   , buy1: arbuy1, article1: ararticle1, article2: ararticle2 , article3: ararticle3, article4: ararticle4, article5: ararticle5   },
-       ur: { common: urcommon , home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5  },
+       ur: { common: urcommon ,         landhero:urlandhero,
+ home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5  },
     
           },
 
