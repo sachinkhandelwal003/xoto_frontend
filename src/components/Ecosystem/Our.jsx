@@ -5,11 +5,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import wave1 from "../../assets/img/wave/waveint2.png";
 import round from "../../assets/img/round231.mp4";
 import rating from "../../assets/icons/Homeicons/rating.png";
-import partner from "../../assets/icons/Homeicons/partners.png";
-import vector from "../../assets/icons/Homeicons/Vector.png";
-import dollar from "../../assets/icons/Homeicons/dollar.png";
-import finance from "../../assets/icons/Homeicons/finance.png";
-import target from "../../assets/icons/Homeicons/target.png";
+import partner from "../../assets/img/ecosystem/finance.png";
+import vector from "../../assets/img/ecosystem/business.png";
+import dollar from "../../assets/img/ecosystem/stratagic.png";
+import finance from "../../assets/img/ecosystem/vector.png";
+import target from "../../assets/img/ecosystem/dev.png";
 
 const BuiltForEveryone = () => {
   const { t } = useTranslation("builtForEveryone");
@@ -150,9 +150,10 @@ const BuiltForEveryone = () => {
   <button
     onClick={nextSlide}
     className="
-      p-3 rounded-sm border border-[#5c039b]
-      bg-[#5c039b] text-white
-      active:scale-95
+      p-3 rounded-sm border border-gray-300
+      bg-white text-black
+      hover:bg-[#5c039b] hover:text-white
+      active:bg-[#5c039b] active:text-white
       transition
     "
   >

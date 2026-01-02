@@ -9,16 +9,65 @@ export default function TestimonialsSection() {
   const [activeBtn, setActiveBtn] = useState(0);
 
   // ✅ ALL CARDS (none removed)
-  const testimonials = [
-    { title: "cards.title1", text: "cards.text", name: "Shubham", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
-    { title: "cards.title1", text: "cards.text", name: "Punit", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
-    { title: "cards.title2", text: "cards.text", name: "Harsh", location: "HSR Layout, Bangalore", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
-    { title: "cards.title1", text: "cards.text", name: "Shubham", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
-    { title: "cards.title3", text: "cards.text", name: "Jai Mathur", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
-    { title: "cards.title3", text: "cards.text", name: "Madhur", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
-    { title: "cards.title3", text: "cards.text", name: "Avn", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
-    { title: "cards.title3", text: "cards.text", name: "Sam", location: "Pune, Maharashtra", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" }
-  ];
+const testimonials = [
+  {
+    title: "cards.title1",
+    text: "cards.text",
+    name: "names.shubham",
+    location: "locations.pune",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+  },
+  {
+    title: "cards.title1",
+    text: "cards.text",
+    name: "names.punit",
+    location: "locations.pune",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+  },
+  {
+    title: "cards.title2",
+    text: "cards.text",
+    name: "names.harsh",
+    location: "locations.bangalore",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+  },
+  {
+    title: "cards.title1",
+    text: "cards.text",
+    name: "names.shubham",
+    location: "locations.pune",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+  },
+  {
+    title: "cards.title3",
+    text: "cards.text",
+    name: "names.jaiMathur",
+    location: "locations.pune",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+  },
+  {
+    title: "cards.title3",
+    text: "cards.text",
+    name: "names.madhur",
+    location: "locations.pune",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+  },
+  {
+    title: "cards.title3",
+    text: "cards.text",
+    name: "names.avn",
+    location: "locations.pune",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+  },
+  {
+    title: "cards.title3",
+    text: "cards.text",
+    name: "names.sam",
+    location: "locations.pune",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+  }
+];
+
 
   const slide = (dir) => {
     if (!scrollRef.current) return;
@@ -92,8 +141,8 @@ export default function TestimonialsSection() {
 
 
 
-                <p className="font-medium text-gray-900">{item.name}</p>
-                <p className="text-sm text-gray-500">{item.location}</p>
+                <p className="font-medium text-gray-900">{t(item.name)}</p>
+                <p className="text-sm text-gray-500">{t(item.location)}</p>
               </div>
             ))}
           </div>

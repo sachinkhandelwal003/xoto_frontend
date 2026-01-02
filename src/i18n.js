@@ -20,6 +20,13 @@ import ararticle2 from "./locales/Ar/article2.json"
 import ararticle3 from "./locales/Ar/article3.json"
 import ararticle4 from "./locales/Ar/article4.json"
 import ararticle5 from "./locales/Ar/article5.json"
+import arlandhero from "./locales/Ar/landhero.json"
+import arinteractive from "./locales/Ar/interactive.json"
+import arconsultation from "./locales/Ar/consultation.json"
+import arscape2 from './locales/Ar/scape2.json'
+import arscape1 from './locales/Ar/scape1.json'
+import arinterior5 from "./locales/Ar/interior5.json"
+import arinterior6 from "./locales/Ar/interior6.json"
 
 
 /* =========================
@@ -167,6 +174,7 @@ import dearticle3 from "./locales/de/article3.json"
 import dearticle4 from "./locales/de/article4.json"
 import dearticle5 from "./locales/de/article5.json"
 import delandhero from "./locales/de/landhero.json";
+import deinteractive from "./locales/de/interactive.json"
 
 /* =========================
    ES
@@ -215,6 +223,7 @@ import esarticle3 from "./locales/es/article3.json"
 import esarticle4 from "./locales/es/article4.json"
 import esarticle5 from "./locales/es/article5.json"
 import eslandhero from "./locales/es/landhero.json";
+import esinteractive from "./locales/es/interactive.json"
 
 /* =========================
    FR
@@ -263,6 +272,7 @@ import frarticle3 from "./locales/fr/article3.json"
 import frarticle4 from "./locales/fr/article4.json"
 import frarticle5 from "./locales/fr/article5.json"
 import frlandhero from "./locales/fr/landhero.json";
+import frinteractive from "./locales/fr/interactive.json"
 
 /* =========================
    RU
@@ -360,6 +370,7 @@ import trarticle3 from "./locales/tr/article3.json"
 import trarticle4 from "./locales/tr/article4.json"
 import trarticle5 from "./locales/tr/article5.json"
 import trlandhero from "./locales/tr/landhero.json";
+import trinteractive from "./locales/tr/interactive.json"
 
 /* =========================
    ZH
@@ -408,6 +419,7 @@ import zharticle3 from "./locales/zh/article3.json"
 import zharticle4 from "./locales/zh/article4.json"
 import zharticle5 from "./locales/zh/article5.json"
 import zhlandhero from "./locales/zh/landhero.json";
+import zhinteractive from "./locales/zh/interactive.json"
 
 /* =========================
    TL
@@ -456,6 +468,7 @@ import tlarticle3 from "./locales/tl/article3.json"
 import tlarticle4 from "./locales/tl/article4.json"
 import tlarticle5 from "./locales/tl/article5.json"
 import tllandhero from "./locales/tl/landhero.json";
+import tlinteractive from "./locales/tl/interactive.json"
 
 /* =========================
    FA
@@ -474,6 +487,12 @@ import faarticle3 from "./locales/fa/article3.json"
 import faarticle4 from "./locales/fa/article4.json"
 import faarticle5 from "./locales/fa/article5.json"
 import falandhero from "./locales/fa/landhero.json";
+import fainteractive from "./locales/fa/interactive.json"
+import faconsultation from "./locales/fa/consultation.json"
+import fascape2 from "./locales/fa/scape2.json"
+import fascape1 from "./locales/fa/scape1.json"
+import fainterior5 from "./locales/fa/interior5.json"
+import fainterior6 from "./locales/fa/interior6.json"
 
 /* =========================
    UR
@@ -492,6 +511,12 @@ import urarticle3 from "./locales/ur/article3.json"
 import urarticle4 from "./locales/ur/article4.json"
 import urarticle5 from "./locales/ur/article5.json"
 import urlandhero from "./locales/ur/landhero.json";
+import urinteractive from "./locales/ur/interactive.json"
+import urconsultation from "./locales/ur/consultation.json"
+import urscape2 from "./locales/ur/scape2.json"
+import urscape1 from "./locales/ur/scape1.json"
+import urinterior5 from "./locales/ur/interior5.json"
+import urinterior6 from "./locales/ur/interior6.json"
 
 
 /* =========================
@@ -724,7 +749,8 @@ i18n
         article2: dearticle2,
         article3: dearticle3,
         article4: dearticle4,
-        article5: dearticle5
+        article5: dearticle5,
+        interactive: deinteractive
       },
 
       es: {
@@ -770,7 +796,8 @@ i18n
         article2: esarticle2,
         article3: esarticle3,
         article4: esarticle4,
-        article5: esarticle5
+        article5: esarticle5,
+        interactive: esinteractive
       },
 
       fr: {
@@ -816,7 +843,8 @@ i18n
         article2: frarticle2,
         article3: frarticle3,
         article4: frarticle4,
-        article5: frarticle5
+        article5: frarticle5,
+        interactive: frinteractive
       },
 
       ru: {
@@ -910,7 +938,8 @@ i18n
         article2: trarticle2,
         article3: trarticle3,
         article4: trarticle4,
-        article5: trarticle5
+        article5: trarticle5,
+        interactive: trinteractive
       },
 
       zh: {
@@ -956,7 +985,8 @@ i18n
         article2: zharticle2,
         article3: zharticle3,
         article4: zharticle4,
-        article5: zharticle5
+        article5: zharticle5,
+        interactive: zhinteractive
       },
 
       tl: {
@@ -1002,7 +1032,8 @@ i18n
         article2: tlarticle2,
         article3: tlarticle3,
         article4: tlarticle4,
-        article5: tlarticle5
+        article5: tlarticle5,
+        interactive: tlinteractive
       },
 
       fa: {
@@ -1012,21 +1043,26 @@ i18n
         article3: faarticle3,
         article4: faarticle4,
         article5: faarticle5,
-home:fahome,
+        home:fahome,
         home1: fahome1,
         home2: fahome2,
         home3: fahome3,
         home4: fahome4,
         home5:fahome5,
         footer:fafooter,
-
-                landhero:falandhero
+        landhero:falandhero,
+        interactive: fainteractive,
+        consultation: faconsultation,
+        scape2: fascape2,
+        scape1: fascape1,
+        interior5: fainterior5,
+        interior6: fainterior6
 
         
       },
-            ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   , buy1: arbuy1, article1: ararticle1, article2: ararticle2 , article3: ararticle3, article4: ararticle4, article5: ararticle5   },
+            ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,     footer:arfooter   , buy1: arbuy1, article1: ararticle1, article2: ararticle2 , article3: ararticle3, article4: ararticle4, article5: ararticle5, landhero: arlandhero, interactive: arinteractive, consultation: arconsultation, scape2: arscape2, scape1: arscape1, interior5: arinterior5, interior6: arinterior6   },
        ur: { common: urcommon ,         landhero:urlandhero,
- home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5  },
+ home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5, interactive: urinteractive, consultation: urconsultation, scape2: urscape2,scape1: urscape1, interior5: urinterior5, interior6: urinterior6  },
     
           },
 
@@ -1043,7 +1079,7 @@ home:fahome,
       "page3","ecosystem","whyPartner","stakeholders",
       "partnerForm","builtForEveryone","cta",
       "mort1","mort2","mort3","mort6",
-      "book","consultation", "article1","article2", "article3", "article4", "article5"
+      "book","consultation", "article1","article2", "article3", "article4", "article5", "landhero"
     ],
 
     defaultNS: "common",
