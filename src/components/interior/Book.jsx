@@ -17,8 +17,9 @@ const countryCodes = [
 ];
 
 export default function ConsultationSection() {
-  const { t } = useTranslation("book");
-  console.log("LANG:", i18n.language);
+  const { t, i18n } = useTranslation("book");
+
+  // console.log("LANG:", i18n.language);
 console.log("BOOK TITLE:", t("title"));
   const [loading, setLoading] = useState(false);
   const [api, contextHolder] = notification.useNotification();
@@ -144,7 +145,17 @@ console.log("BOOK TITLE:", t("title"));
           transition={{ duration: 0.8 }}
           className="max-w-xl text-white text-center lg:text-left"
         >
-          <h2 className="mt-9 text-3xl sm:text-4xl md:text-5xl lg:text-6xl heading-dark-1 text-white">
+                 <h2
+  className={`
+    consultation-title
+    mt-9
+    text-white
+    text-3xl sm:text-4xl md:text-5xl lg:text-6xl
+    ${["ru", "tl", "es" , "fr", "de", "pa", "hi", "en", "tr", "ar", "ur", "fa"].includes(i18n.language)
+      ? "whitespace-normal"
+      : "whitespace-nowrap"}
+  `}
+>
             {t("title")}
           </h2>
           <p className="mt-5 text-xl md:text-2xl paragraph-light-1">
@@ -152,17 +163,114 @@ console.log("BOOK TITLE:", t("title"));
           </p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="w-full max-w-2xl"
-        >
-          <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-2xl">
-            {/* FORM UNCHANGED */}
-            {/* (no layout or responsiveness changes at all) */}
-          </div>
-        </motion.div>
+        {/* Form */}
+              <motion.div
+                 initial={{ opacity: 0, y: 50 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 0.8, delay: 0.3 }}
+                 className="w-full max-w-2xl"
+               >
+                 <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-2xl">
+                   <form onSubmit={onSubmit} className="space-y-4">
+       
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <div>
+                         <label className="block text-sm font-semibold text-gray-700 mb-1">
+                           {t("form.firstName")} <sup className="text-purple-600">*</sup>
+                         </label>
+                         <input
+                           type="text"
+                           name="first_name"
+                           value={formData.first_name}
+                           onChange={handleChange}
+                           className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
+                            placeholder={t("form.firstName")}
+                         />
+                       </div>
+       
+                       <div>
+                         <label className="block text-sm font-semibold text-gray-700 mb-1">
+                           {t("form.lastName")} <sup className="text-purple-600">*</sup>
+                         </label>
+                         <input
+                           type="text"
+                           name="last_name"
+                           value={formData.last_name}
+                           onChange={handleChange}
+                           className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
+                           placeholder={t("form.lastName")}
+                         />
+                       </div>
+                     </div>
+       
+                     <div>
+                       <label className="block text-sm font-semibold text-gray-700 mb-1">
+                         {t("form.email")} <sup className="text-purple-600">*</sup>
+                       </label>
+                       <input
+                         type="email"
+                         name="email"
+                         value={formData.email}
+                         onChange={handleChange}
+                         className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
+                         placeholder={t("form.email")}
+                       />
+                     </div>
+       
+                     <div>
+                       <label className="block text-sm font-semibold text-gray-700 mb-1">
+                         {t("form.mobile")} <sup className="text-purple-600">*</sup>
+                       </label>
+                       <div className="flex gap-2">
+                         <select
+                           value={formData.country_code}
+                           onChange={(e) => handleCountryCode(e.target.value)}
+                           className="rounded-xl border border-gray-300 px-3 py-2.5"
+                         >
+                           {countryCodes.map((c) => (
+                             <option key={c.value} value={c.value}>
+                               {c.label}
+                             </option>
+                           ))}
+                         </select>
+                         <input
+                           type="text"
+                           value={formData.number}
+                           onChange={handleNumber}
+                           className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5"
+                           placeholder={t("form.mobile")}
+                         />
+                       </div>
+                     </div>
+       
+                     <div>
+                       <label className="block text-sm font-semibold text-gray-700 mb-1">
+                         {t("form.message")} <sup className="text-purple-600">*</sup>
+                       </label>
+                       <textarea
+                         name="message"
+                         value={formData.message}
+                         onChange={handleChange}
+                         rows={5}
+                         className="w-full rounded-xl border border-gray-300 px-5 py-2"
+                         placeholder={t("form.message")}
+                       />
+                     </div>
+       
+                     <motion.button
+                       type="submit"
+                       disabled={loading}
+                       className="w-full rounded-xl bg-gradient-to-r from-purple-700 to-purple-900 py-3.5 text-lg font-bold text-white"
+                     >
+                       {loading ? t("buttons.submitting") : t("buttons.submit")}
+                     </motion.button>
+                   </form>
+       
+                   <p className="text-center text-sm text-gray-500 mt-4">
+                     {t("privacy")}
+                   </p>
+                 </div>
+               </motion.div>
       </div>
     </section>
   );

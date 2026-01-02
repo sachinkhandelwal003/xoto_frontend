@@ -145,7 +145,7 @@ export default function Consultation() {
     mt-9
     text-white
     text-3xl sm:text-4xl md:text-5xl lg:text-6xl
-    ${["ru", "tl", "es" , "fr", "de"].includes(i18n.language)
+    ${["ru", "tl", "es" , "fr", "de", "pa"].includes(i18n.language)
       ? "whitespace-normal"
       : "whitespace-nowrap"}
   `}
