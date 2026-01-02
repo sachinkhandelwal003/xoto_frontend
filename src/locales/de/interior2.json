@@ -1,6 +1,9 @@
 {
-  "title": "Erwecken Sie Ihre Vision mit unserem interaktiven Builder zum Leben",
-  "description": "Laden Sie Ihren Raum hoch oder wählen Sie eine Vorlage und erhalten Sie sofort KI-gestützte Designvorschauen.",
-  "button": "Machen Sie den ersten Schritt",
-  "imageAlt": "3D-gerendertes modernes Wohnzimmer"
+  "title": {
+    "line1": "Gestalte deinen Raum",
+    "line2": "auf intelligente Weise"
+  },
+  "description": "Erstelle mit dem interaktiven Design-Tool dein perfektes Zuhause.",
+  "button": "Jetzt starten",
+  "imageAlt": "Interaktives Innendesign"
 }

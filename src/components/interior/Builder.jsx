@@ -7,7 +7,7 @@ import wave2 from "../../assets/img/wave/wave2.png";
 import { Link } from "react-router-dom";
 
 export default function InteractiveBuilderSection() {
-  const { t } = useTranslation("interior2"); // ✅ IMPORTANT
+  const { t } = useTranslation("interior2");
 
   return (
     <section className="relative bg-[var(--color-body)] py-16 md:py-24 overflow-hidden">
@@ -26,19 +26,17 @@ export default function InteractiveBuilderSection() {
 
           {/* LEFT */}
           <div className="space-y-6 text-center lg:text-left">
-            <div className="inline-block max-w-[90%] sm:max-w-[400px] md:max-w-[500px] mx-auto lg:mx-0">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1 text-black">
-                {t("title.line1")}{" "}
-                <span className="text-black">{t("title.line2")}</span>
-              </h2>
-            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl heading-dark-1 text-black">
+              {t("title.line1")}{" "}
+              <span>{t("title.line2")}</span>
+            </h2>
 
             <p className="text-lg sm:text-xl md:text-2xl paragraph-light-1 text-[#547593] max-w-lg mx-auto lg:mx-0">
               {t("description")}
             </p>
 
             <Link to="/aiPlanner/interior">
-              <button className="group inline-flex items-center justify-center gap-3 rounded-md bg-[#5C039B] px-10 sm:px-14 py-3 sm:py-4 text-lg sm:text-xl font-semibold text-white shadow-xl transition-all hover:bg-purple-700 hover:shadow-2xl hover:-translate-y-1 mx-auto lg:mx-0">
+              <button className="inline-flex items-center justify-center rounded-md bg-[#5C039B] px-10 sm:px-14 py-3 sm:py-4 text-lg sm:text-xl font-semibold text-white shadow-xl transition-all hover:bg-purple-700 hover:shadow-2xl hover:-translate-y-1 mx-auto lg:mx-0">
                 {t("button")}
               </button>
             </Link>
@@ -52,6 +50,7 @@ export default function InteractiveBuilderSection() {
               className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg drop-shadow-2xl"
             />
           </div>
+
         </div>
       </div>
     </section>

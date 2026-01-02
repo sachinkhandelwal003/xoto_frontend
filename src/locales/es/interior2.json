@@ -1,6 +1,9 @@
 {
-  "title": "Da vida a tu visión con nuestro constructor interactivo",
-  "description": "Sube tu espacio o elige una plantilla y obtén vistas previas de diseño impulsadas por IA al instante.",
-  "button": "Da el primer paso",
-  "imageAlt": "Sala de estar moderna renderizada en 3D"
+  "title": {
+    "line1": "Diseña tu espacio",
+    "line2": "de forma inteligente"
+  },
+  "description": "Crea el diseño perfecto para tu hogar con nuestra herramienta interactiva.",
+  "button": "Comenzar",
+  "imageAlt": "Diseño interior interactivo"
 }
