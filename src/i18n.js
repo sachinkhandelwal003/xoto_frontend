@@ -34,7 +34,18 @@ import arInterior3 from "./locales/ar/interior3.json";
 import arInterior4 from "./locales/ar/interior4.json";
 import arInterior7 from "./locales/ar/interior7.json";
 import arbook from "./locales/ar/book.json";
-import arbuy2 from './locales/Ar/buy2.json'
+import arbuy2 from './locales/Ar/buy2.json';
+
+import ar from "./locales/ar/mort1.json";
+import arMort2 from "./locales/ar/mort2.json";
+import arMort3 from "./locales/ar/mort3.json";
+import arMort6 from "./locales/ar/mort6.json";
+
+import arEcommerce from "./locales/ar/ecommerce.json";
+
+
+
+
 
 
 
@@ -90,6 +101,8 @@ import enarticle3 from "./locales/en/article3.json"
 import enarticle4 from "./locales/en/article4.json"
 import enarticle5 from "./locales/en/article5.json"
 import eninteractive from "./locales/en/interactive.json";
+import en from "./locales/en/ecommerce.json";
+
 
 /* =========================
    HI
@@ -139,6 +152,8 @@ import hiarticle5 from "./locales/hi/article5.json"
 
 import hilandhero from "./locales/hi/landhero.json";
 import hiinteractive from "./locales/hi/interactive.json";
+import hi from "./locales/hi/ecommerce.json";
+
 
 /* =========================
    DE
@@ -188,6 +203,7 @@ import dearticle4 from "./locales/de/article4.json"
 import dearticle5 from "./locales/de/article5.json"
 import delandhero from "./locales/de/landhero.json";
 import deinteractive from "./locales/de/interactive.json"
+import de from "./locales/de/ecommerce.json";
 
 /* =========================
    ES
@@ -237,6 +253,7 @@ import esarticle4 from "./locales/es/article4.json"
 import esarticle5 from "./locales/es/article5.json"
 import eslandhero from "./locales/es/landhero.json";
 import esinteractive from "./locales/es/interactive.json"
+import es from "./locales/es/ecommerce.json";
 
 /* =========================
    FR
@@ -286,6 +303,7 @@ import frarticle4 from "./locales/fr/article4.json"
 import frarticle5 from "./locales/fr/article5.json"
 import frlandhero from "./locales/fr/landhero.json";
 import frinteractive from "./locales/fr/interactive.json"
+import fr from "./locales/fr/ecommerce.json";
 
 /* =========================
    RU
@@ -335,6 +353,7 @@ import ruarticle4 from "./locales/ru/article4.json"
 import ruarticle5 from "./locales/ru/article5.json"
 import rulandhero from "./locales/ru/landhero.json";
 import ruinteractive from "./locales/ru/interactive.json";
+import ru from "./locales/ru/ecommerce.json";
 
 /* =========================
    TR
@@ -384,6 +403,7 @@ import trarticle4 from "./locales/tr/article4.json"
 import trarticle5 from "./locales/tr/article5.json"
 import trlandhero from "./locales/tr/landhero.json";
 import trinteractive from "./locales/tr/interactive.json"
+import tr from "./locales/tr/ecommerce.json";
 
 /* =========================
    ZH
@@ -432,7 +452,9 @@ import zharticle3 from "./locales/zh/article3.json"
 import zharticle4 from "./locales/zh/article4.json"
 import zharticle5 from "./locales/zh/article5.json"
 import zhlandhero from "./locales/zh/landhero.json";
-import zhinteractive from "./locales/zh/interactive.json"
+import zhinteractive from "./locales/zh/interactive.json";
+import zh from "./locales/zh/ecommerce.json";
+
 
 /* =========================
    TL
@@ -481,7 +503,9 @@ import tlarticle3 from "./locales/tl/article3.json"
 import tlarticle4 from "./locales/tl/article4.json"
 import tlarticle5 from "./locales/tl/article5.json"
 import tllandhero from "./locales/tl/landhero.json";
-import tlinteractive from "./locales/tl/interactive.json"
+import tlinteractive from "./locales/tl/interactive.json";
+import tl from "./locales/tl/ecommerce.json";
+
 
 /* =========================
    FA
@@ -513,8 +537,18 @@ import faInterior3 from "./locales/fa/interior3.json";
 import faInterior4 from "./locales/fa/interior4.json";
 import faInterior7 from "./locales/fa/interior7.json";
 import fabook from "./locales/fa/book.json";
-import fabuy2 from './locales/fa/buy2.json'
-import fabuy1 from './locales/fa/buy1.json'
+import fabuy2 from './locales/fa/buy2.json';
+import fabuy1 from './locales/fa/buy1.json';
+
+import fa from "./locales/fa/mort1.json";
+import faMort2 from "./locales/fa/mort2.json";
+import faMort3 from "./locales/fa/mort3.json";
+import faMort6 from "./locales/fa/mort6.json";
+
+import faEcommerce from "./locales/fa/ecommerce.json";
+
+
+
 
 
 
@@ -548,8 +582,16 @@ import urInterior3 from "./locales/ur/interior3.json";
 import urInterior4 from "./locales/ur/interior4.json";
 import urInterior7 from "./locales/ur/interior7.json";
 import urbook from "./locales/ur/book.json";
-import urbuy2 from './locales/ur/buy2.json'
-import urbuy1 from './locales/ur/buy1.json'
+import urbuy2 from './locales/ur/buy2.json';
+import urbuy1 from './locales/ur/buy1.json';
+import ur from "./locales/ur/mort1.json";
+import urMort2 from "./locales/ur/mort2.json";
+import urMort3 from "./locales/ur/mort3.json";
+import urMort6 from "./locales/ur/mort6.json";
+
+import urEcommerce from "./locales/ur/ecommerce.json";
+
+
 
 
 
@@ -579,8 +621,18 @@ import painterior5 from "./locales/pa/interior5.json"
 import painterior6 from "./locales/pa/interior6.json"
 import paInterior1 from "./locales/pa/interior1.json";
 import pabook from "./locales/pa/book.json";
-import pabuy2 from './locales/pa/buy2.json'
-import pabuy1 from './locales/pa/buy1.json'
+import pabuy2 from './locales/pa/buy2.json';
+import pabuy1 from './locales/pa/buy1.json';
+import pa from "./locales/pa/mort1.json";
+import paMort2 from "./locales/pa/mort2.json";
+import paMort3 from "./locales/pa/mort3.json";
+import paMort6 from "./locales/pa/mort6.json";
+import paEcommerce from "./locales/pa/ecommerce.json";
+
+
+
+
+
 
 i18n
   .use(LanguageDetector)
@@ -630,7 +682,8 @@ i18n
         article2: enarticle2,
         article3: enarticle3,
         article4: enarticle4,
-        article5: enarticle5
+        article5: enarticle5,
+        ecommerce: en
       },
 
       hi: {
@@ -678,7 +731,8 @@ i18n
         article2: hiarticle2,
         article3: hiarticle3,
         article4: hiarticle4,
-        article5: hiarticle5
+        article5: hiarticle5,
+        ecommerce: hi
       },
 
       de: {
@@ -725,7 +779,8 @@ i18n
         article3: dearticle3,
         article4: dearticle4,
         article5: dearticle5,
-        interactive: deinteractive
+        interactive: deinteractive,
+        ecommerce: de
       },
 
       es: {
@@ -772,7 +827,8 @@ i18n
         article3: esarticle3,
         article4: esarticle4,
         article5: esarticle5,
-        interactive: esinteractive
+        interactive: esinteractive,
+        ecommerce: es
       },
 
       fr: {
@@ -819,7 +875,8 @@ i18n
         article3: frarticle3,
         article4: frarticle4,
         article5: frarticle5,
-        interactive: frinteractive
+        interactive: frinteractive,
+        ecommerce: fr
       },
 
       ru: {
@@ -867,7 +924,8 @@ i18n
         article2: ruarticle2,
         article3: ruarticle3,
         article4: ruarticle4,
-        article5: ruarticle5
+        article5: ruarticle5,
+        ecommerce: ru
       },
 
       tr: {
@@ -914,7 +972,8 @@ i18n
         article3: trarticle3,
         article4: trarticle4,
         article5: trarticle5,
-        interactive: trinteractive
+        interactive: trinteractive,
+         ecommerce: tr
       },
 
       zh: {
@@ -961,7 +1020,8 @@ i18n
         article3: zharticle3,
         article4: zharticle4,
         article5: zharticle5,
-        interactive: zhinteractive
+        interactive: zhinteractive,
+        ecommerce: zh
       },
 
       tl: {
@@ -1008,7 +1068,8 @@ i18n
         article3: tlarticle3,
         article4: tlarticle4,
         article5: tlarticle5,
-        interactive: tlinteractive
+        interactive: tlinteractive,
+        ecommerce: tl
       },
 
       fa: {
@@ -1039,7 +1100,13 @@ i18n
         interior6: fainterior6,
         book: fabook,
         buy2: fabuy2,
-        buy1: fabuy1
+        buy1: fabuy1, 
+        mort1: fa,
+                mort2: faMort2,
+                    mort3: faMort3,
+    mort6: faMort6,
+
+ecommerce: faEcommerce,
 
         
       },
@@ -1050,6 +1117,11 @@ i18n
               interior4: arInterior4,
               interior7: arInterior7,
               buy2: arbuy2,
+              mort1: ar,
+                      mort2: arMort2,    mort3: arMort3,    mort6: arMort6,
+
+ecommerce: arEcommerce,
+
 
 
               buy1: arbuy1,
@@ -1064,8 +1136,23 @@ i18n
   interior4: urInterior4,
   interior7: urInterior7,
 landhero:urlandhero,
+mort1: ur,        mort2: urMort2,
+    mort3: urMort3,    mort6: urMort6,
+
+ecommerce: urEcommerce,
+
  home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5, interactive: urinteractive, consultation: urconsultation, scape2: urscape2,scape1: urscape1, interior5: urinterior5, interior6: urinterior6, book: urbook  },
-    pa:{common:pacommon , home:pahome , home1:pahome1 , home2:pahome2 , home3:pahome3 , home4:pahome4 , home5:pahome5 , footer:pafooter , article1:paarticle1, article2:paarticle2, article3:paarticle3 , article4:paarticle4, article5:paarticle5, landhero:palandhero, interactive:painteractive, consultation:paconsultation, scape2: pascape2, scape1: pascape1, interior5: painterior5, interior6: painterior6, interior1: paInterior1, book: pabook, buy2: pabuy2, buy1: pabuy1  }
+    pa:{common:pacommon , home:pahome , home1:pahome1 , home2:pahome2 , home3:pahome3 , home4:pahome4 , home5:pahome5 , footer:pafooter , article1:paarticle1, article2:paarticle2, article3:paarticle3 , article4:paarticle4, article5:paarticle5,
+       landhero:palandhero, interactive:painteractive, consultation:paconsultation,
+        scape2: pascape2, scape1: pascape1, interior5: painterior5, interior6: painterior6,
+         interior1: paInterior1, book: pabook, buy2: pabuy2, buy1: pabuy1,
+          mort1: pa,
+                mort2: paMort2,
+         mort3: paMort3,
+   mort6: paMort6,
+   ecommerce: paEcommerce,
+
+ }
           },
 
     fallbackLng: "en",
@@ -1081,7 +1168,7 @@ landhero:urlandhero,
       "page3","ecosystem","whyPartner","stakeholders",
       "partnerForm","builtForEveryone","cta",
       "mort1","mort2","mort3","mort6",
-      "book","consultation", "article1","article2", "article3", "article4", "article5", "landhero"
+      "book","consultation", "article1","article2", "article3", "article4", "article5", "landhero","ecommerce",
     ],
 
     defaultNS: "common",

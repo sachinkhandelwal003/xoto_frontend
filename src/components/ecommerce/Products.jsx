@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { useNavigate } from "react-router-dom";
 import { 
   FiEye, FiShoppingCart, FiHeart, 
@@ -11,6 +13,8 @@ import "slick-carousel/slick/slick-theme.css";
 import { motion } from 'framer-motion';
 
 // Sample product data
+
+
 const furnitureProducts = [
   { 
     id: 1, 
@@ -124,12 +128,11 @@ const furnitureProducts = [
     tags: ["Modern"]
   },
 ];
-
 // Custom Arrows
 const NextArrow = ({ onClick }) => (
   <button 
-    onClick={onClick} 
-    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[var(--color-primary)] p-3 rounded-md text-white shadow-lg hover:opacity-90 transition-all"
+  onClick={onClick} 
+  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[var(--color-primary)] p-3 rounded-md text-white shadow-lg hover:opacity-90 transition-all"
   >
     <FiChevronRight className="text-xl" />
   </button>
@@ -137,8 +140,8 @@ const NextArrow = ({ onClick }) => (
 
 const PrevArrow = ({ onClick }) => (
   <button 
-    onClick={onClick} 
-    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[var(--color-primary)] p-3 rounded-md text-white shadow-lg hover:opacity-90 transition-all"
+  onClick={onClick} 
+  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[var(--color-primary)] p-3 rounded-md text-white shadow-lg hover:opacity-90 transition-all"
   >
     <FiChevronLeft className="text-xl" />
   </button>
@@ -149,8 +152,10 @@ const ProductCard = ({ product, onViewClick, onAddToCart }) => {
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
   const discount = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
-
+  
+ 
   return (
+    
     <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-300">
       {/* Badges */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
@@ -267,6 +272,7 @@ const ProductCard = ({ product, onViewClick, onAddToCart }) => {
 };
 
 const Products = () => {
+  const { t } = useTranslation("ecommerce");
   const [cartItems, setCartItems] = useState([]);
   const [showCartNotification, setShowCartNotification] = useState(false);
   const navigate = useNavigate();
@@ -319,7 +325,7 @@ const Products = () => {
   <div className="absolute inset-0">
     <img 
       src="https://images.unsplash.com/photo-1618220179428-22790b461013?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
-      alt="Modern living room with XOTO furniture"
+      alt={t("experience.alt")}
       className="w-full h-full object-cover transform scale-110"
     />
     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/70 to-black/60"></div>
@@ -335,12 +341,15 @@ const Products = () => {
       >
     
         
-        <h1 className="heading-light ">
-          The <span className="text-[var(--color-primary)]">XOTO</span> Experience
+     <h1 className="heading-light">
+          {t("experience.title.prefix")}{" "}
+          <span className="text-[var(--color-primary)]">
+            {t("experience.title.brand")}
+          </span>{" "}
+          {t("experience.title.suffix")}
         </h1>
         <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Where innovation meets comfort. Our AI-driven designs create spaces that inspire.
-        </p>
+ {t("experience.subtitle")}        </p>
         
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -348,7 +357,7 @@ const Products = () => {
           onClick={() => navigate("/ecommerce/filter")}
           className="px-10 py-4 bg-[var(--color-primary)] text-white text-lg font-bold rounded-md hover:opacity-90 transition-all shadow-2xl hover:shadow-3xl"
         >
-          Discover XOTO Collection
+          {t("experience.cta")}
         </motion.button>
       </motion.div>
     </div>
