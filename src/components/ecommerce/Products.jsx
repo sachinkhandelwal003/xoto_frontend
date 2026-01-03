@@ -263,7 +263,7 @@ const ProductCard = ({ product, onViewClick, onAddToCart }) => {
             onClick={() => onAddToCart(product)}
             className="flex-1 bg-gray-900 text-white  py-3 rounded-md hover:bg-black transition-all flex items-center justify-center gap-2"
           >
-            <FiShoppingCart /> Add to Cart
+           <FiShoppingCart /> Add to Cart
           </motion.button>
         </div>
       </div>

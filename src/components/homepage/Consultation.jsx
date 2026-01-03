@@ -2,34 +2,23 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-// 1. Import Ant Design Notification
 import { notification } from 'antd';
 import { apiService } from "../../manageApi/utils/custom.apiservice";
-// Removed sweetAlert import
 import helloImage from "../../assets/img/hello.jpg";
-import { useTranslation } from "react-i18next"; // Added i18n hook
-
+import { useTranslation } from "react-i18next";
 
 const countryCodes = [
-  { value: "+91", label: "+91 India" },
+  { value: "+91", label: "+91 IND" },
   { value: "+971", label: "+971 UAE" },
-  { value: "+966", label: "+966 Saudi Arabia" },
-  { value: "+1", label: "+1 USA/Canada" },
+  { value: "+966", label: "+966 KSA" },
+  { value: "+1", label: "+1 US" },
   { value: "+44", label: "+44 UK" },
-  { value: "+61", label: "+61 Australia" },
+  { value: "+61", label: "+61 AU" },
 ];
 
 export default function Consultation() {
-  const { t, i18n } = useTranslation("consultation"); // 🔑 added
-
-  const isRU = i18n.language === "ru";
-  const isDE = i18n.language === "de";
-  const isHI = i18n.language === "hi";
-  const isZH = i18n.language === "zh";
-
-
+  const { t, i18n } = useTranslation("consultation");
   const [loading, setLoading] = useState(false);
-  // 2. Initialize Ant Design Notification Hook
   const [api, contextHolder] = notification.useNotification();
 
   const [formData, setFormData] = useState({
@@ -55,7 +44,6 @@ export default function Consultation() {
     setFormData((prev) => ({ ...prev, number: value }));
   };
 
-  // 3. Helper to trigger notification
   const openNotification = (type, title, description) => {
     api[type]({
       message: title,
@@ -66,8 +54,6 @@ export default function Consultation() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-
-   
     setLoading(true);
 
     const payload = {
@@ -87,24 +73,16 @@ export default function Consultation() {
 
     try {
       await apiService.post("/property/lead", payload);
-
-      // 4. Success Notification
       openNotification(
         "success",
         "Thank You!",
-        "Your consultation request for landscaping  has been submitted successfully. We'll contact you within 24 hours!"
+        "Your consultation request has been submitted successfully."
       );
-
       setFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        country_code: "+971",
-        number: "",
-        message: "",
+        first_name: "", last_name: "", email: "",
+        country_code: "+971", number: "", message: "",
       });
     } catch (err) {
-      // Error Notification
       openNotification("error", "Submission Failed", err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
@@ -113,7 +91,6 @@ export default function Consultation() {
 
   return (
     <section className="relative w-full overflow-hidden bg-gray-900">
-      {/* 5. Render Notification Context */}
       {contextHolder}
 
       <img
@@ -125,103 +102,82 @@ export default function Consultation() {
       <div
         className="absolute inset-0"
         style={{
-          background:
-            "linear-gradient(180deg, rgba(92, 3, 155, 0.85) 20%, rgba(3, 164, 244, 0.85) 95%)",
+          background: "linear-gradient(180deg, rgba(92, 3, 155, 0.85) 20%, rgba(3, 164, 244, 0.85) 95%)",
         }}
       />
 
-      <div className="relative z-10 mx-auto flex flex-col lg:flex-row items-start justify-start max-w-7xl px-4 sm:px-6 lg:px-8  pt-16 pb-16 gap-20">
-        {/* Heading */}
-         <motion.div
+      <div className="relative z-10 mx-auto flex flex-col lg:flex-row items-center lg:items-start justify-center lg:justify-start max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-16 gap-12 lg:gap-20">
+        
+        {/* Content */}
+        <motion.div
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           className="max-w-xl text-white text-center lg:text-left"
         >
-
-        <h2
-  className={`
-    consultation-title
-    mt-9
-    text-white
-    text-3xl sm:text-4xl md:text-5xl lg:text-6xl
-    ${["ru", "tl", "es" , "fr", "de", "pa"].includes(i18n.language)
-      ? "whitespace-normal"
-      : "whitespace-nowrap"}
-  `}
->
-  {t("title")}
-</h2>
-
-
+          <h2 className={`mt-9 text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight`}>
+            {t("title")}
+          </h2>
           <p className="mt-5 text-xl md:text-2xl paragraph-light-1">
             {t("description")}
           </p>
         </motion.div>
 
         {/* Form */}
-       <motion.div
+        <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           className="w-full max-w-2xl"
         >
-          <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-2xl">
+          <div className="rounded-2xl bg-white p-5 sm:p-8 shadow-2xl">
             <form onSubmit={onSubmit} className="space-y-4">
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    {t("form.firstName")} <sup className="text-purple-600">*</sup>
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">{t("form.firstName")}*</label>
                   <input
                     type="text"
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
-                     placeholder={t("form.firstName")}
+                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 outline-none focus:border-purple-500"
+                    placeholder={t("form.firstName")}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    {t("form.lastName")} <sup className="text-purple-600">*</sup>
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">{t("form.lastName")}*</label>
                   <input
                     type="text"
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 outline-none focus:border-purple-500"
                     placeholder={t("form.lastName")}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.email")} <sup className="text-purple-600">*</sup>
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">{t("form.email")}*</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-2.5"
+                  className="w-full rounded-xl border border-gray-300 px-4 py-2.5 outline-none focus:border-purple-500"
                   placeholder={t("form.email")}
                 />
               </div>
 
+              {/* MOBILE NUMBER SECTION - FORCED ONE LINE */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.mobile")} <sup className="text-purple-600">*</sup>
-                </label>
-                <div className="flex gap-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">{t("form.mobile")}*</label>
+                <div className="flex flex-row items-center gap-2 w-full flex-nowrap">
                   <select
                     value={formData.country_code}
                     onChange={(e) => handleCountryCode(e.target.value)}
-                    className="rounded-xl border border-gray-300 px-3 py-2.5"
+                    className="w-[100px] sm:w-[130px] flex-shrink-0 rounded-xl border border-gray-300 px-2 py-2.5 text-sm bg-gray-50 outline-none focus:border-purple-500"
                   >
                     {countryCodes.map((c) => (
                       <option key={c.value} value={c.value}>
@@ -233,36 +189,35 @@ export default function Consultation() {
                     type="text"
                     value={formData.number}
                     onChange={handleNumber}
-                    className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5"
+                    className="flex-1 min-w-0 rounded-xl border border-gray-300 px-4 py-2.5 outline-none focus:border-purple-500"
                     placeholder={t("form.mobile")}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  {t("form.message")} <sup className="text-purple-600">*</sup>
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">{t("form.message")}*</label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  rows={5}
-                  className="w-full rounded-xl border border-gray-300 px-5 py-2"
+                  rows={4}
+                  className="w-full rounded-xl border border-gray-300 px-4 py-2.5 outline-none focus:border-purple-500 resize-none"
                   placeholder={t("form.message")}
                 />
               </div>
 
               <motion.button
+                whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-xl bg-gradient-to-r from-purple-700 to-purple-900 py-3.5 text-lg font-bold text-white"
+                className="w-full rounded-xl bg-gradient-to-r from-purple-700 to-purple-900 py-3.5 text-lg font-bold text-white shadow-lg transition-all disabled:opacity-70"
               >
                 {loading ? t("buttons.submitting") : t("buttons.submit")}
               </motion.button>
             </form>
 
-            <p className="text-center text-sm text-gray-500 mt-4">
+            <p className="text-center text-xs text-gray-500 mt-4 px-2">
               {t("privacy")}
             </p>
           </div>
