@@ -54,7 +54,7 @@ export default function TestimonialsSection() {
            
 
                 <h3 className="text-lg font-bold text-gray-900 mb-3">
-                  {item.title}
+                  {t(item.title)}
                 </h3>
 
                 <p className="text-gray-700 text-sm leading-relaxed mb-6 flex-grow">
