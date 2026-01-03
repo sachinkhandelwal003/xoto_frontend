@@ -53,7 +53,6 @@ import arpartnerForm from "./locales/Ar/partnerForm.json";
 import arbuiltForEveryone from "./locales/Ar/builtForEveryone.json";
 import arCta from "./locales/Ar/cta.json";
 
-
 import arMort1 from "./locales/ar/mort1.json";
 import arMort2 from "./locales/ar/mort2.json";
 import arMort3 from "./locales/ar/mort3.json";
@@ -114,7 +113,6 @@ import enarticle5 from "./locales/en/article5.json";
 import eninteractive from "./locales/en/interactive.json";
 import en from "./locales/en/ecommerce.json";
 
-
 /* =========================
    HI - Hindi
 ========================= */
@@ -167,7 +165,6 @@ import hiarticle5 from "./locales/hi/article5.json";
 import hilandhero from "./locales/hi/landhero.json";
 import hiinteractive from "./locales/hi/interactive.json";
 import hi from "./locales/hi/ecommerce.json";
-
 
 /* =========================
    DE - German
@@ -492,7 +489,6 @@ import zhlandhero from "./locales/zh/landhero.json";
 import zhinteractive from "./locales/zh/interactive.json";
 import zh from "./locales/zh/ecommerce.json";
 
-
 /* =========================
    TL - Filipino/Tagalog
 ========================= */
@@ -545,7 +541,6 @@ import tlarticle5 from "./locales/tl/article5.json";
 import tllandhero from "./locales/tl/landhero.json";
 import tlinteractive from "./locales/tl/interactive.json";
 import tl from "./locales/tl/ecommerce.json";
-
 
 /* =========================
    FA - Persian (Farsi)
@@ -707,7 +702,6 @@ import paMort3 from "./locales/pa/mort3.json";
 import paMort6 from "./locales/pa/mort6.json";
 import paEcommerce from "./locales/pa/ecommerce.json";
 
-
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -763,6 +757,58 @@ i18n
         article4: enarticle4,
         article5: enarticle5,
         ecommerce: en,
+      },
+
+      ar: {
+        common: arCommon,
+        contact: arcontact,
+        contact1: arcontact1,
+        contact3: arcontact3,
+        contact4: arcontact4,
+        home: arhome,
+        home1: arhome1,
+        home2: arhome2,
+        home3: arhome3,
+        home4: arhome4,
+        home5: arhome5,
+        footer: arfooter,
+        interior1: arInterior1,
+        interior2: arInterior2,
+        interior3: arInterior3,
+        interior4: arInterior4,
+        interior5: arinterior5,
+        interior6: arinterior6,
+        interior7: arInterior7,
+        scape1: arscape1,
+        scape2: arscape2,
+        buy1: arbuy1,
+        buy2: arbuy2,
+        buy3: arbuy3,
+        buy4: arbuy4,
+        buy5: arbuy5,
+        buy6: arbuy6,
+        buy7: arbuy7,
+        book: arbook,
+        consultation: arconsultation,
+        landhero: arlandhero,
+        interactive: arinteractive,
+        article1: ararticle1,
+        article2: ararticle2,
+        article3: ararticle3,
+        article4: ararticle4,
+        article5: ararticle5,
+        page3: arpage3,
+        ecosystem: arecosystem,
+        whyPartner: arwhypartner,
+        stakeholders: arstakeholders,
+        partnerForm: arpartnerForm,
+        builtForEveryone: arbuiltForEveryone,
+        cta: arCta,
+        mort1: arMort1,
+        mort2: arMort2,
+        mort3: arMort3,
+        mort6: arMort6,
+        ecommerce: arEcommerce,
       },
 
 
@@ -1401,6 +1447,10 @@ i18n
       },
     },
 
+    fallbackLng: "en",
+
+    supportedLngs: ["en", "ar", "hi", "de", "es", "fr", "ru", "tr", "zh", "tl", "fa", "ur", "pa"],
+
 
     fallbackLng: "en",
 
@@ -1475,5 +1525,5 @@ i18n
     },
   });
 
-
 export default i18n;
+

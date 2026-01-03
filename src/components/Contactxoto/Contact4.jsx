@@ -218,11 +218,9 @@ export default function PartnerForm() {
               <p className="text-base md:text-lg mb-6">
                 {t("chat.description")}
               </p>
-              <div> 
-                <button className="bg-[#5C039B] border border-white/20 px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-[#5C039B] transition-colors shadow-lg">
-                  Talk With Xobia
-                </button>
-              </div>
+              <button className="bg-[#5C039B] border border-white/20 px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-[#5C039B] transition-colors shadow-lg">
+                {t("chat.button")}
+              </button>
             </div>
 
             <div className="md:w-1/2 flex justify-center items-end">

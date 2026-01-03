@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { FiX, FiMic, FiSend, FiVolume2 } from "react-icons/fi";
 import { BsRobot } from "react-icons/bs";
 import xobiaAvatar from "../../assets/img/girlimage.png";
-import { motion, AnimatePresence } from "framer-motion";
+// import { motion, AnimatePresence } from "framer-motion";
 import { getChatSessionId } from "../../utils/createSessionID";
 const API = "https://xoto.ae";
 
@@ -250,54 +250,19 @@ function XobiaChatbot() {
   return (
     <>
       {/* Floating Chat Button */}
-    <AnimatePresence>
-  {!isOpen && (
-    <motion.button
-      // 1. Entrance: Comes from top of screen to fixed bottom position
-      initial={{ y: -1000, opacity: 0 }} 
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 60, 
-        damping: 15, 
-        delay: 0.5 // Adjust delay as needed
-      }}
-      // 2. Continuous Floating Effect
-      whileInView={{
-        y: [0, -10, 0],
-        transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-      }}
-      whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(139, 92, 246, 0.3)" }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() => setIsOpen(true)}
-      // 3. Premium Solid Styling
-      className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 flex items-center gap-4 bg-white border border-slate-100 py-2 pl-6 pr-2 rounded-full shadow-[0_15px_35px_-5px_rgba(0,0,0,0.2)]"
-    >
-      {/* Text on Left */}
-      <div className="flex flex-col text-left">
-        <span className="text-[10px] uppercase tracking-widest text-purple-500 font-bold">
-          AI Expert
-        </span>
-        <span className="text-slate-900 font-extrabold text-sm md:text-base">
-          Talk with <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Xobia</span>
-        </span>
-      </div>
-
-      {/* Image on Right with Purple Ring */}
-      <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[3px] shadow-lg">
-        <div className="w-full h-full rounded-full overflow-hidden bg-white">
-          <img 
-            src={xobiaAvatar} 
-            alt="Xobia" 
-            className="w-full h-full object-cover scale-110 mt-1" 
-          />
-        </div>
-        {/* Active Status */}
-        <span className="absolute bottom-0 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
-      </div>
-    </motion.button>
-  )}
-</AnimatePresence>
+{!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-40 flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+          aria-label="Chat with Xobia"
+        >
+          <div className="relative">
+            <BsRobot className="w-5 h-5 md:w-6 md:h-6" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 md:w-3 md:h-3 bg-green-400 rounded-full animate-pulse"></span>
+          </div>
+          <span className="font-semibold text-xs md:text-sm">Chat with Xobia</span>
+        </button>
+      )}
       {/* Chat Widget - HEADER SE BAHUT NICHE */}
       {isOpen && (
         <>
