@@ -269,7 +269,7 @@ function XobiaChatbot() {
           ></div>
           
           {/* CHAT WIDGET - BAHUT NICHE (md:top-48 se aur neeche) */}
-          <div className="fixed bottom-16 md:top-38 right-4 md:right-8 z-50 w-full max-w-sm md:max-w-md mx-auto">
+          <div className="fixed bottom-16 md:top-32 right-2 md:right-8 z-50 w-full max-w-sm md:max-w-md mx-auto">
             {/* Expanded View Only - No Minimized View */}
             <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[70vh] md:h-[550px] w-full">
               {/* Header */}

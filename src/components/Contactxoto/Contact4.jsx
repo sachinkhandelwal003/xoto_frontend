@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Picture1 from "../../assets/img/image3.png";
 import Picture2 from "../../assets/img/Image4.png";
 import wave2 from "../../assets/img/wave/wave2.png";
 
 export default function PartnerForm() {
+  const { t } = useTranslation("contact4");
+
   const [formData, setFormData] = useState({
     organization: "",
     email: "",
@@ -21,18 +24,19 @@ export default function PartnerForm() {
     let err = {};
 
     if (!formData.organization.trim())
-      err.organization = "Organization Name is required.";
+      err.organization = t("validation.organization");
 
     if (!formData.email.trim()) {
-      err.email = "Email is required.";
+      err.email = t("validation.emailRequired");
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      err.email = "Enter a valid email.";
+      err.email = t("validation.emailInvalid");
     }
 
-    if (!formData.partnerType) err.partnerType = "Partner Type is required.";
+    if (!formData.partnerType)
+      err.partnerType = t("validation.partnerType");
 
     if (!formData.proposal.trim())
-      err.proposal = "Proposal description is required.";
+      err.proposal = t("validation.proposal");
 
     setErrors(err);
     return Object.keys(err).length === 0;
@@ -41,57 +45,49 @@ export default function PartnerForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      alert("Form Submitted Successfully!");
+      alert(t("notification.success"));
       console.log(formData);
     }
   };
 
   return (
     <div className="relative w-full bg-[var(--color-body)] flex flex-col items-center py-10 overflow-hidden">
-      
       <div className="w-full flex flex-col items-center relative z-10">
-        
-        {/* TOP SECTION */}
         <div className="w-full flex justify-center px-4">
           <div className="max-w-7xl w-full p-0 sm:p-6 md:p-8 flex flex-col md:flex-row gap-10 md:gap-16">
-            
-            {/* LEFT CONTENT (Text + Desktop Image) */}
+            {/* LEFT */}
             <div className="md:w-1/2 relative flex flex-col gap-4 md:gap-6 text-center md:text-left">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-black leading-tight">
-                Partner & <br /> Collaboration Form
+                {t("title.line1")} <br /> {t("title.line2")}
               </h2>
 
               <p className="text-[#547593] font-medium text-base sm:text-lg">
-                Interested in collaborating with XOTO?
+                {t("subtitle.line1")}
                 <br className="hidden sm:block" />
-                Tell us more about your business or project.
+                {t("subtitle.line2")}
               </p>
 
-              {/* DESKTOP IMAGE (Hidden on Mobile) */}
               <div
                 className="hidden md:block w-full h-56 sm:h-64 md:h-80 bg-center bg-no-repeat bg-contain absolute bottom-[-75px]"
                 style={{ backgroundImage: `url(${Picture1})` }}
               />
             </div>
 
-            {/* RIGHT CONTENT (Form + Mobile Image) */}
+            {/* RIGHT */}
             <div className="md:w-1/2 w-full flex flex-col gap-8">
-              
-              {/* FORM CARD */}
               <div className="bg-white rounded-xl shadow-md p-6 sm:p-8 border border-gray-200">
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                  
                   {/* Organization */}
                   <div>
                     <label className="text-sm font-medium">
-                      Organization Name*
+                      {t("form.organization")}*
                     </label>
                     <input
                       type="text"
                       name="organization"
                       value={formData.organization}
                       onChange={handleChange}
-                      placeholder="Enter Organization Name"
+                      placeholder={t("placeholders.organization")}
                       className={`border rounded-md p-3 w-full focus:outline-none focus:ring-2 ${
                         errors.organization
                           ? "border-red-500 focus:ring-red-500"
@@ -107,13 +103,15 @@ export default function PartnerForm() {
 
                   {/* Email */}
                   <div>
-                    <label className="text-sm font-medium">Contact Email*</label>
+                    <label className="text-sm font-medium">
+                      {t("form.email")}*
+                    </label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="Enter Email"
+                      placeholder={t("placeholders.email")}
                       className={`border rounded-md p-3 w-full focus:outline-none focus:ring-2 ${
                         errors.email
                           ? "border-red-500 focus:ring-red-500"
@@ -121,13 +119,17 @@ export default function PartnerForm() {
                       }`}
                     />
                     {errors.email && (
-                      <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.email}
+                      </p>
                     )}
                   </div>
 
                   {/* Partner Type */}
                   <div>
-                    <label className="text-sm font-medium">Partner Type*</label>
+                    <label className="text-sm font-medium">
+                      {t("form.partnerType")}*
+                    </label>
                     <select
                       name="partnerType"
                       value={formData.partnerType}
@@ -138,12 +140,22 @@ export default function PartnerForm() {
                           : "border-gray-300 focus:ring-purple-500"
                       }`}
                     >
-                      <option value="">Select Partner Type</option>
-                      <option value="Business Associates">Business Associates</option>
-                      <option value="Execution Partner">Execution Partner</option>
-                      <option value="Strategic Alliances">Strategic Alliances</option>
-                      <option value="Developers">Developers</option>
-                      <option value="Financial Institution">Financial Institution</option>
+                      <option value="">{t("options.select")}</option>
+                      <option value="Business Associates">
+                        {t("options.business")}
+                      </option>
+                      <option value="Execution Partner">
+                        {t("options.execution")}
+                      </option>
+                      <option value="Strategic Alliances">
+                        {t("options.alliance")}
+                      </option>
+                      <option value="Developers">
+                        {t("options.developers")}
+                      </option>
+                      <option value="Financial Institution">
+                        {t("options.finance")}
+                      </option>
                     </select>
                     {errors.partnerType && (
                       <p className="text-red-500 text-sm mt-1">
@@ -155,14 +167,14 @@ export default function PartnerForm() {
                   {/* Proposal */}
                   <div>
                     <label className="text-sm font-medium">
-                      Describe Your Proposal*
+                      {t("form.proposal")}*
                     </label>
                     <textarea
                       name="proposal"
                       rows="3"
                       value={formData.proposal}
                       onChange={handleChange}
-                      placeholder="Describe Your Proposal"
+                      placeholder={t("placeholders.proposal")}
                       className={`border rounded-md p-3 w-full focus:outline-none focus:ring-2 resize-none ${
                         errors.proposal
                           ? "border-red-500 focus:ring-red-500"
@@ -180,58 +192,48 @@ export default function PartnerForm() {
                     type="submit"
                     className="bg-[#5C039B] text-white py-3 rounded-md font-medium hover:bg-opacity-90 transition"
                   >
-                    Submit Now
+                    {t("buttons.submit")}
                   </button>
                 </form>
               </div>
 
-              {/* MOBILE IMAGE (Visible only on Mobile, below form) */}
               <div className="md:hidden w-full flex justify-center">
-                <img 
-                  src={Picture1} 
-                  alt="Collaboration" 
+                <img
+                  src={Picture1}
+                  alt="Collaboration"
                   className="w-full max-w-sm object-contain"
                 />
               </div>
-
             </div>
           </div>
         </div>
 
-        {/* CHAT SECTION */}
+        {/* CHAT */}
         <div className="w-full flex justify-center px-4 mt-10">
           <div className="max-w-6xl w-full bg-gradient-to-t from-[#03A4F4] to-[#5C039B] text-white rounded-2xl shadow-xl flex flex-col md:flex-row gap-8 px-6 py-8 md:px-8">
-            
-            {/* Text Side */}
             <div className="md:w-1/2 flex flex-col justify-center text-center md:text-left">
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
-                Xobia Chat <br className="md:hidden" /> (24/7 AI Help)
+                {t("chat.title")}
               </h2>
               <p className="text-base md:text-lg mb-6">
-                Have a question right now? Xobia, our AI assistant, is available
-                24/7 to guide you through product details, support requests, or
-                general inquiries — anytime you need.
+                {t("chat.description")}
               </p>
-              <div>
-                <button className="bg-[#5C039B] border border-white/20 px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-[#5C039B] transition-colors shadow-lg">
-                  Chat With Xobia
-                </button>
-              </div>
+              <button className="bg-[#5C039B] border border-white/20 px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-[#5C039B] transition-colors shadow-lg">
+                {t("chat.button")}
+              </button>
             </div>
 
-            {/* Image Side */}
             <div className="md:w-1/2 flex justify-center items-end">
-              <img 
-                src={Picture2} 
-                alt="xobia" 
-                className="w-64 sm:w-72 md:w-80 object-contain md:translate-y-8" 
+              <img
+                src={Picture2}
+                alt="xobia"
+                className="w-64 sm:w-72 md:w-80 object-contain md:translate-y-8"
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* WAVE */}
       <div className="absolute bottom-[-400px] md:bottom-[-600px] left-0 w-full z-0 pointer-events-none">
         <img
           src={wave2}
