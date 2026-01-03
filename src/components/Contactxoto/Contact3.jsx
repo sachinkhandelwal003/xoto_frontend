@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { notification } from "antd"; // Import Ant Design notification
+import { notification } from "antd";
 import { apiService } from "../../manageApi/utils/custom.apiservice";
 import Image from "../../assets/img/Image2.jpg";
+import { useTranslation } from "react-i18next";
 
 const countryCodes = [
   { value: "+91", label: "+91" },
@@ -15,9 +16,9 @@ const countryCodes = [
 ];
 
 export default function QuickEnquiry() {
-  // 1. Initialize Ant Design Notification
-  const [api, contextHolder] = notification.useNotification();
+  const { t } = useTranslation("contact3");
 
+  const [api, contextHolder] = notification.useNotification();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
@@ -25,14 +26,13 @@ export default function QuickEnquiry() {
     email: "",
     country_code: "+971",
     number: "",
-    message: ""
+    message: "",
   });
 
-  // 2. Helper to trigger notification
   const openNotification = (type, title, description) => {
     api[type]({
       message: title,
-      description: description,
+      description,
       placement: "topRight",
       showProgress: true,
       pauseOnHover: true,
@@ -41,24 +41,24 @@ export default function QuickEnquiry() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
   const handleCountryCode = (e) => {
-    setFormData(prev => ({ ...prev, country_code: e.target.value }));
+    setFormData((p) => ({ ...p, country_code: e.target.value }));
   };
 
   const handleNumber = (e) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 15);
-    setFormData(prev => ({ ...prev, number: value }));
+    setFormData((p) => ({ ...p, number: value }));
   };
 
   const validateForm = () => {
-    if (!formData.first_name.trim()) return "First name is required";
-    if (!formData.last_name.trim()) return "Last name is required";
-    if (!formData.email.includes("@")) return "Valid email is required";
-    if (formData.number.length < 8) return "Mobile number must be at least 8 digits";
-    if (!formData.message.trim()) return "Message is required";
+    if (!formData.first_name.trim()) return t("validation.firstName");
+    if (!formData.last_name.trim()) return t("validation.lastName");
+    if (!formData.email.includes("@")) return t("validation.email");
+    if (formData.number.length < 8) return t("validation.mobile");
+    if (!formData.message.trim()) return t("validation.message");
     return null;
   };
 
@@ -67,34 +67,31 @@ export default function QuickEnquiry() {
 
     const error = validateForm();
     if (error) {
-      openNotification("error", "Validation Error", error);
+      openNotification("error", t("notification.errorTitle"), error);
       return;
     }
 
     setLoading(true);
 
-    const payload = {
-      type: "enquiry",
-      name: {
-        first_name: formData.first_name.trim(),
-        last_name: formData.last_name.trim()
-      },
-      mobile: {
-        country_code: formData.country_code,
-        number: formData.number
-      },
-      email: formData.email.trim().toLowerCase(),
-      message: formData.message.trim(),
-    };
-
     try {
-      await apiService.post("/property/lead", payload);
+      await apiService.post("/property/lead", {
+        type: "enquiry",
+        name: {
+          first_name: formData.first_name.trim(),
+          last_name: formData.last_name.trim(),
+        },
+        mobile: {
+          country_code: formData.country_code,
+          number: formData.number,
+        },
+        email: formData.email.trim().toLowerCase(),
+        message: formData.message.trim(),
+      });
 
-      // 3. Success Notification
       openNotification(
         "success",
-        "Thank You!",
-        "Your enquiry has been submitted successfully. We'll contact you shortly!"
+        t("notification.successTitle"),
+        t("notification.successMessage")
       );
 
       setFormData({
@@ -103,14 +100,13 @@ export default function QuickEnquiry() {
         email: "",
         country_code: "+971",
         number: "",
-        message: ""
+        message: "",
       });
-
     } catch (err) {
       openNotification(
         "error",
-        "Submission Failed",
-        err.response?.data?.message || "Please try again later."
+        t("notification.errorTitle"),
+        t("notification.errorMessage")
       );
     } finally {
       setLoading(false);
@@ -119,155 +115,119 @@ export default function QuickEnquiry() {
 
   return (
     <>
-      {/* 4. Render the notification context holder */}
       {contextHolder}
 
       <section
         className="relative bg-cover bg-center py-14 sm:py-16 md:py-20 lg:py-24 text-white overflow-hidden"
         style={{ backgroundImage: `url(${Image})` }}
       >
-        {/* Dark Overlay Gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-purple-800/80 to-blue-500/70"></div>
 
-        {/* Content Wrapper */}
-        <div
-          className="relative z-10 max-w-6xl mx-auto 
-          flex flex-col md:flex-row  
-          justify-between gap-10 px-5 sm:px-6 lg:px-8"
-        >
-
-          {/* LEFT SIDE TEXT */}
+        <div className="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-10 px-5 sm:px-6 lg:px-8">
+          {/* LEFT */}
           <div className="w-full md:w-1/2 text-center md:text-left mt-10">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-4 leading-snug">
-              Quick Enquiry
+              {t("title")}
             </h2>
 
             <p className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed">
-              Need answers fast? Drop your details below <br className="hidden sm:block" />
-              and we'll get back to you shortly.
+              {t("description")}
             </p>
           </div>
 
-          {/* RIGHT SIDE FORM */}
-          <div className="w-full md:max-w-xl bg-white  rounded-xl shadow-xl p-6 sm:p-8 md:p-10 text-gray-800">
-            
+          {/* FORM */}
+          <div className="w-full md:max-w-xl bg-white rounded-xl shadow-xl p-6 sm:p-8 md:p-10 text-gray-800">
             <form onSubmit={onSubmit} className="space-y-4 md:space-y-5">
-
-              {/* FIRST & LAST NAME - 2 Columns on Mobile & Desktop */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <div className="w-full min-w-0">
-                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
-                    First Name*
+                <div>
+                  <label className="block text-xs md:text-sm font-medium mb-1">
+                    {t("form.firstName")}*
                   </label>
                   <input
-                    type="text"
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-md px-2 py-2 md:py-2.5 text-sm 
-                    focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition"
+                    className="w-full border rounded-md px-2 py-2 md:py-2.5 text-sm"
                   />
                 </div>
 
-                <div className="w-full min-w-0">
-                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
-                    Last Name*
+                <div>
+                  <label className="block text-xs md:text-sm font-medium mb-1">
+                    {t("form.lastName")}*
                   </label>
                   <input
-                    type="text"
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-md px-2 py-2 md:py-2.5 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition"
+                    className="w-full border rounded-md px-2 py-2 md:py-2.5 text-sm"
                   />
                 </div>
               </div>
 
-              {/* EMAIL & PHONE - 2 Columns on Mobile & Desktop */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
-                <div className="w-full min-w-0">
-                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
-                    Email address*
+                <div>
+                  <label className="block text-xs md:text-sm font-medium mb-1">
+                    {t("form.email")}*
                   </label>
                   <input
-                    type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-md px-2 py-2 md:py-2.5 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition"
+                    className="w-full border rounded-md px-2 py-2 md:py-2.5 text-sm"
                   />
                 </div>
 
-                <div className="w-full min-w-0">
-                  <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
-                    Mobile Number*
+                <div>
+                  <label className="block text-xs md:text-sm font-medium mb-1">
+                    {t("form.mobile")}*
                   </label>
-                  <div className="flex gap-1 md:gap-2">
+                  <div className="flex gap-2">
                     <select
                       value={formData.country_code}
                       onChange={handleCountryCode}
-                      className="w-[70px] md:w-[80px] border border-gray-300 rounded-md px-1 py-2 md:py-2.5 bg-white text-xs md:text-sm
-                      focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+                      className="w-[80px] border rounded-md px-1 py-2"
                     >
-                      {countryCodes.map(c => (
-                        <option key={c.value} value={c.value}>{c.label}</option>
+                      {countryCodes.map((c) => (
+                        <option key={c.value} value={c.value}>
+                          {c.label}
+                        </option>
                       ))}
                     </select>
                     <input
-                      type="text"
                       value={formData.number}
                       onChange={handleNumber}
-                      maxLength="15"
-                      placeholder="501234567"
-                      className="w-full border border-gray-300 rounded-md px-2 py-2 md:py-2.5 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition"
+                      className="w-full border rounded-md px-2 py-2 text-sm"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Message - Full Width */}
-              <div className="w-full min-w-0">
-                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
-                  Message*
+              <div>
+                <label className="block text-xs md:text-sm font-medium mb-1">
+                  {t("form.message")}*
                 </label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   rows="3"
-                  placeholder="Write your message..."
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm 
-                  focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition resize-none"
-                ></textarea>
+                  className="w-full border rounded-md px-3 py-2 text-sm"
+                />
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#5C039B] text-white py-3 md:py-3.5 rounded-md font-semibold 
-                hover:bg-opacity-90 transition disabled:opacity-70 shadow-md hover:shadow-lg flex justify-center items-center gap-2"
+                className="w-full bg-[#5C039B] text-white py-3 rounded-md font-semibold"
               >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Submitting...
-                  </>
-                ) : (
-                  "Submit Enquiry"
-                )}
+                {loading ? t("buttons.submitting") : t("buttons.submit")}
               </button>
-
             </form>
-            
+
             <p className="text-center text-xs text-gray-500 mt-4">
-              We respect your privacy. Your information is safe with us.
+              {t("privacy")}
             </p>
           </div>
-
         </div>
       </section>
     </>
