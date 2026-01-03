@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
+
 /* =========================
    AR - Arabic
 ========================= */
@@ -23,6 +24,7 @@ import arInterior3 from "./locales/ar/interior3.json";
 import arInterior4 from "./locales/ar/interior4.json";
 import arInterior7 from "./locales/ar/interior7.json";
 import arbook from "./locales/ar/book.json";
+
 
 import arbuy1 from "./locales/Ar/buy1.json";
 import arbuy2 from "./locales/Ar/buy2.json";
@@ -56,6 +58,7 @@ import arMort2 from "./locales/ar/mort2.json";
 import arMort3 from "./locales/ar/mort3.json";
 import arMort6 from "./locales/ar/mort6.json";
 import arEcommerce from "./locales/ar/ecommerce.json";
+
 
 /* =========================
    EN - English
@@ -216,6 +219,7 @@ import delandhero from "./locales/de/landhero.json";
 import deinteractive from "./locales/de/interactive.json";
 import de from "./locales/de/ecommerce.json";
 
+
 /* =========================
    ES - Spanish
 ========================= */
@@ -268,6 +272,7 @@ import esarticle5 from "./locales/es/article5.json";
 import eslandhero from "./locales/es/landhero.json";
 import esinteractive from "./locales/es/interactive.json";
 import es from "./locales/es/ecommerce.json";
+
 
 /* =========================
    FR - French
@@ -322,6 +327,7 @@ import frlandhero from "./locales/fr/landhero.json";
 import frinteractive from "./locales/fr/interactive.json";
 import fr from "./locales/fr/ecommerce.json";
 
+
 /* =========================
    RU - Russian
 ========================= */
@@ -375,6 +381,7 @@ import rulandhero from "./locales/ru/landhero.json";
 import ruinteractive from "./locales/ru/interactive.json";
 import ru from "./locales/ru/ecommerce.json";
 
+
 /* =========================
    TR - Turkish
 ========================= */
@@ -427,6 +434,7 @@ import trarticle5 from "./locales/tr/article5.json";
 import trlandhero from "./locales/tr/landhero.json";
 import trinteractive from "./locales/tr/interactive.json";
 import tr from "./locales/tr/ecommerce.json";
+
 
 /* =========================
    ZH - Chinese
@@ -587,6 +595,7 @@ import faMort3 from "./locales/fa/mort3.json";
 import faMort6 from "./locales/fa/mort6.json";
 import faEcommerce from "./locales/fa/ecommerce.json";
 
+
 /* =========================
    UR - Urdu
 ========================= */
@@ -639,6 +648,7 @@ import urMort2 from "./locales/ur/mort2.json";
 import urMort3 from "./locales/ur/mort3.json";
 import urMort6 from "./locales/ur/mort6.json";
 import urEcommerce from "./locales/ur/ecommerce.json";
+
 
 /* =========================
    PA - Punjabi
@@ -801,6 +811,60 @@ i18n
         ecommerce: arEcommerce,
       },
 
+
+      ar: {
+        common: arCommon,
+        contact: arcontact,
+        contact1: arcontact1,
+        contact3: arcontact3,
+        contact4: arcontact4,
+        home: arhome,
+        home1: arhome1,
+        home2: arhome2,
+        home3: arhome3,
+        home4: arhome4,
+        home5: arhome5,
+        footer: arfooter,
+        interior1: arInterior1,
+        interior2: arInterior2,
+        interior3: arInterior3,
+        interior4: arInterior4,
+        interior5: arinterior5,
+        interior6: arinterior6,
+        interior7: arInterior7,
+        scape1: arscape1,
+        scape2: arscape2,
+        buy1: arbuy1,
+        buy2: arbuy2,
+        buy3: arbuy3,
+        buy4: arbuy4,
+        buy5: arbuy5,
+        buy6: arbuy6,
+        buy7: arbuy7,
+        book: arbook,
+        consultation: arconsultation,
+        landhero: arlandhero,
+        interactive: arinteractive,
+        article1: ararticle1,
+        article2: ararticle2,
+        article3: ararticle3,
+        article4: ararticle4,
+        article5: ararticle5,
+        page3: arpage3,
+        ecosystem: arecosystem,
+        whyPartner: arwhypartner,
+        stakeholders: arstakeholders,
+        partnerForm: arpartnerForm,
+        builtForEveryone: arbuiltForEveryone,
+        cta: arCta,
+        mort1: arMort1,
+        mort2: arMort2,
+        mort3: arMort3,
+        mort6: arMort6,
+        ecommerce: arEcommerce,
+      },
+
+
       hi: {
         common: hiCommon,
         contact: hicontact,
@@ -852,6 +916,7 @@ i18n
         article5: hiarticle5,
         ecommerce: hi,
       },
+
 
       de: {
         common: deCommon,
@@ -905,6 +970,7 @@ i18n
         ecommerce: de,
       },
 
+
       es: {
         common: esCommon,
         contact: escontact,
@@ -956,6 +1022,7 @@ i18n
         article5: esarticle5,
         ecommerce: es,
       },
+
 
       fr: {
         common: frCommon,
@@ -1009,6 +1076,7 @@ i18n
         ecommerce: fr,
       },
 
+
       ru: {
         common: ruCommon,
         contact: rucontact,
@@ -1060,6 +1128,7 @@ i18n
         article5: ruarticle5,
         ecommerce: ru,
       },
+
 
       tr: {
         common: trCommon,
@@ -1113,6 +1182,7 @@ i18n
         ecommerce: tr,
       },
 
+
       zh: {
         common: zhCommon,
         contact: zhcontact,
@@ -1164,6 +1234,7 @@ i18n
         article5: zharticle5,
         ecommerce: zh,
       },
+
 
       tl: {
         common: tlCommon,
@@ -1217,6 +1288,7 @@ i18n
         ecommerce: tl,
       },
 
+
       fa: {
         common: faCommon,
         contact: facontact,
@@ -1269,6 +1341,7 @@ i18n
         ecommerce: faEcommerce,
       },
 
+
       ur: {
         common: urcommon,
         contact: urcontact,
@@ -1320,6 +1393,7 @@ i18n
         mort6: urMort6,
         ecommerce: urEcommerce,
       },
+
 
       pa: {
         common: pacommon,
@@ -1377,6 +1451,13 @@ i18n
 
     supportedLngs: ["en", "ar", "hi", "de", "es", "fr", "ru", "tr", "zh", "tl", "fa", "ur", "pa"],
 
+
+    fallbackLng: "en",
+
+
+    supportedLngs: ["en", "ar", "hi", "de", "es", "fr", "ru", "tr", "zh", "tl", "fa", "ur", "pa"],
+
+
     ns: [
       "common",
       "contact",
@@ -1429,12 +1510,15 @@ i18n
       "ecommerce",
     ],
 
+
     defaultNS: "common",
+
 
     detection: {
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
+
 
     interpolation: {
       escapeValue: false,
@@ -1442,3 +1526,4 @@ i18n
   });
 
 export default i18n;
+
