@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../../../assets/img/hero-bg.jpg';
 import Category from '../Category';
@@ -7,12 +8,16 @@ import Products from '../Products';
 import { Link } from 'react-router-dom';
 
 const Ecommerce = () => {
-  const navigate = useNavigate();
+    const { t, i18n } = useTranslation("ecommerce");
 
+  const navigate = useNavigate();
+  const isRTL = ["ar", "fa", "ur"].includes(i18n.language);
+const formatNumber = (num) =>
+  new Intl.NumberFormat(i18n.language).format(num);
   
 
   return (
-    <div className="bg-gray-50  font-sans">
+    <div className="bg-gray-50  font-sans"dir={isRTL ? "rtl" : "ltr"}>
       
       {/* ================= HERO SECTION (Updated to Match Landscaping UI) ================= */}
       <section className="relative flex items-center py-28 justify-center overflow-hidden h-[70vh]">
@@ -34,13 +39,12 @@ const Ecommerce = () => {
             transition={{ duration: 0.8 }}
             className="heading-light mb-6"
           >
-            Redefine Your 
-          Living Space
+             {t("hero.title")}
           </motion.h1>
 
           <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-             AI-curated furniture collections that blend style, comfort, and functionality for your modern lifestyle.
-          </p>
+{t("hero.subtitle")}     
+     </p>
 
        
 
@@ -50,14 +54,14 @@ const Ecommerce = () => {
                         to="/ecommerce/filter"
                         className="bg-[var(--color-primary)] px-8 py-3 rounded-md shadow-lg"
                       >
-              Explore Collections
+        {t("hero.explore")}
                       </Link>
           
                       <Link
                         to="/ecommerce/seller"
                         className="border-2 border-white px-8 py-3 rounded-md hover:bg-white hover:text-black transition"
                       >
-              Become a Vendor
+        {t("hero.vendor")}
                       </Link>
                     </div>
         </div>
@@ -73,11 +77,11 @@ const Ecommerce = () => {
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl border border-gray-100">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Try Before You Buy with <span className="text-[var(--color-primary)]">AR Preview</span>
+                 {t("ar.title")}
               </h2>
               <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                Visualize furniture in your space before purchasing. Our augmented reality feature lets you see exactly how it fits.
-              </p>
+{t("ar.desc")} 
+             </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -86,16 +90,16 @@ const Ecommerce = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-purple-600 rounded-lg flex items-center justify-center mb-6 mx-auto">
                   <span className="text-2xl text-white">📱</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">AR Room Scan</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3 text-center"> {t("cards.arScan.title")}</h3>
                 <p className="text-gray-600 mb-6 text-center">
-                  Use your phone's camera to scan your room and visualize furniture in 3D
+                  {t("cards.arScan.desc")}
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="w-full py-3 bg-[var(--color-primary)] text-white font-semibold rounded-md hover:opacity-90 transition-all"
                 >
-                  Start Scanning
+                    {t("cards.arScan.btn")}
                 </motion.button>
               </div>
 
@@ -104,16 +108,15 @@ const Ecommerce = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-6 mx-auto">
                   <span className="text-2xl text-white">🛋️</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">Virtual Staging</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">  {t("cards.virtual.title")}</h3>
                 <p className="text-gray-600 mb-6 text-center">
-                  See how different furniture styles look in your space with AI-powered suggestions
-                </p>
+  {t("cards.virtual.desc")}                </p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-md hover:opacity-90 transition-all"
                 >
-                  Try Virtual Staging
+                   {t("cards.virtual.btn")}
                 </motion.button>
               </div>
 
@@ -122,16 +125,16 @@ const Ecommerce = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center mb-6 mx-auto">
                   <span className="text-2xl text-white">📏</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">Precision Fit</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3 text-center"> {t("cards.fit.title")}</h3>
                 <p className="text-gray-600 mb-6 text-center">
-                  Get exact measurements and see if furniture fits perfectly in your space
+                 {t("cards.fit.desc")}
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-md hover:opacity-90 transition-all"
                 >
-                  Check Fit
+                  {t("cards.fit.btn")}
                 </motion.button>
               </div>
             </div>
@@ -140,33 +143,33 @@ const Ecommerce = () => {
             <div className="mt-16 bg-gradient-to-r from-gray-50 to-white rounded-xl p-8 border border-gray-200">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">How It Works</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{t("how.title")}</h3>
                   <ul className="space-y-4">
                     <li className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-[var(--color-primary)]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-[var(--color-primary)] font-bold">1</span>
+                        <span className="text-[var(--color-primary)] font-bold">{formatNumber(1)}</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">Scan Your Room</p>
-                        <p className="text-gray-600 text-sm">Use your phone camera to capture your space</p>
+                        <p className="font-semibold text-gray-900">{t("how.step1.title")}</p>
+                        <p className="text-gray-600 text-sm">{t("how.step1.desc")}</p>
                       </div>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-[var(--color-primary)]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-[var(--color-primary)] font-bold">2</span>
+                        <span className="text-[var(--color-primary)] font-bold">{formatNumber(2)}</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">Browse Furniture</p>
-                        <p className="text-gray-600 text-sm">Select from our curated collection</p>
+                        <p className="font-semibold text-gray-900">{t("how.step2.title")}</p>
+                        <p className="text-gray-600 text-sm">{t("how.step2.desc")}</p>
                       </div>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-[var(--color-primary)]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-[var(--color-primary)] font-bold">3</span>
+                        <span className="text-[var(--color-primary)] font-bold">{formatNumber(3)}</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">Preview in AR</p>
-                        <p className="text-gray-600 text-sm">See furniture in your space in real-time</p>
+                        <p className="font-semibold text-gray-900"> {t("how.step3.title")}</p>
+                        <p className="text-gray-600 text-sm">  {t("how.step3.desc")}</p>
                       </div>
                     </li>
                   </ul>
@@ -178,14 +181,14 @@ const Ecommerce = () => {
                         <div className="w-20 h-20 bg-[var(--color-primary)]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                           <span className="text-3xl text-[var(--color-primary)]">▶️</span>
                         </div>
-                        <p className="text-gray-900 font-semibold">AR Demo Video</p>
-                        <p className="text-gray-600 text-sm mt-1">Watch how it works</p>
+                        <p className="text-gray-900 font-semibold">{t("demo.title")}</p>
+                        <p className="text-gray-600 text-sm mt-1"> {t("demo.desc")}</p>
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           className="mt-4 px-6 py-2 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-md hover:opacity-90 transition-all"
                         >
-                          Play Demo
+                         {t("demo.btn")}
                         </motion.button>
                       </div>
                     </div>
