@@ -276,7 +276,7 @@ const buttonVariants = {
   }
 };
   return (
-    <>
+    <> 
 <AnimatePresence>
     {!isOpen && (
       <motion.button
