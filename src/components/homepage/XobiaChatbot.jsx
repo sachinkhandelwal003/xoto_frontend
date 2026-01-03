@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { FiX, FiMic, FiSend, FiVolume2 } from "react-icons/fi";
 import { BsRobot } from "react-icons/bs";
 import xobiaAvatar from "../../assets/img/girlimage.png";
-// import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getChatSessionId } from "../../utils/createSessionID";
 const API = "https://xoto.ae";
 
@@ -246,23 +246,80 @@ function XobiaChatbot() {
       sendMessage();
     }
   };
-
+const buttonVariants = {
+  hidden: { 
+    y: 100, 
+    opacity: 0, 
+    scale: 0.8 
+  }, 
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    scale: 1,
+    transition: { 
+      type: "spring", 
+      stiffness: 200, 
+      damping: 18, 
+      mass: 0.8,
+      delay: 1.5 
+    } 
+  },
+  hover: { 
+    scale: 1.05, 
+    y: -4, 
+    boxShadow: "0px 15px 25px -5px rgba(92, 3, 155, 0.4)", // Purple shadow
+    transition: { type: "spring", stiffness: 400, damping: 10 }
+  },
+  tap: { 
+    scale: 0.95,
+    y: 0 
+  }
+};
   return (
     <>
-      {/* Floating Chat Button */}
-{!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-40 flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
-          aria-label="Chat with Xobia"
-        >
-          <div className="relative">
-            <BsRobot className="w-5 h-5 md:w-6 md:h-6" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 md:w-3 md:h-3 bg-green-400 rounded-full animate-pulse"></span>
-          </div>
-          <span className="font-semibold text-xs md:text-sm">Chat with Xobia</span>
-        </button>
-      )}
+<AnimatePresence>
+    {!isOpen && (
+      <motion.button
+        variants={buttonVariants}
+        initial="hidden"
+        animate="visible"
+        whileHover="hover"
+        whileTap="tap"
+        onClick={() => setIsOpen(true)}
+        // Applied your specific gradient here via style
+        style={{ 
+          background: 'linear-gradient(180deg, #5C039B 0%, #03A4F4 100%)' 
+        }}
+        className="fixed bottom-8 right-8 z-50 group flex items-center gap-4 pl-5 pr-1.5 py-1.5 rounded-full 
+                   shadow-xl text-left border border-white/20 transition-all duration-300"
+      >
+        {/* Text Section - White Text for Dark Background */}
+        <div className="flex flex-col items-start">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-blue-100/80 mb-0.5">
+            AI Assistant
+          </span>
+          <span className="text-sm font-bold text-white tracking-wide">
+            Talk with Xobia
+          </span>
+        </div>
+
+        {/* Avatar Container - Full Image, No Border */}
+        <div className="relative w-12 h-12">
+          <img 
+            src={xobiaAvatar} 
+            alt="Xobia" 
+            className=" absolute rounded-full  "
+          />
+
+          {/* Online Indicator */}
+          <span className="absolute bottom-0 right-0 flex h-3.5 w-3.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-green-500 border-2 border-[#03A4F4]"></span>
+          </span>
+        </div>
+      </motion.button>
+    )}
+  </AnimatePresence>
       {/* Chat Widget - HEADER SE BAHUT NICHE */}
       {isOpen && (
         <>
