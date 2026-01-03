@@ -3,6 +3,7 @@ import { FiX, FiMic, FiSend, FiVolume2 } from "react-icons/fi";
 import { BsRobot } from "react-icons/bs";
 import xobiaAvatar from "../../assets/img/girlimage.png";
 import { motion, AnimatePresence } from "framer-motion";
+import { getChatSessionId } from "../../utils/createSessionID";
 const API = "https://xoto.ae";
 
 function XobiaChatbot() {
@@ -20,7 +21,8 @@ function XobiaChatbot() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await fetch(`${API}/api/ai/chat/get-all-messages`);
+        const session_id = getChatSessionId();
+        const res = await fetch(`${API}/api/ai/chat/get-all-messages?session_id=${session_id}`);
         const data = await res.json();
 
         const formatted = data.map((msg) => ({
@@ -70,8 +72,9 @@ function XobiaChatbot() {
 
     try {
       const formData = new FormData();
+      let session_id = getChatSessionId();
+      formData.append("session_id",session_id)
       formData.append("message", userMsg.text);
-
       const res = await fetch(`${API}/api/ai/chat`, {
         method: "POST",
         body: formData,
@@ -114,11 +117,12 @@ function XobiaChatbot() {
 
   const sendAudioMessage = async (audioBlob) => {
     try {
-      setVoiceLoading(true);
+      setVoiceLoading(true); 
+      let session_id = getChatSessionId();
       
       const formData = new FormData();
       formData.append("audio", audioBlob, "voice.webm");
-
+      formData.append("session_id",session_id)
       const res = await fetch(`${API}/api/ai/chat`, {
         method: "POST",
         body: formData,
