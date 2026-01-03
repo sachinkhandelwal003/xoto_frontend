@@ -5,6 +5,10 @@ import LanguageDetector from "i18next-browser-languagedetector";
 /* =========================
    AR
 ========================= */
+import arcontact4 from "./locales/ar/contact4.json"
+import arcontact1 from "./locales/ar/contact1.json"
+import arcontact3 from "./locales/ar/contact3.json"
+import arcontact from "./locales/ar/contact.json"
 import arCommon from "./locales/ar/common.json";
 import arhome from "./locales/ar/home.json"
 import arhome1 from "./locales/ar/home1.json"
@@ -45,6 +49,10 @@ import arbuy2 from './locales/Ar/buy2.json'
 /* =========================
    EN
 ========================= */
+import encontact4 from "./locales/en/contact4.json";
+import encontact1 from "./locales/en/contact1.json";
+import encontact3 from "./locales/en/contact3.json";
+import encontact from "./locales/en/contact.json";
 import enCommon from "./locales/en/common.json";
 import enHome from "./locales/en/home.json";
 import enHome1 from "./locales/en/home1.json";
@@ -94,6 +102,10 @@ import eninteractive from "./locales/en/interactive.json";
 /* =========================
    HI
 ========================= */
+import hicontact4 from "./locales/hi/contact4.json"
+import hicontact1 from "./locales/hi/contact1.json"
+import hicontact3 from "./locales/hi/contact3.json"
+import hicontact from "./locales/hi/contact.json"
 import hiCommon from "./locales/hi/common.json";
 import hiHome from "./locales/hi/home.json";
 import hiHome1 from "./locales/hi/home1.json";
@@ -143,6 +155,10 @@ import hiinteractive from "./locales/hi/interactive.json";
 /* =========================
    DE
 ========================= */
+import decontact4 from "./locales/de/contact4.json"
+import decontact1 from "./locales/de/contact1.json"
+import decontact3 from "./locales/de/contact3.json"
+import decontact from "./locales/de/contact.json"
 import deCommon from "./locales/de/common.json";
 import deHome from "./locales/de/home.json";
 import deHome1 from "./locales/de/home1.json";
@@ -192,6 +208,10 @@ import deinteractive from "./locales/de/interactive.json"
 /* =========================
    ES
 ========================= */
+import escontact4 from "./locales/es/contact4.json";
+import escontact3 from "./locales/es/contact3.json";
+import escontact1 from "./locales/es/contact1.json";
+import escontact from "./locales/es/contact.json";
 import esCommon from "./locales/es/common.json";
 import esHome from "./locales/es/home.json";
 import esHome1 from "./locales/es/home1.json";
@@ -241,6 +261,10 @@ import esinteractive from "./locales/es/interactive.json"
 /* =========================
    FR
 ========================= */
+import frcontact4 from "./locales/fr/contact4.json"
+import frcontact3 from "./locales/fr/contact3.json"
+import frcontact1 from "./locales/fr/contact1.json"
+import frcontact from "./locales/fr/contact.json"
 import frCommon from "./locales/fr/common.json";
 import frHome from "./locales/fr/home.json";
 import frHome1 from "./locales/fr/home1.json";
@@ -290,6 +314,10 @@ import frinteractive from "./locales/fr/interactive.json"
 /* =========================
    RU
 ========================= */
+import rucontact1 from "./locales/ru/contact1.json"
+import rucontact4 from "./locales/ru/contact4.json"
+import rucontact3 from "./locales/ru/contact3.json"
+import rucontact from "./locales/ru/contact.json"
 import ruCommon from "./locales/ru/common.json";
 import ruHome from "./locales/ru/home.json";
 import ruHome1 from "./locales/ru/home1.json";
@@ -339,6 +367,10 @@ import ruinteractive from "./locales/ru/interactive.json";
 /* =========================
    TR
 ========================= */
+import trcontact4 from "./locales/tr/contact4.json"
+import trcontact1 from "./locales/tr/contact1.json"
+import trcontact from "./locales/tr/contact.json"
+import trcontact3 from "./locales/tr/contact3.json"
 import trCommon from "./locales/tr/common.json";
 import trHome from "./locales/tr/home.json";
 import trHome1 from "./locales/tr/home1.json";
@@ -388,6 +420,10 @@ import trinteractive from "./locales/tr/interactive.json"
 /* =========================
    ZH
 ========================= */
+import zhcontact4 from "./locales/zh/contact4.json"
+import zhcontact1 from "./locales/zh/contact1.json"
+import zhcontact3 from "./locales/zh/contact3.json"
+import zhcontact from "./locales/zh/contact.json"
 import zhCommon from "./locales/zh/common.json";
 import zhHome from "./locales/zh/home.json";
 import zhHome1 from "./locales/zh/home1.json";
@@ -437,6 +473,10 @@ import zhinteractive from "./locales/zh/interactive.json"
 /* =========================
    TL
 ========================= */
+import tlcontact4 from "./locales/tl/contact4.json"
+import tlcontact3 from "./locales/tl/contact3.json"
+import tlcontact1 from "./locales/tl/contact1.json"
+import tlcontact from "./locales/tl/contact.json"
 import tlCommon from "./locales/tl/common.json";
 import tlHome from "./locales/tl/home.json";
 import tlHome1 from "./locales/tl/home1.json";
@@ -486,6 +526,10 @@ import tlinteractive from "./locales/tl/interactive.json"
 /* =========================
    FA
 ========================= */
+import facontact4 from "./locales/fa/contact4.json"
+import facontact3 from "./locales/fa/contact3.json"
+import facontact1 from "./locales/fa/contact1.json"
+import facontact from "./locales/fa/contact.json"
 import faCommon from "./locales/fa/common.json";
 import fahome from "./locales/fa/home.json";
 import fahome1 from "./locales/fa/home1.json";
@@ -522,14 +566,18 @@ import fabuy1 from './locales/fa/buy1.json'
 /* =========================
    UR
 ========================= */
-import urcommon  from "./locales/ur/common.json";
-import  urfooter from "./locales/ur/footer.json";
-import   urhome from "./locales/ur/home.json";
-import   urhome1 from "./locales/ur/home1.json";
-import   urhome2 from "./locales/ur/home2.json";
-import  urhome3 from "./locales/ur/home3.json";
-import  urhome4 from "./locales/ur/home4.json";
-import  urhome5 from "./locales/ur/home5.json";
+import urcontact1 from "./locales/ur/contact1.json"
+import urcontact4 from "./locales/ur/contact4.json"
+import urcontact3 from "./locales/ur/contact3.json"
+import urcontact from "./locales/ur/contact.json"
+import urcommon from "./locales/ur/common.json";
+import urfooter from "./locales/ur/footer.json";
+import urhome from "./locales/ur/home.json";
+import urhome1 from "./locales/ur/home1.json";
+import urhome2 from "./locales/ur/home2.json";
+import urhome3 from "./locales/ur/home3.json";
+import urhome4 from "./locales/ur/home4.json";
+import urhome5 from "./locales/ur/home5.json";
 import urarticle1 from './locales/ur/article1.json'
 import urarticle2 from "./locales/ur/article2.json"
 import urarticle3 from "./locales/ur/article3.json"
@@ -557,11 +605,15 @@ import urbuy1 from './locales/ur/buy1.json'
 /* =========================
    PAN
 ========================= */
+import pacontact4 from "./locales/pa/contact4.json"
+import pacontact1 from "./locales/pa/contact1.json"
+import pacontact3 from "./locales/pa/contact3.json"
+import pacontact from "./locales/pa/contact.json"
 import pacommon from "./locales/pa/common.json"
 import pahome from "./locales/pa/home.json"
 import pahome1 from "./locales/pa/home1.json"
 import pahome2 from "./locales/pa/home2.json"
-import pahome3 from "./locales/pa/home3.json" 
+import pahome3 from "./locales/pa/home3.json"
 import pahome4 from "./locales/pa/home4.json"
 import pahome5 from "./locales/pa/home5.json"
 import pafooter from "./locales/pa/footer.json"
@@ -581,6 +633,7 @@ import paInterior1 from "./locales/pa/interior1.json";
 import pabook from "./locales/pa/book.json";
 import pabuy2 from './locales/pa/buy2.json'
 import pabuy1 from './locales/pa/buy1.json'
+// import { i } from "framer-motion/dist/types.d-DagZKalS";
 
 i18n
   .use(LanguageDetector)
@@ -588,6 +641,10 @@ i18n
   .init({
     resources: {
       en: {
+          contact4: encontact4,
+             contact3: encontact3,
+         contact1: encontact1,
+        contact: encontact,
         common: enCommon,
         home: enHome,
         home1: enHome1,
@@ -624,8 +681,8 @@ i18n
         mort6: enMort6,
         book: enbook,
         consultation: enconsultation,
-        landhero:enlandhero,
-        interactive:eninteractive,
+        landhero: enlandhero,
+        interactive: eninteractive,
         article1: enarticle1,
         article2: enarticle2,
         article3: enarticle3,
@@ -634,6 +691,10 @@ i18n
       },
 
       hi: {
+             contact4: hicontact4,
+            contact3: hicontact3,
+        contact: hicontact,
+          contact1: hicontact1,
         common: hiCommon,
         home: hiHome,
         home1: hiHome1,
@@ -670,10 +731,8 @@ i18n
         mort6: hiMort6,
         book: hibook,
         consultation: hiconsultation,
-                landhero:hilandhero,
-                        interactive:hiinteractive
-
-,
+        landhero: hilandhero,
+        interactive: hiinteractive,
         article1: hiarticle1,
         article2: hiarticle2,
         article3: hiarticle3,
@@ -682,6 +741,10 @@ i18n
       },
 
       de: {
+          contact1: decontact1,
+            contact3: decontact3,
+        contact: decontact,
+              contact4: decontact4,
         common: deCommon,
         home: deHome,
         home1: deHome1,
@@ -718,8 +781,8 @@ i18n
         mort6: deMort6,
         book: debook,
         consultation: deconsultation,
-                landhero:delandhero
-,
+        landhero: delandhero
+        ,
         article1: dearticle1,
         article2: dearticle2,
         article3: dearticle3,
@@ -729,6 +792,10 @@ i18n
       },
 
       es: {
+              contact1: escontact1,
+               contact3: escontact3,
+                     contact4: escontact4,
+        contact: escontact,
         common: esCommon,
         home: esHome,
         home1: esHome1,
@@ -765,8 +832,8 @@ i18n
         mort6: esMort6,
         book: esbook,
         consultation: esconsultation,
-                landhero:eslandhero
-,
+        landhero: eslandhero
+        ,
         article1: esarticle1,
         article2: esarticle2,
         article3: esarticle3,
@@ -776,6 +843,10 @@ i18n
       },
 
       fr: {
+             contact1: frcontact1,
+              contact3: frcontact3,
+                      contact4: frcontact4,
+        contact: frcontact,
         common: frCommon,
         home: frHome,
         home1: frHome1,
@@ -812,8 +883,8 @@ i18n
         mort6: frMort6,
         book: frbook,
         consultation: frconsultation,
-                landhero:frlandhero
-,
+        landhero: frlandhero
+        ,
         article1: frarticle1,
         article2: frarticle2,
         article3: frarticle3,
@@ -823,6 +894,10 @@ i18n
       },
 
       ru: {
+         contact1: rucontact1,
+           contact3: rucontact3,
+              contact4: rucontact4,
+        contact: rucontact,
         common: ruCommon,
         home: ruHome,
         home1: ruHome1,
@@ -859,10 +934,8 @@ i18n
         mort6: ruMort6,
         book: rubook,
         consultation: ruconsultation,
-                landhero:rulandhero,
-                        interactive:ruinteractive
-
-,
+        landhero: rulandhero,
+        interactive: ruinteractive,
         article1: ruarticle1,
         article2: ruarticle2,
         article3: ruarticle3,
@@ -871,6 +944,10 @@ i18n
       },
 
       tr: {
+             contact1: trcontact1,
+                  contact3: trcontact3,
+        contact: trcontact,
+         contact4: trcontact4,
         common: trCommon,
         home: trHome,
         home1: trHome1,
@@ -907,8 +984,8 @@ i18n
         mort6: trMort6,
         book: trbook,
         consultation: trconsultation,
-                landhero:trlandhero
-,
+        landhero: trlandhero
+        ,
         article1: trarticle1,
         article2: trarticle2,
         article3: trarticle3,
@@ -918,6 +995,10 @@ i18n
       },
 
       zh: {
+                contact4: zhcontact4,
+        contact: zhcontact,
+            contact3: zhcontact3,
+          contact1: zhcontact1,
         common: zhCommon,
         home: zhHome,
         home1: zhHome1,
@@ -954,8 +1035,7 @@ i18n
         mort6: zhMort6,
         book: zhbook,
         consultation: zhconsultation,
-                landhero:zhlandhero
-,
+        landhero: zhlandhero,
         article1: zharticle1,
         article2: zharticle2,
         article3: zharticle3,
@@ -965,6 +1045,10 @@ i18n
       },
 
       tl: {
+            contact4: tlcontact4,
+        contact: tlcontact,
+          contact3: tlcontact3,
+            contact1: tlcontact1,
         common: tlCommon,
         home: tlHome,
         home1: tlHome1,
@@ -1001,8 +1085,8 @@ i18n
         mort6: tlMort6,
         book: tlbook,
         consultation: tlconsultation,
-                landhero:tllandhero
-,
+        landhero: tllandhero
+        ,
         article1: tlarticle1,
         article2: tlarticle2,
         article3: tlarticle3,
@@ -1012,25 +1096,29 @@ i18n
       },
 
       fa: {
+            contact4: facontact4,
+         contact3: facontact3,
+        contact: facontact,
+        contact1: facontact1,
         common: faCommon,
-        article1:faarticle1,
+        article1: faarticle1,
         article2: faarticle2,
         article3: faarticle3,
         article4: faarticle4,
         article5: faarticle5,
-        home:fahome,
- interior1: faInterior1,   
-  interior2: faInterior2,
-  interior3: faInterior3,
-  interior4: faInterior4,
-  interior7: faInterior7,
+        home: fahome,
+        interior1: faInterior1,
+        interior2: faInterior2,
+        interior3: faInterior3,
+        interior4: faInterior4,
+        interior7: faInterior7,
         home1: fahome1,
         home2: fahome2,
         home3: fahome3,
         home4: fahome4,
-        home5:fahome5,
-        footer:fafooter,
-        landhero:falandhero,
+        home5: fahome5,
+        footer: fafooter,
+        landhero: falandhero,
         interactive: fainteractive,
         consultation: faconsultation,
         scape2: fascape2,
@@ -1041,47 +1129,58 @@ i18n
         buy2: fabuy2,
         buy1: fabuy1
 
-        
+
       },
-            ar: { common: arCommon , home :arhome , home1:arhome1 , home2:arhome2, home3:arhome3, home4:arhome4, home5:arhome5,footer:arfooter ,
-              interior1: arInterior1,
-              interior2: arInterior2,
-              interior3: arInterior3,
-              interior4: arInterior4,
-              interior7: arInterior7,
-              buy2: arbuy2,
+      ar: {
+        common: arCommon, home: arhome, home1: arhome1, home2: arhome2, home3: arhome3, home4: arhome4, home5: arhome5, footer: arfooter,
+        interior1: arInterior1,
+        interior2: arInterior2,
+        interior3: arInterior3,
+        interior4: arInterior4,
+        interior7: arInterior7,
+        buy2: arbuy2,
+              contact3: arcontact3,
+                      contact4: arcontact4,
+        contact: arcontact,
+  contact1: arcontact1,
+        buy1: arbuy1,
+        article1: ararticle1,
+        article2: ararticle2,
+        article3: ararticle3,
+        article4: ararticle4,
+        article5: ararticle5, landhero: arlandhero, interactive: arinteractive, consultation: arconsultation, scape2: arscape2, scape1: arscape1, interior5: arinterior5, interior6: arinterior6, book: arbook
+      },
+      ur: {
+        common: urcommon, interior1: urInterior1, buy2: urbuy2, buy1: urbuy1,
+        interior2: urInterior2,
+        interior3: urInterior3,
+        interior4: urInterior4,
+        interior7: urInterior7,
+             contact3: urcontact3,
+                 contact4: urcontact4,
+        contact: urcontact,
+                contact1: urcontact1,
+        landhero: urlandhero,
+        home: urhome, home1: urhome1, home2: urhome2, home3: urhome3, home4: urhome4, home5: urhome5, footer: urfooter, article1: urarticle1, article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5, interactive: urinteractive, consultation: urconsultation, scape2: urscape2, scape1: urscape1, interior5: urinterior5, interior6: urinterior6, book: urbook
+      },
+      pa: { common: pacommon, home: pahome, home1: pahome1, home2: pahome2, home3: pahome3, home4: pahome4, home5: pahome5, footer: pafooter, article1: paarticle1, article2: paarticle2, article3: paarticle3, article4: paarticle4, article5: paarticle5, landhero: palandhero, interactive: painteractive, consultation: paconsultation, scape2: pascape2, scape1: pascape1, interior5: painterior5, interior6: painterior6, interior1: paInterior1, book: pabook, buy2: pabuy2, buy1: pabuy1, contact: pacontact, contact1:pacontact1 ,contact3:pacontact3,contact4: pacontact4, }
 
-
-              buy1: arbuy1,
-              article1: ararticle1,
-               article2: ararticle2 ,
-                article3: ararticle3,
-                 article4: ararticle4,
-                  article5: ararticle5, landhero: arlandhero, interactive: arinteractive, consultation: arconsultation, scape2: arscape2, scape1: arscape1, interior5: arinterior5, interior6: arinterior6, book: arbook  },
-       ur: { common: urcommon ,interior1: urInterior1, buy2: urbuy2, buy1: urbuy1,
-  interior2: urInterior2,
-  interior3: urInterior3,
-  interior4: urInterior4,
-  interior7: urInterior7,
-landhero:urlandhero,
- home :urhome , home1:urhome1 , home2:urhome2, home3:urhome3, home4:urhome4, home5:urhome5,     footer:urfooter   , article1: urarticle1 , article2: urarticle2, article3: urarticle3, article4: urarticle4, article5: urarticle5, interactive: urinteractive, consultation: urconsultation, scape2: urscape2,scape1: urscape1, interior5: urinterior5, interior6: urinterior6, book: urbook  },
-    pa:{common:pacommon , home:pahome , home1:pahome1 , home2:pahome2 , home3:pahome3 , home4:pahome4 , home5:pahome5 , footer:pafooter , article1:paarticle1, article2:paarticle2, article3:paarticle3 , article4:paarticle4, article5:paarticle5, landhero:palandhero, interactive:painteractive, consultation:paconsultation, scape2: pascape2, scape1: pascape1, interior5: painterior5, interior6: painterior6, interior1: paInterior1, book: pabook, buy2: pabuy2, buy1: pabuy1  }
-          },
+    },
 
     fallbackLng: "en",
 
- supportedLngs: ["en","hi","de","es","fr","ru","tr","zh","tl","fa","ur","ar" , "pa"],
+    supportedLngs: ["en", "hi", "de", "es", "fr", "ru", "tr", "zh", "tl", "fa", "ur", "ar", "pa"],
 
     ns: [
-      "common","home","home1","home2","home3","home4","home5",
-      "footer","interior1","interior2","interior3","interior4",
-      "interior5","interior6","interior7",
-      "scape1","scape2",
-      "buy1","buy2","buy3","buy4","buy5","buy6","buy7",
-      "page3","ecosystem","whyPartner","stakeholders",
-      "partnerForm","builtForEveryone","cta",
-      "mort1","mort2","mort3","mort6",
-      "book","consultation", "article1","article2", "article3", "article4", "article5", "landhero"
+      "common", "contact","contact4", "contact3","contact1", "home", "home1", "home2", "home3", "home4", "home5",
+      "footer", "interior1", "interior2", "interior3", "interior4",
+      "interior5", "interior6", "interior7",
+      "scape1", "scape2",
+      "buy1", "buy2", "buy3", "buy4", "buy5", "buy6", "buy7",
+      "page3", "ecosystem", "whyPartner", "stakeholders",
+      "partnerForm", "builtForEveryone", "cta",
+      "mort1", "mort2", "mort3", "mort6",
+      "book", "consultation", "article1", "article2", "article3", "article4", "article5", "landhero"
     ],
 
     defaultNS: "common",
