@@ -142,8 +142,33 @@ const Calculator = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [phoneError, setPhoneError] = useState("");
   const [galleryImages, setGalleryImages] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
+
+  const handlePhoneChange = (e) => {
+  const value = e.target.value.replace(/\D/g, ""); // numbers only
+  const rule = COUNTRY_PHONE_RULES[countryCode];
+
+  if (!rule) return;
+
+  if (value.length > rule.digits) return; // block extra digits
+
+  setPhone(value);
+
+  if (value.length < rule.digits) {
+    setPhoneError(`Phone number must be ${rule.digits} digits`);
+  } else {
+    setPhoneError("");
+  }
+};
+
+
+const handleCountryChange = (code) => {
+  setCountryCode(code);
+  setPhone(""); // reset phone on country change
+  setPhoneError("");
+};
 
 
   const toggleImageSelect = (img) => {
@@ -206,6 +231,19 @@ const Calculator = () => {
     { value: '+44', label: 'UK (+44)' },
     { value: '+1', label: 'USA/Canada (+1)' },
   ];
+
+  const COUNTRY_PHONE_RULES = {
+  "+971": { country: "UAE", digits: 9 },
+  "+91": { country: "India", digits: 10 },
+  "+966": { country: "KSA", digits: 9 },
+  "+974": { country: "Qatar", digits: 8 },
+  "+968": { country: "Oman", digits: 8 },
+  "+973": { country: "Bahrain", digits: 8 },
+  "+965": { country: "Kuwait", digits: 8 },
+  "+92": { country: "Pakistan", digits: 10 },
+  "+44": { country: "UK", digits: 10 },
+  "+1": { country: "USA/Canada", digits: 10 },
+};
 
   // --- API FETCHING ---
   useEffect(() => {
@@ -885,33 +923,43 @@ const Calculator = () => {
                     </div>
 
                     <div>
-                      <Text strong className="block mb-2">Contact Number *</Text>
-                      <Row gutter={8}>
-                        <Col span={8}>
-                          <Select
-                            value={countryCode}
-                            onChange={setCountryCode}
-                            className="w-full rounded-xl h-14"
-                            size="large"
-                          >
-                            {countryCodes.map(code => (
-                              <Option key={code.value} value={code.value}>
-                                {code.label}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Col>
-                        <Col span={16}>
-                          <Input
-                            size="large"
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
-                            prefix={<PhoneFilled className="text-gray-300" />}
-                            className="rounded-xl h-14"
-                            placeholder="Phone number"
-                          />
-                        </Col>
-                      </Row>
+                       <Text strong className="block mb-2">Contact Number *</Text>
+
+  <Row gutter={8}>
+    <Col span={8}>
+      <Select
+        value={countryCode}
+        onChange={handleCountryChange}
+        className="w-full"
+        size="large"
+      >
+        {countryCodes.map(code => (
+          <Option key={code.value} value={code.value}>
+            {code.label}
+          </Option>
+        ))}
+      </Select>
+    </Col>
+
+    <Col span={16}>
+      <Input
+        size="large"
+        value={phone}
+        onChange={handlePhoneChange}
+        placeholder={`Enter ${COUNTRY_PHONE_RULES[countryCode]?.digits || ""} digit number`}
+        prefix={<PhoneFilled />}
+        maxLength={COUNTRY_PHONE_RULES[countryCode]?.digits}
+        status={phoneError ? "error" : ""}
+        className="rounded-xl h-14"
+      />
+    </Col>
+  </Row>
+
+  {phoneError && (
+    <Text type="danger" className="text-xs mt-1 block">
+      {phoneError}
+    </Text>
+  )}
                     </div>
                     {/* 
                     <Button

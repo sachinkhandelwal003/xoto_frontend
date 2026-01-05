@@ -12,25 +12,35 @@ function XobiaChatbot() {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [voiceLoading, setVoiceLoading] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [botSpeaking, setBotSpeaking] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState(null);
+
+
   const chatEndRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-  const [recording, setRecording] = useState(false);
 
-  // Fetch initial messages
+  // 🔥 SINGLE AUDIO CONTROLLER
+  const audioRef = useRef(null);
+
+  /* ================= FETCH OLD MESSAGES ================= */
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const session_id = getChatSessionId();
-        const res = await fetch(`${API}/api/ai/chat/get-all-messages?session_id=${session_id}`);
+        const res = await fetch(
+          `${API}/api/ai/chat/get-all-messages?session_id=${session_id}`
+        );
         const data = await res.json();
 
         const formatted = data.map((msg) => ({
           id: msg._id,
           role: msg.sender === "user" ? "user" : "bot",
-          text: msg.text,
-          audioUrl: msg.audioUrl,
-          type: msg.type || "text",
+          text: msg.text || "",
+          audioUrl: msg.audioUrl || null,
+          type: msg.audioUrl ? "audio" : "text",
+          autoPlay: false,
           timestamp: new Date(msg.createdAt).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -46,20 +56,83 @@ function XobiaChatbot() {
     fetchMessages();
   }, []);
 
-  // Auto-scroll to bottom
+  /* ================= AUTO SCROLL ================= */
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading, voiceLoading]);
 
+  /* ================= SAFE AUDIO PLAYER ================= */
+ const playBotAudio = (url, messageId) => {
+  // 🔇 Stop previous audio
+  if (audioRef.current) {
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    audioRef.current.src = "";
+    audioRef.current = null;
+  }
+
+  const audio = new Audio(url);
+  audioRef.current = audio;
+
+  // 🔥 Mark only THIS message as speaking
+  setBotSpeaking(true);
+  setSpeakingMessageId(messageId);
+
+  audio.play().catch(() => {});
+
+  audio.onended = () => {
+    setBotSpeaking(false);
+    setSpeakingMessageId(null);
+    audioRef.current = null;
+  };
+};
+
+  /* ================= AUTOPLAY BOT AUDIO ================= */
+ useEffect(() => {
+  const lastMessage = messages[messages.length - 1];
+
+  if (
+    lastMessage?.role === "bot" &&
+    lastMessage?.type === "audio" &&
+    lastMessage?.audioUrl &&
+    lastMessage?.autoPlay
+  ) {
+    playBotAudio(lastMessage.audioUrl, lastMessage.id);
+  }
+}, [messages]);
+
+  /* ================= CHAT CLOSE = FORCE STOP ================= */
+ useEffect(() => {
+  if (!isOpen && audioRef.current) {
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    audioRef.current.src = "";
+    audioRef.current = null;
+    setBotSpeaking(false);
+    setSpeakingMessageId(null);
+  }
+}, [isOpen]);
+  /* ================= COMPONENT UNMOUNT CLEANUP ================= */
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  /* ================= SEND TEXT ================= */
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMsg = {
-      id: `${Date.now()}-${Math.random()}`,
+      id: Date.now(),
       role: "user",
-      text: input,
-      audioUrl: null,
       type: "text",
+      text: input,
       timestamp: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -72,9 +145,9 @@ function XobiaChatbot() {
 
     try {
       const formData = new FormData();
-      let session_id = getChatSessionId();
-      formData.append("session_id",session_id)
       formData.append("message", userMsg.text);
+      formData.append("session_id", getChatSessionId());
+
       const res = await fetch(`${API}/api/ai/chat`, {
         method: "POST",
         body: formData,
@@ -82,28 +155,29 @@ function XobiaChatbot() {
 
       const data = await res.json();
 
-      const aiResponse = {
-        id: `${Date.now()}-${Math.random()}`,
-        role: "bot",
-        text: data.ai?.text || data.text || "I'm here to help!",
-        audioUrl: data.ai?.audioUrl || data.audioUrl || null,
-        type: data.ai?.audioUrl ? "audio" : "text",
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-
-      setMessages((prev) => [...prev, aiResponse]);
-    } catch (err) {
-      console.error(err);
       setMessages((prev) => [
         ...prev,
         {
-          id: `${Date.now()}-${Math.random()}`,
+          id: Date.now() + 1,
           role: "bot",
-          text: "Sorry, I'm having trouble connecting. Please try again.",
+          text: data.ai?.text || data.text || "",
+          audioUrl: data.ai?.audioUrl || null,
+          type: data.ai?.audioUrl ? "audio" : "text",
+          autoPlay: true,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 2,
+          role: "bot",
           type: "text",
+          text: "Sorry, something went wrong.",
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -115,50 +189,52 @@ function XobiaChatbot() {
     }
   };
 
+  const handleKeyDown = (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+};
+
+  /* ================= SEND VOICE ================= */
   const sendAudioMessage = async (audioBlob) => {
     try {
-      setVoiceLoading(true); 
-      let session_id = getChatSessionId();
-      
+      setVoiceLoading(true);
+
       const formData = new FormData();
       formData.append("audio", audioBlob, "voice.webm");
-      formData.append("session_id",session_id)
+      formData.append("session_id", getChatSessionId());
+
       const res = await fetch(`${API}/api/ai/chat`, {
         method: "POST",
         body: formData,
       });
 
-      const raw = await res.text();
+      const data = await res.json();
 
-      if (!res.ok) {
-        console.error("Backend error:", raw);
-        throw new Error("Backend error");
-      }
-
-      const data = JSON.parse(raw);
-
-      const aiResponse = {
-        id: Date.now() + 1,
-        role: "bot",
-        text: data.ai?.text || data.text || "I received your voice message!",
-        audioUrl: data.ai?.audioUrl || data.audioUrl || null,
-        type: (data.ai?.audioUrl || data.audioUrl) ? "audio" : "text",
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-
-      setMessages((prev) => [...prev, aiResponse]);
-    } catch (err) {
-      console.error("Audio upload failed:", err);
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
           role: "bot",
-          text: "Sorry, I couldn't process your voice message. Please try again.",
+          text: data.ai?.text || "",
+          audioUrl: data.ai?.audioUrl || null,
+          type: "audio",
+          autoPlay: true,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 2,
+          role: "bot",
           type: "text",
+          text: "Could not process voice message.",
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -170,156 +246,111 @@ function XobiaChatbot() {
     }
   };
 
+  /* ================= RECORD ================= */
   const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const recorder = new MediaRecorder(stream);
 
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : "audio/webm";
+    mediaRecorderRef.current = recorder;
+    audioChunksRef.current = [];
 
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+    recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
 
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+    recorder.onstop = async () => {
+      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
 
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
-      };
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          role: "user",
+          type: "voice-sent",
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
 
-      mediaRecorder.onstop = async () => {
-        try {
-          const webmBlob = new Blob(audioChunksRef.current, {
-            type: mimeType
-          });
+      await sendAudioMessage(blob);
+      stream.getTracks().forEach((t) => t.stop());
+    };
 
-          if (webmBlob.size < 1000) {
-            console.error("❌ Empty or too short audio");
-            return;
-          }
-
-          const audioUrl = URL.createObjectURL(webmBlob);
-
-          const voiceMessage = {
-            id: Date.now(),
-            role: "user",
-            audioUrl,
-            type: "audio",
-            timestamp: new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit"
-            })
-          };
-
-          setMessages(prev => [...prev, voiceMessage]);
-
-          await sendAudioMessage(webmBlob);
-
-          stream.getTracks().forEach((t) => t.stop());
-          audioChunksRef.current = [];
-
-        } catch (err) {
-          console.error("Recording stop error:", err);
-        }
-      };
-
-      mediaRecorder.start();
-      setRecording(true);
-    } catch (err) {
-      console.error("Microphone access error:", err);
-      alert("Please allow microphone access to record voice messages.");
-    }
+    recorder.start();
+    setRecording(true);
   };
 
   const stopRecording = () => {
-    if (!mediaRecorderRef.current) return;
-    mediaRecorderRef.current.stop();
+    mediaRecorderRef.current?.stop();
     setRecording(false);
   };
 
-  // Handle keyboard shortcuts
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-const buttonVariants = {
-  hidden: { 
-    y: 100, 
-    opacity: 0, 
-    scale: 0.8 
-  }, 
-  visible: { 
-    y: 0, 
-    opacity: 1, 
-    scale: 1,
-    transition: { 
-      type: "spring", 
-      stiffness: 200, 
-      damping: 18, 
-      mass: 0.8,
-      delay: 1.5 
-    } 
-  },
-  hover: { 
-    scale: 1.05, 
-    y: -4, 
-    boxShadow: "0px 15px 25px -5px rgba(92, 3, 155, 0.4)", // Purple shadow
-    transition: { type: "spring", stiffness: 400, damping: 10 }
-  },
-  tap: { 
-    scale: 0.95,
-    y: 0 
-  }
-};
-  return (
-    <> 
-<AnimatePresence>
-    {!isOpen && (
-      <motion.button
-        variants={buttonVariants}
-        initial="hidden"
-        animate="visible"
-        whileHover="hover"
-        whileTap="tap"
-        onClick={() => setIsOpen(true)}
-        // Applied your specific gradient here via style
-        style={{ 
-          background: 'linear-gradient(180deg, #5C039B 0%, #03A4F4 100%)' 
-        }}
-        className="fixed bottom-8 right-8 z-50 group flex items-center gap-4 pl-5 pr-1.5 py-1.5 rounded-full 
-                   shadow-xl text-left border border-white/20 transition-all duration-300"
-      >
-        {/* Text Section - White Text for Dark Background */}
-        <div className="flex flex-col items-start">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-blue-100/80 mb-0.5">
-            AI Assistant
-          </span>
-          <span className="text-sm font-bold text-white tracking-wide">
-            Talk with Xobia
-          </span>
-        </div>
+  const SpeakingIndicator = () => (
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-medium text-purple-600">
+        Xobia is speaking
+      </span>
+      <div className="flex gap-1">
+        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" />
+        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:0.4s]" />
+      </div>
+    </div>
+  );
 
-        {/* Avatar Container - Full Image, No Border */}
-        <div className="relative w-12 h-12">
+ 
+
+return (
+    <>
+      {/* Floating Chat Button */}
+    <AnimatePresence>
+  {!isOpen && (
+    <motion.button
+      // 1. Entrance: Comes from top of screen to fixed bottom position
+      initial={{ y: -1000, opacity: 0 }} 
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 60, 
+        damping: 15, 
+        delay: 0.5 // Adjust delay as needed
+      }}
+      // 2. Continuous Floating Effect
+      whileInView={{
+        y: [0, -10, 0],
+        transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+      }}
+      whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(139, 92, 246, 0.3)" }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => setIsOpen(true)}
+      // 3. Premium Solid Styling
+      className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 flex items-center gap-4 bg-white border border-slate-100 py-2 pl-6 pr-2 rounded-full shadow-[0_15px_35px_-5px_rgba(0,0,0,0.2)]"
+    >
+      {/* Text on Left */}
+      <div className="flex flex-col text-left">
+        <span className="text-[10px] uppercase tracking-widest text-purple-500 font-bold">
+          AI Expert
+        </span>
+        <span className="text-slate-900 font-extrabold text-sm md:text-base">
+          Talk with <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Xobia</span>
+        </span>
+      </div>
+
+      {/* Image on Right with Purple Ring */}
+      <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[3px] shadow-lg">
+        <div className="w-full h-full rounded-full overflow-hidden bg-white">
           <img 
             src={xobiaAvatar} 
             alt="Xobia" 
-            className=" absolute rounded-full  "
+            className="w-full h-full object-cover scale-110 mt-1" 
           />
-
-          {/* Online Indicator */}
-          <span className="absolute bottom-0 right-0 flex h-3.5 w-3.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-green-500 border-2 border-[#03A4F4]"></span>
-          </span>
         </div>
-      </motion.button>
-    )}
-  </AnimatePresence>
+        {/* Active Status */}
+        <span className="absolute bottom-0 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
+      </div>
+    </motion.button>
+  )}
+</AnimatePresence>
       {/* Chat Widget - HEADER SE BAHUT NICHE */}
       {isOpen && (
         <>
@@ -330,7 +361,7 @@ const buttonVariants = {
           ></div>
           
           {/* CHAT WIDGET - BAHUT NICHE (md:top-48 se aur neeche) */}
-          <div className="fixed bottom-16 md:top-32 right-2 md:right-8 z-50 w-full max-w-sm md:max-w-md mx-auto">
+          <div className="fixed bottom-16 md:top-38 right-4 md:right-8 z-50 w-full max-w-sm md:max-w-md mx-auto">
             {/* Expanded View Only - No Minimized View */}
             <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[70vh] md:h-[550px] w-full">
               {/* Header */}
@@ -381,36 +412,33 @@ const buttonVariants = {
                               : "bg-white text-gray-800 rounded-bl-none shadow-md border border-gray-100"
                           }`}
                         >
-                          {/* Audio Message */}
-                          {m.type === "audio" ? (
-                            <div className="space-y-1 md:space-y-2">
-                              {/* Audio Player */}
-                              <div className="flex items-center gap-2 md:gap-3 bg-gray-100 rounded-lg p-1 md:p-2">
-                                <button 
-                                  className="w-6 h-6 md:w-8 md:h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    const audio = new Audio(m.audioUrl);
-                                    audio.play();
-                                  }}
-                                >
-                                  <FiVolume2 className="w-3 h-3 md:w-4 md:h-4" />
-                                </button>
-                                <audio
-                                  controls
-                                  src={m.audioUrl}
-                                  className="flex-1 h-6 md:h-8"
-                                  controlsList="nodownload"
-                                />
-                              </div>
-                            </div>
-                          ) : (
-                            /* Text Message */
-                            <div>
-                              <p className="text-xs md:text-sm md:text-base">{m.text}</p>
-                            </div>
-                          )}
-                          
+ {/* USER VOICE */}
+{m.role === "user" && m.type === "voice-sent" && (
+  <p className="text-xs font-medium text-white/90">
+    🎙️ Voice note sent
+  </p>
+)}
+
+{/* BOT AUDIO */}
+{m.role === "bot" && m.type === "audio" && (
+  <>
+    {botSpeaking && speakingMessageId === m.id ? (
+      <SpeakingIndicator />
+    ) : (
+      <p className="text-sm font-medium text-gray-600">
+        ✅ Voice reply delivered
+      </p>
+    )}
+  </>
+)}
+
+{/* TEXT */}
+{m.type === "text" && (
+  <p className="text-xs md:text-sm md:text-base">
+    {m.text}
+  </p>
+)}
+
                           {/* Timestamp */}
                           <div className={`flex items-center justify-end mt-1 md:mt-2 ${
                             m.role === "user" ? "text-blue-100" : "text-gray-500"
