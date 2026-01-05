@@ -43,9 +43,7 @@ const SellerPage = () => {
     control,
     handleSubmit,
     trigger,
-    setValue,
     setError,
-    clearErrors,
     formState: { errors }
   } = useForm({
     mode: 'onChange',
@@ -114,8 +112,13 @@ const SellerPage = () => {
     }
   };
 
-  const handlePrev = () => {
-    setCurrentStep(prev => prev - 1);
+  const handleBack = () => {
+    if (currentStep === 0) {
+      // First step se back → browser history se previous page par le jao
+      window.history.back();
+    } else {
+      setCurrentStep(prev => prev - 1);
+    }
   };
 
   const onSubmit = async (data) => {
@@ -156,41 +159,30 @@ const SellerPage = () => {
       }
     };
 
-    console.log(payload)
     try {
       await apiService.post('/vendor/b2c', payload);
       setSuccess(true);
       message.success('Registration successful! Awaiting approval.');
-   } catch (err) {
-  const res = err.response?.data;
+    } catch (err) {
+      const res = err.response?.data;
 
-  if (res?.errors && Array.isArray(res.errors)) {
-    const errorMap = {};
+      if (res?.errors && Array.isArray(res.errors)) {
+        const errorMap = {};
+        res.errors.forEach(e => {
+          errorMap[e.field] = e.message;
+          setError(e.field, { type: "server", message: e.message });
+        });
+        setApiErrors(errorMap);
 
-    res.errors.forEach(e => {
-      errorMap[e.field] = e.message;
+        const firstErrorField = res.errors[0].field;
+        const el = document.querySelector(`[name="${firstErrorField}"]`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
 
-      setError(e.field, {
-        type: "server",
-        message: e.message,
-      });
-    });
-
-    setApiErrors(errorMap);
-
-    // Scroll to first error
-    const firstErrorField = res.errors[0].field;
-    const el = document.querySelector(`[name="${firstErrorField}"]`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-
-    message.error(`Please fix ${res.errors.length} error(s).`);
-  } else {
-    message.error(res?.message || "Registration failed. Please try again.");
-  }
-}
- finally {
+        message.error(`Please fix ${res.errors.length} error(s).`);
+      } else {
+        message.error(res?.message || "Registration failed. Please try again.");
+      }
+    } finally {
       setSubmitting(false);
     }
   };
@@ -272,7 +264,7 @@ const SellerPage = () => {
             <Card bordered={false} style={{ borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.2)', background: '#fff' }} bodyStyle={{ padding: 40 }}>
               <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
                 <Spin spinning={submitting}>
-                  {/* Step 1: Personal Information */}
+                  {/* Step 0: Personal Information */}
                   {currentStep === 0 && (
                     <>
                       <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
@@ -292,7 +284,7 @@ const SellerPage = () => {
                       </Row>
 
                       <Form.Item label="Email Address" required validateStatus={errors.email ? 'error' : ''} help={errors.email?.message || apiErrors.email}>
-                        <Controller name="email" control={control} rules={{ required: 'Required', type: 'email' }} render={({ field }) => <Input size="large" {...field} />} />
+                        <Controller name="email" control={control} rules={{ required: 'Required', pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' } }} render={({ field }) => <Input size="large" {...field} />} />
                       </Form.Item>
 
                       <Row gutter={16}>
@@ -329,7 +321,7 @@ const SellerPage = () => {
                     </>
                   )}
 
-                  {/* Step 2: Store Information */}
+                  {/* Step 1: Store Information */}
                   {currentStep === 1 && (
                     <>
                       <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
@@ -359,7 +351,7 @@ const SellerPage = () => {
                     </>
                   )}
 
-                  {/* Step 3: Business Details */}
+                  {/* Step 2: Business Details */}
                   {currentStep === 2 && (
                     <>
                       <Title level={4} style={{ marginBottom: 24, color: '#333' }}>
@@ -417,19 +409,36 @@ const SellerPage = () => {
                     </>
                   )}
 
+                  {/* Buttons Section - Back button always visible */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32, paddingTop: 24, borderTop: '1px solid #f0f0f0' }}>
-                    <Button size="large" onClick={handlePrev} disabled={currentStep === 0} icon={<ArrowLeftOutlined />}>
+                    <Button size="large" onClick={handleBack} icon={<ArrowLeftOutlined />}>
                       Back
                     </Button>
-                    {currentStep < steps.length - 1 ? (
-                      <Button type="primary" size="large" onClick={handleNext} style={{ background: themeColor, borderColor: themeColor }} icon={<ArrowRightOutlined />}>
-                        Continue
-                      </Button>
-                    ) : (
-                      <Button type="primary" size="large" htmlType="submit" loading={submitting} style={{ background: themeColor, borderColor: themeColor }} icon={<CheckCircleOutlined />}>
-                        Register Vendor
-                      </Button>
-                    )}
+
+                    <div>
+                      {currentStep < steps.length - 1 ? (
+                        <Button
+                          type="primary"
+                          size="large"
+                          onClick={handleNext}
+                          style={{ background: themeColor, borderColor: themeColor }}
+                          icon={<ArrowRightOutlined />}
+                        >
+                          Continue
+                        </Button>
+                      ) : (
+                        <Button
+                          type="primary"
+                          size="large"
+                          htmlType="submit"
+                          loading={submitting}
+                          style={{ background: themeColor, borderColor: themeColor }}
+                          icon={<CheckCircleOutlined />}
+                        >
+                          Register Vendor
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </Spin>
               </Form>

@@ -246,58 +246,80 @@ function XobiaChatbot() {
       sendMessage();
     }
   };
-
+const buttonVariants = {
+  hidden: { 
+    y: 100, 
+    opacity: 0, 
+    scale: 0.8 
+  }, 
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    scale: 1,
+    transition: { 
+      type: "spring", 
+      stiffness: 200, 
+      damping: 18, 
+      mass: 0.8,
+      delay: 1.5 
+    } 
+  },
+  hover: { 
+    scale: 1.05, 
+    y: -4, 
+    boxShadow: "0px 15px 25px -5px rgba(92, 3, 155, 0.4)", // Purple shadow
+    transition: { type: "spring", stiffness: 400, damping: 10 }
+  },
+  tap: { 
+    scale: 0.95,
+    y: 0 
+  }
+};
   return (
-    <>
-      {/* Floating Chat Button */}
-    <AnimatePresence>
-  {!isOpen && (
-    <motion.button
-      // 1. Entrance: Comes from top of screen to fixed bottom position
-      initial={{ y: -1000, opacity: 0 }} 
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 60, 
-        damping: 15, 
-        delay: 0.5 // Adjust delay as needed
-      }}
-      // 2. Continuous Floating Effect
-      whileInView={{
-        y: [0, -10, 0],
-        transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-      }}
-      whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(139, 92, 246, 0.3)" }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() => setIsOpen(true)}
-      // 3. Premium Solid Styling
-      className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 flex items-center gap-4 bg-white border border-slate-100 py-2 pl-6 pr-2 rounded-full shadow-[0_15px_35px_-5px_rgba(0,0,0,0.2)]"
-    >
-      {/* Text on Left */}
-      <div className="flex flex-col text-left">
-        <span className="text-[10px] uppercase tracking-widest text-purple-500 font-bold">
-          AI Expert
-        </span>
-        <span className="text-slate-900 font-extrabold text-sm md:text-base">
-          Talk with <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Xobia</span>
-        </span>
-      </div>
+    <> 
+<AnimatePresence>
+    {!isOpen && (
+      <motion.button
+        variants={buttonVariants}
+        initial="hidden"
+        animate="visible"
+        whileHover="hover"
+        whileTap="tap"
+        onClick={() => setIsOpen(true)}
+        // Applied your specific gradient here via style
+        style={{ 
+          background: 'linear-gradient(180deg, #5C039B 0%, #03A4F4 100%)' 
+        }}
+        className="fixed bottom-8 right-8 z-50 group flex items-center gap-4 pl-5 pr-1.5 py-1.5 rounded-full 
+                   shadow-xl text-left border border-white/20 transition-all duration-300"
+      >
+        {/* Text Section - White Text for Dark Background */}
+        <div className="flex flex-col items-start">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-blue-100/80 mb-0.5">
+            AI Assistant
+          </span>
+          <span className="text-sm font-bold text-white tracking-wide">
+            Talk with Xobia
+          </span>
+        </div>
 
-      {/* Image on Right with Purple Ring */}
-      <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[3px] shadow-lg">
-        <div className="w-full h-full rounded-full overflow-hidden bg-white">
+        {/* Avatar Container - Full Image, No Border */}
+        <div className="relative w-12 h-12">
           <img 
             src={xobiaAvatar} 
             alt="Xobia" 
-            className="w-full h-full object-cover scale-110 mt-1" 
+            className=" absolute rounded-full  "
           />
+
+          {/* Online Indicator */}
+          <span className="absolute bottom-0 right-0 flex h-3.5 w-3.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-green-500 border-2 border-[#03A4F4]"></span>
+          </span>
         </div>
-        {/* Active Status */}
-        <span className="absolute bottom-0 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
-      </div>
-    </motion.button>
-  )}
-</AnimatePresence>
+      </motion.button>
+    )}
+  </AnimatePresence>
       {/* Chat Widget - HEADER SE BAHUT NICHE */}
       {isOpen && (
         <>
@@ -308,7 +330,7 @@ function XobiaChatbot() {
           ></div>
           
           {/* CHAT WIDGET - BAHUT NICHE (md:top-48 se aur neeche) */}
-          <div className="fixed bottom-16 md:top-38 right-4 md:right-8 z-50 w-full max-w-sm md:max-w-md mx-auto">
+          <div className="fixed bottom-16 md:top-32 right-2 md:right-8 z-50 w-full max-w-sm md:max-w-md mx-auto">
             {/* Expanded View Only - No Minimized View */}
             <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[70vh] md:h-[550px] w-full">
               {/* Header */}
