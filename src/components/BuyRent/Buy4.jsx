@@ -5,22 +5,35 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import { useTranslation } from "react-i18next";
-
+import partner1 from '../../assets/xoto_partners/xoto_logo1.png';
+import partner2 from '../../assets/xoto_partners/xoto_logo2.png';
+import partner3 from '../../assets/xoto_partners/xoto_logo3.png';
+import partner4 from '../../assets/xoto_partners/xoto_logo4.png';
+import partner5 from '../../assets/xoto_partners/xoto_logo5.png';
+import partner6 from '../../assets/xoto_partners/xoto_logo6.png';
+import partner7 from '../../assets/xoto_partners/xoto_logo7.png';
+import partner8 from '../../assets/xoto_partners/xoto_logo8.png';
+import partner9 from '../../assets/xoto_partners/xoto_logo9.png';
+import partner10 from '../../assets/xoto_partners/xoto_logo10.png';
+import partner11 from '../../assets/xoto_partners/xoto_logo11.png';
 import waveint5 from "../../assets/img/wave/waveint5.png";
-import company1 from "../../assets/img/home/companylogo1.png";
-import company2 from "../../assets/img/home/companylogo2.png";
-import company3 from "../../assets/img/home/companylogo3.png";
 
 export default function TrustPresenceSection() {
-  const { t } = useTranslation("buy4"); // 👈 namespace
+  const { t } = useTranslation("buy4");
 
+  // Define the logos array
   const logos = [
-    { icon: company1 },
-    { icon: company2 },
-    { icon: company3 },
-    { icon: company1 },
-    { icon: company2 },
-    { icon: company3 },
+    { icon: partner1 },
+    { icon: partner2 },
+    { icon: partner3 },
+    { icon: partner4 },
+    { icon: partner5 },
+    { icon: partner6 },
+    { icon: partner7 },
+    { icon: partner8 },
+    { icon: partner9 },
+    { icon: partner10 },
+    { icon: partner11 },
   ];
 
   return (
@@ -47,7 +60,11 @@ export default function TrustPresenceSection() {
           spaceBetween={40}
           loop
           speed={3000}
-          autoplay={{ disableOnInteraction: false, reverseDirection: true }}
+          autoplay={{ 
+            delay: 0,
+            disableOnInteraction: false, 
+            reverseDirection: true 
+          }}
           centeredSlides
           className="!overflow-visible"
         >
@@ -58,20 +75,35 @@ export default function TrustPresenceSection() {
             >
               <div
                 className="
-                  relative group bg-[var(--color-body)] cursor-pointer
-                  w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48
-                  rounded-full border border-green-300
+                  relative group bg-white cursor-pointer
+                  w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44
+                  rounded-full border-2 border-green-300
                   flex items-center justify-center
-                  shadow-xl
+                  shadow-xl shadow-green-100/50
                   transition-all duration-300 ease-out
-                  hover:scale-125
+                  hover:scale-125 hover:shadow-2xl hover:shadow-green-200/50
+                  overflow-hidden
                 "
               >
-                <img
-                  src={logo.icon}
-                  alt="Logo"
-                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain transition-all duration-300 group-hover:scale-110"
-                />
+                {/* Logo Container - Perfect circle with padding */}
+                <div className="
+                  w-[70%] h-[70%]
+                  flex items-center justify-center
+                  overflow-hidden
+                  rounded-full
+                  p-3
+                ">
+                  <img
+                    src={logo.icon}
+                    alt={`Partner Logo ${index % logos.length + 1}`}
+                    className="
+                      w-full h-full
+                      object-contain
+                      transition-all duration-300
+                      group-hover:scale-110
+                    "
+                  />
+                </div>
               </div>
             </SwiperSlide>
           ))}
