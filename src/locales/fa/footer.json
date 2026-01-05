@@ -1,9 +1,8 @@
 {
   "company": {
-    "slogan": "یک اکوسیستم یکپارچه که <br/> ارزش مادام‌العمر ملک ایجاد می‌کند.",
-    "description": "مقیاس‌پذیر. مبتنی بر هوش مصنوعی. سبک‌دارایی."
+    "slogan": "یک اکوسیستم یکپارچه برای ایجاد <br/> ارزش مادام‌العمر ملک.",
+    "description": "مقیاس‌پذیر. مبتنی بر هوش مصنوعی. سبک دارایی."
   },
-
   "titles": {
     "offerings": "خدمات ما",
     "resources": "اکوسیستم شرکا",
@@ -11,37 +10,32 @@
     "location": "موقعیت‌ها",
     "email": "ایمیل"
   },
-
   "offerings": [
     { "label": "محوطه‌سازی", "path": "/landscaping" },
-    { "label": "طراحی داخلی", "path": "/interiors" },
-    { "label": "اجاره", "path": "/rentals" },
-    { "label": "خرید", "path": "/buy" },
-    { "label": "فروش", "path": "/sell" },
+    { "label": "طراحی داخلی", "path": "/services/interior" },
+    { "label": "اجاره", "path": "/marketplace" },
+    { "label": "خرید", "path": "/marketplace" },
+    { "label": "فروش", "path": "/marketplace" },
     { "label": "وام مسکن", "path": "/mortgage/services" },
-    { "label": "نگهداری", "path": "/maintenance" }
+    { "label": "نگهداری", "path": "" }
   ],
-
   "resources": [
-    { "label": "اتحاد راهبردی", "path": "/strategic-alliance" },
-    { "label": "همکاران تجاری", "path": "/business-associates" },
-    { "label": "شرکای اجرایی", "path": "/execution-partners" },
-    { "label": "توسعه‌دهندگان", "path": "/developers" },
-    { "label": "مؤسسات مالی", "path": "/financial-institutions" }
+    { "label": "همکاری استراتژیک", "path": "/login" },
+    { "label": "همکاران تجاری", "path": "/login" },
+    { "label": "شرکای اجرایی", "path": "/login" },
+    { "label": "توسعه‌دهندگان", "path": "/" },
+    { "label": "مؤسسات مالی", "path": "/" }
   ],
-
   "knowledge": [
-    { "label": "مرکز دانش", "path": "/knowledge-centre" },
-    { "label": "پایداری ما", "path": "/sustainability" },
-    { "label": "تمرکز", "path": "/focus" },
-    { "label": "ارسال بازخورد", "path": "/feedback" },
+    { "label": "مرکز دانش", "path": "/about" },
+    { "label": "پایداری ما", "path": "/about" },
+    { "label": "تمرکز", "path": "/about" },
+    { "label": "ارسال بازخورد", "path": "/about" },
     { "label": "تماس با ما", "path": "/contact" },
-    { "label": "سیاست حفظ حریم خصوصی", "path": "/privacy" },
-    { "label": "شرایط استفاده", "path": "/terms" }
+    { "label": "سیاست حفظ حریم خصوصی", "path": "/about" },
+    { "label": "شرایط استفاده", "path": "/about" }
   ],
-
   "locations": "هند | امارات | عربستان سعودی",
-
   "email": {
     "labels": {
       "partners": "برای شرکا",
@@ -50,14 +44,12 @@
     "partners": "connect@xoto.ae",
     "customers": "care@xoto.ae"
   },
-
   "social": [
-    { "name": "فیسبوک", "url": "#" },
+    { "name": "فیس‌بوک", "url": "#" },
     { "name": "اینستاگرام", "url": "#" },
     { "name": "توییتر", "url": "#" },
     { "name": "لینکدین", "url": "#" }
   ],
-
   "bottom": {
     "copyright": "©2021 XOTO. کلیه حقوق محفوظ است"
   }

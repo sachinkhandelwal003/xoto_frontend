@@ -1,47 +1,41 @@
 {
   "company": {
-    "slogan": "Ein einheitliches Ökosystem zur <br/> Schaffung lebenslangen Immobilienwerts.",
-    "description": "Skalierbar. KI-gestützt. Asset-leicht."
+    "slogan": "Ein vereintes Ökosystem zur Schaffung <br/> lebenslangen Immobilienwerts.",
+    "description": "Skalierbar. KI-gestützt. Asset-light."
   },
-
   "titles": {
     "offerings": "Unsere Leistungen",
     "resources": "Partner-Ökosystem",
-    "knowledge": "Über Uns",
+    "knowledge": "Über uns",
     "location": "Standorte",
     "email": "E-Mail"
   },
-
   "offerings": [
     { "label": "Landschaftsbau", "path": "/landscaping" },
-    { "label": "Innenräume", "path": "/interiors" },
-    { "label": "Vermietung", "path": "/rentals" },
-    { "label": "Kaufen", "path": "/buy" },
-    { "label": "Verkaufen", "path": "/sell" },
+    { "label": "Innenausbau", "path": "/services/interior" },
+    { "label": "Vermietung", "path": "/marketplace" },
+    { "label": "Kaufen", "path": "/marketplace" },
+    { "label": "Verkaufen", "path": "/marketplace" },
     { "label": "Hypotheken", "path": "/mortgage/services" },
-    { "label": "Wartung", "path": "/maintenance" }
+    { "label": "Wartung", "path": "" }
   ],
-
   "resources": [
-    { "label": "Strategische Allianzen", "path": "/strategic-alliance" },
-    { "label": "Geschäftspartner", "path": "/business-associates" },
-    { "label": "Ausführungspartner", "path": "/execution-partners" },
-    { "label": "Entwickler", "path": "/developers" },
-    { "label": "Finanzinstitute", "path": "/financial-institutions" }
+    { "label": "Strategische Allianz", "path": "/login" },
+    { "label": "Geschäftspartner", "path": "/login" },
+    { "label": "Ausführungspartner", "path": "/login" },
+    { "label": "Entwickler", "path": "/" },
+    { "label": "Finanzinstitute", "path": "/" }
   ],
-
   "knowledge": [
-    { "label": "Wissenszentrum", "path": "/knowledge-centre" },
-    { "label": "Unsere Nachhaltigkeit", "path": "/sustainability" },
-    { "label": "Fokus", "path": "/focus" },
-    { "label": "Feedback senden", "path": "/feedback" },
-    { "label": "Kontaktieren Sie uns", "path": "/contact" },
-    { "label": "Datenschutzrichtlinie", "path": "/privacy" },
-    { "label": "Nutzungsbedingungen", "path": "/terms" }
+    { "label": "Wissenszentrum", "path": "/about" },
+    { "label": "Unsere Nachhaltigkeit", "path": "/about" },
+    { "label": "Fokus", "path": "/about" },
+    { "label": "Feedback senden", "path": "/about" },
+    { "label": "Kontakt", "path": "/contact" },
+    { "label": "Datenschutz", "path": "/about" },
+    { "label": "Nutzungsbedingungen", "path": "/about" }
   ],
-
   "locations": "Indien | VAE | Saudi-Arabien",
-
   "email": {
     "labels": {
       "partners": "Für Partner",
@@ -50,14 +44,12 @@
     "partners": "connect@xoto.ae",
     "customers": "care@xoto.ae"
   },
-
   "social": [
     { "name": "Facebook", "url": "#" },
     { "name": "Instagram", "url": "#" },
     { "name": "Twitter", "url": "#" },
     { "name": "LinkedIn", "url": "#" }
   ],
-
   "bottom": {
     "copyright": "©2021 XOTO. Alle Rechte vorbehalten"
   }
