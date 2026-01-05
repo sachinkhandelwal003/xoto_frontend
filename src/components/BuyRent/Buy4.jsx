@@ -76,15 +76,15 @@ export default function TrustPresenceSection() {
                 "
               >
             <img
-  src={logo.icon}
-  alt="Logo"
-  className="
-    w-full h-full
-    object-fit-contain
-    rounded-full
-    transition-all duration-300
-    group-hover:scale-110
-  "
+            src={logo.icon}
+            alt="Logo"
+            className="
+              w-full h-full
+              object-fit-contain
+              rounded-full
+              transition-all duration-300
+              group-hover:scale-110
+            "
 />
               </div>
             </SwiperSlide>
