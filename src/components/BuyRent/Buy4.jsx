@@ -53,62 +53,48 @@ export default function TrustPresenceSection() {
       </h2>
 
       {/* Swiper */}
-      <div className="relative w-screen -mx-[calc((100vw-100%)/2)] mb-16 md:mb-20">
-        <Swiper
-          modules={[Autoplay]}
-          slidesPerView={7}
-          spaceBetween={40}
-          loop
-          speed={3000}
-          autoplay={{ 
-            delay: 0,
-            disableOnInteraction: false, 
-            reverseDirection: true 
-          }}
-          centeredSlides
-          className="!overflow-visible"
-        >
-          {logos.concat(logos).map((logo, index) => (
-            <SwiperSlide
-              key={index}
-              className="!w-auto flex justify-center transition-all duration-500 ease-out"
-            >
-              <div
-                className="
-                  relative group bg-white cursor-pointer
-                  w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44
-                  rounded-full border-2 border-green-300
-                  flex items-center justify-center
-                  shadow-xl shadow-green-100/50
-                  transition-all duration-300 ease-out
-                  hover:scale-125 hover:shadow-2xl hover:shadow-green-200/50
-                  overflow-hidden
-                "
-              >
-                {/* Logo Container - Perfect circle with padding */}
-                <div className="
-                  w-[70%] h-[70%]
-                  flex items-center justify-center
-                  overflow-hidden
-                  rounded-full
-                  p-3
-                ">
-                  <img
-                    src={logo.icon}
-                    alt={`Partner Logo ${index % logos.length + 1}`}
-                    className="
-                      w-full h-full
-                      object-contain
-                      transition-all duration-300
-                      group-hover:scale-110
-                    "
-                  />
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
+     {/* Swiper Logos */}
+           <div className="relative w-screen -mx-[calc((100vw-100%)/2)] mb-16 md:mb-20">
+             <Swiper
+               modules={[Autoplay]}
+               slidesPerView={7}
+               spaceBetween={40}
+               loop={true}
+               speed={3000}
+               autoplay={{
+                 disableOnInteraction: false,
+                 reverseDirection: true,
+               }}
+               centeredSlides={true}
+               className="!overflow-visible"
+             >
+               {logos.concat(logos).map((logo, index) => (
+                 <SwiperSlide
+                   key={index}
+                   className="!w-auto flex justify-center transition-all duration-500 ease-out"
+                 >
+                   <div
+                     className="
+                       relative group bg-[var(--color-body)] cursor-pointer
+                       w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48
+                       rounded-full border border-green-300
+                       flex items-center justify-center
+                       shadow-xl 
+                       transition-all duration-300 ease-out
+                       hover:scale-125
+                     "
+                   >
+                     <img
+                       src={logo.icon}
+                       alt="Logo"
+                       className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain transition-all duration-300 group-hover:scale-110"
+                     />
+                     <div className="absolute inset-0 rounded-full bg-purple-200/30 blur-2xl opacity-0 group-hover:opacity-100 transition"></div>
+                   </div>
+                 </SwiperSlide>
+               ))}
+             </Swiper>
+           </div>
     </section>
   );
 }
