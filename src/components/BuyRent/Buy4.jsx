@@ -7,20 +7,28 @@ import "swiper/css";
 import { useTranslation } from "react-i18next";
 
 import waveint5 from "../../assets/img/wave/waveint5.png";
-import company1 from "../../assets/img/home/companylogo1.png";
-import company2 from "../../assets/img/home/companylogo2.png";
-import company3 from "../../assets/img/home/companylogo3.png";
+// import company1 from "../../assets/img/home/companylogo1.png";
+// import company2 from "../../assets/img/home/companylogo2.png";
+// import company3 from "../../assets/img/home/companylogo3.png";
 
 export default function TrustPresenceSection() {
   const { t } = useTranslation("buy4"); // 👈 namespace
 
   const logos = [
-    { icon: company1 },
-    { icon: company2 },
-    { icon: company3 },
-    { icon: company1 },
-    { icon: company2 },
-    { icon: company3 },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767441852149-Screenshot%202026-01-03%20172246.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767441895828-Screenshot%202026-01-03%20172336.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767441942079-Screenshot%202026-01-03%20172436.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767441959428-Screenshot%202026-01-03%20172532.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442087630-Screenshot%202026-01-03%20172639.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442118961-Screenshot%202026-01-03%20172703.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442157517-Screenshot%202026-01-03%20172731.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442211857-Screenshot%202026-01-03%20172849.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442254795-Screenshot%202026-01-03%20172951.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442321079-Screenshot%202026-01-03%20173017.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442352175-Screenshot%202026-01-03%20173040.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442445482-Screenshot%202026-01-03%20173113.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442525434-Screenshot%202026-01-03%20173140.png" },
+    { icon: "https://xotostaging.s3.me-central-1.amazonaws.com/properties/1767442584681-Screenshot%202026-01-03%20173242.png" },
   ];
 
   return (
@@ -40,7 +48,7 @@ export default function TrustPresenceSection() {
       </h2>
 
       {/* Swiper */}
-      <div className="relative w-screen -mx-[calc((100vw-100%)/2)] mb-16 md:mb-20">
+      <div className="relative w-screen -mx-[calc((100vw-100%)/2)] mb-16 md:mb-20 ">
         <Swiper
           modules={[Autoplay]}
           slidesPerView={7}
@@ -67,11 +75,17 @@ export default function TrustPresenceSection() {
                   hover:scale-125
                 "
               >
-                <img
-                  src={logo.icon}
-                  alt="Logo"
-                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain transition-all duration-300 group-hover:scale-110"
-                />
+            <img
+  src={logo.icon}
+  alt="Logo"
+  className="
+    w-full h-full
+    object-fit-contain
+    rounded-full
+    transition-all duration-300
+    group-hover:scale-110
+  "
+/>
               </div>
             </SwiperSlide>
           ))}
