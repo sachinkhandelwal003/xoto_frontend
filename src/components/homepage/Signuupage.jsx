@@ -19,12 +19,14 @@ const BRAND_PURPLE_DARK = "#4a027d";
 const LeadGenerationModal = ({ 
   visible, 
   onCancel, 
-  onAuthSuccess 
+  onAuthSuccess, 
+ defaultTab = "signin",
+  fullscreen = false
 }) => {
   const [form] = Form.useForm();
   const { login } = useContext(AuthContext); 
   
-  const [activeTab, setActiveTab] = useState('signin'); 
+  const [activeTab, setActiveTab] = useState(defaultTab); 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // --- UI Components ---
@@ -190,10 +192,13 @@ const LeadGenerationModal = ({
         open={visible}
         footer={null}
         onCancel={onCancel}
-        width={1000}
-        centered
-        closable={false}
-        bodyStyle={{ padding: 0, borderRadius: '24px', overflow: 'hidden' }}
+        width={fullscreen ? "100vw" : 1000} 
+        centered={!fullscreen}
+        closable={!fullscreen}
+        bodyStyle={{  padding: 0,
+  borderRadius: fullscreen ? 0 : "24px",
+  height: fullscreen ? "100vh" : "auto",
+  overflow: "hidden" }}
         maskStyle={{ backdropFilter: 'blur(8px)', background: 'rgba(0,0,0,0.6)' }}
       >
         <div className="flex flex-col lg:flex-row min-h-[600px] bg-white">
