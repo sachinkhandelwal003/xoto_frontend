@@ -13,23 +13,33 @@ import building from "../../assets/icons/Homeicons/building.png";
 import rental from "../../assets/icons/Homeicons/rental.png";
 import sale from "../../assets/icons/Homeicons/sale.png";
 
-import company1 from "../../assets/img/home/companylogo1.png";
-import company2 from "../../assets/img/home/companylogo2.png";
-import company3 from "../../assets/img/home/companylogo3.png";
+import partner1 from '../../assets/xoto_partners/xoto_logo1.png';
+import partner2 from '../../assets/xoto_partners/xoto_logo2.png';
+import partner3 from '../../assets/xoto_partners/xoto_logo3.png';
+import partner4 from '../../assets/xoto_partners/xoto_logo4.png';
+import partner5 from '../../assets/xoto_partners/xoto_logo5.png';
+import partner6 from '../../assets/xoto_partners/xoto_logo6.png';
+import partner7 from '../../assets/xoto_partners/xoto_logo7.png';
+import partner8 from '../../assets/xoto_partners/xoto_logo8.png';
+import partner9 from '../../assets/xoto_partners/xoto_logo9.png';
+import partner10 from '../../assets/xoto_partners/xoto_logo10.png';
+import partner11 from '../../assets/xoto_partners/xoto_logo11.png';
 
 export default function TrustPresenceSection() {
   const { t } = useTranslation("home5"); // ✅ NEW namespace added
 
   const logos = [
-    { icon: company1 },
-    { icon: company2 },
-    { icon: company3 },
-    { icon: company1 },
-    { icon: company2 },
-    { icon: company3 },
-    { icon: company1 },
-    { icon: company2 },
-    { icon: company3 },
+      { icon: partner1 },
+      { icon: partner2 },
+      { icon: partner3 },
+      { icon: partner4 },
+      { icon: partner5 },
+      { icon: partner6 },
+      { icon: partner7 },
+      { icon: partner8 },
+      { icon: partner9 },
+      { icon: partner10 },
+      { icon: partner11 },
   ];
 
   return (

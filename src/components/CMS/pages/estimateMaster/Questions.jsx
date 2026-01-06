@@ -77,14 +77,23 @@ const TypesGallery = () => {
 
   const createEstimateQuestion = async (values) => {
     try {
-      const payload = {
-        question: values.question,
-        questionType: values.questionType,
-        options: values.options?.map((opt, index) => ({
-          title: opt.title,
-          order: index + 1
-        })) || []
-      };
+  const payload = {
+  question: values.question,
+  questionType: values.questionType,
+  valueType: "number",          // ✅ REQUIRED
+  valueSubType: values.valueSubType || "persqm",
+
+  options: values.options?.map((opt, index) => ({
+    title: opt.title,
+    order: index + 1,
+    includeInEstimate: true,
+
+    valueType: "number",        // ✅ REQUIRED
+    value: Number(opt.value) ?? 0,   // ✅ THIS MAKES VALUE SHOW
+    valueSubType: opt.valueSubType || "persqm"
+  })) || []
+};
+
 
       console.log("this payloadddddddddddddddddddd cameeeeeeeeeeee",payload)
 

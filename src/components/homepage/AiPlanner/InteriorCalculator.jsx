@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const InteriorEstimatorComingSoon = () => { 
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -33,11 +36,20 @@ const InteriorEstimatorComingSoon = () => {
 
       {/* Main Card */}
       <motion.div
+
         className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-white/20"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
       >
+        {/* Back Arrow - Top Most Left */}
+<button
+  onClick={() => navigate("/")}
+  className="absolute top-5 left-3 z-50 flex items-center justify-center w-10 h-10 rounded-full   transition"
+>
+  <ArrowLeft className="w-9 h-14 text-purple-700" />
+</button>
+
         <div className="h-4 bg-gradient-to-r from-purple-600 via-purple-800 to-indigo-900" />
 
         <div className="p-8 md:p-12">
