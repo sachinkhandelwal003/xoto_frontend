@@ -17,6 +17,7 @@ import { AuthContext } from '../../manageApi/context/AuthContext.jsx';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
+
 // Assets
 import loginimage from '../../assets/img/one.png';
 import logoNew from '../../assets/img/logoNew.png';
@@ -251,7 +252,7 @@ const CustomerLogin = () => {
                 <div style={{ textAlign: 'center', marginTop: 24 }}>
                   <Text>Don’t have an account? </Text>
                   <span
-                    onClick={() => navigate('/customer/registration')}
+                    onClick={() => navigate('/register')}
                     style={{ color: '#03A4F4', fontWeight: 'bold', cursor: 'pointer' }}
                   >
                     Register Now
