@@ -143,7 +143,21 @@ const generateAIDesigns = async (currentUser) => {
 
   const formData = new FormData();
 
-  // REQUIRED FIELDS ONLY
+  // IMAGE (mandatory as per your current UI)
+  if (uploadedFile) {
+    formData.append('image', uploadedFile);
+  } else {
+    try {
+      const response = await fetch(selectedImage);
+      const blob = await response.blob();
+      const file = new File([blob], 'input_image.jpg', { type: 'image/jpeg' });
+      formData.append('image', file);
+    } catch (err) {
+      console.error('Image processing failed', err);
+    }
+  }
+
+  // REQUIRED API FIELDS
   formData.append(
     'styleName',
     selectedStyles.length > 0
@@ -161,21 +175,20 @@ const generateAIDesigns = async (currentUser) => {
   );
 
   formData.append(
+    'description',
+    specificRequirement || 'A professional interior design'
+  );
+
+  formData.append(
     'roomType',
     selectedRoomType
       ? roomTypes.find(r => r.value === selectedRoomType)?.label
       : 'Living Room'
   );
 
-  formData.append(
-    'description',
-    specificRequirement ||
-      `A professional ${roomTypes.find(r => r.value === selectedRoomType)?.label || 'interior'} design`
-  );
-
+  // 🔥 THIS WAS MISSING (CRITICAL)
   formData.append('userId', currentUser?._id);
 
-  // Progress animation
   const interval = setInterval(() => {
     setGenerationProgress(prev =>
       prev < 95 ? prev + (95 - prev) * 0.1 : 95
@@ -184,7 +197,7 @@ const generateAIDesigns = async (currentUser) => {
 
   try {
     const response = await apiService.post(
-      'ai/generate-interior',
+      '/api/ai/generate-interior',
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -194,33 +207,32 @@ const generateAIDesigns = async (currentUser) => {
 
     const resData = response;
 
-    if (resData.status === false) {
-      setIsGenerating(false);
-      setUpgradeMessage(resData.message || 'Limit reached. Upgrade to continue.');
+    if (resData?.status === false) {
+      setUpgradeMessage(resData.message || 'Upgrade required');
       setShowUpgradeModal(true);
       return;
     }
 
-    if (resData.imageUrl) {
-      const aiUrl = resData.imageUrl;
-      const aiDesc = resData.message || 'Interior generated successfully';
-
+    if (resData?.imageUrl) {
       const newDesign = {
         id: Date.now(),
-        image: aiUrl,
+        image: resData.imageUrl,
         title: `Vision ${designs.length + 1}`,
         styles: [...selectedStyles],
         elements: [...selectedElements],
         timestamp: new Date().toLocaleTimeString(),
-        aiAnalysis: aiDesc,
+        aiAnalysis: resData.message || 'Interior generated successfully',
         userInfo: currentUser,
       };
 
       setDesigns(prev => [newDesign, ...prev]);
-      setCurrentResult({ url: aiUrl, desc: aiDesc });
-      setGenerationProgress(100);
+      setCurrentResult({
+        url: resData.imageUrl,
+        desc: resData.message,
+      });
 
-      notification.success({ message: 'Interior Generated!', duration: 2 });
+      setGenerationProgress(100);
+      notification.success({ message: 'Design Generated!' });
 
       setTimeout(() => {
         setIsGenerating(false);
@@ -233,12 +245,12 @@ const generateAIDesigns = async (currentUser) => {
       message: 'Generation failed',
       description: 'Please try again later.',
     });
-    setIsGenerating(false);
   } finally {
     clearInterval(interval);
+    setIsGenerating(false);
   }
 };
-
+  ;
 
   const downloadImage = (url, name) => {
     const link = document.createElement('a');
