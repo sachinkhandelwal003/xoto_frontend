@@ -1,28 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Card, Select, Button, Upload, Modal, message,Checkbox,
-  Typography, Divider, Space, Empty, Spin, Popconfirm, Input, Image, Form, Row, Col, Avatar,InputNumber
+  Card, Select, Button, Modal, message, Typography, Divider, Space, 
+  Empty, Spin, Popconfirm, Input, Form, Avatar, InputNumber
 } from 'antd';
 import {
-  PlusOutlined, DeleteOutlined, EditOutlined,
-  AppstoreOutlined, UploadOutlined, FileImageOutlined,
+  PlusOutlined, DeleteOutlined, AppstoreOutlined, 
   PictureOutlined, LoadingOutlined, EyeOutlined
 } from '@ant-design/icons';
 import { apiService } from '../../../../manageApi/utils/custom.apiservice';
 
 const { Title, Text } = Typography;
-const { Meta } = Card;
 
 const THEME = {
   primary: "#722ed1",
   bgLight: "#f9f0ff",
-  border: "#efdbff"
+  border: "#efdbff",
+  success: "#722ed1"
 };
 
-const BASE_URL = 'https://xoto.ae/api';
 const API_PREFIX = '/estimate/master/category';
 
 const TypesGallery = () => {
+  const [form] = Form.useForm();
+  
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [types, setTypes] = useState([]);
@@ -32,94 +32,13 @@ const TypesGallery = () => {
   const [gallery, setGallery] = useState(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  
   const [questionModalOpen, setQuestionModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null); 
   const [questionType, setQuestionType] = useState("text");
-  const [options, setOptions] = useState([""]);
-  const [form] = Form.useForm();
+  const [options, setOptions] = useState([]);
 
-  // Modal States
-  const [editModal, setEditModal] = useState({ open: false, imageId: '', title: '', type: '' });
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
-
-
-  // const createEstimateQuestion = async (values) => {
-  //   try {
-  //     const payload = {
-  //       question: values.question,
-  //       options: [
-  //         { title: values.option1 },
-  //         { title: values.option2 },
-  //         { title: values.option3 },
-  //         { title: values.option4 }
-  //       ]
-  //     };
-
-  //     await apiService.post(
-  //       `${API_PREFIX}/types/${selectedType}/question/moodboard`,
-  //       payload
-  //     );
-
-  //     message.success('Question created successfully');
-
-  //     setQuestionModalOpen(false);
-  //     form.resetFields();
-
-  //     // 🔁 Refresh questions list
-  //     fetchGallery(selectedType);
-
-  //   } catch (err) {
-  //     message.error('Failed to create question');
-  //   }
-  // };
-
-
-
-  const createEstimateQuestion = async (values) => {
-    try {
-  const payload = {
-  question: values.question,
-  questionType: values.questionType,
-  valueType: "number",          // ✅ REQUIRED
-  valueSubType: values.valueSubType || "persqm",
-
-  options: values.options?.map((opt, index) => ({
-    title: opt.title,
-    order: index + 1,
-    includeInEstimate: true,
-
-    valueType: "number",        // ✅ REQUIRED
-    value: Number(opt.value) ?? 0,   // ✅ THIS MAKES VALUE SHOW
-    valueSubType: opt.valueSubType || "persqm"
-  })) || []
-};
-
-
-      console.log("this payloadddddddddddddddddddd cameeeeeeeeeeee",payload)
-
-      await apiService.post(
-        `${API_PREFIX}/types/${selectedType}/question/moodboard`,
-        payload
-      );
-
-      message.success("Question created successfully");
-
-      setQuestionModalOpen(false);
-      form.resetFields();
-      setQuestionType("text");
-      setOptions([""]);
-
-      // 🔁 Refresh questions list
-      fetchGallery(selectedType);
-
-    } catch (err) {
-      message.error("Failed to create question");
-    }
-  };
-
-
-
-  // 1. Fetch Categories
+  // Load Categories on mount
   useEffect(() => {
     const fetchCats = async () => {
       try {
@@ -130,7 +49,6 @@ const TypesGallery = () => {
     fetchCats();
   }, []);
 
-  // 2. Cascade Fetching Logic
   const handleCatChange = async (val) => {
     setSelectedCat(val); setSelectedSub(null); setSelectedType(null); setGallery(null);
     try {
@@ -159,62 +77,100 @@ const TypesGallery = () => {
 
   useEffect(() => { if (selectedType) fetchGallery(selectedType); }, [selectedType, fetchGallery]);
 
-  // 3. Image Actions
-  const handleUpload = async ({ file, type }) => {
-    const formData = new FormData();
-    const endpoint = type === 'preview' ? 'preview' : 'moodboard';
-    formData.append(type === 'preview' ? 'previewImage' : 'moodboardImages', file);
+  const handleOpenModal = async (questionId = null) => {
+    if (questionId) {
+      setActionLoading(true);
+      try {
+        const res = await apiService.get(`${API_PREFIX}/types/${selectedType}/get-questions/${questionId}`);
+        const data = res.data;
+        
+        setEditingId(questionId);
+        setQuestionType(data.questionType);
+        
+        if (data.options) {
+          setOptions(data.options.map(o => ({
+            title: o.title,
+            value: o.value,
+            valueSubType: o.valueSubType || "persqm"
+          })));
+        } else {
+          setOptions([]);
+        }
 
+        form.setFieldsValue({
+          question: data.question,
+          questionType: data.questionType,
+          valueSubType: data.valueSubType,
+          isActive: data.isActive,
+          includeInEstimate: data.includeInEstimate
+        });
+        setQuestionModalOpen(true);
+      } catch (err) {
+        message.error("Failed to load details");
+      } finally {
+        setActionLoading(false);
+      }
+    } else {
+      setEditingId(null);
+      setQuestionType("text");
+      setOptions([]);
+      form.resetFields();
+      setQuestionModalOpen(true);
+    }
+  };
+
+  const onFinish = async (values) => {
     setActionLoading(true);
+    const payload = {
+      type: selectedType,
+      question: values.question,
+      questionType,
+      isActive: values.isActive ?? true,
+      includeInEstimate: values.includeInEstimate ?? true,
+      valueType: "number",
+      valueSubType: values.valueSubType || "persqm",
+      options: (questionType === "options" || questionType === "yesorno")
+        ? options.map((opt, index) => ({
+            title: opt.title,
+            order: index + 1,
+            includeInEstimate: true,
+            valueType: "number",
+            value: Number(opt.value) || 0,
+            valueSubType: opt.valueSubType || "persqm"
+          }))
+        : []
+    };
+
     try {
-      await apiService.post(`${API_PREFIX}/types/${selectedType}/gallery/${endpoint}`, formData);
-      message.success(`${type} image uploaded successfully`);
+      if (editingId) {
+        // --- EDIT API ---
+        await apiService.post(`${API_PREFIX}/types/${selectedType}/question/moodboard/edit/${editingId}`, payload);
+        message.success("Question updated successfully");
+      } else {
+        // --- CREATE API ---
+        await apiService.post(`${API_PREFIX}/types/${selectedType}/question/moodboard`, payload);
+        message.success("Question created successfully");
+      }
+      setQuestionModalOpen(false);
       fetchGallery(selectedType);
-    } catch (err) { message.error("Upload failed"); }
-    finally { setActionLoading(false); }
+    } catch (err) {
+      message.error("Action failed");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const deleteQuestion = async (questionId) => {
     try {
-      await apiService.post(
-        `${API_PREFIX}/types/${selectedType}/question/moodboard/delete`,
-        {
-          question_id: questionId
-        }
-      );
-
-      message.success('Question deleted successfully');
-
-      // 🔁 Refresh questions list
+      await apiService.post(`${API_PREFIX}/types/${selectedType}/question/moodboard/delete`, { question_id: questionId });
+      message.success('Question deleted');
       fetchGallery(selectedType);
-
-    } catch (err) {
-      message.error('Failed to delete question');
-    }
-  };
-
-
-  const handleUpdateTitle = async () => {
-    try {
-      await apiService.put(`${API_PREFIX}/types/${selectedType}/gallery/image-title`, {
-        imageId: editModal.imageId, title: editModal.title, type: editModal.type
-      });
-      message.success("Title updated");
-      setEditModal({ ...editModal, open: false });
-      fetchGallery(selectedType);
-    } catch (err) { message.error("Update failed"); }
-  };
-
-  // 4. Preview Helper
-  const showFullImage = (url) => {
-    setPreviewImage(url.startsWith('http') ? url : `${BASE_URL}${url}`);
-    setPreviewVisible(true);
+    } catch (err) { message.error('Failed to delete'); }
   };
 
   return (
     <div className="p-6 bg-[#f0f2f5] min-h-screen">
       <div className="max-w-7xl mx-auto">
-
         {/* Header Section */}
         <div className="bg-white p-6 rounded-2xl shadow-sm mb-6 flex justify-between items-center border-b-4" style={{ borderBottomColor: THEME.primary }}>
           <Space size="large">
@@ -223,7 +179,7 @@ const TypesGallery = () => {
             </div>
             <div>
               <Title level={3} className="m-0">Questions</Title>
-              <Text className="text-gray-400">Stunning property visuals powered by intelligent master image management.</Text>
+              <Text className="text-gray-400">Manage property visually with intelligent master questions.</Text>
             </div>
           </Space>
         </div>
@@ -256,13 +212,6 @@ const TypesGallery = () => {
           <div className="text-center py-20 bg-white rounded-3xl"><Spin indicator={<LoadingOutlined style={{ fontSize: 48, color: THEME.primary }} spin />} /></div>
         ) : selectedType ? (
           <div className="space-y-8">
-
-            {/* --- QUESTIONS SECTION --- */}
-            {/* <Divider /> */}
-
-
-
-
             <section>
               <div className="flex justify-between items-center mb-6 mt-5">
                 <div className="flex items-center gap-3">
@@ -275,425 +224,198 @@ const TypesGallery = () => {
                 <Button
                   type="primary"
                   icon={<PlusOutlined />}
-                  style={{
-                    background: THEME.primary,
-                    borderRadius: 12,
-                    border: 'none'
-                  }}
-                  onClick={() => setQuestionModalOpen(true)}
+                  style={{ background: THEME.primary, borderRadius: 12, border: 'none' }}
+                  onClick={() => handleOpenModal()}
                 >
                   Add Question
                 </Button>
               </div>
 
               {gallery && gallery.length > 0 ? (
-                <Card
-                  className="rounded-2xl shadow-sm border-none"
-                >
-                  {/* Question row with delete on right */}
-                  {/* {gallery && gallery.length > 0 && gallery.map((obj) => {
-                    console.log(`objecttttttttttt`,obj)
-                    return (
-
-                      <div className="flex justify-between items-start gap-4 mb-4">
-                        <Title level={5} className="m-0 flex-1">
-                          {obj.question}
-                        </Title>
-
-                        <Popconfirm title="Delete question?" okText="Yes"
-                          cancelText="No"
-                          onConfirm={() => deleteQuestion(obj._id)}>
-                          <Button
-                            danger
-                            type="text"
-                            icon={<DeleteOutlined />}
+                <Card className="rounded-2xl shadow-sm border-none">
+                  {gallery.map((obj) => (
+                    <div key={obj._id} className="border rounded-lg p-4 mb-4 bg-white hover:border-purple-200 transition-all">
+                      <div className="flex justify-between items-start gap-4">
+                        <Title level={5} className="m-0 flex-1">{obj.question}</Title>
+                        <Space>
+                          <Button 
+                            type="text" 
+                            className="text-purple-600 hover:bg-purple-50" 
+                            icon={<EyeOutlined />} 
+                            onClick={() => handleOpenModal(obj._id)} 
                           />
-                        </Popconfirm>
+                          <Popconfirm title="Delete question?" onConfirm={() => deleteQuestion(obj._id)}>
+                            <Button danger type="text" icon={<DeleteOutlined />} />
+                          </Popconfirm>
+                        </Space>
                       </div>
-                    )
-                  })} */}
 
-
-                  {gallery && gallery.length > 0 && gallery.map((obj) => {
-  return (
-    <div
-      key={obj._id}
-      className="border rounded-lg p-3 mb-4 bg-white"
-    >
-      {/* Question Row */}
-      <div className="flex justify-between items-start gap-4">
-        <Title level={5} className="m-0 flex-1">
-          {obj.question}
-        </Title>
-
-        <Popconfirm
-          title="Delete question?"
-          okText="Yes"
-          cancelText="No"
-          onConfirm={() => deleteQuestion(obj._id)}
-        >
-          <Button
-            danger
-            type="text"
-            icon={<DeleteOutlined />}
-          />
-        </Popconfirm>
-      </div>
-
-      {/* Options Pills */}
-      {obj.questionType === "options" && obj.options?.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {obj.options.map((opt, index) => (
-            <span
-              key={opt._id || index}
-              className="px-3 py-1 text-sm rounded-full bg-purple-600 text-white shadow-sm"
-            >
-              {opt.title}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-})}
-
+                      {obj.questionType === "options" && obj.options?.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {obj.options.map((opt, index) => (
+                            <span key={index} className="px-3 py-1 text-sm rounded-full bg-purple-600 text-white shadow-sm">
+                              {opt.title} ({opt.value})
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </Card>
               ) : (
-                <Empty
-                  description="No questions added for this type"
-                  className="p-20 bg-white rounded-3xl"
-                />
+                <Empty description="No questions added for this type" className="p-20 bg-white rounded-3xl" />
               )}
             </section>
 
+            <Modal
+              title={
+                <div className="flex items-center gap-3">
+                  <Avatar size={40} style={{ background: THEME.primary }} icon={<AppstoreOutlined />} />
+                  <span className="text-lg font-semibold">{editingId ? "Edit Question Details" : "Add Estimate Question"}</span>
+                </div>
+              }
+              open={questionModalOpen}
+              onCancel={() => { setQuestionModalOpen(false); form.resetFields(); }}
+              footer={null}
+              width={650}
+              centered
+              destroyOnClose
+            >
+              <Form 
+                form={form} 
+                layout="vertical" 
+                onFinish={onFinish} 
+                initialValues={{ isActive: true, includeInEstimate: true, valueType: "number", valueSubType: "persqm" }}
+              >
+                <Form.Item label="Question" name="question" rules={[{ required: true, message: 'Please enter the question' }]}>
+                  <Input.TextArea rows={2} placeholder="Enter question text..." />
+                </Form.Item>
 
-            {/* 👇 ADD QUESTION MODAL (PASTE HERE) */}
+                <div className="grid grid-cols-2 gap-4">
+                  <Form.Item label="Question Type" name="questionType">
+                    <Select value={questionType} onChange={(val) => {
+                      setQuestionType(val);
+                      if (val === "yesorno") {
+                        setOptions([{ title: "Yes", valueSubType: "persqm", value: 0 }, { title: "No", valueSubType: "persqm", value: 0 }]);
+                      } else if (val === "options") {
+                        setOptions([{ title: "", valueSubType: "persqm", value: 0 }]);
+                      } else {
+                        setOptions([]);
+                      }
+                    }}>
+                      <Select.Option value="text">Text</Select.Option>
+                      <Select.Option value="options">Options</Select.Option>
+                      <Select.Option value="yesorno">Yes / No</Select.Option>
+                      <Select.Option value="number">Number</Select.Option>
+                    </Select>
+                  </Form.Item>
 
+                  {questionType !== "text" && (
+                    <Form.Item label="Default Value Sub Type" name="valueSubType">
+                      <Select>
+                        <Select.Option value="persqm">Per Sq.m</Select.Option>
+                        <Select.Option value="flat">Flat</Select.Option>
+                      </Select>
+                    </Form.Item>
+                  )}
+                </div>
 
+                {(questionType === "options" || questionType === "yesorno") && (
+                  <div className="bg-gray-50 p-4 rounded-xl mb-4">
+                    <Text strong className="block mb-3 text-gray-500 uppercase text-xs">Configure Options & Pricing</Text>
+                    <div className="flex flex-col gap-3">
+                      {options.map((opt, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-2 items-center">
+                          <div className="col-span-6">
+                            <Input 
+                              placeholder="Option Title" 
+                              value={opt.title} 
+                              disabled={questionType === "yesorno"}
+                              onChange={e => {
+                                const newOpts = [...options];
+                                newOpts[index].title = e.target.value;
+                                setOptions(newOpts);
+                              }} 
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Select value={opt.valueSubType} onChange={v => {
+                              const newOpts = [...options];
+                              newOpts[index].valueSubType = v;
+                              setOptions(newOpts);
+                            }}>
+                              <Select.Option value="persqm">Sq.m</Select.Option>
+                              <Select.Option value="flat">Flat</Select.Option>
+                            </Select>
+                          </div>
+                          <div className="col-span-3">
+                            <InputNumber 
+                              style={{ width: "100%" }} 
+                              placeholder="Price"
+                              value={opt.value} 
+                              onChange={v => {
+                                const newOpts = [...options];
+                                newOpts[index].value = v;
+                                setOptions(newOpts);
+                              }} 
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      {questionType === "options" && (
+                        <Button type="dashed" block icon={<PlusOutlined />} onClick={() => setOptions([...options, { title: "", valueSubType: "persqm", value: 0 }])}>
+                          Add More Option
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
 
+                <Divider className="my-4" />
 
-
-
-
-<Modal
-  title={
-    <div className="flex items-center gap-3">
-      <Avatar
-        size={40}
-        style={{ background: THEME.primary }}
-        icon={<AppstoreOutlined />}
-      />
-      <span className="text-lg font-semibold">
-        Add Estimate Question
-      </span>
-    </div>
-  }
-  open={questionModalOpen}
-  onCancel={() => {
-    setQuestionModalOpen(false);
-    form.resetFields();
-    setQuestionType("text");
-    setOptions([]);
-  }}
-  footer={null}
-  width={650}
-  centered
-  destroyOnClose
-  maskClosable={false}
->
-  <Form
-    form={form}
-    layout="vertical"
-    initialValues={{
-      isActive: true,
-      includeInEstimate: true,
-      valueType: "number",     // 🔒 fixed
-      valueSubType: "persqm"
-    }}
-    // onFinish={(values) => {
-    //   createEstimateQuestion({
-    //     ...values,
-    //     questionType,
-    //     valueType: "number",   // 🔒 enforce
-    //     options:
-    //       questionType === "options" || questionType === "yesorno"
-    //         ? options.map((opt, index) => ({
-    //             title: opt.title,
-    //             order: index + 1,
-    //             includeInEstimate: true,
-    //             valueType: "number",      // 🔒 enforce
-    //             valueSubType: opt.valueSubType,
-    //             value: opt.value ?? 0
-    //           }))
-    //         : []
-    //   });
-    // }}
-    onFinish={(values) => {
-  const payload = {
-    type: selectedType, // 🔴 REQUIRED (you already have this somewhere)
-    question: values.question,
-    questionType,
-    isActive: values.isActive ?? true,
-    includeInEstimate: values.includeInEstimate ?? true,
-
-    // 🔒 ENFORCED (as per your rule)
-    valueType: "number",
-    valueSubType: values.valueSubType || "persqm",
-
-    options:
-      questionType === "options" || questionType === "yesorno"
-        ? options.map((opt, index) => ({
-            title: opt.title,
-            order: index + 1,
-            includeInEstimate: true,
-            valueType: "number",      // 🔒 always number
-            value: Number(opt.value) || 0,
-            valueSubType: opt.valueSubType || "persqm"
-          }))
-        : []
-  };
-
-  createEstimateQuestion(payload);
-}}
-
-  >
-    {/* Question */}
-    <Form.Item
-      label="Question"
-      name="question"
-      rules={[{ required: true }]}
-    >
-      <Input.TextArea rows={2} />
-    </Form.Item>
-
-    {/* Question Type */}
-    <Form.Item label="Question Type">
-      <Select
-        value={questionType}
-        onChange={(val) => {
-          setQuestionType(val);
-
-          if (val === "yesorno") {
-            setOptions([
-              { title: "Yes", valueSubType: "persqm", value: 0 },
-              { title: "No", valueSubType: "persqm", value: 0 }
-            ]);
-          }
-
-          if (val === "options") {
-            setOptions([
-              { title: "", valueSubType: "persqm", value: 0 }
-            ]);
-          }
-
-          if (val === "text" || val === "number") {
-            setOptions([]);
-          }
-        }}
-      >
-        <Select.Option value="text">Text</Select.Option>
-        <Select.Option value="options">Options</Select.Option>
-        <Select.Option value="yesorno">Yes / No</Select.Option>
-        <Select.Option value="number">Number</Select.Option>
-      </Select>
-    </Form.Item>
-
-    {/* Include In Estimate
-    <Form.Item name="includeInEstimate" valuePropName="checked">
-      <Checkbox>Include in Estimate</Checkbox>
-    </Form.Item> */}
-
-    {/* Value Sub Type (ONLY meaningful field now) */}
-    {questionType !== "text" && (
-      <Form.Item label="Value Sub Type" name="valueSubType">
-        <Select>
-          <Select.Option value="persqm">Per Sq.m</Select.Option>
-          <Select.Option value="flat">Flat</Select.Option>
-        </Select>
-      </Form.Item>
-    )}
-
-    {/* OPTIONS TYPE */}
-    {questionType === "options" && (
-      <Form.Item label="Options">
-        <div className="flex flex-col gap-3">
-          {options.map((opt, index) => (
-            <div key={index} className="grid grid-cols-12 gap-2">
-              <div className="col-span-6">
-                <Input
-                  placeholder="Option title"
-                  value={opt.title}
-                  onChange={(e) => {
-                    const updated = [...options];
-                    updated[index].title = e.target.value;
-                    setOptions(updated);
-                  }}
-                />
-              </div>
-
-              <div className="col-span-3">
-                <Select
-                  value={opt.valueSubType}
-                  onChange={(val) => {
-                    const updated = [...options];
-                    updated[index].valueSubType = val;
-                    setOptions(updated);
-                  }}
-                >
-                  <Select.Option value="persqm">Per Sq.m</Select.Option>
-                  <Select.Option value="flat">Flat</Select.Option>
-                </Select>
-              </div>
-
-              <div className="col-span-3">
-                <InputNumber
-                  style={{ width: "100%" }}
-                  value={opt.value}
-                  onChange={(val) => {
-                    const updated = [...options];
-                    updated[index].value = val;
-                    setOptions(updated);
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-
-          <Button
-            type="dashed"
-            icon={<PlusOutlined />}
-            onClick={() =>
-              setOptions([
-                ...options,
-                { title: "", valueSubType: "persqm", value: 0 }
-              ])
-            }
-          >
-            Add Option
-          </Button>
-        </div>
-      </Form.Item>
-    )}
-
-    {/* YES / NO TYPE */}
-    {questionType === "yesorno" && (
-      <Form.Item label="Yes / No Values">
-        <div className="flex flex-col gap-3">
-          {options.map((opt, index) => (
-            <div key={index} className="grid grid-cols-12 gap-2">
-              <div className="col-span-4">
-                <Input value={opt.title} disabled />
-              </div>
-
-              <div className="col-span-4">
-                <Select
-                  value={opt.valueSubType}
-                  onChange={(val) => {
-                    const updated = [...options];
-                    updated[index].valueSubType = val;
-                    setOptions(updated);
-                  }}
-                >
-                  <Select.Option value="persqm">Per Sq.m</Select.Option>
-                  <Select.Option value="flat">Flat</Select.Option>
-                </Select>
-              </div>
-
-              <div className="col-span-4">
-                <InputNumber
-                  style={{ width: "100%" }}
-                  value={opt.value}
-                  onChange={(val) => {
-                    const updated = [...options];
-                    updated[index].value = val;
-                    setOptions(updated);
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </Form.Item>
-    )}
-
-    {/* ACTIONS */}
-    <div className="flex justify-end gap-2 mt-4">
-      <Button
-        onClick={() => {
-          setQuestionModalOpen(false);
-          form.resetFields();
-          setQuestionType("text");
-          setOptions([]);
-        }}
-      >
-        Cancel
-      </Button>
-
-      <Button
-        type="primary"
-        htmlType="submit"
-        icon={<PlusOutlined />}
-        style={{ background: THEME.primary, border: "none" }}
-      >
-        Create Question
-      </Button>
-    </div>
-  </Form>
-</Modal>
-
-
-
-
-
-
+                <div className="flex justify-end gap-3">
+                  <Button size="large" onClick={() => setQuestionModalOpen(false)} className="rounded-lg">
+                    Cancel
+                  </Button>
+                  
+                  {editingId ? (
+                    <Button 
+                      type="primary" 
+                      htmlType="submit" 
+                      size="large"
+                      loading={actionLoading}
+                      style={{ background: THEME.success, border: "none", borderRadius: 8, padding: '0 30px' }}
+                    >
+                      Update Question
+                    </Button>
+                  ) : (
+                    <Button 
+                      type="primary" 
+                      htmlType="submit" 
+                      size="large"
+                      loading={actionLoading}
+                      style={{ background: THEME.primary, border: "none", borderRadius: 8, padding: '0 30px' }}
+                    >
+                      Create Question
+                    </Button>
+                  )}
+                </div>
+              </Form>
+            </Modal>
           </div>
         ) : (
           <div className="bg-white rounded-3xl p-24 text-center border-2 border-dashed border-gray-100">
             <div className="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
               <PictureOutlined style={{ fontSize: 40, color: '#d9d9d9' }} />
             </div>
-            <Title level={4} className="text-gray-300">Select a type above to start managing assets</Title>
+            <Title level={4} className="text-gray-300">Select a type above to start managing questions</Title>
           </div>
         )}
       </div>
 
-      {/* --- LIGHTBOX PREVIEW --- */}
-      <Image
-        preview={{
-          visible: previewVisible,
-          src: previewImage,
-          onVisibleChange: (value) => setPreviewVisible(value),
-        }}
-      />
-
-      {/* --- EDIT TITLE MODAL --- */}
-      <Modal
-        title={<Text strong className="text-purple-700">Update Asset Name</Text>}
-        open={editModal.open}
-        onOk={handleUpdateTitle}
-        onCancel={() => setEditModal({ ...editModal, open: false })}
-        okButtonProps={{ style: { background: THEME.primary, borderRadius: '8px' } }}
-      >
-        <div className="py-4">
-          <Input
-            size="large"
-            prefix={<EditOutlined className="text-gray-300" />}
-            value={editModal.title}
-            onChange={(e) => setEditModal({ ...editModal, title: e.target.value })}
-            placeholder="New title name..."
-          />
-        </div>
-      </Modal>
-
-      {/* Global Action Loader */}
-      {actionLoading && (
+      {actionLoading && !questionModalOpen && (
         <div className="fixed inset-0 z-[9999] bg-white/60 backdrop-blur-sm flex items-center justify-center">
-          <Card className="shadow-2xl rounded-2xl border-none">
-            <Space direction="vertical" align="center" size="large">
-              <Spin indicator={<LoadingOutlined style={{ fontSize: 32, color: THEME.primary }} spin />} />
-              <Text strong className="text-purple-800">Updating your gallery...</Text>
-            </Space>
-          </Card>
+          <Spin size="large" />
         </div>
       )}
     </div>
