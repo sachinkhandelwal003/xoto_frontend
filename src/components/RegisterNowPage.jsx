@@ -8,12 +8,21 @@ import { AuthContext } from "../manageApi/context/AuthContext";
 
 const { Option } = Select;
 
-const countryCodes = [
-  { value: "+91", label: "+91 India" },
-  { value: "+971", label: "+971 UAE" },
-  { value: "+966", label: "+966 Saudi Arabia" },
-  { value: "+1", label: "+1 USA/Canada" },
-];
+/* ================= COUNTRY CONFIG ================= */
+
+const COUNTRY_PHONE_RULES = {
+  "+91": { label: "India", digits: 10 },
+  "+971": { label: "UAE", digits: 9 },
+  "+966": { label: "Saudi Arabia", digits: 9 },
+  "+1": { label: "USA / Canada", digits: 10 },
+};
+
+const countryCodes = Object.keys(COUNTRY_PHONE_RULES).map((code) => ({
+  value: code,
+  label: `${code} ${COUNTRY_PHONE_RULES[code].label}`,
+}));
+
+/* ================= COMPONENT ================= */
 
 const RegisterNowPage = () => {
   const navigate = useNavigate();
@@ -29,12 +38,15 @@ const RegisterNowPage = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // =========================
-  // SUBMIT HANDLER
-  // =========================
+  /* ================= SUBMIT ================= */
+
   const onSubmit = async (data) => {
-    if (!mobileNumber || mobileNumber.length < 6) {
-      return message.error("Please enter a valid mobile number");
+    const requiredDigits = COUNTRY_PHONE_RULES[countryCode].digits;
+
+    if (mobileNumber.length !== requiredDigits) {
+      return message.error(
+        `Please enter a valid ${requiredDigits}-digit mobile number`
+      );
     }
 
     if (data.password !== data.confirmPassword) {
@@ -59,10 +71,10 @@ const RegisterNowPage = () => {
     try {
       setLoading(true);
 
-      // 1️⃣ SIGNUP
+      // 1️⃣ SIGN UP
       await apiService.post("/users/signup/customer", signupPayload);
 
-      // 2️⃣ AUTO LOGIN (SETS AuthContext)
+      // 2️⃣ AUTO LOGIN (AuthContext)
       await login("/users/login/customer", {
         mobile: {
           country_code: countryCode,
@@ -70,7 +82,7 @@ const RegisterNowPage = () => {
         },
       });
 
-      // 3️⃣ REDIRECT (NOW IT WILL WORK)
+      // 3️⃣ REDIRECT
       navigate("/dashboard/customer", { replace: true });
 
     } catch (err) {
@@ -91,16 +103,18 @@ const RegisterNowPage = () => {
     }
   };
 
+  /* ================= UI ================= */
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#5C039B] py-12 px-4">
       <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2">
 
-        {/* ================= LEFT SIDE ================= */}
-        <div className="hidden lg:flex flex-col justify-between p-12 text-white relative bg-[#5C039B]">
-          <div className="absolute inset-0 bg-black/20"></div>
+        {/* ===== LEFT ===== */}
+        <div className="hidden lg:flex flex-col justify-between p-12 text-white bg-[#5C039B] relative">
+          <div className="absolute inset-0 bg-black/20" />
 
           <div className="relative z-10">
-            <h1 className="text-4xl font-extrabold mb-2">
+            <h1 className="text-4xl font-extrabold">
               <span className="text-green-400">Xoto</span>
             </h1>
             <h2 className="text-3xl font-semibold mt-6">
@@ -108,7 +122,7 @@ const RegisterNowPage = () => {
             </h2>
             <p className="mt-4 text-white/80 max-w-sm leading-relaxed">
               Create your account to start designing your dream outdoor spaces
-              with AI-powered tools.
+              using AI.
             </p>
           </div>
 
@@ -117,7 +131,7 @@ const RegisterNowPage = () => {
           </div>
         </div>
 
-        {/* ================= RIGHT SIDE ================= */}
+        {/* ===== RIGHT ===== */}
         <div className="p-8 md:p-12 flex flex-col justify-center">
 
           <div className="mb-10">
@@ -129,7 +143,11 @@ const RegisterNowPage = () => {
             </p>
           </div>
 
-          <Form layout="vertical" onFinish={handleSubmit(onSubmit)} className="space-y-4">
+          <Form
+            layout="vertical"
+            onFinish={handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
 
             {/* NAME */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -187,12 +205,18 @@ const RegisterNowPage = () => {
             </Form.Item>
 
             {/* MOBILE */}
-            <Form.Item label="Mobile Number" required>
+            <Form.Item
+              label={`Mobile Number (${COUNTRY_PHONE_RULES[countryCode].digits} digits)`}
+              required
+            >
               <div className="flex gap-3">
                 <Select
                   size="large"
                   value={countryCode}
-                  onChange={setCountryCode}
+                  onChange={(val) => {
+                    setCountryCode(val);
+                    setMobileNumber("");
+                  }}
                   className="w-[150px]"
                 >
                   {countryCodes.map((c) => (
@@ -209,8 +233,8 @@ const RegisterNowPage = () => {
                   onChange={(e) =>
                     setMobileNumber(e.target.value.replace(/\D/g, ""))
                   }
-                  placeholder="9876543210"
-                  maxLength={15}
+                  placeholder={`Enter ${COUNTRY_PHONE_RULES[countryCode].digits}-digit number`}
+                  maxLength={COUNTRY_PHONE_RULES[countryCode].digits}
                 />
               </div>
             </Form.Item>
@@ -264,7 +288,7 @@ const RegisterNowPage = () => {
               </Button>
             </div>
 
-            {/* LOGIN LINK */}
+            {/* LOGIN */}
             <div className="text-center mt-6 text-sm">
               <span className="text-gray-500">Already have an account? </span>
               <span
