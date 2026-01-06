@@ -137,91 +137,108 @@ const [showRoomTypeModal, setShowRoomTypeModal] = useState(false);
     setShowAuthModal(false);
   };
 
-  const generateAIDesigns = async (currentUser) => {
-    setIsGenerating(true);
-    setGenerationProgress(0);
+const generateAIDesigns = async (currentUser) => {
+  setIsGenerating(true);
+  setGenerationProgress(0);
 
-    const formData = new FormData();
-    if (uploadedFile) {
-      formData.append('gardenImage', uploadedFile);
-    } else {
-      try {
-        const response = await fetch(selectedImage);
-        const blob = await response.blob();
-        const file = new File([blob], "input_image.jpg", { type: "image/jpeg" });
-        formData.append('gardenImage', file);
-      } catch (err) {
-        console.error("Blob failed", err);
-      }
-    }
+  const formData = new FormData();
 
-    formData.append('styleName', selectedStyles.length > 0 ? interStyles.find(s => s.value === selectedStyles[0])?.label : 'Modern');
-    formData.append('elements', selectedElements.map(e => interElements.find(el => el.value === e)?.label).join(', ') || 'sofa, coffee table');
-    formData.append('description', specificRequirement || 'A professional interior design');
-    formData.append('roomType', selectedRoomType ? roomTypes.find(r => r.value === selectedRoomType)?.label : 'Living Room');
+  // REQUIRED FIELDS ONLY
+  formData.append(
+    'styleName',
+    selectedStyles.length > 0
+      ? interStyles.find(s => s.value === selectedStyles[0])?.label
+      : 'Modern'
+  );
 
-    const interval = setInterval(() => {
-      setGenerationProgress(prev => (prev < 95 ? prev + (95 - prev) * 0.1 : 95));
-    }, 500);
+  formData.append(
+    'elements',
+    selectedElements.length > 0
+      ? selectedElements
+          .map(e => interElements.find(el => el.value === e)?.label)
+          .join(', ')
+      : 'Sofa, Coffee Table'
+  );
 
-    try {
-      const response = await apiService.post('ai/generate-garden', formData, {
+  formData.append(
+    'roomType',
+    selectedRoomType
+      ? roomTypes.find(r => r.value === selectedRoomType)?.label
+      : 'Living Room'
+  );
+
+  formData.append(
+    'description',
+    specificRequirement ||
+      `A professional ${roomTypes.find(r => r.value === selectedRoomType)?.label || 'interior'} design`
+  );
+
+  formData.append('userId', currentUser?._id);
+
+  // Progress animation
+  const interval = setInterval(() => {
+    setGenerationProgress(prev =>
+      prev < 95 ? prev + (95 - prev) * 0.1 : 95
+    );
+  }, 500);
+
+  try {
+    const response = await apiService.post(
+      'ai/generate-interior',
+      formData,
+      {
         headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 120000
-      });
-
-      const resData = response;
-
-      if (resData.status === false && resData.aiImageGeneration === false) {
-        setIsGenerating(false);
-        setUpgradeMessage(resData.message || "Limit reached. Upgrade to continue.");
-        setShowUpgradeModal(true);
-        return;
+        timeout: 120000,
       }
+    );
 
-      if (resData.imageUrl && resData.imageUrl !== "") {
-        const aiUrl = resData.imageUrl;
-        const aiDesc = resData.message || "Interior generated successfully";
+    const resData = response;
 
-        const newDesign = {
-          id: Date.now(),
-          image: aiUrl,
-          title: `Vision ${designs.length + 1}`,
-          styles: [...selectedStyles],
-          elements: [...selectedElements],
-          timestamp: new Date().toLocaleTimeString(),
-          aiAnalysis: aiDesc,
-          userInfo: currentUser
-        };
-
-        setDesigns(prev => [newDesign, ...prev]);
-        setCurrentResult({ url: aiUrl, desc: aiDesc });
-        setGenerationProgress(100);
-
-        notification.success({ message: 'Design Generated!', duration: 2 });
-
-        setTimeout(() => {
-          setIsGenerating(false);
-          setShowGeneratedModal(true);
-        }, 500);
-      }
-    } catch (error) {
-      console.error('Generation failed:', error);
-
-      const errRes = error.response?.data;
-      if (errRes && (errRes.aiImageGeneration === false || errRes.status === false)) {
-        setIsGenerating(false);
-        setUpgradeMessage(errRes.message || "Please upgrade to generate more images.");
-        setShowUpgradeModal(true);
-        return;
-      }
-
-      notification.error({ message: 'Generation failed', description: 'Please try again later.' });
+    if (resData.status === false) {
       setIsGenerating(false);
-    } finally {
-      clearInterval(interval);
+      setUpgradeMessage(resData.message || 'Limit reached. Upgrade to continue.');
+      setShowUpgradeModal(true);
+      return;
     }
-  };
+
+    if (resData.imageUrl) {
+      const aiUrl = resData.imageUrl;
+      const aiDesc = resData.message || 'Interior generated successfully';
+
+      const newDesign = {
+        id: Date.now(),
+        image: aiUrl,
+        title: `Vision ${designs.length + 1}`,
+        styles: [...selectedStyles],
+        elements: [...selectedElements],
+        timestamp: new Date().toLocaleTimeString(),
+        aiAnalysis: aiDesc,
+        userInfo: currentUser,
+      };
+
+      setDesigns(prev => [newDesign, ...prev]);
+      setCurrentResult({ url: aiUrl, desc: aiDesc });
+      setGenerationProgress(100);
+
+      notification.success({ message: 'Interior Generated!', duration: 2 });
+
+      setTimeout(() => {
+        setIsGenerating(false);
+        setShowGeneratedModal(true);
+      }, 500);
+    }
+  } catch (error) {
+    console.error('Generation failed:', error);
+    notification.error({
+      message: 'Generation failed',
+      description: 'Please try again later.',
+    });
+    setIsGenerating(false);
+  } finally {
+    clearInterval(interval);
+  }
+};
+
 
   const downloadImage = (url, name) => {
     const link = document.createElement('a');
