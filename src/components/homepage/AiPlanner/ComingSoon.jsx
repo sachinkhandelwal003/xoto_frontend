@@ -197,7 +197,7 @@ const generateAIDesigns = async (currentUser) => {
 
   try {
     const response = await apiService.post(
-      '/api/ai/generate-interior',
+      '/ai/generate-interior',
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' },
