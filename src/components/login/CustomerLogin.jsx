@@ -115,25 +115,23 @@ const CustomerLogin = () => {
 
   /* ---------------- FORM SUBMIT ---------------- */
 
-  const onFinish = async (values) => {
-    
-    setLoading(true);
-    try {
-      const fullMobile =
-        COUNTRY_CONFIG[country].code + values.mobile;
-
-      await login('/users/login/customer', {
-        mobile: fullMobile,
-      });
-
-    } catch (err) {
-      toast.error(err?.message || 'Login failed', {
-        position: 'top-center',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+ const onFinish = async (values) => {
+  setLoading(true);
+  try {
+    await login('/users/login/customer', {
+      mobile: {
+        country_code: COUNTRY_CONFIG[country].code, 
+        number: values.mobile,                      
+      },
+    });
+  } catch (err) {
+    toast.error(err?.message || 'Login failed', {
+      position: 'top-center',
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* ---------------- UI ---------------- */
 
