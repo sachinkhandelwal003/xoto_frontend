@@ -14,30 +14,30 @@
 
   "offerings": [
     { "label": "Landscaping", "path": "/landscaping" },
-    { "label": "Interiors", "path": "/interiors" },
-    { "label": "Rentals", "path": "/rentals" },
-    { "label": "Buy", "path": "/buy" },
-    { "label": "Sell", "path": "/sell" },
+    { "label": "Interiors", "path": "/services/interior" },
+    { "label": "Rentals", "path": "/marketplace" },
+    { "label": "Buy", "path": "/marketplace" },
+    { "label": "Sell", "path": "/marketplace" },
     { "label": "Mortgages", "path": "/mortgage/services" },
-    { "label": "Maintenance", "path": "/maintenance" }
+    { "label": "Maintenance", "path": "" }
   ],
 
   "resources": [
-    { "label": "Strategic Alliance", "path": "/strategic-alliance" },
-    { "label": "Business Associates", "path": "/business-associates" },
-    { "label": "Execution Partners", "path": "/execution-partners" },
-    { "label": "Developers", "path": "/developers" },
-    { "label": "Financial Institutions", "path": "/financial-institutions" }
+    { "label": "Strategic Alliance", "path": "/login" },
+    { "label": "Business Associates", "path": "/login" },
+    { "label": "Execution Partners", "path": "/login" },
+    { "label": "Developers", "path": "/" },
+    { "label": "Financial Institutions", "path": "/" }
   ],
 
   "knowledge": [
-    { "label": "Knowledge Centre", "path": "/knowledge-centre" },
-    { "label": "Our Sustainability", "path": "/sustainability" },
-    { "label": "Focus", "path": "/focus" },
-    { "label": "Submit Your Feedback", "path": "/feedback" },
+    { "label": "Knowledge Centre", "path": "/about" },
+    { "label": "Our Sustainability", "path": "/about" },
+    { "label": "Focus", "path": "/about" },
+    { "label": "Submit Your Feedback", "path": "/about" },
     { "label": "Contact Us", "path": "/contact" },
-    { "label": "Privacy Policy", "path": "/privacy" },
-    { "label": "Terms Of Use", "path": "/terms" }
+    { "label": "Privacy Policy", "path": "/about" },
+    { "label": "Terms Of Use", "path": "/about" }
   ],
 
   "locations": "India | UAE | Saudi Arabia",

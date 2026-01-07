@@ -138,25 +138,37 @@ export default function Footer() {
             <p className="mt-3 text-white/70">{company.description}</p>
           </div>
 
-          {/* Offerings */}
-          <div>
-            <h4 className="font-bold text-[24px] mb-4">
-              {t("titles.offerings")}
-            </h4>
-            {offerings.map((i, k) => (
-              <p key={k} className="text-white/70">{i.label}</p>
-            ))}
-          </div>
+{/* Offerings */}
+<div>
+  <h4 className="font-bold text-[24px] mb-4">
+    {t("titles.offerings")}
+  </h4>
+  {offerings.map((i, k) => (
+    <Link 
+      key={k} 
+      to={i.path}  
+      className="block mb-2 text-white/70 "
+    >
+      {i.label}
+    </Link>
+  ))}
+</div>
 
-          {/* Partner */}
-          <div>
-            <h4 className="font-bold text-[24px] mb-4">
-              {t("titles.resources")}
-            </h4>
-            {resources.map((i, k) => (
-              <p key={k} className="text-white/70">{i.label}</p>
-            ))}
-          </div>
+       {/* Partner Ecosystem */}
+<div>
+  <h4 className="font-bold text-[24px] mb-4">
+    {t("titles.resources")}
+  </h4>
+  {resources.map((i, k) => (
+    <Link 
+      key={k} 
+      to={i.path} 
+      className="block mb-2 text-white/70"
+    >
+      {i.label}
+    </Link>
+  ))}
+</div>
 
           {/* About */}
           <div>
@@ -164,7 +176,13 @@ export default function Footer() {
               {t("titles.knowledge")}
             </h4>
             {knowledge.map((i, k) => (
-              <p key={k} className="text-white/70">{i.label}</p>
+              <Link 
+                key={k} 
+                to={i.path}
+                className="block mb-2 text-white/70"
+              >
+                {i.label}
+              </Link>
             ))}
           </div>
 

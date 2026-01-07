@@ -1,64 +1,56 @@
 {
   "company": {
-    "slogan": "ਇੱਕ ਇਕੱਠਾ ਇਕੋਸਿਸਟਮ ਜੋ <br/> ਆਜੀਵਨ ਜਾਇਦਾਦ ਮੁੱਲ ਬਣਾਉਂਦਾ ਹੈ।",
-    "description": "ਸਕੇਲੇਬਲ। ਏਆਈ ਨਾਲ ਸੰਚਾਲਿਤ। ਐਸੈਟ-ਲਾਈਟ।"
+    "slogan": "ਜ਼ਿੰਦਗੀ ਭਰ ਦੀ ਜਾਇਦਾਦ ਮੁੱਲ ਬਣਾਉਣ ਵਾਲਾ <br/> ਇੱਕ ਇਕਜੁੱਟ ਇਕੋਸਿਸਟਮ।",
+    "description": "ਸਕੇਲੇਬਲ। AI ਨਾਲ ਸੰਚਾਲਿਤ। ਐਸੈੱਟ-ਲਾਈਟ।"
   },
-
   "titles": {
     "offerings": "ਸਾਡੀਆਂ ਸੇਵਾਵਾਂ",
-    "resources": "ਸਾਥੀ ਇਕੋਸਿਸਟਮ",
+    "resources": "ਭਾਗੀਦਾਰ ਇਕੋਸਿਸਟਮ",
     "knowledge": "ਸਾਡੇ ਬਾਰੇ",
-    "location": "ਥਾਵਾਂ",
+    "location": "ਸਥਾਨ",
     "email": "ਈਮੇਲ"
   },
-
   "offerings": [
     { "label": "ਲੈਂਡਸਕੇਪਿੰਗ", "path": "/landscaping" },
-    { "label": "ਇੰਟੀਰੀਅਰਜ਼", "path": "/interiors" },
-    { "label": "ਕਿਰਾਏ", "path": "/rentals" },
-    { "label": "ਖਰੀਦੋ", "path": "/buy" },
-    { "label": "ਵੇਚੋ", "path": "/sell" },
-    { "label": "ਘਰ ਦੇ ਕਰਜ਼ੇ", "path": "/mortgage/services" },
-    { "label": "ਮੈਂਟੇਨੈਂਸ", "path": "/maintenance" }
+    { "label": "ਇੰਟੀਰੀਅਰ", "path": "/services/interior" },
+    { "label": "ਕਿਰਾਇਆ", "path": "/marketplace" },
+    { "label": "ਖਰੀਦੋ", "path": "/marketplace" },
+    { "label": "ਵੇਚੋ", "path": "/marketplace" },
+    { "label": "ਹੋਮ ਲੋਨ", "path": "/mortgage/services" },
+    { "label": "ਰਖ-ਰਖਾਵ", "path": "" }
   ],
-
   "resources": [
-    { "label": "ਰਣਨੀਤਿਕ ਸਾਂਝ", "path": "/strategic-alliance" },
-    { "label": "ਵਪਾਰਕ ਸਾਥੀ", "path": "/business-associates" },
-    { "label": "ਕਾਰਜਾਨਵਿਤ ਸਾਥੀ", "path": "/execution-partners" },
-    { "label": "ਡਿਵੈਲਪਰ", "path": "/developers" },
-    { "label": "ਵਿੱਤੀ ਸੰਸਥਾਵਾਂ", "path": "/financial-institutions" }
+    { "label": "रणਨੀਤਿਕ ਭਾਈਚਾਰਾ", "path": "/login" },
+    { "label": "ਕਾਰੋਬਾਰੀ ਸਾਥੀ", "path": "/login" },
+    { "label": "ਐਗਜ਼ੀਕਿਊਸ਼ਨ ਭਾਈਚਾਰੇ", "path": "/login" },
+    { "label": "ਡਿਵੈਲਪਰ", "path": "/" },
+    { "label": "ਵਿੱਤੀ ਸੰਸਥਾਵਾਂ", "path": "/" }
   ],
-
   "knowledge": [
-    { "label": "ਗਿਆਨ ਕੇਂਦਰ", "path": "/knowledge-centre" },
-    { "label": "ਸਾਡੀ ਟਿਕਾਊਤਾ", "path": "/sustainability" },
-    { "label": "ਫੋਕਸ", "path": "/focus" },
-    { "label": "ਫੀਡਬੈਕ ਭੇਜੋ", "path": "/feedback" },
-    { "label": "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ", "path": "/contact" },
-    { "label": "ਪਰਦੇਦਾਰੀ ਨੀਤੀ", "path": "/privacy" },
-    { "label": "ਵਰਤੋਂ ਦੀਆਂ ਸ਼ਰਤਾਂ", "path": "/terms" }
+    { "label": "ਨੋਲਜ ਸੈਂਟਰ", "path": "/about" },
+    { "label": "ਸਾਡੀ ਟਿਕਾਊਤਾ", "path": "/about" },
+    { "label": "ਫੋਕਸ", "path": "/about" },
+    { "label": "ਫੀਡਬੈਕ ਭੇਜੋ", "path": "/about" },
+    { "label": "ਸੰਪਰਕ ਕਰੋ", "path": "/contact" },
+    { "label": "ਪਰਾਈਵੇਸੀ ਨੀਤੀ", "path": "/about" },
+    { "label": "ਵਰਤੋਂ ਦੀਆਂ ਸ਼ਰਤਾਂ", "path": "/about" }
   ],
-
   "locations": "ਭਾਰਤ | UAE | ਸਾਊਦੀ ਅਰਬ",
-
   "email": {
     "labels": {
-      "partners": "ਸਾਥੀਆਂ ਲਈ",
+      "partners": "ਭਾਗੀਦਾਰਾਂ ਲਈ",
       "customers": "ਗਾਹਕਾਂ ਲਈ"
     },
     "partners": "connect@xoto.ae",
     "customers": "care@xoto.ae"
   },
-
   "social": [
     { "name": "ਫੇਸਬੁੱਕ", "url": "#" },
     { "name": "ਇੰਸਟਾਗ੍ਰਾਮ", "url": "#" },
     { "name": "ਟਵਿੱਟਰ", "url": "#" },
     { "name": "ਲਿੰਕਡਇਨ", "url": "#" }
   ],
-
   "bottom": {
-    "copyright": "©2021 XOTO. ਸਭ ਹੱਕ ਰਾਖਵੇਂ ਹਨ"
+    "copyright": "©2021 XOTO. ਸਾਰੇ ਅਧਿਕਾਰ ਰਾਖਵੇਂ ਹਨ"
   }
 }
