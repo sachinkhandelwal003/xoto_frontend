@@ -130,14 +130,27 @@ const AITools = () => {
         onMouseLeave={() => setIsSidebarHovered(false)}
       >
         {/* Sidebar Header / Logo */}
-        <div className="h-24 flex items-center justify-center relative mb-4">
-           <div className="w-10 h-10 bg-[var(--color-primary)] rounded-xl flex items-center justify-center shrink-0 z-10 text-white shadow-lg">
-             <BrainCircuit size={24} />
-           </div>
-           <span className={`ml-3 font-bold text-2xl tracking-tight text-gray-900 absolute left-20 transition-opacity duration-300 ${isSidebarHovered ? 'opacity-100' : 'opacity-0'}`}>
-             xoto          
-           </span>
-        </div>
+     <div className="h-24 flex items-center justify-center relative mb-4">
+  {/* Wrapper jo icon aur text ko group karega */}
+  <div className="flex items-center justify-center">
+    
+    {/* Logo Icon */}
+    <div className="w-10 h-10 bg-[var(--color-primary)] rounded-xl flex items-center justify-center shrink-0 z-10 text-white shadow-lg">
+      <BrainCircuit size={24} />
+    </div>
+
+    {/* Xoto Text - Iska width aur margin animate hoga */}
+    <div 
+      className={`overflow-hidden transition-all duration-300 flex items-center
+        ${isSidebarHovered ? 'w-20 opacity-100 ml-3' : 'w-0 opacity-0 ml-0'}`}
+    >
+      <span className="font-bold text-2xl tracking-tight text-gray-900 whitespace-nowrap">
+        xoto
+      </span>
+    </div>
+    
+  </div>
+</div>
         
         <div className="flex-1 flex flex-col gap-2 px-3">
            {/* Sidebar Items */}
