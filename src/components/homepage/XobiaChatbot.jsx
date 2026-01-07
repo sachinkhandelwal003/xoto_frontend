@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { FiX, FiMic, FiSend, FiVolume2, FiTrash2 } from "react-icons/fi";
+import { FiX, FiMic, FiSend } from "react-icons/fi";
 import { BsRobot } from "react-icons/bs";
 import xobiaAvatar from "../../assets/img/girlimage.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,19 +15,18 @@ function XobiaChatbot() {
   const [recording, setRecording] = useState(false);
   const [botSpeaking, setBotSpeaking] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
-  const [showDelete, setShowDelete] = useState(false);
   const [isHolding, setIsHolding] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
 
   const chatEndRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const audioRef = useRef(null);
   const holdTimerRef = useRef(null);
-  const touchStartXRef = useRef(0);
+  const recordingTimerRef = useRef(null);
 
   /* ================= STOP ALL AUDIO FUNCTIONS ================= */
   const stopAllAudio = () => {
-    // Stop bot audio if playing
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -39,12 +38,16 @@ function XobiaChatbot() {
   };
 
   const stopAllRecording = () => {
-    // Stop current recording if any
     if (recording && mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setRecording(false);
+      setRecordingTime(0);
       
-      // Stop microphone stream
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+      
       if (mediaRecorderRef.current.stream) {
         mediaRecorderRef.current.stream.getTracks().forEach(track => {
           track.stop();
@@ -52,18 +55,15 @@ function XobiaChatbot() {
         });
       }
       
-      // Clear audio chunks
       audioChunksRef.current = [];
     }
     
-    // Clear hold timer
     if (holdTimerRef.current) {
       clearTimeout(holdTimerRef.current);
       holdTimerRef.current = null;
     }
     
     setIsHolding(false);
-    setShowDelete(false);
   };
 
   /* ================= CHAT CLOSE - COMPLETE CLEANUP ================= */
@@ -114,7 +114,6 @@ function XobiaChatbot() {
 
   /* ================= SAFE AUDIO PLAYER ================= */
   const playBotAudio = (url, messageId) => {
-    // Pehle sab audio stop karo
     stopAllAudio();
     
     const audio = new Audio(url);
@@ -152,9 +151,7 @@ function XobiaChatbot() {
       lastMessage?.audioUrl &&
       lastMessage?.autoPlay
     ) {
-      // Pehle agar koi recording chal rahi hai toh stop karo
       stopAllRecording();
-      // Phir audio play karo
       playBotAudio(lastMessage.audioUrl, lastMessage.id);
     }
   }, [messages]);
@@ -171,7 +168,6 @@ function XobiaChatbot() {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    // Agar recording chal rahi hai toh pehle stop karo
     stopAllRecording();
     
     const userMsg = {
@@ -296,7 +292,6 @@ function XobiaChatbot() {
   const handleMouseDown = () => {
     if (loading || voiceLoading) return;
     
-    // Agar bot bol raha hai toh stop karo
     if (botSpeaking) {
       stopAllAudio();
     }
@@ -315,59 +310,24 @@ function XobiaChatbot() {
       holdTimerRef.current = null;
     }
     
-    setIsHolding(false);
-    setShowDelete(false);
-    
-    if (recording) {
-      stopRecordingAndSend();
-    }
-  };
-
-  const handleTouchStart = (e) => {
-    if (loading || voiceLoading) return;
-    
-    touchStartXRef.current = e.touches[0].clientX;
-    handleMouseDown();
-  };
-
-  const handleTouchMove = (e) => {
-    if (!recording) return;
-    
-    const touchX = e.touches[0].clientX;
-    const deltaX = touchStartXRef.current - touchX;
-    
-    if (deltaX > 50) { // Swipe left more than 50px
-      setShowDelete(true);
-    } else {
-      setShowDelete(false);
-    }
-  };
-
-  const handleTouchEnd = (e) => {
+    // If user released before 300ms, don't start recording
     if (!recording) {
-      handleMouseUp();
+      setIsHolding(false);
       return;
     }
     
-    const touchX = e.changedTouches[0].clientX;
-    const deltaX = touchStartXRef.current - touchX;
-    
-    if (deltaX > 50) { // Swipe left to delete
-      cancelRecording();
-    } else {
+    // If recording, stop and send
+    if (recording) {
       stopRecordingAndSend();
     }
     
     setIsHolding(false);
-    setShowDelete(false);
   };
 
   const startRecording = async () => {
     try {
-      // Pehle agar koi audio chal rahi hai toh stop karo
       stopAllAudio();
       
-      // Agar pehle se recording chal rahi hai toh stop karo
       if (recording) {
         mediaRecorderRef.current?.stop();
       }
@@ -381,7 +341,7 @@ function XobiaChatbot() {
       recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
 
       recorder.onstop = async () => {
-        // Agar cancel nahi hua toh send karo
+        // Send the recording
         if (audioChunksRef.current.length > 0) {
           const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
 
@@ -406,15 +366,26 @@ function XobiaChatbot() {
           t.stop();
           t.enabled = false;
         });
+        
+        setRecordingTime(0);
+        if (recordingTimerRef.current) {
+          clearInterval(recordingTimerRef.current);
+          recordingTimerRef.current = null;
+        }
       };
 
       recorder.start();
       setRecording(true);
+      
+      // Start recording timer
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+      
     } catch (error) {
       console.error("Recording error:", error);
       setIsHolding(false);
       
-      // Show error to user
       setMessages((prev) => [
         ...prev,
         {
@@ -438,21 +409,10 @@ function XobiaChatbot() {
     }
   };
 
-  const cancelRecording = () => {
-    if (mediaRecorderRef.current) {
-      // Stop recording without sending
-      mediaRecorderRef.current.stop();
-      audioChunksRef.current = [];
-      setRecording(false);
-      
-      // Stop and disable tracks
-      if (mediaRecorderRef.current.stream) {
-        mediaRecorderRef.current.stream.getTracks().forEach(track => {
-          track.stop();
-          track.enabled = false;
-        });
-      }
-    }
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   const SpeakingIndicator = () => (
@@ -536,21 +496,6 @@ function XobiaChatbot() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 md:gap-2">
-                  {/* Stop All Audio Button */}
-                  {(botSpeaking || recording) && (
-                    <button
-                      onClick={() => {
-                        stopAllAudio();
-                        stopAllRecording();
-                      }}
-                      className="p-1.5 md:p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
-                      aria-label="Stop all audio"
-                      title="Stop all audio"
-                    >
-                      <FiVolume2 className="w-3 h-3 md:w-4 md:h-4" />
-                    </button>
-                  )}
-                  
                   <button
                     onClick={handleCloseChat}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -597,43 +542,17 @@ function XobiaChatbot() {
                             </p>
                           )}
 
-                          {/* BOT AUDIO with Stop Button */}
+                          {/* BOT AUDIO */}
                           {m.role === "bot" && m.type === "audio" && (
-                            <div className="flex flex-col gap-2">
-                              <div className="flex items-center justify-between">
-                                {botSpeaking && speakingMessageId === m.id ? (
-                                  <SpeakingIndicator />
-                                ) : (
-                                  <p className="text-sm font-medium text-gray-600">
-                                    ✅ Voice reply delivered
-                                  </p>
-                                )}
-                                
-                                {/* Show stop button if this audio is playing */}
-                                {botSpeaking && speakingMessageId === m.id && (
-                                  <button
-                                    onClick={stopAllAudio}
-                                    className="ml-2 p-1.5 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
-                                    aria-label="Stop audio"
-                                    title="Stop audio"
-                                  >
-                                    <FiVolume2 className="w-3 h-3" />
-                                  </button>
-                                )}
-                              </div>
-                              
-                              {/* Play button if not speaking */}
-                              {!botSpeaking && (
-                                <button
-                                  onClick={() => playBotAudio(m.audioUrl, m.id)}
-                                  className="text-xs flex items-center gap-1 text-purple-600 hover:text-purple-700"
-                                  disabled={recording}
-                                >
-                                  <FiVolume2 className="w-3 h-3" />
-                                  {recording ? "Recording in progress..." : "Play voice"}
-                                </button>
+                            <>
+                              {botSpeaking && speakingMessageId === m.id ? (
+                                <SpeakingIndicator />
+                              ) : (
+                                <p className="text-sm font-medium text-gray-600">
+                                  ✅ Voice reply delivered
+                                </p>
                               )}
-                            </div>
+                            </>
                           )}
 
                           {/* TEXT */}
@@ -692,44 +611,37 @@ function XobiaChatbot() {
                 )}
               </div>
 
-              {/* Input Area */}
+              {/* Input Area - SIMPLE */}
               <div className="border-t border-gray-200 p-3 md:p-4 bg-white">
                 <div className="flex items-center gap-1 md:gap-2">
-                  {/* Recording Button */}
+                  {/* Recording Button - SIMPLE */}
                   <button
                     onMouseDown={handleMouseDown}
                     onMouseUp={handleMouseUp}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
+                    onTouchStart={handleMouseDown}
+                    onTouchEnd={handleMouseUp}
                     className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all relative ${
                       isHolding && !recording
                         ? "bg-gradient-to-r from-blue-200 to-purple-200 scale-110"
                         : recording
-                          ? showDelete
-                            ? "bg-red-500 text-white"
-                            : "bg-gradient-to-r from-blue-500 to-purple-500 text-white animate-pulse"
+                          ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white animate-pulse"
                           : "bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 hover:from-blue-200 hover:to-purple-200"
                     }`}
                     disabled={loading || voiceLoading}
                     aria-label={recording ? "Recording in progress" : "Hold to record"}
                   >
                     {recording ? (
-                      showDelete ? (
-                        <FiTrash2 className="w-4 h-4 md:w-5 md:h-5" />
-                      ) : (
-                        <div className="flex items-center justify-center">
-                          <div className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-white"></div>
-                        </div>
-                      )
+                      <div className="flex items-center justify-center">
+                        <div className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-white"></div>
+                      </div>
                     ) : (
                       <FiMic className="w-4 h-4 md:w-5 md:h-5" />
                     )}
                     
                     {/* Recording indicator */}
-                    {recording && !showDelete && (
+                    {recording && (
                       <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-purple-600 bg-white px-2 py-1 rounded-full shadow whitespace-nowrap">
-                        ● Recording
+                        ● {formatTime(recordingTime)}
                       </span>
                     )}
                   </button>
@@ -760,7 +672,7 @@ function XobiaChatbot() {
                   </div>
                 </div>
 
-                {/* Instructions */}
+                {/* Instructions - SIMPLE */}
                 <div className="mt-2 text-center">
                   {isHolding && !recording && (
                     <div className="flex flex-col items-center">
@@ -773,37 +685,21 @@ function XobiaChatbot() {
                     </div>
                   )}
 
-                  {recording && !showDelete && (
-                    <p className="text-xs text-purple-600 font-medium">
-                      🎤 Speaking... Release to send • Swipe left to delete
-                    </p>
-                  )}
-
-                  {showDelete && (
-                    <div className="flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg animate-pulse">
-                      <FiTrash2 className="w-4 h-4" />
-                      <span className="text-sm font-bold">Release to delete recording</span>
-                    </div>
-                  )}
-
-                  {!isHolding && !recording && !showDelete && (
-                    <div className="flex flex-col items-center gap-1">
-                      <p className="text-xs text-gray-500">
-                        💡 Hold mic button to record voice message
+                  {recording && (
+                    <div className="flex flex-col items-center gap-2">
+                      <p className="text-xs text-purple-600 font-medium">
+                        🎤 Recording... {formatTime(recordingTime)} • Release to send
                       </p>
-                      {(botSpeaking || recording) && (
-                        <button
-                          onClick={() => {
-                            stopAllAudio();
-                            stopAllRecording();
-                          }}
-                          className="text-xs text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
-                        >
-                          <FiVolume2 className="w-3 h-3" />
-                          Stop all audio
-                        </button>
-                      )}
+                      <div className="w-full max-w-xs h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-purple-500 animate-pulse" style={{ width: '100%' }}></div>
+                      </div>
                     </div>
+                  )}
+
+                  {!isHolding && !recording && (
+                    <p className="text-xs text-gray-500">
+                      💡 Hold mic button to record voice message
+                    </p>
                   )}
                 </div>
               </div>
