@@ -494,12 +494,12 @@ const generateAIDesigns = async (currentUser) => {
                 <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Your Masterpieces</h1>
                 <p className="text-gray-500 font-medium text-lg">AI-generated interior created by you.</p>
               </div>
-              {isCustomerLoggedIn && (
+              {/* {isCustomerLoggedIn && (
                 <div className="px-4 py-2 bg-white rounded-full shadow-sm border border-green-100 flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
            
                 </div>
-              )}
+              )} */}
             </div>
 
             {designs.length === 0 ? (
