@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "ਲੈਂਡਸਕੇਪਿੰਗ", "path": "/landscaping" },
-    { "label": "ਇੰਟੀਰੀਅਰਜ਼", "path": "/interiors" },
+    { "label": "ਇੰਟੀਰੀਅਰਜ਼", "path": "/services/interior" },
     { "label": "ਕਿਰਾਏ", "path": "/rentals" },
     { "label": "ਖਰੀਦੋ", "path": "/buy" },
     { "label": "ਵੇਚੋ", "path": "/sell" },

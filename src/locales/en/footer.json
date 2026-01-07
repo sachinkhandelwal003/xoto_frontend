@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "Landscaping", "path": "/landscaping" },
-    { "label": "Interiors", "path": "/interiors" },
+    { "label": "Interiors", "path": "/services/interior" },
     { "label": "Rentals", "path": "/rentals" },
     { "label": "Buy", "path": "/buy" },
     { "label": "Sell", "path": "/sell" },

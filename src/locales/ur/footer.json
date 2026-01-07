@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "لینڈ اسکیپنگ", "path": "/landscaping" },
-    { "label": "انٹیریئرز", "path": "/interiors" },
+    { "label": "انٹیریئرز", "path": "/services/interior" },
     { "label": "کرایہ", "path": "/rentals" },
     { "label": "خریدیں", "path": "/buy" },
     { "label": "فروخت کریں", "path": "/sell" },

@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "园林景观", "path": "/landscaping" },
-    { "label": "室内设计", "path": "/interiors" },
+    { "label": "室内设计", "path": "/services/interior" },
     { "label": "租赁", "path": "/rentals" },
     { "label": "购买", "path": "/buy" },
     { "label": "出售", "path": "/sell" },

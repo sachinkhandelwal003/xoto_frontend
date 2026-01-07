@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "Peyzaj", "path": "/landscaping" },
-    { "label": "İç Mekanlar", "path": "/interiors" },
+    { "label": "İç Mekanlar", "path": "/services/interior" },
     { "label": "Kiralama", "path": "/rentals" },
     { "label": "Satın Alma", "path": "/buy" },
     { "label": "Satış", "path": "/sell" },

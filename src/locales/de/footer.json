@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "Landschaftsbau", "path": "/landscaping" },
-    { "label": "Innenräume", "path": "/interiors" },
+    { "label": "Innenräume", "path": "/services/interior" },
     { "label": "Vermietung", "path": "/rentals" },
     { "label": "Kaufen", "path": "/buy" },
     { "label": "Verkaufen", "path": "/sell" },

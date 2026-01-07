@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "लैंडस्केपिंग", "path": "/landscaping" },
-    { "label": "इंटीरियर्स", "path": "/interiors" },
+    { "label": "इंटीरियर्स", "path": "/services/interior" },
     { "label": "किराये", "path": "/rentals" },
     { "label": "खरीदें", "path": "/buy" },
     { "label": "बेचें", "path": "/sell" },

@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "Paisajismo", "path": "/landscaping" },
-    { "label": "Interiores", "path": "/interiors" },
+    { "label": "Interiores", "path": "/services/interior" },
     { "label": "Alquileres", "path": "/rentals" },
     { "label": "Comprar", "path": "/buy" },
     { "label": "Vender", "path": "/sell" },

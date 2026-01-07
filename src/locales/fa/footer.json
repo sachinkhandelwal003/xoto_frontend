@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "محوطه‌سازی", "path": "/landscaping" },
-    { "label": "طراحی داخلی", "path": "/interiors" },
+    { "label": "طراحی داخلی", "path": "/services/interior" },
     { "label": "اجاره", "path": "/rentals" },
     { "label": "خرید", "path": "/buy" },
     { "label": "فروش", "path": "/sell" },

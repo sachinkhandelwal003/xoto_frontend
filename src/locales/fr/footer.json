@@ -14,7 +14,7 @@
 
   "offerings": [
     { "label": "Aménagement Paysager", "path": "/landscaping" },
-    { "label": "Intérieurs", "path": "/interiors" },
+    { "label": "Intérieurs", "path": "/services/interior" },
     { "label": "Locations", "path": "/rentals" },
     { "label": "Acheter", "path": "/buy" },
     { "label": "Vendre", "path": "/sell" },
