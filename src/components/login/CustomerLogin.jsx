@@ -17,6 +17,7 @@ import { AuthContext } from '../../manageApi/context/AuthContext.jsx';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
+
 // Assets
 import loginimage from '../../assets/img/one.png';
 import logoNew from '../../assets/img/logoNew.png';
@@ -114,25 +115,23 @@ const CustomerLogin = () => {
 
   /* ---------------- FORM SUBMIT ---------------- */
 
-  const onFinish = async (values) => {
-    
-    setLoading(true);
-    try {
-      const fullMobile =
-        COUNTRY_CONFIG[country].code + values.mobile;
-
-      await login('/users/login/customer', {
-        mobile: fullMobile,
-      });
-
-    } catch (err) {
-      toast.error(err?.message || 'Login failed', {
-        position: 'top-center',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+ const onFinish = async (values) => {
+  setLoading(true);
+  try {
+    await login('/users/login/customer', {
+      mobile: {
+        country_code: COUNTRY_CONFIG[country].code, 
+        number: values.mobile,                      
+      },
+    });
+  } catch (err) {
+    toast.error(err?.message || 'Login failed', {
+      position: 'top-center',
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* ---------------- UI ---------------- */
 
@@ -251,7 +250,7 @@ const CustomerLogin = () => {
                 <div style={{ textAlign: 'center', marginTop: 24 }}>
                   <Text>Don’t have an account? </Text>
                   <span
-                    onClick={() => navigate('/customer/registration')}
+                    onClick={() => navigate('/register')}
                     style={{ color: '#03A4F4', fontWeight: 'bold', cursor: 'pointer' }}
                   >
                     Register Now
