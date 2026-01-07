@@ -337,12 +337,12 @@ return (
       </div>
 
       {/* Image on Right with Purple Ring */}
-      <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[3px] shadow-lg">
-        <div className="w-full h-full rounded-full overflow-hidden bg-white">
+      <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[1px] shadow-lg">
+        <div className="w-full h-full animate-come-up  rounded-full ">
           <img 
             src={xobiaAvatar} 
             alt="Xobia" 
-            className="w-full h-full object-cover scale-110 mt-1" 
+            className="w-full h-55px object-cover animate-entrance-bottom scale-110 mt-1" 
           />
         </div>
         {/* Active Status */}

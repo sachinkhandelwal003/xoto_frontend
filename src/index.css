@@ -164,3 +164,23 @@
     color: var(--color-text-white);
   }
 }
+
+
+@import "tailwindcss";
+
+@theme {
+  /* Keyframes define karein */
+  @keyframes slide-from-bottom {
+    0% {
+      transform: translateY(100vh); /* Viewport ke bilkul niche se */
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0); /* Apni original jagah par */
+      opacity: 1;
+    }
+  }
+
+  /* Animation class name assign karein */
+  --animate-come-up: slide-from-bottom 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
