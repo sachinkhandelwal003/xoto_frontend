@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { FiX, FiMic, FiSend, FiVolume2 } from "react-icons/fi";
+import { FiX, FiMic, FiSend, FiVolume2, FiTrash2 } from "react-icons/fi";
 import { BsRobot } from "react-icons/bs";
 import xobiaAvatar from "../../assets/img/girlimage.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,14 +15,63 @@ function XobiaChatbot() {
   const [recording, setRecording] = useState(false);
   const [botSpeaking, setBotSpeaking] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
-
+  const [showDelete, setShowDelete] = useState(false);
+  const [isHolding, setIsHolding] = useState(false);
 
   const chatEndRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-
-  // 🔥 SINGLE AUDIO CONTROLLER
   const audioRef = useRef(null);
+  const holdTimerRef = useRef(null);
+  const touchStartXRef = useRef(0);
+
+  /* ================= STOP ALL AUDIO FUNCTIONS ================= */
+  const stopAllAudio = () => {
+    // Stop bot audio if playing
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.src = "";
+      audioRef.current = null;
+      setBotSpeaking(false);
+      setSpeakingMessageId(null);
+    }
+  };
+
+  const stopAllRecording = () => {
+    // Stop current recording if any
+    if (recording && mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+      
+      // Stop microphone stream
+      if (mediaRecorderRef.current.stream) {
+        mediaRecorderRef.current.stream.getTracks().forEach(track => {
+          track.stop();
+          track.enabled = false;
+        });
+      }
+      
+      // Clear audio chunks
+      audioChunksRef.current = [];
+    }
+    
+    // Clear hold timer
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+    
+    setIsHolding(false);
+    setShowDelete(false);
+  };
+
+  /* ================= CHAT CLOSE - COMPLETE CLEANUP ================= */
+  const handleCloseChat = () => {
+    stopAllAudio();
+    stopAllRecording();
+    setIsOpen(false);
+  };
 
   /* ================= FETCH OLD MESSAGES ================= */
   useEffect(() => {
@@ -53,8 +102,10 @@ function XobiaChatbot() {
       }
     };
 
-    fetchMessages();
-  }, []);
+    if (isOpen) {
+      fetchMessages();
+    }
+  }, [isOpen]);
 
   /* ================= AUTO SCROLL ================= */
   useEffect(() => {
@@ -62,65 +113,57 @@ function XobiaChatbot() {
   }, [messages, loading, voiceLoading]);
 
   /* ================= SAFE AUDIO PLAYER ================= */
- const playBotAudio = (url, messageId) => {
-  // 🔇 Stop previous audio
-  if (audioRef.current) {
-    audioRef.current.pause();
-    audioRef.current.currentTime = 0;
-    audioRef.current.src = "";
-    audioRef.current = null;
-  }
+  const playBotAudio = (url, messageId) => {
+    // Pehle sab audio stop karo
+    stopAllAudio();
+    
+    const audio = new Audio(url);
+    audioRef.current = audio;
 
-  const audio = new Audio(url);
-  audioRef.current = audio;
+    setBotSpeaking(true);
+    setSpeakingMessageId(messageId);
 
-  // 🔥 Mark only THIS message as speaking
-  setBotSpeaking(true);
-  setSpeakingMessageId(messageId);
+    audio.play().catch((err) => {
+      console.error("Audio play error:", err);
+      setBotSpeaking(false);
+      setSpeakingMessageId(null);
+    });
 
-  audio.play().catch(() => {});
+    audio.onended = () => {
+      setBotSpeaking(false);
+      setSpeakingMessageId(null);
+      audioRef.current = null;
+    };
 
-  audio.onended = () => {
-    setBotSpeaking(false);
-    setSpeakingMessageId(null);
-    audioRef.current = null;
+    audio.onerror = () => {
+      setBotSpeaking(false);
+      setSpeakingMessageId(null);
+      audioRef.current = null;
+    };
   };
-};
 
   /* ================= AUTOPLAY BOT AUDIO ================= */
- useEffect(() => {
-  const lastMessage = messages[messages.length - 1];
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
 
-  if (
-    lastMessage?.role === "bot" &&
-    lastMessage?.type === "audio" &&
-    lastMessage?.audioUrl &&
-    lastMessage?.autoPlay
-  ) {
-    playBotAudio(lastMessage.audioUrl, lastMessage.id);
-  }
-}, [messages]);
+    if (
+      lastMessage?.role === "bot" &&
+      lastMessage?.type === "audio" &&
+      lastMessage?.audioUrl &&
+      lastMessage?.autoPlay
+    ) {
+      // Pehle agar koi recording chal rahi hai toh stop karo
+      stopAllRecording();
+      // Phir audio play karo
+      playBotAudio(lastMessage.audioUrl, lastMessage.id);
+    }
+  }, [messages]);
 
-  /* ================= CHAT CLOSE = FORCE STOP ================= */
- useEffect(() => {
-  if (!isOpen && audioRef.current) {
-    audioRef.current.pause();
-    audioRef.current.currentTime = 0;
-    audioRef.current.src = "";
-    audioRef.current = null;
-    setBotSpeaking(false);
-    setSpeakingMessageId(null);
-  }
-}, [isOpen]);
-  /* ================= COMPONENT UNMOUNT CLEANUP ================= */
+  /* ================= CLEANUP WHEN UNMOUNTING ================= */
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        audioRef.current.src = "";
-        audioRef.current = null;
-      }
+      stopAllAudio();
+      stopAllRecording();
     };
   }, []);
 
@@ -128,6 +171,9 @@ function XobiaChatbot() {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
+    // Agar recording chal rahi hai toh pehle stop karo
+    stopAllRecording();
+    
     const userMsg = {
       id: Date.now(),
       role: "user",
@@ -190,11 +236,11 @@ function XobiaChatbot() {
   };
 
   const handleKeyDown = (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-};
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
   /* ================= SEND VOICE ================= */
   const sendAudioMessage = async (audioBlob) => {
@@ -246,43 +292,167 @@ function XobiaChatbot() {
     }
   };
 
-  /* ================= RECORD ================= */
+  /* ================= SIMPLE RECORDING FUNCTIONS ================= */
+  const handleMouseDown = () => {
+    if (loading || voiceLoading) return;
+    
+    // Agar bot bol raha hai toh stop karo
+    if (botSpeaking) {
+      stopAllAudio();
+    }
+    
+    setIsHolding(true);
+    
+    // Start recording after 300ms
+    holdTimerRef.current = setTimeout(() => {
+      startRecording();
+    }, 300);
+  };
+
+  const handleMouseUp = () => {
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+    
+    setIsHolding(false);
+    setShowDelete(false);
+    
+    if (recording) {
+      stopRecordingAndSend();
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    if (loading || voiceLoading) return;
+    
+    touchStartXRef.current = e.touches[0].clientX;
+    handleMouseDown();
+  };
+
+  const handleTouchMove = (e) => {
+    if (!recording) return;
+    
+    const touchX = e.touches[0].clientX;
+    const deltaX = touchStartXRef.current - touchX;
+    
+    if (deltaX > 50) { // Swipe left more than 50px
+      setShowDelete(true);
+    } else {
+      setShowDelete(false);
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!recording) {
+      handleMouseUp();
+      return;
+    }
+    
+    const touchX = e.changedTouches[0].clientX;
+    const deltaX = touchStartXRef.current - touchX;
+    
+    if (deltaX > 50) { // Swipe left to delete
+      cancelRecording();
+    } else {
+      stopRecordingAndSend();
+    }
+    
+    setIsHolding(false);
+    setShowDelete(false);
+  };
+
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const recorder = new MediaRecorder(stream);
+    try {
+      // Pehle agar koi audio chal rahi hai toh stop karo
+      stopAllAudio();
+      
+      // Agar pehle se recording chal rahi hai toh stop karo
+      if (recording) {
+        mediaRecorderRef.current?.stop();
+      }
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
 
-    mediaRecorderRef.current = recorder;
-    audioChunksRef.current = [];
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
 
-    recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
+      recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
 
-    recorder.onstop = async () => {
-      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      recorder.onstop = async () => {
+        // Agar cancel nahi hua toh send karo
+        if (audioChunksRef.current.length > 0) {
+          const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
 
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now(),
+              role: "user",
+              type: "voice-sent",
+              timestamp: new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+            },
+          ]);
+
+          await sendAudioMessage(blob);
+        }
+        
+        // Cleanup stream
+        stream.getTracks().forEach((t) => {
+          t.stop();
+          t.enabled = false;
+        });
+      };
+
+      recorder.start();
+      setRecording(true);
+    } catch (error) {
+      console.error("Recording error:", error);
+      setIsHolding(false);
+      
+      // Show error to user
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now(),
-          role: "user",
-          type: "voice-sent",
+          role: "bot",
+          type: "text",
+          text: "Could not access microphone. Please check permissions.",
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           }),
         },
       ]);
-
-      await sendAudioMessage(blob);
-      stream.getTracks().forEach((t) => t.stop());
-    };
-
-    recorder.start();
-    setRecording(true);
+    }
   };
 
-  const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
-    setRecording(false);
+  const stopRecordingAndSend = () => {
+    if (mediaRecorderRef.current && recording) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
+  };
+
+  const cancelRecording = () => {
+    if (mediaRecorderRef.current) {
+      // Stop recording without sending
+      mediaRecorderRef.current.stop();
+      audioChunksRef.current = [];
+      setRecording(false);
+      
+      // Stop and disable tracks
+      if (mediaRecorderRef.current.stream) {
+        mediaRecorderRef.current.stream.getTracks().forEach(track => {
+          track.stop();
+          track.enabled = false;
+        });
+      }
+    }
   };
 
   const SpeakingIndicator = () => (
@@ -298,73 +468,63 @@ function XobiaChatbot() {
     </div>
   );
 
- 
-
-return (
+  return (
     <>
       {/* Floating Chat Button */}
-    <AnimatePresence>
-  {!isOpen && (
-    <motion.button
-      // 1. Entrance: Comes from top of screen to fixed bottom position
-      initial={{ y: -1000, opacity: 0 }} 
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 60, 
-        damping: 15, 
-        delay: 0.5 // Adjust delay as needed
-      }}
-      // 2. Continuous Floating Effect
-      whileInView={{
-        y: [0, -10, 0],
-        transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-      }}
-      whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(139, 92, 246, 0.3)" }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() => setIsOpen(true)}
-      // 3. Premium Solid Styling
-      className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 flex items-center gap-4 bg-white border border-slate-100 py-2 pl-6 pr-2 rounded-full shadow-[0_15px_35px_-5px_rgba(0,0,0,0.2)]"
-    >
-      {/* Text on Left */}
-      <div className="flex flex-col text-left">
-        <span className="text-[10px] uppercase tracking-widest text-purple-500 font-bold">
-          AI Expert
-        </span>
-        <span className="text-slate-900 font-extrabold text-sm md:text-base">
-          Talk with <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Xobia</span>
-        </span>
-      </div>
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            initial={{ y: -1000, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{
+              type: "spring",
+              stiffness: 60,
+              damping: 15,
+              delay: 0.5
+            }}
+            whileInView={{
+              y: [0, -10, 0],
+              transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            }}
+            whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(139, 92, 246, 0.3)" }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsOpen(true)}
+            className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 flex items-center gap-4 bg-white border border-slate-100 py-2 pl-6 pr-2 rounded-full shadow-[0_15px_35px_-5px_rgba(0,0,0,0.2)]"
+          >
+            <div className="flex flex-col text-left">
+              <span className="text-[10px] uppercase tracking-widest text-purple-500 font-bold">
+                AI Expert
+              </span>
+              <span className="text-slate-900 font-extrabold text-sm md:text-base">
+                Talk with <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Xobia</span>
+              </span>
+            </div>
 
-      {/* Image on Right with Purple Ring */}
-      <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[3px] shadow-lg">
-        <div className="w-full h-full rounded-full overflow-hidden bg-white">
-          <img 
-            src={xobiaAvatar} 
-            alt="Xobia" 
-            className="w-full h-full object-cover scale-110 mt-1" 
-          />
-        </div>
-        {/* Active Status */}
-        <span className="absolute bottom-0 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
-      </div>
-    </motion.button>
-  )}
-</AnimatePresence>
-      {/* Chat Widget - HEADER SE BAHUT NICHE */}
+            <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[3px] shadow-lg">
+              <div className="w-full h-full rounded-full overflow-hidden bg-white">
+                <img
+                  src={xobiaAvatar}
+                  alt="Xobia"
+                  className="w-full h-full object-cover scale-110 mt-1"
+                />
+              </div>
+              <span className="absolute bottom-0 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
+            </div>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Chat Widget */}
       {isOpen && (
         <>
-          {/* Backdrop - Only for mobile */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/20 z-40 md:hidden"
-            onClick={() => setIsOpen(false)}
+            onClick={handleCloseChat}
           ></div>
-          
-          {/* CHAT WIDGET - BAHUT NICHE (md:top-48 se aur neeche) */}
+
           <div className="fixed bottom-16 md:top-38 right-4 md:right-8 z-50 w-full max-w-sm md:max-w-md mx-auto">
-            {/* Expanded View Only - No Minimized View */}
             <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[70vh] md:h-[550px] w-full">
-              {/* Header */}
+              {/* Header with Close Button */}
               <div className="flex items-center justify-between p-3 md:p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
@@ -376,10 +536,25 @@ return (
                   </div>
                 </div>
                 <div className="flex items-center gap-1 md:gap-2">
+                  {/* Stop All Audio Button */}
+                  {(botSpeaking || recording) && (
+                    <button
+                      onClick={() => {
+                        stopAllAudio();
+                        stopAllRecording();
+                      }}
+                      className="p-1.5 md:p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                      aria-label="Stop all audio"
+                      title="Stop all audio"
+                    >
+                      <FiVolume2 className="w-3 h-3 md:w-4 md:h-4" />
+                    </button>
+                  )}
+                  
                   <button
-                    onClick={() => setIsOpen(false)}
+                    onClick={handleCloseChat}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                    aria-label="Close"
+                    aria-label="Close chat"
                   >
                     <FiX className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
@@ -397,6 +572,9 @@ return (
                     <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4 max-w-xs">
                       Ask me about home designs, properties, or anything else!
                     </p>
+                    <div className="text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-lg">
+                      💡 Hold mic button to record voice message
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-2 md:space-y-3">
@@ -412,32 +590,58 @@ return (
                               : "bg-white text-gray-800 rounded-bl-none shadow-md border border-gray-100"
                           }`}
                         >
- {/* USER VOICE */}
-{m.role === "user" && m.type === "voice-sent" && (
-  <p className="text-xs font-medium text-white/90">
-    🎙️ Voice note sent
-  </p>
-)}
+                          {/* USER VOICE */}
+                          {m.role === "user" && m.type === "voice-sent" && (
+                            <p className="text-xs font-medium text-white/90">
+                              🎙️ Voice note sent
+                            </p>
+                          )}
 
-{/* BOT AUDIO */}
-{m.role === "bot" && m.type === "audio" && (
-  <>
-    {botSpeaking && speakingMessageId === m.id ? (
-      <SpeakingIndicator />
-    ) : (
-      <p className="text-sm font-medium text-gray-600">
-        ✅ Voice reply delivered
-      </p>
-    )}
-  </>
-)}
+                          {/* BOT AUDIO with Stop Button */}
+                          {m.role === "bot" && m.type === "audio" && (
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center justify-between">
+                                {botSpeaking && speakingMessageId === m.id ? (
+                                  <SpeakingIndicator />
+                                ) : (
+                                  <p className="text-sm font-medium text-gray-600">
+                                    ✅ Voice reply delivered
+                                  </p>
+                                )}
+                                
+                                {/* Show stop button if this audio is playing */}
+                                {botSpeaking && speakingMessageId === m.id && (
+                                  <button
+                                    onClick={stopAllAudio}
+                                    className="ml-2 p-1.5 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
+                                    aria-label="Stop audio"
+                                    title="Stop audio"
+                                  >
+                                    <FiVolume2 className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                              
+                              {/* Play button if not speaking */}
+                              {!botSpeaking && (
+                                <button
+                                  onClick={() => playBotAudio(m.audioUrl, m.id)}
+                                  className="text-xs flex items-center gap-1 text-purple-600 hover:text-purple-700"
+                                  disabled={recording}
+                                >
+                                  <FiVolume2 className="w-3 h-3" />
+                                  {recording ? "Recording in progress..." : "Play voice"}
+                                </button>
+                              )}
+                            </div>
+                          )}
 
-{/* TEXT */}
-{m.type === "text" && (
-  <p className="text-xs md:text-sm md:text-base">
-    {m.text}
-  </p>
-)}
+                          {/* TEXT */}
+                          {m.type === "text" && (
+                            <p className="text-xs md:text-sm md:text-base">
+                              {m.text}
+                            </p>
+                          )}
 
                           {/* Timestamp */}
                           <div className={`flex items-center justify-end mt-1 md:mt-2 ${
@@ -451,8 +655,8 @@ return (
                         </div>
                       </div>
                     ))}
-                    
-                    {/* Loading Indicator for Text */}
+
+                    {/* Loading Indicators */}
                     {loading && (
                       <div className="flex justify-start">
                         <div className="max-w-[80%] md:max-w-[70%] bg-white rounded-2xl rounded-bl-none p-3 md:p-4 shadow-md border border-gray-100">
@@ -467,8 +671,7 @@ return (
                         </div>
                       </div>
                     )}
-                    
-                    {/* Loading Indicator for Voice Processing */}
+
                     {voiceLoading && (
                       <div className="flex justify-start">
                         <div className="max-w-[80%] md:max-w-[70%] bg-white rounded-2xl rounded-bl-none p-3 md:p-4 shadow-md border border-gray-100">
@@ -483,32 +686,51 @@ return (
                         </div>
                       </div>
                     )}
-                    
+
                     <div ref={chatEndRef} />
                   </div>
                 )}
               </div>
 
-              {/* Input Area - REMOVED "ENTER TO SEND" HINT */}
+              {/* Input Area */}
               <div className="border-t border-gray-200 p-3 md:p-4 bg-white">
                 <div className="flex items-center gap-1 md:gap-2">
                   {/* Recording Button */}
                   <button
-                    onClick={recording ? stopRecording : startRecording}
-                    className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all ${
-                      recording
-                        ? "bg-red-500 hover:bg-red-600 animate-pulse text-white"
-                        : "bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 hover:from-blue-200 hover:to-purple-200"
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all relative ${
+                      isHolding && !recording
+                        ? "bg-gradient-to-r from-blue-200 to-purple-200 scale-110"
+                        : recording
+                          ? showDelete
+                            ? "bg-red-500 text-white"
+                            : "bg-gradient-to-r from-blue-500 to-purple-500 text-white animate-pulse"
+                          : "bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 hover:from-blue-200 hover:to-purple-200"
                     }`}
                     disabled={loading || voiceLoading}
-                    aria-label={recording ? "Stop recording" : "Start recording"}
+                    aria-label={recording ? "Recording in progress" : "Hold to record"}
                   >
                     {recording ? (
-                      <div className="flex items-center justify-center">
-                        <div className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-white"></div>
-                      </div>
+                      showDelete ? (
+                        <FiTrash2 className="w-4 h-4 md:w-5 md:h-5" />
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <div className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-white"></div>
+                        </div>
+                      )
                     ) : (
                       <FiMic className="w-4 h-4 md:w-5 md:h-5" />
+                    )}
+                    
+                    {/* Recording indicator */}
+                    {recording && !showDelete && (
+                      <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-purple-600 bg-white px-2 py-1 rounded-full shadow whitespace-nowrap">
+                        ● Recording
+                      </span>
                     )}
                   </button>
 
@@ -523,7 +745,7 @@ return (
                       rows={1}
                       className="w-full px-3 py-2 md:px-4 md:py-3 pr-10 md:pr-12 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-xs md:text-sm disabled:opacity-50"
                     />
-                    
+
                     {/* Send Button */}
                     {input.trim() && (
                       <button
@@ -537,20 +759,53 @@ return (
                     )}
                   </div>
                 </div>
-                
-                {/* Recording Indicator */}
-                {recording && (
-                  <div className="mt-2 md:mt-3 flex items-center justify-center">
-                    <div className="flex items-center gap-1 md:gap-2 bg-red-50 text-red-600 px-2 py-1 md:px-4 md:py-2 rounded-full">
-                      <div className="flex gap-0.5 md:gap-1">
-                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-red-500 rounded-full animate-pulse"></div>
-                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></div>
-                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: "0.4s" }}></div>
+
+                {/* Instructions */}
+                <div className="mt-2 text-center">
+                  {isHolding && !recording && (
+                    <div className="flex flex-col items-center">
+                      <p className="text-xs text-purple-600 font-medium mb-1">
+                        Keep holding to record...
+                      </p>
+                      <div className="w-24 h-1 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-purple-500 animate-pulse" style={{ animationDuration: '0.3s' }}></div>
                       </div>
-                      <span className="text-xs md:text-sm font-medium">Recording... Click to stop</span>
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {recording && !showDelete && (
+                    <p className="text-xs text-purple-600 font-medium">
+                      🎤 Speaking... Release to send • Swipe left to delete
+                    </p>
+                  )}
+
+                  {showDelete && (
+                    <div className="flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg animate-pulse">
+                      <FiTrash2 className="w-4 h-4" />
+                      <span className="text-sm font-bold">Release to delete recording</span>
+                    </div>
+                  )}
+
+                  {!isHolding && !recording && !showDelete && (
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="text-xs text-gray-500">
+                        💡 Hold mic button to record voice message
+                      </p>
+                      {(botSpeaking || recording) && (
+                        <button
+                          onClick={() => {
+                            stopAllAudio();
+                            stopAllRecording();
+                          }}
+                          className="text-xs text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
+                        >
+                          <FiVolume2 className="w-3 h-3" />
+                          Stop all audio
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
