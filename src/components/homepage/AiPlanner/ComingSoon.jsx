@@ -53,7 +53,7 @@ const interElements = [
 const roomTypes = [
   { value: 'living', label: 'Living Room', img: 'https://gstatic.ideal.house/interior/Home/Living_Room.webp'   },
   { value: 'bedroom', label: 'Bedroom', img: 'https://gstatic.ideal.house/interior/Home/Bed_Room.webp' },
-  { value: 'kitchen', label: 'Kitchen', img: 'https://gstatic.ideal.house/interior/Home/Living_Room.webp' },
+  { value: 'kitchen', label: 'Kitchen', img: 'https://gstatic.ideal.house/interior/Home/Kitchen.webp' },
   { value: 'bathroom', label: 'Bathroom', img: 'https://gstatic.ideal.house/interior/Home/Bath_Room.webp' },
   { value: 'dining', label: 'Dining Room', img: 'https://gstatic.ideal.house/interior/Home/Dining_Room.webp' }, 
   { value: 'office', label: 'Home Office', img: 'https://gstatic.ideal.house/interior/Home/Home_Office.webp' },
@@ -494,12 +494,7 @@ const generateAIDesigns = async (currentUser) => {
                 <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Your Masterpieces</h1>
                 <p className="text-gray-500 font-medium text-lg">AI-generated interior created by you.</p>
               </div>
-              {/* {isCustomerLoggedIn && (
-                <div className="px-4 py-2 bg-white rounded-full shadow-sm border border-green-100 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-           
-                </div>
-              )} */}
+              
             </div>
 
             {designs.length === 0 ? (
@@ -525,7 +520,7 @@ const generateAIDesigns = async (currentUser) => {
                         </button>
                       </div>
                       <div className="absolute top-5 left-5">
-                        <Tag color="#fff" className="text-purple-700 font-bold border-none px-3 py-1.5 rounded-full shadow-lg">AI GENERATED</Tag>
+                        <Tag color="#5c039b" className="text-purple-700 font-bold border-none px-3 py-1.5 rounded-full shadow-lg">AI GENERATED</Tag>
                       </div>
                     </div>
                     <div className="p-6">
