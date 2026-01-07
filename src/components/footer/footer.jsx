@@ -22,7 +22,9 @@ const Accordion = ({ title, children, isOpen, toggle }) => (
     >
       {title}
       <ChevronDown
-        className={`transition-transform ${isOpen ? "rotate-180" : "rotate-0"}`}
+        className={`transition-transform ${
+          isOpen ? "rotate-180" : "rotate-0"
+        }`}
       />
     </button>
     <div
@@ -49,7 +51,6 @@ export default function Footer() {
 
   return (
     <footer className="main-gradient-color text-white relative">
-
       {/* ================= MOBILE TOP ================= */}
       <div className="relative text-center pt-10 lg:hidden px-6">
         <img src={logoNewImage} className="h-16 mx-auto" alt="Xoto" />
@@ -84,35 +85,72 @@ export default function Footer() {
 
       {/* ================= MOBILE ACCORDIONS ================= */}
       <div className="px-6 lg:hidden mt-10">
-        <Accordion title={t("titles.offerings")} isOpen={open === 1} toggle={() => toggle(1)}>
+        <Accordion
+          title={t("titles.offerings")}
+          isOpen={open === 1}
+          toggle={() => toggle(1)}
+        >
           {offerings.map((i, k) => (
-            <p key={k} className="text-purple-200 text-sm font-bold">
+            <Link
+              key={k}
+              to={i.path}
+              className="block text-purple-200 text-sm font-bold py-1 hover:text-white"
+            >
               {i.label}
-            </p>
+            </Link>
           ))}
         </Accordion>
 
-        <Accordion title={t("titles.resources")} isOpen={open === 2} toggle={() => toggle(2)}>
+        <Accordion
+          title={t("titles.resources")}
+          isOpen={open === 2}
+          toggle={() => toggle(2)}
+        >
           {resources.map((i, k) => (
-            <p key={k} className="text-purple-200 text-sm font-bold">
+            <Link
+              key={k}
+              to={i.path}
+              className="block text-purple-200 text-sm font-bold py-1 hover:text-white"
+            >
               {i.label}
-            </p>
+            </Link>
           ))}
         </Accordion>
 
-        <Accordion title={t("titles.knowledge")} isOpen={open === 3} toggle={() => toggle(3)}>
+        <Accordion
+          title={t("titles.knowledge")}
+          isOpen={open === 3}
+          toggle={() => toggle(3)}
+        >
           {knowledge.map((i, k) => (
-            <p key={k} className="text-purple-200 text-sm font-bold">
+            <Link
+              key={k}
+              to={i.path}
+              className="block text-purple-200 text-sm font-bold py-1 hover:text-white"
+            >
               {i.label}
-            </p>
+            </Link>
           ))}
         </Accordion>
 
-        <Accordion title={t("titles.location")} isOpen={open === 4} toggle={() => toggle(4)}>
-          <p className="text-purple-200 text-sm">{t("locations")}</p>
+        <Accordion
+          title={t("titles.location")}
+          isOpen={open === 4}
+          toggle={() => toggle(4)}
+        >
+          <Link
+            to="/contact"
+            className="block text-purple-200 text-sm hover:text-white"
+          >
+            {t("locations")}
+          </Link>
         </Accordion>
 
-        <Accordion title={t("titles.email")} isOpen={open === 5} toggle={() => toggle(5)}>
+        <Accordion
+          title={t("titles.email")}
+          isOpen={open === 5}
+          toggle={() => toggle(5)}
+        >
           <p className="text-purple-200 text-sm">
             {t("email.labels.partners")}:{" "}
             <span className="text-white">{t("email.partners")}</span>
@@ -127,8 +165,6 @@ export default function Footer() {
       {/* ================= DESKTOP FOOTER ================= */}
       <div className="hidden lg:block max-w-screen-2xl mx-auto px-14 pt-20">
         <div className="grid grid-cols-5 gap-14 pb-10">
-
-          {/* Logo */}
           <div>
             <img src={logoNewImage} className="w-[163px] h-[65px] mb-4" />
             <p
@@ -170,7 +206,6 @@ export default function Footer() {
   ))}
 </div>
 
-          {/* About */}
           <div>
             <h4 className="font-bold text-[24px] mb-4">
               {t("titles.knowledge")}
@@ -186,82 +221,45 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* Location + Email */}
-          <div className="relative">
+          <div>
             <h4 className="font-bold text-[24px] mb-4">
               {t("titles.location")}
             </h4>
-            <p>{t("locations")}</p>
+            <Link to="/contact">{t("locations")}</Link>
 
-            <h4 className="mt-6 mb-2 font-bold">
-              {t("titles.email")}
-            </h4>
+            <h4 className="mt-6 mb-2 font-bold">{t("titles.email")}</h4>
 
-           <p>
-  {t("email.labels.partners")}:{" "}
-  <strong>{t("email.partners")}</strong>
-</p>
-
-<p>
-  {t("email.labels.customers")}:{" "}
-  <strong>{t("email.customers")}</strong>
-</p>
-
-
-            {/* Floating Icons */}
-            <div className="flex flex-col gap-4 mt-6 items-end">
-              <div className="w-[53px] h-[53px] bg-[#03A4F4] rounded-full flex items-center justify-center">
-                <img src={whatsappIcon} className="w-[32px]" />
-              </div>
-              <div className="w-[53px] h-[53px] bg-[#32CD32] rounded-full flex items-center justify-center">
-                <img src={chatIcon} className="w-[28px]" />
-              </div>
-            </div>
+            <p>
+              {t("email.labels.partners")}:{" "}
+              <strong>{t("email.partners")}</strong>
+            </p>
+            <p>
+              {t("email.labels.customers")}:{" "}
+              <strong>{t("email.customers")}</strong>
+            </p>
           </div>
         </div>
       </div>
-{/* ================= COPYRIGHT + SOCIALS (DESKTOP) ================= */}
-<div className="border-t py-10 border-purple-500/20">
-  <div className="max-w-screen-2xl mx-auto px-24 hidden lg:flex items-center justify-between">
 
-    {/* LEFT : Copyright */}
-    <p className="text-white/50 text-[16px] leading-[26px]">
-      {t("bottom.copyright")}
-    </p>
+      {/* ================= COPYRIGHT ================= */}
+      <div className="border-t py-10 border-purple-500/20">
+        <div className="hidden lg:flex justify-between max-w-screen-2xl mx-auto px-24">
+          <p className="text-white/50">
+            {t("bottom.copyright")}
+          </p>
 
-    {/* RIGHT : Social Icons */}
-    <div className="flex items-center gap-[40px]">
-      <img
-        src={facebookIcon}
-        alt="Facebook"
-        className="w-[24px] h-[24px] cursor-pointer"
-      />
-      <img
-        src={instagramIcon}
-        alt="Instagram"
-        className="w-[24px] h-[24px] cursor-pointer"
-      />
-      <img
-        src={twitterIcon}
-        alt="Twitter"
-        className="w-[24px] h-[24px] cursor-pointer"
-      />
-      <img
-        src={linkedinIcon}
-        alt="LinkedIn"
-        className="w-[24px] h-[24px] cursor-pointer"
-      />
-    </div>
+          <div className="flex gap-10">
+            <img src={facebookIcon} className="w-[24px]" />
+            <img src={instagramIcon} className="w-[24px]" />
+            <img src={twitterIcon} className="w-[24px]" />
+            <img src={linkedinIcon} className="w-[24px]" />
+          </div>
+        </div>
 
-  </div>
-
-  {/* MOBILE */}
-  <div className="lg:hidden py-6 text-center text-white/50 text-sm">
-    {t("bottom.copyright")}
-  </div>
-</div>
-
-
+        <div className="lg:hidden text-center text-white/50 text-sm">
+          {t("bottom.copyright")}
+        </div>
+      </div>
     </footer>
   );
 }
