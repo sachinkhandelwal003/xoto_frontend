@@ -6,18 +6,17 @@ import Topbar from "./Topbar";
 import BackToTop from "./BackToTop";
 
 const CmsLayoutContent = ({ children }) => {
-  const { sidebarCollapsed, isMobile } = useCmsContext();
-
-  const mainMargin = isMobile || sidebarCollapsed ? "ml-0" : "ml-64";
+  const { sidebarCollapsed, mobileSidebarOpen } = useCmsContext();
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 flex">
       <Sidebar />
 
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${mainMargin}`}>
+      <div className="flex-1 flex flex-col overflow-hidden transition-all duration-300">
         <Topbar />
 
-        <main className="flex-1 overflow-y-auto pt-16 pb-6 bg-gray-300">
+        <main className={`flex-1 overflow-y-auto pt-16 pb-6 bg-gray-300 transition-all duration-300
+          ${sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'}`}>
           <div className="max-w-full px-4 py-6 sm:px-6 lg:px-8 mx-auto w-full">
               {children}
            
@@ -30,7 +29,7 @@ const CmsLayoutContent = ({ children }) => {
 };
 
 const CmsLayout = ({ children }) => (
-  <CmsProvider>
+   <CmsProvider>
     <CmsLayoutContent>{children}</CmsLayoutContent>
   </CmsProvider>
 );

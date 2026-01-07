@@ -16,15 +16,15 @@ const ComingSoonPage = () => {
         <div className="absolute inset-0 bg-black/50"></div>
 
         {/* Content */}
-        <div className="relative z-10 text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+        <div className="relative z-10 text-center px-4 heading-light">
+          <h1 className="text-4xl md:text-6xl  text-white mb-6">
             Real stories.
-            <span className="block mt-2">Coming soon.</span>
+            <span className="block mt-2 heading-light ">Coming soon.</span>
           </h1>
 
           <button
             onClick={() => navigate("/")}
-            className="mt-4 inline-block rounded-full bg-white px-8 py-3 text-lg font-semibold text-black transition hover:bg-gray-200"
+            className="mt-4 inline-block rounded-full bg-white px-8 py-3 text-lg  text-black transition hover:bg-gray-200"
           >
             Take me back to Home
           </button>
