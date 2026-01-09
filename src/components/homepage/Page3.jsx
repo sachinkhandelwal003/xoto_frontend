@@ -18,7 +18,7 @@ import i1 from "../../assets/icons/Homeicons/xx1.png";
 import i2 from "../../assets/icons/Homeicons/xx2.png";
 import i3 from "../../assets/icons/Homeicons/xx3.png";
 import i4 from "../../assets/icons/Homeicons/xx4.png";
-import { Link } from "react-router-dom";
+
 
 const Page3 = () => {
   const { t } = useTranslation("page3");
