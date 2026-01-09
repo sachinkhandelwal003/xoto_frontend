@@ -1,9 +1,6 @@
 // src/components/property/Property.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  BedDouble,
-  Bath,
-  Ruler,
   X,
   User,
   Mail,
@@ -12,23 +9,22 @@ import {
   Briefcase,
   MapPin,
 } from "lucide-react";
-import propertyImg1 from "../../assets/img/buy/home1.png";
-import propertyImg2 from "../../assets/img/buy/home2.png";
-import propertyImg3 from "../../assets/img/buy/home3.png";
+import { notification } from "antd";
+import { apiService } from "../../manageApi/utils/custom.apiservice";
+import { useTranslation } from "react-i18next";
 import bgImage from "../../assets/img/buy3bg.png";
 import Bedicon from "../../assets/img/buy/Vector.png";
 import Bathicon from "../../assets/img/buy/Bath.png";
 import Squareicon from "../../assets/img/buy/Square Meters.png";
 import favoriteicon from "../../assets/img/buy/Favorited.png";
 import popularicon from "../../assets/img/buy/Group 860.png";
-import { notification } from "antd";
-import { apiService } from "../../manageApi/utils/custom.apiservice";
-import { useTranslation } from "react-i18next";
 
 const Property = () => {
   const { t } = useTranslation("buy3");
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [properties, setProperties] = useState([]);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [api, contextHolder] = notification.useNotification();
 
   const countryCodes = [
@@ -48,44 +44,49 @@ const Property = () => {
     preferred_contact: "whatsapp",
   });
 
-  const deals = [
-    {
-      id: 1,
-      price: "$2,095",
-      period: "/month",
-      name: "Palm Harbor",
-      location: "2699 Green Valley, Highland Lake, FL",
-      beds: 3,
-      bathrooms: 2,
-      area: "5×7 m²",
-      popular: true,
-      imgUrl: propertyImg1,
-    },
-    {
-      id: 2,
-      price: "$2,700",
-      period: "/month",
-      name: "Beverly Springfield",
-      location: "2821 Lake Sevilla, Palm Harbor, TX",
-      beds: 4,
-      bathrooms: 2,
-      area: "6×7.5 m²",
-      popular: true,
-      imgUrl: propertyImg2,
-    },
-    {
-      id: 3,
-      price: "$4,550",
-      period: "/month",
-      name: "Faulkner Ave",
-      location: "909 Woodland St, Michigan, IN",
-      beds: 4,
-      bathrooms: 3,
-      area: "8×10 m²",
-      popular: true,
-      imgUrl: propertyImg3,
-    },
-  ];
+  // Fetch real properties from marketplace API
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        setFetchLoading(true);
+
+        // Correct endpoint (no extra /api/)
+        const res = await apiService.get("/property/marketplace");
+
+        console.log("Marketplace API Response:", res);
+
+        if (res.success && res.data && Array.isArray(res.data.properties)) {
+          const transformed = res.data.properties.map((item) => ({
+            id: item._id,
+            price: item.price
+              ? `${item.currency || "AED"} ${Number(item.price).toLocaleString()}`
+              : "Price on Request",
+            period: item.propertyType === "rent" ? "/month" : "",
+            name: item.propertyName || "Luxury Property",
+            location: item.area && item.city ? `${item.area}, ${item.city}` : "Dubai, UAE",
+            beds: item.bedrooms || 0,
+            bathrooms: item.bathrooms || 0,
+            area: item.builtUpArea
+              ? `${item.builtUpArea} ${item.builtUpAreaUnit || "sqft"}`
+              : "N/A",
+            imgUrl: item.photos?.[0] || item.mainLogo || "https://via.placeholder.com/400x300?text=No+Image",
+          }));
+
+          setProperties(transformed);
+        } else {
+          throw new Error("Invalid API response format");
+        }
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+        openNotification("error", "Failed to Load Properties", "Please try again later.");
+        setProperties([]);
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -151,28 +152,35 @@ const Property = () => {
       >
         <div className="max-w-7xl mx-auto mb-10 md:mb-14">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            {/* LEFT: Title - Added max-w and changed fixed width to allow responsiveness */}
             <h2 className="font-dm font-semibold text-[36px] md:text-[60px] leading-[1.1] tracking-[-0.03em] text-white max-w-[515px] w-full text-left">
               {t("heading.title")}
             </h2>
 
-            {/* RIGHT: Subtitle - Changed fixed width to max-w */}
             <p className="text-white font-medium text-[18px] md:text-[24px] leading-[1.4] max-w-[454px] w-full text-left md:text-right">
               {t("heading.subtitle")}
             </p>
           </div>
         </div>
 
-        {/* Responsive Grid: 1 col on mobile, 2 on tablet, 3 on desktop */}
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-          {deals.map((deal) => (
-            <PropertyCard
-              key={deal.id}
-              deal={deal}
-              onClick={() => setOpenModal(true)}
-            />
-          ))}
-        </div>
+        {fetchLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#5C039B]"></div>
+          </div>
+        ) : properties.length === 0 ? (
+          <p className="text-center text-white text-xl py-10">
+            No properties available at the moment
+          </p>
+        ) : (
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+            {properties.map((deal) => (
+              <PropertyCard
+                key={deal.id}
+                deal={deal}
+                onClick={() => setOpenModal(true)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Modal */}
@@ -207,7 +215,9 @@ const Property = () => {
                       required
                       className="premium-input pl-12"
                     />
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600"><User size={20} /></div>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600">
+                      <User size={20} />
+                    </div>
                   </div>
                   <div className="relative">
                     <input
@@ -218,7 +228,9 @@ const Property = () => {
                       required
                       className="premium-input pl-12"
                     />
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600"><User size={20} /></div>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600">
+                      <User size={20} />
+                    </div>
                   </div>
                 </div>
 
@@ -232,7 +244,9 @@ const Property = () => {
                     required
                     className="premium-input pl-12"
                   />
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600"><Mail size={20} /></div>
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600">
+                    <Mail size={20} />
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -247,7 +261,9 @@ const Property = () => {
                         <option key={item.code} value={item.code}>{item.code}</option>
                       ))}
                     </select>
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-600 pointer-events-none"><Globe size={18} /></div>
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-600 pointer-events-none">
+                      <Globe size={18} />
+                    </div>
                   </div>
 
                   <div className="relative flex-1">
@@ -261,7 +277,9 @@ const Property = () => {
                       required
                       className="premium-input pl-12"
                     />
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600"><Phone size={20} /></div>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600">
+                      <Phone size={20} />
+                    </div>
                   </div>
                 </div>
 
@@ -274,7 +292,9 @@ const Property = () => {
                     required
                     className="premium-input pl-12"
                   />
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600"><Briefcase size={20} /></div>
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600">
+                    <Briefcase size={20} />
+                  </div>
                 </div>
 
                 <div className="relative">
@@ -286,7 +306,9 @@ const Property = () => {
                     required
                     className="premium-input pl-12"
                   />
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600"><MapPin size={20} /></div>
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-600">
+                    <MapPin size={20} />
+                  </div>
                 </div>
 
                 <button
@@ -294,7 +316,11 @@ const Property = () => {
                   disabled={loading}
                   className="w-full bg-gradient-to-r from-purple-600 to-violet-600 text-white py-4 md:py-5 rounded-xl text-lg font-bold hover:shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
                 >
-                  {loading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : t("actions.submit")}
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  ) : (
+                    t("actions.submit")
+                  )}
                 </button>
               </form>
             </div>
@@ -314,7 +340,7 @@ const Property = () => {
           transition: all 0.3s;
         }
         @media (min-width: 768px) {
-            .premium-input { padding: 1rem 1.25rem 1rem 3rem; }
+          .premium-input { padding: 1rem 1.25rem 1rem 3rem; }
         }
         .premium-input:focus {
           border-color: #9333ea;
@@ -330,17 +356,15 @@ const Property = () => {
 
 function PropertyCard({ deal, onClick }) {
   return (
-    /* Changed fixed w-[396px] to max-w-[396px] and w-full to prevent overflow on mobile */
     <div className="bg-white rounded-[16px] shadow-[0_10px_30px_rgba(0,0,0,0.12)] overflow-hidden w-full max-w-[396px] mb-6 transition-transform duration-300 hover:scale-[1.02]">
       <div className="relative">
         <img src={deal.imgUrl} alt={deal.name} className="h-[200px] md:h-[230px] w-full object-cover" />
-        {deal.popular && (
-          <img
-            src={popularicon}
-            alt="Popular"
-            className="absolute left-0 bottom-[-16px] w-[100px] md:w-[124.22px] h-auto"
-          />
-        )}
+        {/* Always show popular badge on all cards */}
+        <img
+          src={popularicon}
+          alt="Popular"
+          className="absolute left-0 bottom-[-16px] w-[100px] md:w-[124.22px] h-auto"
+        />
       </div>
 
       <div className="p-5 md:p-[24px] bg-gradient-to-b from-[#F7F6F9] to-white">
@@ -355,7 +379,6 @@ function PropertyCard({ deal, onClick }) {
         <h3 className="text-[16px] leading-[24px] font-semibold text-[#111827]">{deal.name}</h3>
         <p className="mt-1 text-[14px] leading-[20px] font-medium text-[#6B7280] opacity-90">{deal.location}</p>
 
-        {/* Features: Added flex-wrap for very small screens */}
         <div className="flex flex-wrap items-center gap-3 md:gap-4 mt-5 text-[12px] md:text-[13px] text-[#374151]">
           <div className="flex items-center gap-2">
             <img src={Bedicon} alt="Beds" className="h-[14px] md:h-[16px]" />
