@@ -1,10 +1,13 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
-
+import { useState } from "react";
+import { useTranslation  } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import GetPreApprovedModal from "../homepage/GetPreApprovedModal";
 export default function CTAButtons() {
   const { t, i18n } = useTranslation("mort1");
   const isRTL = i18n.language === "fa";
-
+  const navigate = useNavigate();
+const [openPreApproved, setOpenPreApproved] = useState(false);
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
@@ -16,26 +19,27 @@ export default function CTAButtons() {
       "
     >
       {/* PRIMARY BUTTON */}
-      <button
-        onClick={() => alert(t("cta.preApprovedAlert"))}
-        className="
-          flex-1 sm:flex-none
-          px-3 sm:px-8
-          py-2.5 sm:py-3
-          bg-[var(--color-primary)]
-          text-white
-          rounded-lg
-          shadow-md
-          transition-all duration-300
-          whitespace-nowrap
-        "
-      >
-        {t("cta.preApproved")}
-      </button>
+    {/* PRIMARY BUTTON → OPEN MODAL */}
+        <button
+          onClick={() => setOpenPreApproved(true)}
+          className="
+            flex-1 sm:flex-none
+            px-3 sm:px-8
+            py-2.5 sm:py-3
+            bg-[var(--color-primary)]
+            text-white
+            rounded-lg
+            shadow-md
+            transition-all duration-300
+            whitespace-nowrap
+          "
+        >
+          {t("cta.preApproved")}
+        </button>
 
       {/* OUTLINE BUTTON */}
       <button
-        onClick={() => alert(t("cta.calculateAlert"))}
+        onClick={() => navigate("/mortgages")}
         className="
           flex-1 sm:flex-none
           px-3 sm:px-8
@@ -52,6 +56,13 @@ export default function CTAButtons() {
       >
         {t("cta.calculate")}
       </button>
+{/* PRE-APPROVED MODAL */}
+      <GetPreApprovedModal
+        open={openPreApproved}
+        onClose={() => setOpenPreApproved(false)}
+      />
+
     </div>
+    
   );
 }

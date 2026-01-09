@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-
+import { Link } from "react-router-dom";
 import Picture from "../../assets/img/photo-1477959858617-67f85cf4f1df.png";
 import wave2 from "../../assets/img/wave/wave2.png";
 
@@ -182,9 +182,9 @@ const Page3 = () => {
                   <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 break-words">
                     {post.title}
                   </h3>
-                  <a  className="text-[#5C039B] mt-2 text-lg font-semibold hover:text-purple-800">
+                  <Link to="/Ai" className="text-[#5C039B] mt-2 text-lg font-semibold hover:text-purple-800">
                     {t("blogs.readMore")}
-                  </a>
+                  </Link>
                 </div>
               </div>
             ))}

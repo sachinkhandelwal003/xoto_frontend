@@ -34,7 +34,7 @@ export default function HeroSection() {
   );
 
   return (
-    <section className="relative flex items-center py-24 lg:py-40 justify-center overflow-hidden min-h-[600px]">
+    <section className="relative flex items-center py-24 lg:py-40 justify-center overflow-hidden min-h-[600px] bg-[var(--color-body)]">
       
       {/* Background Image & Overlay */}
       <div className="absolute inset-0">
