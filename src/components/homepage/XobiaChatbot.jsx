@@ -24,6 +24,17 @@ function XobiaChatbot() {
   const audioRef = useRef(null);
   const holdTimerRef = useRef(null);
   const recordingTimerRef = useRef(null);
+  const inputTextareaRef = useRef(null);
+  const recordingButtonRef = useRef(null);
+
+  /* ================= AUTO-ADJUST TEXTAREA HEIGHT ================= */
+  useEffect(() => {
+    const textarea = inputTextareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+    }
+  }, [input]);
 
   /* ================= STOP ALL AUDIO FUNCTIONS ================= */
   const stopAllAudio = () => {
@@ -185,6 +196,11 @@ function XobiaChatbot() {
     setInput("");
     setLoading(true);
 
+    // Reset textarea height
+    if (inputTextareaRef.current) {
+      inputTextareaRef.current.style.height = 'auto';
+    }
+
     try {
       const formData = new FormData();
       formData.append("message", userMsg.text);
@@ -288,8 +304,8 @@ function XobiaChatbot() {
     }
   };
 
-  /* ================= SIMPLE RECORDING FUNCTIONS ================= */
-  const handleMouseDown = () => {
+  /* ================= ENHANCED RECORDING FOR MOBILE & PC ================= */
+  const startRecordingProcess = () => {
     if (loading || voiceLoading) return;
     
     if (botSpeaking) {
@@ -304,7 +320,7 @@ function XobiaChatbot() {
     }, 300);
   };
 
-  const handleMouseUp = () => {
+  const stopRecordingProcess = () => {
     if (holdTimerRef.current) {
       clearTimeout(holdTimerRef.current);
       holdTimerRef.current = null;
@@ -324,6 +340,28 @@ function XobiaChatbot() {
     setIsHolding(false);
   };
 
+  /* ================= HANDLE MOUSE EVENTS (PC) ================= */
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    startRecordingProcess();
+  };
+
+  const handleMouseUp = (e) => {
+    e.preventDefault();
+    stopRecordingProcess();
+  };
+
+  /* ================= HANDLE TOUCH EVENTS (MOBILE) ================= */
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+    startRecordingProcess();
+  };
+
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    stopRecordingProcess();
+  };
+
   const startRecording = async () => {
     try {
       stopAllAudio();
@@ -332,7 +370,13 @@ function XobiaChatbot() {
         mediaRecorderRef.current?.stop();
       }
       
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 16000
+        } 
+      });
       const recorder = new MediaRecorder(stream);
 
       mediaRecorderRef.current = recorder;
@@ -449,7 +493,7 @@ function XobiaChatbot() {
             whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(139, 92, 246, 0.3)" }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 flex items-center gap-4 bg-white border border-slate-100 py-2 pl-6 pr-2 rounded-full shadow-[0_15px_35px_-5px_rgba(0,0,0,0.2)]"
+            className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[9999] flex items-center gap-4 bg-white border border-slate-100 py-2 pl-6 pr-2 rounded-full shadow-[0_15px_35px_-5px_rgba(0,0,0,0.2)]"
           >
             <div className="flex flex-col text-left">
               <span className="text-[10px] uppercase tracking-widest text-purple-500 font-bold">
@@ -460,33 +504,36 @@ function XobiaChatbot() {
               </span>
             </div>
 
-      {/* Image on Right with Purple Ring */}
-      <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[1px] shadow-lg">
-        <div className="w-full h-full animate-come-up  rounded-full ">
-          <img 
-            src={xobiaAvatar}
-            
-            alt="Xobia" 
-            className="w-full h-55px object-cover animate-entrance-bottom scale-110 mt-1" 
-          />
-        </div>
-        {/* Active Status */}
-        <span className="absolute bottom-0 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
-      </div>
-    </motion.button>
-  )}
-</AnimatePresence>
-      {/* Chat Widget - HEADER SE BAHUT NICHE */}
+            {/* Image on Right with Purple Ring */}
+            <div className="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-blue-500 rounded-full p-[1px] shadow-lg">
+              <div className="w-full h-full animate-come-up rounded-full ">
+                <img 
+                  src={xobiaAvatar}
+                  alt="Xobia" 
+                  className="w-full h-[55px] object-cover animate-entrance-bottom scale-110 mt-1" 
+                />
+              </div>
+              {/* Active Status */}
+              <span className="absolute bottom-0 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
+            </div>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Chat Widget - FIXED POSITIONING */}
       {isOpen && (
         <>
+          {/* Backdrop - Only for mobile */}
           <div
-            className="fixed inset-0 bg-black/20 z-40 md:hidden"
+            className="fixed inset-0 bg-black/20 z-[9998] md:hidden"
             onClick={handleCloseChat}
           ></div>
 
-          <div className="fixed bottom-16 md:top-38 right-4 md:right-8 z-50 w-full max-w-sm md:max-w-md mx-auto">
+          {/* Chat Container - PC: BELOW NAVBAR, Mobile: BOTTOM */}
+          <div className="fixed top-24 md:top-[152px] right-4 md:right-8 z-[9999] w-full max-w-sm md:max-w-md mx-auto">
             <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[70vh] md:h-[550px] w-full">
-              {/* Header with Close Button */}
+              
+              {/* Header */}
               <div className="flex items-center justify-between p-3 md:p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
@@ -497,15 +544,13 @@ function XobiaChatbot() {
                     <p className="text-xs md:text-sm text-white/80">Your AI design & property assistant</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 md:gap-2">
-                  <button
-                    onClick={handleCloseChat}
-                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                    aria-label="Close chat"
-                  >
-                    <FiX className="w-4 h-4 md:w-5 md:h-5" />
-                  </button>
-                </div>
+                <button
+                  onClick={handleCloseChat}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  aria-label="Close chat"
+                >
+                  <FiX className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
               </div>
 
               {/* Messages Area */}
@@ -613,22 +658,26 @@ function XobiaChatbot() {
                 )}
               </div>
 
-              {/* Input Area - SIMPLE */}
+              {/* Input Area */}
               <div className="border-t border-gray-200 p-3 md:p-4 bg-white">
                 <div className="flex items-center gap-1 md:gap-2">
-                  {/* Recording Button - SIMPLE */}
+                  {/* Recording Button */}
                   <button
+                    ref={recordingButtonRef}
                     onMouseDown={handleMouseDown}
                     onMouseUp={handleMouseUp}
-                    onTouchStart={handleMouseDown}
-                    onTouchEnd={handleMouseUp}
-                    className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all relative ${
+                    onMouseLeave={stopRecordingProcess}
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchCancel={stopRecordingProcess}
+                    onContextMenu={(e) => e.preventDefault()}
+                    className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all relative touch-none select-none ${
                       isHolding && !recording
                         ? "bg-gradient-to-r from-blue-200 to-purple-200 scale-110"
                         : recording
                           ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white animate-pulse"
                           : "bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 hover:from-blue-200 hover:to-purple-200"
-                    }`}
+                    } ${(loading || voiceLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                     disabled={loading || voiceLoading}
                     aria-label={recording ? "Recording in progress" : "Hold to record"}
                   >
@@ -642,8 +691,8 @@ function XobiaChatbot() {
                     
                     {/* Recording indicator */}
                     {recording && (
-                      <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-purple-600 bg-white px-2 py-1 rounded-full shadow whitespace-nowrap">
-                        ● {formatTime(recordingTime)}
+                      <span className="absolute -top-14 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse shadow-lg whitespace-nowrap">
+                        ● REC {formatTime(recordingTime)}
                       </span>
                     )}
                   </button>
@@ -651,13 +700,14 @@ function XobiaChatbot() {
                   {/* Text Input */}
                   <div className="flex-1 relative">
                     <textarea
+                      ref={inputTextareaRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="Type your message..."
                       disabled={loading || recording || voiceLoading}
                       rows={1}
-                      className="w-full px-3 py-2 md:px-4 md:py-3 pr-10 md:pr-12 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-xs md:text-sm disabled:opacity-50"
+                      className="w-full px-3 py-2 md:px-4 md:py-3 pr-10 md:pr-12 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-xs md:text-sm disabled:opacity-50 touch-manipulation"
                     />
 
                     {/* Send Button */}
@@ -665,7 +715,7 @@ function XobiaChatbot() {
                       <button
                         onClick={sendMessage}
                         disabled={!input.trim() || loading || voiceLoading}
-                        className="absolute right-1 md:right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-500 to-purple-500 text-white p-1.5 md:p-2 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="absolute right-1 md:right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-500 to-purple-500 text-white p-1.5 md:p-2 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
                         aria-label="Send message"
                       >
                         <FiSend className="w-3 h-3 md:w-4 md:h-4" />
@@ -674,7 +724,7 @@ function XobiaChatbot() {
                   </div>
                 </div>
 
-                {/* Instructions - SIMPLE */}
+                {/* Instructions */}
                 <div className="mt-2 text-center">
                   {isHolding && !recording && (
                     <div className="flex flex-col items-center">
