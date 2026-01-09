@@ -155,7 +155,7 @@ const Page3 = () => {
       "
     />
 
-    <button
+              <button
       className="
         absolute right-2 top-1/2 -translate-y-1/2
         bg-[#5C039B]
