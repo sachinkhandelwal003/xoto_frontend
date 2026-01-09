@@ -18,6 +18,7 @@ import i1 from "../../assets/icons/Homeicons/xx1.png";
 import i2 from "../../assets/icons/Homeicons/xx2.png";
 import i3 from "../../assets/icons/Homeicons/xx3.png";
 import i4 from "../../assets/icons/Homeicons/xx4.png";
+import { Link } from "react-router-dom";
 
 const Page3 = () => {
   const { t } = useTranslation("page3");
@@ -181,7 +182,7 @@ const Page3 = () => {
                   <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 break-words">
                     {post.title}
                   </h3>
-                  <a className="text-[#5C039B] mt-2 text-lg font-semibold hover:text-purple-800">
+                  <a  className="text-[#5C039B] mt-2 text-lg font-semibold hover:text-purple-800">
                     {t("blogs.readMore")}
                   </a>
                 </div>
