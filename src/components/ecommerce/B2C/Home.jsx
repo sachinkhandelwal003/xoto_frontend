@@ -27,10 +27,23 @@ const Ecommerce = () => {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          
         </div>
+  {/* Bottom clipping shapes */}
+      <div className="absolute bottom-0 left-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-left-shape" />
+      <div className="absolute bottom-0 right-0 w-72 h-12 bg-[var(--color-body)] z-[3] clip-right-shape" />
+
+      <style>{`
+        .clip-left-shape {
+          clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
+        }
+        .clip-right-shape {
+          clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+      `}</style>
 
         {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center text-white">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center text-white ">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

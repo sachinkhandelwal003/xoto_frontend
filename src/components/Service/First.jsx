@@ -11,14 +11,13 @@ const dmSans = {
 export default function HomeLoanHero() {
   const { t, i18n } = useTranslation("mort1");
 
+  // RTL only for text direction, NOT alignment
   const isRTL = i18n.language === "fa";
 
   return (
     <section
       dir={isRTL ? "rtl" : "ltr"}
-      className={`relative bg-cover bg-center w-full h-140 ${
-        isRTL ? "text-right" : "text-center"
-      }`}
+      className="relative bg-cover bg-center w-full h-140 text-center"
       style={{ backgroundImage: `url(${herobg})`, ...dmSans }}
     >
       {/* Bottom shapes */}
@@ -36,11 +35,8 @@ export default function HomeLoanHero() {
       `}</style>
 
       <div className="hero-overlay p-8 md:p-16" style={dmSans}>
-        <div
-          className={`max-w-6xl mx-auto text-white py-20 md:py-28 ${
-            isRTL ? "text-right" : "text-center"
-          }`}
-        >
+        <div className="max-w-6xl mx-auto text-white py-20 md:py-28 text-center">
+          
           {/* HERO TITLE */}
           <h1
             className="text-3xl md:text-6xl heading-light font-extrabold"
@@ -60,9 +56,9 @@ export default function HomeLoanHero() {
           </p>
 
           {/* CTA */}
-         <div className="mt-8 flex justify-center">
-  <CTAButtons />
-</div>
+          <div className="mt-8 flex justify-center">
+            <CTAButtons />
+          </div>
 
         </div>
       </div>

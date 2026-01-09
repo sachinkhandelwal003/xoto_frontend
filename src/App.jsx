@@ -60,7 +60,7 @@ import ComingSoon from "./components/homepage/AiPlanner/ComingSoon";
 import Casestudy from "./components/homepage/Casestudy"
 import Training from "./components/homepage/Trainning";
 import RegisterNowPage from "./components/RegisterNowPage";
-
+import Mortgage from "./components/homepage/Mortgage"
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
 const Consult = lazy(() => import("./components/consultation/Consult"));
@@ -266,7 +266,7 @@ function App() {
           <Route path="/landscaping" element={<Landspackng />} />
                     <Route path="/aiPlanner" element={<AITools />} />
                     <Route path="/aiPlanner/demo" element={<AIPlannerDemoPage />} />
-
+ <Route path="/mortgages" element={<Mortgage />} />
                                         <Route path="/aiPlanner/interior" element={<ComingSoon />} />
                                         <Route path="/aiPlanner/landscape" element={<AIPlanner />} />
                                             <Route path="/register" element={<RegisterNowPage />} />
