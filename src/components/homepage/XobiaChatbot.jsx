@@ -120,8 +120,10 @@ function XobiaChatbot() {
 
   /* ================= AUTO SCROLL ================= */
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading, voiceLoading]);
+chatEndRef.current?.scrollIntoView({
+  behavior: "smooth",
+  block: "end",
+});  }, [messages, loading, voiceLoading]);
 
   /* ================= SAFE AUDIO PLAYER ================= */
   const playBotAudio = (url, messageId) => {
@@ -169,11 +171,17 @@ function XobiaChatbot() {
 
   /* ================= CLEANUP WHEN UNMOUNTING ================= */
   useEffect(() => {
-    return () => {
-      stopAllAudio();
+  const handleVisibility = () => {
+    if (document.hidden) {
       stopAllRecording();
-    };
-  }, []);
+      stopAllAudio();
+    }
+  };
+
+  document.addEventListener("visibilitychange", handleVisibility);
+  return () =>
+    document.removeEventListener("visibilitychange", handleVisibility);
+}, []);
 
   /* ================= SEND TEXT ================= */
   const sendMessage = async () => {
@@ -213,21 +221,21 @@ function XobiaChatbot() {
 
       const data = await res.json();
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          role: "bot",
-          text: data.ai?.text || data.text || "",
-          audioUrl: data.ai?.audioUrl || null,
-          type: data.ai?.audioUrl ? "audio" : "text",
-          autoPlay: true,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
+     setMessages(prev => {
+  const botMsg = {
+    id: Date.now() + Math.random(),
+    role: "bot",
+    text: data.ai?.text || data.text || "",
+    audioUrl: data.ai?.audioUrl || null,
+    type: data.ai?.audioUrl ? "audio" : "text",
+    autoPlay: true,
+    timestamp: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
+  return [...prev, botMsg];
+});
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -352,16 +360,13 @@ function XobiaChatbot() {
   };
 
   /* ================= HANDLE TOUCH EVENTS (MOBILE) ================= */
-  const handleTouchStart = (e) => {
-    e.preventDefault();
-    startRecordingProcess();
-  };
+  const handleTouchStart = () => {
+  startRecordingProcess();
+};
 
-  const handleTouchEnd = (e) => {
-    e.preventDefault();
-    stopRecordingProcess();
-  };
-
+const handleTouchEnd = () => {
+  stopRecordingProcess();
+};
   const startRecording = async () => {
     try {
       stopAllAudio();
@@ -387,8 +392,11 @@ function XobiaChatbot() {
       recorder.onstop = async () => {
         // Send the recording
         if (audioChunksRef.current.length > 0) {
-          const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+const mimeType = MediaRecorder.isTypeSupported("audio/mp4")
+  ? "audio/mp4"
+  : "audio/webm";
 
+const blob = new Blob(audioChunksRef.current, { type: mimeType });
           setMessages((prev) => [
             ...prev,
             {
@@ -530,8 +538,8 @@ function XobiaChatbot() {
           ></div>
 
           {/* Chat Container - PC: BELOW NAVBAR, Mobile: BOTTOM */}
-          <div className="fixed top-24 md:top-[152px] right-4 md:right-8 z-[9999] w-full max-w-sm md:max-w-md mx-auto">
-            <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[70vh] md:h-[550px] w-full">
+<div className="fixed bottom-4 md:bottom-8 right-4 md:right-8 z-[9999] w-full max-w-sm md:max-w-md">
+            <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[70vh] md:h-[500px] w-full">
               
               {/* Header */}
               <div className="flex items-center justify-between p-3 md:p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
@@ -678,7 +686,7 @@ function XobiaChatbot() {
                           ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white animate-pulse"
                           : "bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 hover:from-blue-200 hover:to-purple-200"
                     } ${(loading || voiceLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={loading || voiceLoading}
+disabled={loading || voiceLoading || botSpeaking}
                     aria-label={recording ? "Recording in progress" : "Hold to record"}
                   >
                     {recording ? (
@@ -699,16 +707,16 @@ function XobiaChatbot() {
 
                   {/* Text Input */}
                   <div className="flex-1 relative">
-                    <textarea
-                      ref={inputTextareaRef}
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder="Type your message..."
-                      disabled={loading || recording || voiceLoading}
-                      rows={1}
-                      className="w-full px-3 py-2 md:px-4 md:py-3 pr-10 md:pr-12 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-xs md:text-sm disabled:opacity-50 touch-manipulation"
-                    />
+                   <textarea
+    ref={inputTextareaRef}
+    value={input}
+    onChange={(e) => setInput(e.target.value)}
+    onKeyDown={handleKeyDown}   // ✅ FIX 7 applied here
+    placeholder="Type your message..."
+    disabled={loading || recording || voiceLoading}
+    rows={1}
+    className="w-full px-3 py-2 md:px-4 md:py-3 pr-10 md:pr-12 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-xs md:text-sm disabled:opacity-50 touch-manipulation"
+  />
 
                     {/* Send Button */}
                     {input.trim() && (

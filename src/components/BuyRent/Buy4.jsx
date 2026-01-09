@@ -5,36 +5,39 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import { useTranslation } from "react-i18next";
-import partner1 from '../../assets/xoto_partners/xoto_logo1.png';
-import partner2 from '../../assets/xoto_partners/xoto_logo2.png';
-import partner3 from '../../assets/xoto_partners/xoto_logo3.png';
-import partner4 from '../../assets/xoto_partners/xoto_logo4.png';
-import partner5 from '../../assets/xoto_partners/xoto_logo5.png';
-import partner6 from '../../assets/xoto_partners/xoto_logo6.png';
-import partner7 from '../../assets/xoto_partners/xoto_logo7.png';
-import partner8 from '../../assets/xoto_partners/xoto_logo8.png';
-import partner9 from '../../assets/xoto_partners/xoto_logo9.png';
-import partner10 from '../../assets/xoto_partners/xoto_logo10.png';
-import partner11 from '../../assets/xoto_partners/xoto_logo11.png';
-import waveint5 from "../../assets/img/wave/waveint5.png";
+import ADIB from "../../assets/xoto_partners/bank logos/ADIB.png";
+import Ajman from "../../assets/xoto_partners/bank logos/Ajman Bank.png";
+import DIB from "../../assets/xoto_partners/bank logos/DIB.png";
+import FAB from "../../assets/xoto_partners/bank logos/FAB.png";
+import HSBC from "../../assets/xoto_partners/bank logos/HSBC.png";
+import Mashreq from "../../assets/xoto_partners/bank logos/Mashreq Bank.png";
+import NBF from "../../assets/xoto_partners/bank logos/NBF bank (1).png";
+import RAK from "../../assets/xoto_partners/bank logos/RAK (1).png";
+import SC from "../../assets/xoto_partners/bank logos/SC (1).png";
+import SIB from "../../assets/xoto_partners/bank logos/SIB (1).png";
+import UAB from "../../assets/xoto_partners/bank logos/UAB (1).png";
+
+import waveint5 from "../../assets/img/wave/waveint5.png"; 
+
 
 export default function TrustPresenceSection() {
   const { t } = useTranslation("buy4");
 
   // Define the logos array
-  const logos = [
-    { icon: partner1 },
-    { icon: partner2 },
-    { icon: partner3 },
-    { icon: partner4 },
-    { icon: partner5 },
-    { icon: partner6 },
-    { icon: partner7 },
-    { icon: partner8 },
-    { icon: partner9 },
-    { icon: partner10 },
-    { icon: partner11 },
-  ];
+const logos = [
+  { icon: ADIB, name: "ADIB" },
+  { icon: Ajman, name: "Ajman Bank" },
+  { icon: DIB, name: "DIB" },
+  { icon: FAB, name: "FAB" },
+  { icon: HSBC, name: "HSBC" },
+  { icon: Mashreq, name: "Mashreq Bank" },
+  { icon: NBF, name: "NBF Bank" },
+  { icon: RAK, name: "RAK Bank" },
+  { icon: SC, name: "Standard Chartered" },
+  { icon: SIB, name: "SIB" },
+  { icon: UAB, name: "UAB" },
+];
+
 
   return (
     <section className="relative w-full py-16 md:py-20 lg:py-24 overflow-hidden bg-[var(--color-body)]">
@@ -69,29 +72,38 @@ export default function TrustPresenceSection() {
                className="!overflow-visible"
              >
                {logos.concat(logos).map((logo, index) => (
-                 <SwiperSlide
-                   key={index}
-                   className="!w-auto flex justify-center transition-all duration-500 ease-out"
-                 >
-                   <div
-                     className="
-                       relative group bg-[var(--color-body)] cursor-pointer
-                       w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48
-                       rounded-full border border-green-300
-                       flex items-center justify-center
-                       shadow-xl 
-                       transition-all duration-300 ease-out
-                       hover:scale-125
-                     "
-                   >
-                     <img
-                       src={logo.icon}
-                       alt="Logo"
-                       className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain transition-all duration-300 group-hover:scale-110"
-                     />
-                     <div className="absolute inset-0 rounded-full bg-purple-200/30 blur-2xl opacity-0 group-hover:opacity-100 transition"></div>
-                   </div>
-                 </SwiperSlide>
+                <SwiperSlide
+  key={index}
+  className="!w-auto flex justify-center transition-all duration-500 ease-out"
+>
+  <div
+    className="
+      relative group bg-[var(--color-body)] cursor-pointer
+      w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40
+      rounded-full border border-green-300
+      flex items-center justify-center
+      shadow-xl 
+      transition-all duration-300 ease-out
+      hover:scale-115
+    "
+  >
+    <img
+      src={logo.icon}
+      alt={logo.name}
+      className="
+        max-w-[65%] max-h-[65%]
+        sm:max-w-[70%] sm:max-h-[70%]
+        md:max-w-[75%] md:max-h-[75%]
+        object-contain
+        transition-all duration-300
+        group-hover:scale-110
+      "
+    />
+
+    <div className="absolute inset-0 rounded-full bg-purple-200/30 blur-2xl opacity-0 group-hover:opacity-100 transition"></div>
+  </div>
+</SwiperSlide>
+
                ))}
              </Swiper>
            </div>
