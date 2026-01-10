@@ -28,6 +28,9 @@ function XobiaChatbot() {
   const inputTextareaRef = useRef(null);
   const startTimeRef = useRef(null);
 
+  const touchActiveRef = useRef(false);
+
+  
   /* ================= AUTO-ADJUST TEXTAREA HEIGHT ================= */
   useEffect(() => {
     const textarea = inputTextareaRef.current;
@@ -152,19 +155,20 @@ function XobiaChatbot() {
   };
 
   /* ================= AUTOPLAY BOT AUDIO ================= */
-  useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
+ useEffect(() => {
+  const lastMessage = messages[messages.length - 1];
 
-    if (
-      lastMessage?.role === "bot" &&
-      lastMessage?.type === "audio" &&
-      lastMessage?.audioUrl &&
-      lastMessage?.autoPlay
-    ) {
+  if (
+    lastMessage?.role === "bot" &&
+    lastMessage?.type === "audio" &&
+    lastMessage?.audioUrl
+  ) {
+    if (!isIOS && lastMessage.autoPlay) {
       stopAllRecording();
       playBotAudio(lastMessage.audioUrl, lastMessage.id);
     }
-  }, [messages]);
+  }
+}, [messages]);
 
   /* ================= VISIBILITY CHANGE ================= */
   useEffect(() => {
@@ -296,9 +300,13 @@ function XobiaChatbot() {
     setIsHolding(true);
     startTimeRef.current = Date.now();
 
-    holdTimerRef.current = setTimeout(() => {
-      startRecording();
-    }, 200); 
+   if (isIOS) {
+  startRecording(); // direct user gesture (iOS requirement)
+} else {
+  holdTimerRef.current = setTimeout(() => {
+    startRecording();
+  }, 200);
+}
   };
 
   const stopRecordingProcess = () => {
@@ -328,6 +336,14 @@ function XobiaChatbot() {
     
     setIsHolding(false);
   };
+
+  const isIOS =
+  typeof navigator !== "undefined" &&
+  /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+
+
+
 
   const startRecording = async () => {
     try {
@@ -389,21 +405,23 @@ function XobiaChatbot() {
   };
 
   const handleMouseDown = (e) => {
-    if (e.button !== 0) return;
-    startRecordingProcess();
-  };
+  if (touchActiveRef.current) return;
+  if (e.button !== 0) return;
+  startRecordingProcess();
+};
 
   const handleMouseUp = () => stopRecordingProcess();
 
-  const handleTouchStart = (e) => {
-    e.preventDefault();
-    startRecordingProcess();
-  };
+ const handleTouchStart = (e) => {
+  touchActiveRef.current = true;
+  if (!isIOS) e.preventDefault();
+  startRecordingProcess();
+};
 
-  const handleTouchEnd = (e) => {
-    e.preventDefault();
-    stopRecordingProcess();
-  };
+ const handleTouchEnd = (e) => {
+  touchActiveRef.current = false;
+  stopRecordingProcess();
+};
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -592,5 +610,6 @@ function XobiaChatbot() {
     </>
   );
 }
+
 
 export default XobiaChatbot;
