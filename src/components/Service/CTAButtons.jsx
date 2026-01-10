@@ -37,6 +37,8 @@ const [openPreApproved, setOpenPreApproved] = useState(false);
           {t("cta.preApproved")}
         </button>
       {/* OUTLINE                        BUTTON */}
+
+      {/* OUTLINE BUTTON */}
       <button
         onClick={() => navigate("/mortgages")}
         className="
