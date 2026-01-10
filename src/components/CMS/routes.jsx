@@ -62,6 +62,8 @@ import UpdateProduct from "../ecommerce/B2C/products/UpdateProduct";
 import ViewProject from "./pages/dashboardPages/managefreelancer/freelancer/Projects/ViewProjects";
 import TypesGallery from "./pages/estimateMaster/TypesGallery";
 import Questions from "./pages/estimateMaster/Questions";
+import CreateDeveloper from "./pages/Properties/createDeveloper";
+import Propertymanagement from "./pages/Properties/Propertymanagement";
 const roleSlugMap = {
   0: "superadmin",
   1: "admin",
@@ -123,7 +125,10 @@ warehouse:<ManageWarehouses/>,
   "property/leads":<PropertyLeads/>,
 "meta/leads":<Meta/>,
 enquiries:<Enquiry/>,
-packages:<Packages/>};
+packages:<Packages/>,
+"developer/create":<CreateDeveloper/>,
+"developer/property":<Propertymanagement/>,};
+
 
 // Placeholder for missing components
 const Placeholder = ({ title }) => (
@@ -145,6 +150,7 @@ const CmsRoutes = () => {
 
   const roleSlug = roleSlugMap[user.role.code] ?? "dashboard";
   const base = `/dashboard/${roleSlug}`; // REMOVED /sawtar
+
 
   // Redirect root dashboard to role-specific
   if (
@@ -206,6 +212,7 @@ const CmsRoutes = () => {
 
       <Route path="freelancer/myprofile" element={<MyprofileFreelancer />} />
       <Route path="/update" element={<UpdateProfilePage />} />
+
 
       {/* Catch-all fallback */}
     </Routes>
