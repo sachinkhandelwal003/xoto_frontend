@@ -29,8 +29,9 @@ function XobiaChatbot() {
   const startTimeRef = useRef(null);
 
   const touchActiveRef = useRef(false);
-
   
+  const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
   /* ================= AUTO-ADJUST TEXTAREA HEIGHT ================= */
   useEffect(() => {
     const textarea = inputTextareaRef.current;
@@ -134,7 +135,6 @@ function XobiaChatbot() {
   /* ================= AUDIO PLAYER ================= */
   const playBotAudio = (url, messageId) => {
     stopAllAudio();
-
     const audio = new Audio(url);
     audioRef.current = audio;
 
@@ -155,20 +155,19 @@ function XobiaChatbot() {
   };
 
   /* ================= AUTOPLAY BOT AUDIO ================= */
- useEffect(() => {
-  const lastMessage = messages[messages.length - 1];
-
-  if (
-    lastMessage?.role === "bot" &&
-    lastMessage?.type === "audio" &&
-    lastMessage?.audioUrl
-  ) {
-    if (!isIOS && lastMessage.autoPlay) {
-      stopAllRecording();
-      playBotAudio(lastMessage.audioUrl, lastMessage.id);
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (
+      lastMessage?.role === "bot" &&
+      lastMessage?.type === "audio" &&
+      lastMessage?.audioUrl &&
+      lastMessage.autoPlay
+    ) {
+        // On iOS, autoplay is often blocked unless we play immediately after a user touch.
+        // We call it here, but it may still require a manual tap on iOS.
+        playBotAudio(lastMessage.audioUrl, lastMessage.id);
     }
-  }
-}, [messages]);
+  }, [messages]);
 
   /* ================= VISIBILITY CHANGE ================= */
   useEffect(() => {
@@ -185,7 +184,6 @@ function XobiaChatbot() {
   /* ================= SEND TEXT ================= */
   const sendMessage = async () => {
     if (!input.trim()) return;
-
     stopAllRecording();
 
     const userMsg = {
@@ -193,10 +191,7 @@ function XobiaChatbot() {
       role: "user",
       type: "text",
       text: input,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -227,10 +222,7 @@ function XobiaChatbot() {
           audioUrl: data.ai?.audioUrl || null,
           type: data.ai?.audioUrl ? "audio" : "text",
           autoPlay: true,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         };
         return [...prev, botMsg];
       });
@@ -252,12 +244,13 @@ function XobiaChatbot() {
   };
 
   /* ================= SEND VOICE ================= */
-  const sendAudioMessage = async (audioBlob) => {
+  const sendAudioMessage = async (audioBlob, extension) => {
     try {
       setVoiceLoading(true);
 
       const formData = new FormData();
-      formData.append("audio", audioBlob, "voice.webm");
+      // Dynamically use the correct extension (webm for Android/Chrome, mp4 for iOS)
+      formData.append("audio", audioBlob, `voice.${extension}`);
       formData.append("session_id", getChatSessionId());
 
       const res = await fetch(`${API}/api/ai/chat`, {
@@ -276,10 +269,7 @@ function XobiaChatbot() {
           audioUrl: data.ai?.audioUrl || null,
           type: "audio",
           autoPlay: true,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
     } catch {
@@ -300,13 +290,13 @@ function XobiaChatbot() {
     setIsHolding(true);
     startTimeRef.current = Date.now();
 
-   if (isIOS) {
-  startRecording(); // direct user gesture (iOS requirement)
-} else {
-  holdTimerRef.current = setTimeout(() => {
-    startRecording();
-  }, 200);
-}
+    if (isIOS) {
+      startRecording();
+    } else {
+      holdTimerRef.current = setTimeout(() => {
+        startRecording();
+      }, 200);
+    }
   };
 
   const stopRecordingProcess = () => {
@@ -317,7 +307,6 @@ function XobiaChatbot() {
 
     const duration = Date.now() - (startTimeRef.current || 0);
 
-    // If held for less than 500ms, cancel
     if (duration < 500) {
         setIsHolding(false);
         if(recording){
@@ -333,24 +322,28 @@ function XobiaChatbot() {
     if (recording) {
       stopRecordingAndSend();
     }
-    
     setIsHolding(false);
   };
-
-  const isIOS =
-  typeof navigator !== "undefined" &&
-  /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-
-
-
 
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 16000 }
+        audio: { 
+            echoCancellation: true, 
+            noiseSuppression: true, 
+            autoGainControl: true 
+        }
       });
-      const recorder = new MediaRecorder(stream);
+
+      // iOS Safari usually only supports audio/mp4
+      let options = {};
+      if (MediaRecorder.isTypeSupported("audio/mp4")) {
+          options = { mimeType: "audio/mp4" };
+      } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+          options = { mimeType: "audio/webm" };
+      }
+
+      const recorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = recorder;
       audioChunksRef.current = [];
 
@@ -360,8 +353,9 @@ function XobiaChatbot() {
 
       recorder.onstop = async () => {
         if (audioChunksRef.current.length > 0) {
-          const mimeType = MediaRecorder.isTypeSupported("audio/mp4") ? "audio/mp4" : "audio/webm";
-          const blob = new Blob(audioChunksRef.current, { type: mimeType });
+          const actualType = mediaRecorderRef.current.mimeType || "audio/webm";
+          const extension = actualType.includes("mp4") ? "mp4" : "webm";
+          const blob = new Blob(audioChunksRef.current, { type: actualType });
           
           setMessages((prev) => [
             ...prev,
@@ -373,7 +367,7 @@ function XobiaChatbot() {
             },
           ]);
 
-          await sendAudioMessage(blob);
+          await sendAudioMessage(blob, extension);
         }
 
         stream.getTracks().forEach((t) => { t.stop(); t.enabled = false; });
@@ -405,23 +399,22 @@ function XobiaChatbot() {
   };
 
   const handleMouseDown = (e) => {
-  if (touchActiveRef.current) return;
-  if (e.button !== 0) return;
-  startRecordingProcess();
-};
+    if (touchActiveRef.current) return;
+    if (e.button !== 0) return;
+    startRecordingProcess();
+  };
 
   const handleMouseUp = () => stopRecordingProcess();
 
- const handleTouchStart = (e) => {
-  touchActiveRef.current = true;
-  if (!isIOS) e.preventDefault();
-  startRecordingProcess();
-};
+  const handleTouchStart = (e) => {
+    touchActiveRef.current = true;
+    startRecordingProcess();
+  };
 
- const handleTouchEnd = (e) => {
-  touchActiveRef.current = false;
-  stopRecordingProcess();
-};
+  const handleTouchEnd = (e) => {
+    touchActiveRef.current = false;
+    stopRecordingProcess();
+  };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -509,7 +502,11 @@ function XobiaChatbot() {
                           </div>
                         )}
                         {m.role === "bot" && m.type === "audio" && (
-                          botSpeaking && speakingMessageId === m.id ? <SpeakingIndicator /> : <p className="text-sm font-medium">🔊 Audio Response</p>
+                          botSpeaking && speakingMessageId === m.id ? 
+                          <SpeakingIndicator /> : 
+                          <button onClick={() => playBotAudio(m.audioUrl, m.id)} className="text-sm font-medium flex items-center gap-2">
+                            <span>🔊 Play Response</span>
+                          </button>
                         )}
                         {m.type === "text" && <p className="text-sm leading-relaxed">{m.text}</p>}
                         <div className={`text-[10px] text-right mt-1 ${m.role === "user" ? "text-blue-100" : "text-gray-400"}`}>{m.timestamp}</div>
@@ -523,7 +520,7 @@ function XobiaChatbot() {
               )}
             </div>
 
-            {/* NEW FOOTER DESIGN - COMPACT RECORDING BAR */}
+            {/* FOOTER */}
             <div className="p-3 bg-white border-t border-gray-100 shrink-0">
               <div className="flex items-end gap-2 h-full min-h-[50px]">
                 
@@ -535,49 +532,47 @@ function XobiaChatbot() {
                   onTouchStart={handleTouchStart}
                   onTouchEnd={handleTouchEnd}
                   onTouchCancel={stopRecordingProcess}
+                  onContextMenu={(e) => e.preventDefault()} // Critical for iOS
                   disabled={loading || voiceLoading || botSpeaking}
                   className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 select-none touch-none ${
                     isHolding 
                       ? "bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] scale-110" 
                       : "bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
                   } ${(loading || voiceLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  style={{ touchAction: 'none' }}
+                  style={{ 
+                    touchAction: 'none', 
+                    WebkitUserSelect: 'none', 
+                    userSelect: 'none',
+                    WebkitTouchCallout: 'none' 
+                  }}
                 >
                   <FiMic className={`w-5 h-5 ${isHolding ? 'animate-bounce' : ''}`} />
                 </button>
 
-                {/* DYNAMIC INPUT AREA: Swaps between Textarea and Recording Bar */}
+                {/* Input Area */}
                 <div className="flex-1 relative h-12 flex items-center">
                   {isHolding ? (
-                    // 🎤 RECORDING STATE (Compact Bar)
                     <motion.div 
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="absolute inset-0 bg-red-50 rounded-2xl border border-red-100 flex items-center justify-between px-4 overflow-hidden"
                     >
-                        {/* Left: Timer */}
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                             <span className="text-red-600 font-mono font-bold text-sm min-w-[40px]">
                                 {formatTime(recordingTime)}
                             </span>
                         </div>
-
-                        {/* Center: Instruction */}
                         <span className="text-[10px] md:text-xs text-red-400 uppercase font-medium tracking-wider">
                             Release to Send
                         </span>
-
-                        {/* Right: Waveform Animation */}
                         <div className="flex items-center gap-1 h-3">
-                            <div className="w-1 bg-red-400 rounded-full h-full animate-[bounce_1s_infinite]"></div>
-                            <div className="w-1 bg-red-400 rounded-full h-2/3 animate-[bounce_1.2s_infinite]"></div>
-                            <div className="w-1 bg-red-400 rounded-full h-full animate-[bounce_0.8s_infinite]"></div>
-                            <div className="w-1 bg-red-400 rounded-full h-3/4 animate-[bounce_1.1s_infinite]"></div>
+                            <div className="w-1 bg-red-400 rounded-full h-full animate-bounce"></div>
+                            <div className="w-1 bg-red-400 rounded-full h-2/3 animate-bounce [animation-delay:0.2s]"></div>
+                            <div className="w-1 bg-red-400 rounded-full h-full animate-bounce [animation-delay:0.4s]"></div>
                         </div>
                     </motion.div>
                   ) : (
-                    // 📝 NORMAL TEXT INPUT STATE
                     <div className="w-full h-full bg-gray-100 rounded-2xl flex items-center pr-2">
                         <textarea
                             ref={inputTextareaRef}
@@ -600,16 +595,13 @@ function XobiaChatbot() {
                     </div>
                   )}
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
       )}
     </>
   );
 }
-
 
 export default XobiaChatbot;
