@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { FiX, FiChevronDown } from "react-icons/fi";
+// 1. Import toast and Toaster
+import toast, { Toaster } from "react-hot-toast";
 
 export default function GetPreApprovedModal({ open, onClose }) {
-  const [loading, setLoading] = useState(false); // Submit state handle karne ke liye
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -14,7 +16,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
     terms: false,
   });
 
-  /* ================= COUNTRY CONFIG ================= */
   const COUNTRY_CONFIG = {
     UAE: { code: "+971", flag: "https://flagcdn.com/w20/ae.png", digits: 9, fullName: "United Arab Emirates" },
     India: { code: "+91", flag: "https://flagcdn.com/w20/in.png", digits: 10, fullName: "India" },
@@ -27,7 +28,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
 
   if (!open) return null;
 
-  /* ================= HANDLERS ================= */
   const toggleContact = (v) => {
     setForm((p) => ({
       ...p,
@@ -44,14 +44,13 @@ export default function GetPreApprovedModal({ open, onClose }) {
   };
 
   const handleSubmit = async () => {
+    // 2. Changed alert to toast.error
     if (!form.name || !form.phone || !form.email || !form.terms) {
-      alert("Please fill all required fields.");
+      toast.error("Please fill all required fields.");
       return;
     }
 
     setLoading(true);
-
-    // Name split karna first aur last mein
     const nameParts = form.name.trim().split(" ");
     const first_name = nameParts[0];
     const last_name = nameParts.slice(1).join(" ") || " ";
@@ -81,19 +80,19 @@ export default function GetPreApprovedModal({ open, onClose }) {
         body: JSON.stringify(payload),
       });
 
-      // Response check (Empty body handling)
       const text = await response.text();
       const result = text ? JSON.parse(text) : {};
 
       if (response.ok) {
-        alert("Success! Lead Created.");
-        onClose();
+        // 3. Success Toast
+        toast.success("Success! Lead Created.");
+        setTimeout(() => onClose(), 1500); // Small delay so they see the success toast
       } else {
-        alert(result.message || "Something went wrong");
+        toast.error(result.message || "Something went wrong");
       }
     } catch (error) {
       console.error("API Error:", error);
-      alert("Submission failed. Check your internet or CORS settings.");
+      toast.error("Submission failed. Check internet or CORS.");
     } finally {
       setLoading(false);
     }
@@ -101,14 +100,14 @@ export default function GetPreApprovedModal({ open, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 overflow-y-auto">
+      {/* 4. Toaster component (doesn't affect UI layout) */}
+      <Toaster position="top-center" reverseOrder={false} />
+      
       <div className="flex min-h-screen items-center justify-center p-4">
+        {/* ... Rest of your UI code remains exactly the same ... */}
         <div className="relative w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden text-black max-h-[95vh] md:max-h-none">
-          {/* BACKGROUND */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#f4f1ff] via-white to-[#e9fbff]" />
-
-          {/* CONTENT */}
           <div className="relative bg-white rounded-3xl px-5 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 overflow-y-auto">
-            {/* CLOSE */}
             <button onClick={onClose} className="absolute right-4 top-4 sm:right-6 sm:top-6 p-2 rounded-full hover:bg-gray-100">
               <FiX className="text-xl" />
             </button>
@@ -116,7 +115,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
             <h2 className="text-xl sm:text-2xl font-bold text-left mb-6 sm:mb-8">Let's get started</h2>
 
             <div className="space-y-5 sm:space-y-6 text-sm">
-              {/* NAME + PHONE */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                 <div>
                   <label className="block text-left mb-1 font-medium">Name <span className="text-red-500">*</span></label>
@@ -155,7 +153,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
                 </div>
               </div>
 
-              {/* EMAIL */}
               <div>
                 <label className="block text-left mb-1 font-medium">Email <span className="text-red-500">*</span></label>
                 <input
@@ -166,7 +163,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
                 />
               </div>
 
-              {/* FOUND PROPERTY */}
               <div>
                 <label className="block text-left mb-2 font-medium">Have you found a property? <span className="text-red-500">*</span></label>
                 <div className="flex gap-6">
@@ -178,7 +174,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
                 </div>
               </div>
 
-              {/* LOCATION */}
               <div>
                 <label className="block mb-1 font-medium">Where is the property located? <span className="text-red-500">*</span></label>
                 <div className="relative">
@@ -195,7 +190,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
                 </div>
               </div>
 
-              {/* CONTACT PREF */}
               <div>
                 <label className="block text-left mb-2 font-medium">How do you prefer to be contacted?</label>
                 <div className="flex gap-6 flex-wrap">
@@ -207,7 +201,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
                 </div>
               </div>
 
-              {/* AGREEMENTS */}
               <div className="space-y-3">
                 <label className="flex items-start gap-2">
                   <input type="checkbox" checked={form.marketing} onChange={(e) => setForm({...form, marketing: e.target.checked})} />
@@ -219,7 +212,6 @@ export default function GetPreApprovedModal({ open, onClose }) {
                 </label>
               </div>
 
-              {/* CTA */}
               <button
                 onClick={handleSubmit}
                 disabled={loading}
