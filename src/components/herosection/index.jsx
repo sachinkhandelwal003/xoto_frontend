@@ -28,7 +28,7 @@ const HeroSection = () => {
         playsInline
         className="absolute inset-0 w-full h-full object-cover z-0"
       >
-        <source src={video} type="video/mp4" />
+        <source src={"https://xotostaging.s3.me-central-1.amazonaws.com/properties/1768043300370-mortgage2.mp4"} type="video/mp4" />
       </video>
 
       {/* Content */}

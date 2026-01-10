@@ -250,7 +250,7 @@ const Login = () => {
 
   // --- RENDER CONTENT ---
 
-  const renderPartnerSelection = () => (
+const renderPartnerSelection = () => (
     <motion.div
       key="selection"
       initial={{ opacity: 0, x: -20 }}
@@ -258,6 +258,20 @@ const Login = () => {
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
     >
+      {/* --- ICON ONLY BACK BUTTON --- */}
+      <div style={{ marginBottom: 24 }}> 
+        <ArrowLeftOutlined 
+          onClick={() => navigate("/")}
+          style={{ 
+            fontSize: "24px", 
+            color: "#000", 
+            cursor: "pointer",
+            padding: "8px",
+            marginLeft: "-8px" // Aligns icon flush with left content
+          }} 
+        />
+      </div>
+
       <div style={{ textAlign: 'center', marginBottom: 30 }}>
         <Title level={3} style={{ margin: 0, color: '#333' }}>Select Partner Type</Title>
         <Text type="secondary">Choose your Account type to continue</Text>

@@ -28,8 +28,8 @@
   ],
   "knowledge": [
     { "label": "नॉलेज सेंटर", "path": "/about" },
-    { "label": "हमारी सस्टेनेबिलिटी", "path": "/about" },
-    { "label": "फोकस", "path": "/about" },
+    { "label": "हमारी सस्टेनेबिलिटी फोकस", "path": "/about" },
+    
     { "label": "फीडबैक दें", "path": "/about" },
     { "label": "संपर्क करें", "path": "/contact" },
     { "label": "प्राइवेसी पॉलिसी", "path": "/about" },

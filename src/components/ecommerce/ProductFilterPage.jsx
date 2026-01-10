@@ -267,7 +267,7 @@ const ProductFilterPage = () => {
   </Button>
 
   {/* Button 2 — Glass CTA */}
-  <Button
+  {/* <Button
     size="large"
     className="
       !bg-white/10 
@@ -286,8 +286,45 @@ const ProductFilterPage = () => {
   >
     <VideoCameraOutlined className="mr-2" />
     AR Preview
+  </Button> */}
+<div className="relative inline-block">
+  {/* Coming Soon badge */}
+  <span className="
+    absolute -top-4 -right-2 
+    bg-grey text-white 
+    text-[10px] font-bold 
+    px-2 py-1 
+    rounded-full 
+    shadow-md
+    z-10
+  ">
+  Upcoming
+  </span>
+
+  <Button
+    size="large"
+    className="
+      !bg-white/10 
+      !border-2 !border-white/30 
+      !text-white 
+      font-bold
+      px-8
+      h-12
+      rounded-lg
+      backdrop-blur-md
+      transition-all duration-300 ease-out
+      hover:!bg-white
+      hover:!text-black
+      hover:!border-white
+    "
+    disabled  // optional: disable kar diya taaki click na ho
+  >
+    <VideoCameraOutlined className="mr-2" />
+    AR Preview
   </Button>
 </div>
+</div>
+
 
               </motion.div>
             </div>

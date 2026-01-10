@@ -28,14 +28,14 @@
   ],
   "knowledge": [
     { "label": "Wissenszentrum", "path": "/about" },
-    { "label": "Unsere Nachhaltigkeit", "path": "/about" },
-    { "label": "Fokus", "path": "/about" },
+    { "label": "Unsere Nachhaltigkeit Fokus", "path": "/about" },
+    
     { "label": "Feedback senden", "path": "/about" },
     { "label": "Kontakt", "path": "/contact" },
     { "label": "Datenschutz", "path": "/about" },
     { "label": "Nutzungsbedingungen", "path": "/about" }
   ],
-  "locations": "Indien | VAE | Saudi-Arabien",
+  "locations": " VAE | Saudi-Arabien",
   "email": {
     "labels": {
       "partners": "Für Partner",

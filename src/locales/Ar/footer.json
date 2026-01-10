@@ -28,8 +28,8 @@
   ],
   "knowledge": [
     { "label": "مركز المعرفة", "path": "/about" },
-    { "label": "الاستدامة", "path": "/about" },
-    { "label": "التركيز", "path": "/about" },
+    { "label": "التركيز على الاستدامة", "path": "/about" },
+    { "label": "التركي", "path": "/about" },
     { "label": "أرسل ملاحظاتك", "path": "/about" },
     { "label": "اتصل بنا", "path": "/contact" },
     { "label": "سياسة الخصوصية", "path": "/about" },

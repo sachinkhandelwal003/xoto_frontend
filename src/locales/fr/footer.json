@@ -28,14 +28,14 @@
   ],
   "knowledge": [
     { "label": "Centre de connaissances", "path": "/about" },
-    { "label": "Notre durabilité", "path": "/about" },
-    { "label": "Focus", "path": "/about" },
+    { "label": "Notre durabilité Focus", "path": "/about" },
+    
     { "label": "Envoyer un avis", "path": "/about" },
     { "label": "Contactez-nous", "path": "/contact" },
     { "label": "Politique de confidentialité", "path": "/about" },
     { "label": "Conditions d’utilisation", "path": "/about" }
   ],
-  "locations": "Inde | EAU | Arabie Saoudite",
+  "locations":" EAU | Arabie Saoudite",
   "email": {
     "labels": {
       "partners": "Pour les partenaires",
