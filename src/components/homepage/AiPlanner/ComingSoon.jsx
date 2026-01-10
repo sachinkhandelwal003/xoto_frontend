@@ -4,7 +4,6 @@ import img1 from "../../../assets/img/interior/interior1.jpg"
 import img2 from "../../../assets/img/interior/interior2.jpg"
 import img3 from "../../../assets/img/interior/interior3.jpg"
 
-
 import {
   Home, LayoutDashboard, Compass,
   Image as ImageIcon, Sparkles, Upload,
@@ -70,7 +69,7 @@ const ComingSoon = () => {
   const [selectedElements, setSelectedElements] = useState([]);
   const [specificRequirement, setSpecificRequirement] = useState('');
   const [selectedRoomType, setSelectedRoomType] = useState(null);
-const [showRoomTypeModal, setShowRoomTypeModal] = useState(false);
+  const [showRoomTypeModal, setShowRoomTypeModal] = useState(false);
 
 
   const [designs, setDesigns] = useState([]);
@@ -83,11 +82,13 @@ const [showRoomTypeModal, setShowRoomTypeModal] = useState(false);
   const [showStyleModal, setShowStyleModal] = useState(false);
   const [showElementModal, setShowElementModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  
+  // --- UPGRADE MODAL STATE ---
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeMessage, setUpgradeMessage] = useState('');
 
   // UI & Results
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
-  const [upgradeMessage, setUpgradeMessage] = useState('');
   const [currentResult, setCurrentResult] = useState({ url: '', desc: '' });
 
   // Mobile Tabs
@@ -137,120 +138,139 @@ const [showRoomTypeModal, setShowRoomTypeModal] = useState(false);
     setShowAuthModal(false);
   };
 
-const generateAIDesigns = async (currentUser) => {
-  setIsGenerating(true);
-  setGenerationProgress(0);
+  const generateAIDesigns = async (currentUser) => {
+    setIsGenerating(true);
+    setGenerationProgress(0);
 
-  const formData = new FormData();
+    const formData = new FormData();
 
-  // IMAGE (mandatory as per your current UI)
-  if (uploadedFile) {
-    formData.append('image', uploadedFile);
-  } else {
-    try {
-      const response = await fetch(selectedImage);
-      const blob = await response.blob();
-      const file = new File([blob], 'input_image.jpg', { type: 'image/jpeg' });
-      formData.append('image', file);
-    } catch (err) {
-      console.error('Image processing failed', err);
-    }
-  }
-
-  // REQUIRED API FIELDS
-  formData.append(
-    'styleName',
-    selectedStyles.length > 0
-      ? interStyles.find(s => s.value === selectedStyles[0])?.label
-      : 'Modern'
-  );
-
-  formData.append(
-    'elements',
-    selectedElements.length > 0
-      ? selectedElements
-          .map(e => interElements.find(el => el.value === e)?.label)
-          .join(', ')
-      : 'Sofa, Coffee Table'
-  );
-
-  formData.append(
-    'description',
-    specificRequirement || 'A professional interior design'
-  );
-
-  formData.append(
-    'roomType',
-    selectedRoomType
-      ? roomTypes.find(r => r.value === selectedRoomType)?.label
-      : 'Living Room'
-  );
-
-  // 🔥 THIS WAS MISSING (CRITICAL)
-  formData.append('userId', currentUser?._id);
-
-  const interval = setInterval(() => {
-    setGenerationProgress(prev =>
-      prev < 95 ? prev + (95 - prev) * 0.1 : 95
-    );
-  }, 500);
-
-  try {
-    const response = await apiService.post(
-      '/ai/generate-interior',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 120000,
+    // IMAGE
+    if (uploadedFile) {
+      formData.append('image', uploadedFile);
+    } else {
+      try {
+        const response = await fetch(selectedImage);
+        const blob = await response.blob();
+        const file = new File([blob], 'input_image.jpg', { type: 'image/jpeg' });
+        formData.append('image', file);
+      } catch (err) {
+        console.error('Image processing failed', err);
       }
+    }
+
+    // REQUIRED API FIELDS
+    formData.append(
+      'styleName',
+      selectedStyles.length > 0
+        ? interStyles.find(s => s.value === selectedStyles[0])?.label
+        : 'Modern'
     );
 
-    const resData = response;
+    formData.append(
+      'elements',
+      selectedElements.length > 0
+        ? selectedElements
+            .map(e => interElements.find(el => el.value === e)?.label)
+            .join(', ')
+        : 'Sofa, Coffee Table'
+    );
 
-    if (resData?.status === false) {
-      setUpgradeMessage(resData.message || 'Upgrade required');
-      setShowUpgradeModal(true);
-      return;
-    }
+    formData.append(
+      'description',
+      specificRequirement || 'A professional interior design'
+    );
 
-    if (resData?.imageUrl) {
-      const newDesign = {
-        id: Date.now(),
-        image: resData.imageUrl,
-        title: `Vision ${designs.length + 1}`,
-        styles: [...selectedStyles],
-        elements: [...selectedElements],
-        timestamp: new Date().toLocaleTimeString(),
-        aiAnalysis: resData.message || 'Interior generated successfully',
-        userInfo: currentUser,
-      };
+    formData.append(
+      'roomType',
+      selectedRoomType
+        ? roomTypes.find(r => r.value === selectedRoomType)?.label
+        : 'Living Room'
+    );
 
-      setDesigns(prev => [newDesign, ...prev]);
-      setCurrentResult({
-        url: resData.imageUrl,
-        desc: resData.message,
-      });
+    formData.append('userId', currentUser?._id);
 
-      setGenerationProgress(100);
-      notification.success({ message: 'Design Generated!' });
+    const interval = setInterval(() => {
+      setGenerationProgress(prev =>
+        prev < 95 ? prev + (95 - prev) * 0.1 : 95
+      );
+    }, 500);
 
-      setTimeout(() => {
+    try {
+      const response = await apiService.post(
+        '/ai/generate-interior',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 120000,
+        }
+      );
+
+      const resData = response;
+
+      // --- EXACT LOGIC FROM AIPLANNER ---
+      if (resData.status === false && resData.aiImageGeneration === false) {
         setIsGenerating(false);
-        setShowGeneratedModal(true);
-      }, 500);
+        // setUpgradeMessage(resData.message || "Limit reached. Upgrade to continue.");
+        setShowUpgradeModal(true);
+        return; 
+      }
+
+      // Check standard failure
+      if (resData?.status === false) {
+        setUpgradeMessage(resData.message || 'Upgrade required');
+        setShowUpgradeModal(true);
+        setIsGenerating(false);
+        return;
+      }
+
+      // Success
+      if (resData?.imageUrl) {
+        const newDesign = {
+          id: Date.now(),
+          image: resData.imageUrl,
+          title: `Vision ${designs.length + 1}`,
+          styles: [...selectedStyles],
+          elements: [...selectedElements],
+          timestamp: new Date().toLocaleTimeString(),
+          aiAnalysis: resData.message || 'Interior generated successfully',
+          userInfo: currentUser,
+        };
+
+        setDesigns(prev => [newDesign, ...prev]);
+        setCurrentResult({
+          url: resData.imageUrl,
+          desc: resData.message,
+        });
+
+        setGenerationProgress(100);
+        notification.success({ message: 'Design Generated!' });
+
+        setTimeout(() => {
+          setIsGenerating(false);
+          setShowGeneratedModal(true);
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Generation failed:', error);
+      
+      // --- EXACT LOGIC FROM AIPLANNER FOR ERRORS ---
+      const errRes = error.response?.data;
+      if (errRes && (errRes.aiImageGeneration === false || errRes.status === false)) {
+         setIsGenerating(false);
+        //  setUpgradeMessage(errRes.message || "Please upgrade to generate more images.");
+         setShowUpgradeModal(true);
+         return;
+      }
+
+      notification.error({
+        message: 'Generation failed',
+        description: 'Please try again later.',
+      });
+      setIsGenerating(false);
+    } finally {
+      clearInterval(interval);
     }
-  } catch (error) {
-    console.error('Generation failed:', error);
-    notification.error({
-      message: 'Generation failed',
-      description: 'Please try again later.',
-    });
-  } finally {
-    clearInterval(interval);
-    setIsGenerating(false);
-  }
-};
-  ;
+  };
 
   const downloadImage = (url, name) => {
     const link = document.createElement('a');
@@ -373,30 +393,28 @@ const generateAIDesigns = async (currentUser) => {
 
           {/* Configuration Grid */}
           <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-6 lg:mb-8">
-          <button
-    onClick={() => setShowRoomTypeModal(true)}
-    className="bg-[#F3F4F6] hover:bg-gray-100 transition-colors rounded-[20px] lg:rounded-[24px] p-4 lg:p-6 flex flex-col items-center justify-center gap-3 lg:gap-4 aspect-square relative group"
-  >
-    <div className="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
-      <Home className="text-gray-500 w-5 h-5 lg:w-6 lg:h-6" />
-    </div>
+            <button
+              onClick={() => setShowRoomTypeModal(true)}
+              className="bg-[#F3F4F6] hover:bg-gray-100 transition-colors rounded-[20px] lg:rounded-[24px] p-4 lg:p-6 flex flex-col items-center justify-center gap-3 lg:gap-4 aspect-square relative group"
+            >
+              <div className="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
+                <Home className="text-gray-500 w-5 h-5 lg:w-6 lg:h-6" />
+              </div>
 
-    <span className="font-bold text-gray-700 text-sm lg:text-base">
-      Room Type
-    </span>
+              <span className="font-bold text-gray-700 text-sm lg:text-base">
+                Room Type
+              </span>
 
-    <span className="bg-white border border-gray-200 text-gray-600 text-[10px] lg:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-      {selectedRoomType ? 'Selected' : 'Choose'}
-    </span>
+              <span className="bg-white border border-gray-200 text-gray-600 text-[10px] lg:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                {selectedRoomType ? 'Selected' : 'Choose'}
+              </span>
 
-    {selectedRoomType && (
-      <div className="absolute top-2 right-2 text-green-500 bg-white rounded-full p-1 shadow-sm">
-        <CheckCircle2 size={16} />
-      </div>
-    )}
-  </button>
-
- 
+              {selectedRoomType && (
+                <div className="absolute top-2 right-2 text-green-500 bg-white rounded-full p-1 shadow-sm">
+                  <CheckCircle2 size={16} />
+                </div>
+              )}
+            </button>
 
             <button onClick={() => setShowStyleModal(true)} className="bg-[#F3F4F6] hover:bg-gray-100 transition-colors rounded-[20px] lg:rounded-[24px] p-4 lg:p-6 flex flex-col items-center justify-center gap-3 lg:gap-4 aspect-square relative group">
               <div className="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">
@@ -545,21 +563,29 @@ const generateAIDesigns = async (currentUser) => {
       {/* MODALS */}
       <LeadGenerationModal visible={showAuthModal} onCancel={() => setShowAuthModal(false)} onAuthSuccess={handleAuthSuccess} />
 
-      <Modal open={showUpgradeModal} footer={null} onCancel={() => setShowUpgradeModal(false)} width={500} centered bodyStyle={{ padding: 0, borderRadius: '24px', overflow: 'hidden' }}>
+      {/* --- EXACT REPLICA OF AIPLANNER UPGRADE MODAL --- */}
+      <Modal
+        open={showUpgradeModal}
+        footer={null}
+        onCancel={() => setShowUpgradeModal(false)}
+        width={500}
+        centered
+        bodyStyle={{ padding: 0, borderRadius: '24px', overflow: 'hidden' }}
+      >
         <div className="p-8 text-center bg-gradient-to-b from-white to-purple-50">
-          <div className="w-20 h-20 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-yellow-200">
-            <Crown size={40} className="text-yellow-600" fill="currentColor" fillOpacity={0.2} />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">Unlock Limitless Creativity</h3>
-          <p className="text-gray-500 mb-8 leading-relaxed px-4">{upgradeMessage || "You've reached your limit. Upgrade to Pro to continue designing."}</p>
-          <div className="space-y-3">
-            <Link to="/subscription/plans">
-              <Button type="primary" size="large" block className="h-12 text-base font-bold rounded-xl shadow-lg shadow-purple-200" style={{ background: 'linear-gradient(135deg, #5C039B 0%, #8E2DE2 100%)', border: 'none' }} onClick={() => setShowUpgradeModal(false)}>
-                View Upgrade Plans
-              </Button>
-            </Link>
-            <Button type="text" block className="text-gray-400" onClick={() => setShowUpgradeModal(false)}>Maybe Later</Button>
-          </div>
+            <div className="w-20 h-20 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-yellow-200">
+                <Crown size={40} className="text-yellow-600" fill="currentColor" fillOpacity={0.2} />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Unlock Limitless Creativity</h3>
+            <p className="text-gray-500 mb-8 leading-relaxed px-4">
+                {upgradeMessage || "You've reached your limit. Upgrade to Pro to continue designing."}
+            </p>
+            <div className="space-y-3">
+                <Link to="/subscription/plans">
+                    <Button type="primary" size="large" block className="h-12 text-base font-bold rounded-xl shadow-lg shadow-purple-200" style={{ background: 'linear-gradient(135deg, #5C039B 0%, #8E2DE2 100%)', border: 'none' }} onClick={() => setShowUpgradeModal(false)}>View Upgrade Plans</Button>
+                </Link>
+                <Button type="text" block className="text-gray-400" onClick={() => setShowUpgradeModal(false)}>Maybe Later</Button>
+            </div>
         </div>
       </Modal>
 
@@ -645,56 +671,54 @@ const generateAIDesigns = async (currentUser) => {
         </div>
       </Modal>
     <Modal
-  open={showRoomTypeModal}
-  footer={null}
-  onCancel={() => setShowRoomTypeModal(false)}
-  width={800}
-  centered
-  title="Choose Room Type"
-  bodyStyle={{ padding: '0.5rem' }}
-  style={{ maxWidth: '95vw' }}
->
-  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 p-2">
-    {roomTypes.map((room) => (
-      <div
-        key={room.value}
-        onClick={() => {
-          setSelectedRoomType(room.value);
-          setShowRoomTypeModal(false);
-        }}
-        className={`relative cursor-pointer rounded-2xl overflow-hidden group border-4 transition-all
-          ${
-            selectedRoomType === room.value
-              ? 'border-purple-600 shadow-lg'
-              : 'border-transparent hover:border-purple-100 hover:shadow-md'
-          }`}
-      >
-        {/* IMAGE */}
-        <img
-          src={room.img}
-          alt={room.label}
-          className="h-32 lg:h-40 w-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+      open={showRoomTypeModal}
+      footer={null}
+      onCancel={() => setShowRoomTypeModal(false)}
+      width={800}
+      centered
+      title="Choose Room Type"
+      bodyStyle={{ padding: '0.5rem' }}
+      style={{ maxWidth: '95vw' }}
+    >
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 p-2">
+        {roomTypes.map((room) => (
+          <div
+            key={room.value}
+            onClick={() => {
+              setSelectedRoomType(room.value);
+              setShowRoomTypeModal(false);
+            }}
+            className={`relative cursor-pointer rounded-2xl overflow-hidden group border-4 transition-all
+              ${
+                selectedRoomType === room.value
+                  ? 'border-purple-600 shadow-lg'
+                  : 'border-transparent hover:border-purple-100 hover:shadow-md'
+              }`}
+          >
+            {/* IMAGE */}
+            <img
+              src={room.img}
+              alt={room.label}
+              className="h-32 lg:h-40 w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
 
-        {/* LABEL OVERLAY */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-3 lg:p-4">
-          <p className="text-white font-bold text-sm lg:text-base m-0 truncate">
-            {room.label}
-          </p>
-        </div>
+            {/* LABEL OVERLAY */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-3 lg:p-4">
+              <p className="text-white font-bold text-sm lg:text-base m-0 truncate">
+                {room.label}
+              </p>
+            </div>
 
-        {/* CHECK ICON */}
-        {selectedRoomType === room.value && (
-          <div className="absolute top-2 right-2 bg-purple-600 text-white p-1.5 rounded-full shadow-lg">
-            <CheckCircle2 size={14} />
+            {/* CHECK ICON */}
+            {selectedRoomType === room.value && (
+              <div className="absolute top-2 right-2 bg-purple-600 text-white p-1.5 rounded-full shadow-lg">
+                <CheckCircle2 size={14} />
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
-    ))}
-  </div>
-</Modal>
-
-
+    </Modal>
 
       {/* GENERATION LOADING OVERLAY */}
       {isGenerating && (

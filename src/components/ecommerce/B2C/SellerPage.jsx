@@ -48,7 +48,7 @@ const SellerPage = () => {
   } = useForm({
     mode: 'onChange',
     defaultValues: {
-      mobile: { country_code: '+91' }
+      mobile: { country_code: '+971' }
     }
   });
 
@@ -62,6 +62,7 @@ const SellerPage = () => {
   ];
 
   const countries = [
+    { label: 'United Arab Emirates', value: 'United Arab Emirates' },
     { label: 'India', value: 'India' },
     { label: 'United States', value: 'United States' },
     { label: 'United Kingdom', value: 'United Kingdom' },
@@ -292,6 +293,7 @@ const SellerPage = () => {
                           <Form.Item label="Code">
                             <Controller name="mobile.country_code" control={control} render={({ field }) => (
                               <Select size="large" {...field}>
+                                <Select.Option value="+971">+971 (AE)</Select.Option>
                                 <Select.Option value="+91">+91 (IN)</Select.Option>
                                 <Select.Option value="+1">+1 (US)</Select.Option>
                                 <Select.Option value="+44">+44 (UK)</Select.Option>
