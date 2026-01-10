@@ -28,14 +28,14 @@
   ],
   "knowledge": [
     { "label": "ਨੋਲਜ ਸੈਂਟਰ", "path": "/about" },
-    { "label": "ਸਾਡੀ ਟਿਕਾਊਤਾ", "path": "/about" },
-    { "label": "ਫੋਕਸ", "path": "/about" },
+    { "label": "ਸਾਡੀ ਟਿਕਾਊਤਾ ਫੋਕਸ", "path": "/about" },
+    
     { "label": "ਫੀਡਬੈਕ ਭੇਜੋ", "path": "/about" },
     { "label": "ਸੰਪਰਕ ਕਰੋ", "path": "/contact" },
     { "label": "ਪਰਾਈਵੇਸੀ ਨੀਤੀ", "path": "/about" },
     { "label": "ਵਰਤੋਂ ਦੀਆਂ ਸ਼ਰਤਾਂ", "path": "/about" }
   ],
-  "locations": "ਭਾਰਤ | UAE | ਸਾਊਦੀ ਅਰਬ",
+  "locations": " UAE | ਸਾਊਦੀ ਅਰਬ",
   "email": {
     "labels": {
       "partners": "ਭਾਗੀਦਾਰਾਂ ਲਈ",

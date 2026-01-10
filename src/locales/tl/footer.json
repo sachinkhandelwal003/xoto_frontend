@@ -28,14 +28,14 @@
   ],
   "knowledge": [
     { "label": "Knowledge Centre", "path": "/about" },
-    { "label": "Our Sustainability", "path": "/about" },
-    { "label": "Focus", "path": "/about" },
+    { "label": "Our Sustainability Focus", "path": "/about" },
+   
     { "label": "Submit Feedback", "path": "/about" },
     { "label": "Makipag-ugnayan", "path": "/contact" },
     { "label": "Patakaran sa Privacy", "path": "/about" },
     { "label": "Mga Tuntunin ng Paggamit", "path": "/about" }
   ],
-  "locations": "India | UAE | Saudi Arabia",
+  "locations": " UAE | Saudi Arabia",
   "email": {
     "labels": {
       "partners": "Para sa Mga Partner",

@@ -28,14 +28,14 @@
   ],
   "knowledge": [
     { "label": "Центр знаний", "path": "/about" },
-    { "label": "Наша устойчивость", "path": "/about" },
-    { "label": "Фокус", "path": "/about" },
+    { "label": "Наша устойчивость Фокус", "path": "/about" },
+
     { "label": "Оставить отзыв", "path": "/about" },
     { "label": "Связаться с нами", "path": "/contact" },
     { "label": "Политика конфиденциальности", "path": "/about" },
     { "label": "Условия использования", "path": "/about" }
   ],
-  "locations": "Индия | ОАЭ | Саудовская Аравия",
+  "locations": " ОАЭ | Саудовская Аравия",
   "email": {
     "labels": {
       "partners": "Для партнеров",

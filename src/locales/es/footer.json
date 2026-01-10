@@ -28,14 +28,14 @@
   ],
   "knowledge": [
     { "label": "Centro de conocimiento", "path": "/about" },
-    { "label": "Nuestra sostenibilidad", "path": "/about" },
-    { "label": "Enfoque", "path": "/about" },
+    { "label": "Nuestra sostenibilidad Enfoque", "path": "/about" },
+    
     { "label": "Enviar comentarios", "path": "/about" },
     { "label": "Contáctanos", "path": "/contact" },
     { "label": "Política de privacidad", "path": "/about" },
     { "label": "Términos de uso", "path": "/about" }
   ],
-  "locations": "India | EAU | Arabia Saudita",
+  "locations": " EAU | Arabia Saudita",
   "email": {
     "labels": {
       "partners": "Para socios",
