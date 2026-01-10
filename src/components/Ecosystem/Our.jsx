@@ -54,38 +54,27 @@ const BuiltForEveryone = () => {
       setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
     }, 3000);
     return () => clearInterval(autoSlide);
-  }, [cardsToShow]);
+  }, [cardsToShow, cards.length]);
 
   return (
-    <section className="relative bg-[var(--color-body)] overflow-hidden py-3 px-4 sm:px-6 lg:px-8   ">
+    <section className="relative bg-[var(--color-body)] overflow-hidden py-3 px-4 sm:px-6 lg:px-8">
       <div className="absolute bottom-[-20px] sm:bottom-[-50px] md:bottom-[-80px] lg:bottom-[-130px] left-0 w-full z-20 pointer-events-none">
-  <img
-    src={wave1}
-    alt=""
-    className="w-[180%] sm:w-[165%] md:w-[150%] lg:w-full -ml-[20%] sm:-ml-[12%] md:-ml-[8%] lg:ml-0 scale-[1.6] sm:scale-[1.4] md:scale-[1.2] lg:scale-100 pointer-events-none select-none"
-  />
-</div>
-
+        <img
+          src={wave1}
+          alt=""
+          className="w-[180%] sm:w-[165%] md:w-[150%] lg:w-full -ml-[20%] sm:-ml-[12%] md:-ml-[8%] lg:ml-0 scale-[1.6] sm:scale-[1.4] md:scale-[1.2] lg:scale-100 pointer-events-none select-none"
+        />
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        <h2
-          className="text-center mb-12 lg:mb-16 heading-light"
-          style={{ color: "var(--color-black)" }}
-        >
+        <h2 className="text-center mb-12 lg:mb-16 heading-light" style={{ color: "var(--color-black)" }}>
           {t("title")}
         </h2>
 
         <div className="flex flex-col lg:flex-row items-center justify-between ">
           <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-25">
             <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
-              <video
-                src={round}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full object-contain"
-              />
+              <video src={round} autoPlay loop muted playsInline className="w-full object-contain" />
             </div>
           </div>
 
@@ -94,26 +83,24 @@ const BuiltForEveryone = () => {
               <div
                 className="flex transition-transform duration-500 ease-in-out gap-4"
                 style={{
-                  transform: `translateX(-${
-                    isMobile
-                      ? currentIndex * 100
-                      : currentIndex * (100 / cardsToShow)
-                  }%)`
+                  /* FIXED MATH: We must add the 16px (gap-4) to the 100% width calculation */
+                  transform: isMobile 
+                    ? `translateX(calc(-${currentIndex} * (100% + 16px)))` 
+                    : `translateX(-${currentIndex * (100 / cardsToShow)}%)`
                 }}
               >
                 {cards.map((card, index) => (
                   <div
                     key={index}
                     className={`flex-shrink-0 bg-white rounded-xl p-6 transition-all duration-300 ${
-                      index >= currentIndex &&
-                      index < currentIndex + cardsToShow
+                      index >= currentIndex && index < currentIndex + cardsToShow
                         ? "shadow-xl scale-100 opacity-100"
                         : "opacity-70 scale-95"
                     }`}
                     style={{
                       width: isMobile
                         ? "100%"
-                        : `calc(${100 / cardsToShow}% - 16px)`
+                        : `calc(${100 / cardsToShow}% - 12px)` /* Adjusted for gap */
                     }}
                   >
                     <div className="flex justify-between items-center mb-4 ">
@@ -122,7 +109,6 @@ const BuiltForEveryone = () => {
                         <img src={card.icon} alt="" className="w-6 h-6" />
                       </div>
                     </div>
-
                     <p className="text-sm text-gray-600 leading-relaxed ">
                       {card.desc}
                     </p>
@@ -131,37 +117,20 @@ const BuiltForEveryone = () => {
               </div>
             </div>
 
-   <div className="relative z-30 flex gap-3 mt-8 mb-16 sm:mb-0">
-  {/* LEFT */}
-  <button
-    onClick={prevSlide}
-    className="
-      p-3 rounded-sm border border-gray-300
-      bg-white text-black
-      hover:bg-[#5c039b] hover:text-white
-      active:bg-[#5c039b] active:text-white
-      transition
-    "
-  >
-    <ChevronLeft className="w-5 h-5" />
-  </button>
-
-  {/* RIGHT */}
-  <button
-    onClick={nextSlide}
-    className="
-      p-3 rounded-sm border border-gray-300
-      bg-white text-black
-      hover:bg-[#5c039b] hover:text-white
-      active:bg-[#5c039b] active:text-white
-      transition
-    "
-  >
-    <ChevronRight className="w-5 h-5" />
-  </button>
-</div>
-
-
+            <div className="relative z-30 flex gap-3 mt-8 mb-16 sm:mb-0">
+              <button
+                onClick={prevSlide}
+                className="p-3 rounded-sm border border-gray-300 bg-white text-black hover:bg-[#5c039b] hover:text-white transition"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="p-3 rounded-sm border border-gray-300 bg-white text-black hover:bg-[#5c039b] hover:text-white transition"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

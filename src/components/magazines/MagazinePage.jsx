@@ -94,88 +94,80 @@ const BuiltForEveryone = () => {
           </div>
 
           {/* Slider */}
-          <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
-            <div className="relative w-full max-w-sm lg:max-w-2xl overflow-hidden">
-              <div
-                className="flex transition-transform duration-500 ease-in-out gap-4"
-                style={{
-                  transform: `translateX(-${
-                    isMobile
-                      ? currentIndex * 100
-                      : currentIndex * (100 / cardsToShow)
-                  }%)`,
-                }}
-              >
-                {cards.map((card, index) => (
-                  <div
-                    key={index}
-                    className={`flex-shrink-0 bg-white rounded-xl p-6 transition-all duration-300 ${
-                      index >= currentIndex &&
-                      index < currentIndex + cardsToShow
-                        ? "shadow-xl scale-100 opacity-100"
-                        : "opacity-70 scale-95"
-                    }`}
-                    style={{
-                      width: isMobile
-                        ? "100%"
-                        : `calc(${100 / cardsToShow}% - 16px)`,
-                    }}
-                  >
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl card-heading">
-                        {t(card.titleKey)}
-                      </h3>
-
-                      <div className="bg-[var(--color-primary)] p-2 rounded-full">
-                        <img src={card.icon} alt="" className="w-6 h-6" />
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {t(card.descKey)}
-                    </p>
-                  </div>
-                ))}
+    <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
+  {/* The "Window": This MUST have overflow-hidden and a defined width */}
+  <div className="relative w-full max-w-sm lg:max-w-2xl overflow-hidden rounded-xl">
+    <div
+      className="flex transition-transform duration-500 ease-in-out"
+      style={{
+        // Using translateX with exact 100% units works best when children are also 100%
+        transform: `translateX(-${
+          isMobile
+            ? currentIndex * 100
+            : currentIndex * (100 / cardsToShow)
+        }%)`,
+      }}
+    >
+      {cards.map((card, index) => (
+        <div
+          key={index}
+          className="flex-shrink-0 w-full" 
+          style={{
+            // On mobile, width is exactly 100% of the parent 'Window'
+            width: isMobile ? "100%" : `${100 / cardsToShow}%`,
+            padding: "0 4px", // Tiny horizontal padding to prevent cards touching
+          }}
+        >
+          {/* Content Card: This is where the white background and shadow live */}
+          <div
+            className={`bg-white rounded-xl p-6 h-full transition-all duration-300 ${
+              index === currentIndex
+                ? "shadow-xl opacity-100"
+                : "opacity-70"
+            }`}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold text-gray-800 leading-tight">
+                {t(card.titleKey)}
+              </h3>
+              <div className="bg-[var(--color-primary)] p-2 rounded-full shrink-0 ml-2">
+                <img src={card.icon} alt="" className="w-6 h-6" />
               </div>
             </div>
 
-            {/* Arrows */}
-               <div className="flex gap-3 mt-8">
-<button
-  onClick={() => {
-    prevSlide();
-    setActiveBtn("left");
-  }}
-  className={`p-3 rounded-sm border transition-all duration-300
-    ${
-      activeBtn === "left"
-        ? "bg-[var(--color-primary)] text-white border-transparent"
-        : "bg-white text-black border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-    }
-  `}
->
-  <ChevronLeft className="w-5 h-5" />
-</button>
-
-<button
-  onClick={() => {
-    nextSlide();
-    setActiveBtn("right");
-  }}
-  className={`p-3 rounded-sm border transition-all duration-300
-    ${
-      activeBtn === "right"
-        ? "bg-[var(--color-primary)] text-white border-transparent"
-        : "bg-white text-black border-gray-300 hover:bg-[var(--color-primary)] hover:text-white"
-    }
-  `}
->
-  <ChevronRight className="w-5 h-5" />
-</button>
-
-
-            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {t(card.descKey)}
+            </p>
           </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Arrows Section */}
+  <div className="flex gap-3 mt-8">
+    <button
+      onClick={() => { prevSlide(); setActiveBtn("left"); }}
+      className={`p-3 rounded-sm border transition-all duration-300 ${
+        activeBtn === "left" 
+          ? "bg-[var(--color-primary)] text-white" 
+          : "bg-white text-black hover:bg-gray-100"
+      }`}
+    >
+      <ChevronLeft className="w-5 h-5" />
+    </button>
+    <button
+      onClick={() => { nextSlide(); setActiveBtn("right"); }}
+      className={`p-3 rounded-sm border transition-all duration-300 ${
+        activeBtn === "right" 
+          ? "bg-[var(--color-primary)] text-white" 
+          : "bg-white text-black hover:bg-gray-100"
+      }`}
+    >
+      <ChevronRight className="w-5 h-5" />
+    </button>
+  </div>
+</div>
         </div>
       </div>
     </section>
