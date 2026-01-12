@@ -504,15 +504,11 @@ const LoanCalculator = () => {
                 <div className="flex space-x-3">
 <button
   onClick={() => setShowPreApprovalModal(true)}
-  className="flex-1 bg-transparent border border-white text-white hover:bg-white/10 py-3 rounded-lg font-medium text-sm transition-colors"
+  className="w-full mt-3 bg-transparent border border-white text-white hover:bg-white/10 py-3.5 rounded-lg font-medium text-sm transition-colors"
 >
   Get pre-approval
 </button>
-                  <button 
-                    className="flex-1  border border-white text-white hover:bg-white/20 py-3 rounded-lg font-medium text-sm transition-colors"
-                  >
-                    Contact Us
-                  </button>
+                 
                 </div>
           <GetPreApprovedModal
   open={showPreApprovalModal}

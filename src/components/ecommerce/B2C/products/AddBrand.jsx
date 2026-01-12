@@ -1,683 +1,456 @@
-// src/components/CMS/pages/brands/AddBrand.jsx
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; 
 import {
-  Button,
-  Input,
-  Upload,
-  Modal,
-  message,
-  Card,
-  Row,
-  Col,
-  Statistic,
-  Tabs,
-  Space,
-  Tooltip,
-  Avatar,
-  Typography,
-  Divider,
-  Form,
-  Badge
+  Button, Modal, Form, Input, Popconfirm, Card, Table,
+  Typography, Avatar, Row, Col, Statistic, Space, Divider, 
+  message, notification, Upload, Switch, Tag
 } from 'antd';
 import {
-  ArrowLeftOutlined,
-  UploadOutlined,
-  SearchOutlined,
-  ShopOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  RotateLeftOutlined,
-  PlusOutlined,
-  GlobalOutlined,
-  RestOutlined,
-  CheckCircleOutlined
+  PlusOutlined, ShopOutlined, LinkOutlined,
+  DeleteOutlined, EditOutlined, SearchOutlined, GlobalOutlined, 
+  PictureOutlined, CheckOutlined, CloseOutlined
 } from '@ant-design/icons';
-import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
-import CustomTable from '../../../CMS/pages/custom/CustomTable';
-import { apiService } from '../../../../manageApi/utils/custom.apiservice';
-import { showSuccessAlert, showErrorAlert, showConfirmDialog } from '../../../../manageApi/utils/sweetAlert';
 
-const { TextArea } = Input;
 const { Title, Text } = Typography;
+const { TextArea } = Input;
 
-// --- THEME CONFIGURATION ---
+// --- CONFIGURATION ---
 const THEME = {
-  primary: "#722ed1", // Purple
-  secondary: "#1890ff", // Blue
-  success: "#52c41a",
-  warning: "#faad14",
-  error: "#ff4d4f",
-  bgLight: "#f9f0ff",
+  primary: "#7c3aed", 
 };
 
-const AddBrand = () => {
-  const navigate = useNavigate();
+const API_BASE = "https://xoto.ae/api"; 
+const URL_PRODUCTS = `${API_BASE}/products`;
+const URL_UPLOAD = `${API_BASE}/upload`;
 
-  // --- STATES ---
-  // Form State (Add)
-  const [addForm] = Form.useForm();
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [logoPreview, setLogoPreview] = useState(null);
-  const [isLoadingForm, setIsLoadingForm] = useState(false);
-
-  // Edit State
-  const [editForm] = Form.useForm();
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editLogoPreview, setEditLogoPreview] = useState(null);
-  const [selectedBrand, setSelectedBrand] = useState(null);
-
-  // View State
-  const [showViewModal, setShowViewModal] = useState(false);
-
-  // Data State
-  const [brands, setBrands] = useState([]);
-  const [loadingTable, setLoadingTable] = useState(true);
-  const [activeTab, setActiveTab] = useState('active');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  
-  // Filter & Pagination
-  const [filters, setFilters] = useState({ search: '', status: 1 });
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    itemsPerPage: 10,
-    totalResults: 0,
+// --- HELPER: Base64 for Preview ---
+const getBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
   });
 
-  // --- API CALLS ---
-  const fetchBrands = useCallback(
-    async (page = 1, itemsPerPage = 10, currentFilters = filters) => {
-      setLoadingTable(true);
-      try {
-        const params = {
-          page,
-          limit: itemsPerPage,
-          status: currentFilters.status,
-        };
-        if (currentFilters.search) params.search = currentFilters.search;
+const CreateBrand = () => {
+  // --- STATE ---
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  
+  // Pagination
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchText, setSearchText] = useState('');
+  
+  // Modal & Form
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingId, setEditingId] = useState(null); 
+  const [form] = Form.useForm();
 
-        const response = await apiService.get('/brands', params);
+  // Image Upload State
+  const [fileList, setFileList] = useState([]); 
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
 
-        setBrands(response.brands || []);
-        setPagination({
-          currentPage: response.pagination?.page || 1,
-          itemsPerPage: response.pagination?.limit || 10,
-          totalResults: response.pagination?.total || 0,
-        });
-      } catch (error) {
-        showErrorAlert('Error', error.response?.data?.message || 'Failed to fetch brands');
-        setBrands([]);
-      } finally {
-        setLoadingTable(false);
+  // --- 1. FETCH BRANDS ---
+  const fetchBrands = async (page = 1, limit = 10, search = '') => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${URL_PRODUCTS}/get-all-brand`, {
+        params: { page, limit, search: search || undefined }
+      });
+      const resData = response.data;
+      if (resData.success) {
+        setBrands(resData.data || []);
+        setTotal(resData.pagination?.total || 0);
       }
-    },
-    []
-  );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchBrands(pagination.currentPage, pagination.itemsPerPage, filters);
-  }, [refreshTrigger, fetchBrands, filters]);
+    const delayDebounce = setTimeout(() => {
+        fetchBrands(currentPage, pageSize, searchText);
+    }, 400);
+    return () => clearTimeout(delayDebounce);
+  }, [currentPage, pageSize, searchText]);
 
-  // --- HANDLERS ---
-
-  const handleTabChange = (key) => {
-    setActiveTab(key);
-    const newStatus = key === 'active' ? 1 : 0;
-    const newFilters = { ...filters, status: newStatus };
-    setFilters(newFilters);
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
-    fetchBrands(1, pagination.itemsPerPage, newFilters);
-  };
-
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    const newFilters = { ...filters, search: value };
-    setFilters(newFilters);
-    fetchBrands(1, pagination.itemsPerPage, newFilters);
-  };
-
-  const handlePageChange = (page, itemsPerPage) => {
-    fetchBrands(page, itemsPerPage, filters);
-  };
-
-  // --- CRUD ACTIONS ---
-
-  const handleAddSubmit = async (values) => {
-    setIsLoadingForm(true);
+  // --- 2. FETCH SINGLE BRAND (EDIT) ---
+  const fetchBrandById = async (id) => {
+    setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('name', values.name.trim());
-      formData.append('description', values.description?.trim() || '');
-      formData.append('website', values.website?.trim() || '');
-      formData.append('country', values.country?.trim() || '');
-      if (values.logo?.file) formData.append('logo', values.logo.file);
-
-      await apiService.upload('/brands', formData);
-      showSuccessAlert('Success', 'Brand created successfully');
-      
-      setIsAddModalOpen(false);
-      addForm.resetFields();
-      setLogoPreview(null);
-      setRefreshTrigger(prev => prev + 1);
-    } catch (error) {
-      showErrorAlert('Error', error.response?.data?.message || 'Failed to create brand');
-    } finally {
-      setIsLoadingForm(false);
-    }
-  };
-
-  const handleEditSubmit = async (values) => {
-    setIsLoadingForm(true);
-    try {
-      const formData = new FormData();
-      formData.append('name', values.name.trim());
-      formData.append('description', values.description?.trim() || '');
-      formData.append('website', values.website?.trim() || '');
-      formData.append('country', values.country?.trim() || '');
-      if (values.logo?.file) formData.append('logo', values.logo.file);
-
-      await apiService.put(`/brands/${selectedBrand._id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const response = await axios.get(`${URL_PRODUCTS}/get-brand-by-id`, {
+        params: { id }
       });
-      
-      showSuccessAlert('Success', 'Brand updated successfully');
-      setShowEditModal(false);
-      setRefreshTrigger(prev => prev + 1);
-    } catch (error) {
-      showErrorAlert('Error', error.response?.data?.message || 'Failed to update brand');
+      const resData = response.data;
+
+      if (resData.success && resData.data) {
+        const brand = resData.data;
+        form.setFieldsValue({
+          brandName: brand.brandName,
+          websiteUrl: brand.websiteUrl,
+          country: brand.country,
+          description: brand.description,
+          isActive: brand.isActive, // Set Status
+        });
+
+        if (brand.photo) {
+          setFileList([{
+            uid: '-1',
+            name: 'current-logo.png',
+            status: 'done',
+            url: brand.photo,
+          }]);
+        } else {
+          setFileList([]);
+        }
+        setEditingId(brand._id);
+        setModalVisible(true);
+      } else {
+        message.warning("Brand details not found.");
+      }
+    } catch (err) {
+      message.error("Failed to fetch details.");
     } finally {
-      setIsLoadingForm(false);
+      setLoading(false);
     }
   };
 
-  const handleSoftDelete = async (brandId) => {
-    const result = await showConfirmDialog(
-      'Move to Trash?',
-      'This brand will be deactivated.',
-      'Yes, Trash it'
-    );
-    if (result.isConfirmed) {
-      try {
-        await apiService.delete(`/brands/${brandId}`);
-        showSuccessAlert('Moved to Trash', 'Brand has been deactivated.');
-        setRefreshTrigger(prev => prev + 1);
-      } catch (error) {
-        showErrorAlert('Error', 'Failed to trash brand');
+  // --- 3. UPLOAD HANDLERS ---
+  const handleCancelPreview = () => setPreviewOpen(false);
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
+  };
+
+  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+
+  // --- UPLOAD LOGIC ---
+  const uploadImageFile = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file); // Sending as 'file'
+
+    try {
+      const res = await axios.post(URL_UPLOAD, formData);
+      if (res.data?.file?.url) {
+        return res.data.file.url;
       }
+      return res.data?.url || res.data?.data; 
+    } catch (error) {
+      console.error("UPLOAD ERROR:", error.response);
+      const serverMsg = error.response?.data?.message || "Upload failed";
+      throw new Error(serverMsg);
     }
   };
 
-  const handleRestore = async (brandId) => {
-    const result = await showConfirmDialog(
-      'Restore Brand?',
-      'This will reactivate the brand.',
-      'Yes, Restore'
-    );
-    if (result.isConfirmed) {
-      try {
-        await apiService.post(`/brands/${brandId}/restore`);
-        showSuccessAlert('Restored', 'Brand is active again.');
-        setRefreshTrigger(prev => prev + 1);
-      } catch (error) {
-        showErrorAlert('Error', 'Failed to restore brand');
+  // --- 4. SAVE HANDLER (Create/Edit) ---
+  const handleSave = async (values) => {
+    setSaving(true);
+    try {
+      let finalPhotoUrl = "";
+      const hasNewFile = fileList.length > 0 && fileList[0].originFileObj;
+      const hasExistingUrl = fileList.length > 0 && !fileList[0].originFileObj && fileList[0].url;
+
+      if (hasNewFile) {
+        finalPhotoUrl = await uploadImageFile(fileList[0].originFileObj);
+        if (!finalPhotoUrl) throw new Error("Server returned invalid image URL.");
+      } else if (hasExistingUrl) {
+        finalPhotoUrl = fileList[0].url;
       }
+
+      const payload = {
+        brandName: values.brandName,
+        websiteUrl: values.websiteUrl,
+        country: values.country,
+        description: values.description,
+        isActive: values.isActive, // Send Active Status
+        photo: finalPhotoUrl, 
+      };
+
+      let response;
+      if (editingId) {
+        response = await axios.post(`${URL_PRODUCTS}/edit-brand-by-id?id=${editingId}`, payload);
+      } else {
+        response = await axios.post(`${URL_PRODUCTS}/create-brand`, payload);
+      }
+      
+      if (response.data?.success) {
+        notification.success({
+          message: 'Success',
+          description: `Brand saved successfully.`,
+          placement: 'topRight'
+        });
+        closeModal();
+        fetchBrands(currentPage, pageSize);
+      } else {
+        message.error(response.data?.message || "Operation failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      message.error(err.message || "Failed to save brand.");
+    } finally {
+      setSaving(false);
     }
   };
 
-  // --- MODAL OPENERS ---
-  const openEditModal = (item) => {
-    setSelectedBrand(item);
-    setEditFormWrapper(item);
-    setShowEditModal(true);
+  // --- 5. DELETE HANDLER ---
+  const deleteBrand = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(`${URL_PRODUCTS}/delete-brand-by-id?id=${id}`); 
+      if (response.data?.success) {
+          message.success("Brand deleted successfully.");
+          fetchBrands(currentPage, pageSize, searchText);
+      } else {
+          message.error("Delete failed.");
+      }
+    } catch (err) {
+      message.error("Deletion failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const setEditFormWrapper = (item) => {
-    editForm.setFieldsValue({
-      name: item.name,
-      description: item.description,
-      website: item.website,
-      country: item.country,
-    });
-    setEditLogoPreview(item.logo ? `http://localhost:5000/${item.logo}` : null);
+  // --- UTILS ---
+  const closeModal = () => {
+    setModalVisible(false);
+    setEditingId(null);
+    setFileList([]);
+    form.resetFields();
   };
 
-  // --- HELPERS ---
-  const getUploadProps = (setPreviewFn) => ({
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith('image/');
-      if (!isImage) {
-        message.error('You can only upload image files!');
-        return Upload.LIST_IGNORE;
-      }
-      const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isLt2M) {
-        message.error('Image must smaller than 2MB!');
-        return Upload.LIST_IGNORE;
-      }
-      setPreviewFn(URL.createObjectURL(file));
-      return false; // Prevent auto upload
-    },
-    maxCount: 1,
-    showUploadList: false,
-  });
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
 
-  // --- COLUMNS ---
-  const columns = useMemo(() => [
+  // --- TABLE COLUMNS ---
+  const columns = [
     {
-      key: 'info',
-      title: 'Brand',
-      render: (_, r) => (
-        <div className="flex items-center gap-3">
-          <Avatar 
-            shape="square" 
-            size={48} 
-            src={r.logo ? `http://localhost:5000/${r.logo}` : null}
-            icon={<ShopOutlined />}
-            style={{ backgroundColor: THEME.bgLight, color: THEME.primary, border: '1px solid #eee' }}
-          />
-          <div>
-            <div className="font-bold text-gray-800 text-base">{r.name}</div>
-            <div className="text-xs text-gray-500">{r.country || 'No Country'}</div>
+      title: 'Logo',
+      dataIndex: 'photo',
+      key: 'photo',
+      width: 100,
+      align: 'center',
+      render: (photo) => (
+        <div className="border rounded bg-white flex justify-center items-center shadow-sm mx-auto" style={{ width: '60px', height: '60px', padding: '2px' }}>
+           {photo && typeof photo === 'string' && photo.startsWith('http') ? (
+            <img src={photo} alt="Brand" style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+            />
+           ) : null}
+           <div style={{ display: (photo && typeof photo === 'string' && photo.startsWith('http')) ? 'none' : 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ccc', width: '100%', height: '100%' }}>
+              <ShopOutlined style={{ fontSize: '20px' }} />
+           </div>
+        </div>
+      ),
+    },
+    {
+      title: 'Brand Info',
+      dataIndex: 'brandName',
+      key: 'brandName',
+      render: (text, record) => (
+        <div>
+          <Text strong className="text-base">{text}</Text>
+          <div className="mt-1">
+            <Space size="small">
+                <Text type="secondary" className="text-xs">
+                    <GlobalOutlined /> {record.country || 'Unknown'}
+                </Text>
+            </Space>
           </div>
         </div>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      width: 100,
+      render: (isActive) => (
+        <Tag color={isActive ? 'success' : 'error'} icon={isActive ? <CheckOutlined /> : <CloseOutlined />}>
+          {isActive ? 'Active' : 'Inactive'}
+        </Tag>
       )
     },
     {
-      key: 'description',
-      title: 'Description',
-      width: 300,
-      render: (v) => <div className="truncate w-64 text-gray-500" title={v}>{v || '--'}</div>
-    },
-    {
-      key: 'website',
       title: 'Website',
-      render: (v) => v ? (
-        <a href={v} target="_blank" rel="noopener noreferrer" className="text-blue-600 flex items-center gap-1">
-          <GlobalOutlined /> Visit
-        </a>
-      ) : '--'
+      dataIndex: 'websiteUrl',
+      key: 'websiteUrl',
+      responsive: ['md'], // Hide on small mobile
+      render: (url) => url ? <a href={url} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline"><LinkOutlined /> Visit</a> : <Text disabled>-</Text>,
     },
     {
-      key: 'created_at',
-      title: 'Created',
-      render: (v) => {
-        if (!v) return <span className="text-gray-400">--</span>;
-        const date = new Date(v);
-        return isNaN(date.getTime()) ? (
-            <span className="text-gray-400">--</span>
-        ) : (
-            <span className="text-gray-500 text-xs">{format(date, 'dd MMM yyyy')}</span>
-        );
-      }
-    },
-    {
+      title: 'Action',
       key: 'actions',
-      title: 'Actions',
       align: 'right',
-      render: (_, r) => (
-        <Space>
-          <Tooltip title="View">
-            <Button 
-                shape="circle" 
-                icon={<EyeOutlined style={{ color: THEME.primary }} />} 
-                onClick={() => { setSelectedBrand(r); setShowViewModal(true); }}
-            />
-          </Tooltip>
-          
-          {activeTab === 'active' ? (
-            <>
-              <Tooltip title="Edit">
-                <Button 
-                    shape="circle" 
-                    icon={<EditOutlined style={{ color: THEME.secondary }} />} 
-                    onClick={() => openEditModal(r)}
-                />
-              </Tooltip>
-              <Tooltip title="Trash">
-                <Button 
-                    shape="circle" 
-                    danger 
-                    icon={<DeleteOutlined />} 
-                    onClick={() => handleSoftDelete(r._id)}
-                />
-              </Tooltip>
-            </>
-          ) : (
-            <Tooltip title="Restore">
-                <Button 
-                    shape="circle" 
-                    icon={<RotateLeftOutlined style={{ color: THEME.success }} />} 
-                    onClick={() => handleRestore(r._id)}
-                    className="border-green-500"
-                />
-            </Tooltip>
-          )}
+      width: 100,
+      render: (_, record) => (
+        <Space size="small">
+          <Button type="text" icon={<EditOutlined className="text-blue-600" />} onClick={() => fetchBrandById(record._id)} />
+          <Popconfirm title="Delete?" onConfirm={() => deleteBrand(record._id)} okText="Yes" cancelText="No" okButtonProps={{ danger: true }}>
+            <Button type="text" danger icon={<DeleteOutlined />} />
+          </Popconfirm>
         </Space>
-      )
-    }
-  ], [activeTab]);
-
-  // --- TAB ITEMS CONFIGURATION ---
-  const tabItems = [
-    {
-      key: 'active',
-      label: (
-        <span>
-          <ShopOutlined /> Active Brands
-          <Badge 
-            count={activeTab === 'active' ? pagination.totalResults : 0} 
-            style={{ marginLeft: 8, backgroundColor: THEME.success }} 
-          />
-        </span>
-      )
+      ),
     },
-    {
-      key: 'trashed',
-      label: (
-        <span>
-          <DeleteOutlined /> Trashed
-          <Badge 
-            count={activeTab === 'trashed' ? pagination.totalResults : 0} 
-            style={{ marginLeft: 8, backgroundColor: THEME.error }} 
-          />
-        </span>
-      )
-    }
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      
-      {/* 1. Header & Stats */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
-               
-                <div>
-                    <Title level={3} style={{ margin: 0 }}>Brand Management</Title>
-                    <Text type="secondary">Create and manage your partner brands.</Text>
-                </div>
-            </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-    {/* Add Brand Button */}
-    <Button
-        type="primary"
-        size="large"
-        icon={<PlusOutlined />}
-        style={{
-            backgroundColor: THEME.primary,
-            borderColor: THEME.primary
-        }}
-        onClick={() => setIsAddModalOpen(true)}
-    >
-        Add New Brand
-    </Button>
-
-    {/* Back Button */}
-    <Button
-        size="large"
-        icon={<ArrowLeftOutlined />}
-        onClick={() => navigate(-1)}
-        style={{
-            backgroundColor: THEME.primary,
-            borderColor: THEME.primary,
-            color: "#fff"
-        }}
-        onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "black";
-            e.currentTarget.style.borderColor = "black";
-        }}
-        onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = THEME.primary;
-            e.currentTarget.style.borderColor = THEME.primary;
-        }}
-    >
-        Back
-    </Button>
-</div>
-
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+      {/* HEADER SECTION - RESPONSIVE */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+          <Title level={3} style={{ margin: 0 }}>Brand Management</Title>
+          <Text type="secondary">Manage your product brands and partners.</Text>
         </div>
-
-        <Row gutter={[16, 16]}>
-            <Col xs={24} sm={8}>
-                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
-                    <Statistic 
-                        title="Total Brands" 
-                        value={pagination.totalResults} 
-                        prefix={<ShopOutlined style={{ color: THEME.primary }} />} 
-                    />
-                </Card>
-            </Col>
-            <Col xs={24} sm={8}>
-                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.success }}>
-                    <Statistic 
-                        title="Active Brands" 
-                        value={activeTab === 'active' ? pagination.totalResults : '--'} 
-                        prefix={<CheckCircleOutlined style={{ color: THEME.success }} />} 
-                    />
-                </Card>
-            </Col>
-            <Col xs={24} sm={8}>
-                <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.error }}>
-                    <Statistic 
-                        title="Trashed Brands" 
-                        value={activeTab === 'trashed' ? pagination.totalResults : '--'} 
-                        prefix={<RestOutlined style={{ color: THEME.error }} />} 
-                    />
-                </Card>
-            </Col>
-        </Row>
+        <Button 
+          type="primary" 
+          size="large" 
+          icon={<PlusOutlined />} 
+          onClick={() => { setEditingId(null); form.resetFields(); form.setFieldsValue({ isActive: true }); setModalVisible(true); }}
+          style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+          className="w-full md:w-auto"
+        >
+          Add New Brand
+        </Button>
       </div>
 
-      {/* 2. Main Content */}
-      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
-        {/* Search Bar */}
-       
-
-        {/* --- TABS WITH CARD STYLE --- */}
-        <Tabs
-            activeKey={activeTab}
-            onChange={handleTabChange}
-            type="card"
-            size="large"
-            tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
-            items={tabItems}
-        />
-
-        {/* Table */}
-        <div className="p-0">
-            <CustomTable
-                columns={columns}
-                data={brands}
-                loading={loadingTable}
-                totalItems={pagination.totalResults}
-                currentPage={pagination.currentPage}
-                itemsPerPage={pagination.itemsPerPage}
-                onPageChange={handlePageChange}
+      {/* STATS SECTION */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={12} md={8}>
+          <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+            <Statistic 
+              title="Total Brands" 
+              value={total} 
+              prefix={<ShopOutlined style={{ color: THEME.primary }} />} 
             />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* TABLE SECTION - RESPONSIVE SCROLL */}
+      <Card bordered={false} className="shadow-md" bodyStyle={{ padding: 0 }}>
+        <div className="p-4 border-b bg-white rounded-t-lg">
+          <Input 
+            prefix={<SearchOutlined className="text-gray-400" />} 
+            placeholder="Search brand name..." 
+            className="w-full md:max-w-md"
+            onChange={(e) => { setSearchText(e.target.value); setCurrentPage(1); }}
+            allowClear
+            size="large"
+          />
         </div>
+
+        <Table 
+          columns={columns} 
+          dataSource={brands} 
+          loading={loading}
+          rowKey="_id"
+          scroll={{ x: 800 }} // Enables horizontal scroll on mobile
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            onChange: (p, s) => { setCurrentPage(p); setPageSize(s); }
+          }}
+        />
       </Card>
 
-      {/* 3. ADD BRAND MODAL */}
+      {/* CREATE / EDIT MODAL */}
       <Modal
-        title={
-            <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
-                <PlusOutlined style={{ color: THEME.primary }} /> Add New Brand
-            </div>
-        }
-        open={isAddModalOpen}
-        onCancel={() => { setIsAddModalOpen(false); addForm.resetFields(); setLogoPreview(null); }}
+        title={<div className="font-bold text-lg">{editingId ? 'Edit Brand' : 'Create New Brand'}</div>}
+        open={modalVisible}
+        onCancel={closeModal}
         footer={null}
-        width={600}
-        destroyOnClose
         centered
+        destroyOnClose
+        width={600}
       >
-        <Divider className="my-4" />
-        <Form form={addForm} onFinish={handleAddSubmit} layout="vertical">
-            <Row gutter={16}>
-                <Col span={24} className="flex justify-center mb-4">
-                    <Form.Item name="logo">
-                        <Upload {...getUploadProps(setLogoPreview)} listType="picture-card" showUploadList={false}>
-                            {logoPreview ? (
-                                <img src={logoPreview} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                <div>
-                                    <PlusOutlined />
-                                    <div style={{ marginTop: 8 }}>Upload Logo</div>
-                                </div>
-                            )}
-                        </Upload>
-                    </Form.Item>
-                </Col>
-            </Row>
-            
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Form.Item name="name" label="Brand Name" rules={[{ required: true }]}>
-                        <Input size="large" placeholder="e.g. Nike" />
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item name="country" label="Country">
-                        <Input size="large" placeholder="e.g. USA" />
-                    </Form.Item>
-                </Col>
-            </Row>
+        <Divider style={{ margin: '10px 0 25px 0' }} />
+        <Form form={form} layout="vertical" onFinish={handleSave} initialValues={{ isActive: true }}>
+          
+          <Row gutter={16}>
+             <Col xs={24} sm={18}>
+                <Form.Item name="brandName" label="Brand Name" rules={[{ required: true }]}>
+                  <Input prefix={<ShopOutlined />} placeholder="e.g. XOTO Living" size="large" />
+                </Form.Item>
+             </Col>
+             <Col xs={24} sm={6}>
+                {/* ACTIVE STATUS SWITCH */}
+                <Form.Item name="isActive" label="Status" valuePropName="checked">
+                   <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+                </Form.Item>
+             </Col>
+          </Row>
 
-            <Form.Item name="website" label="Website URL" rules={[{ type: 'url', warningOnly: true }]}>
-                <Input size="large" prefix={<GlobalOutlined className="text-gray-400" />} placeholder="https://..." />
-            </Form.Item>
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item name="country" label="Country" rules={[{ required: true }]}>
+                <Input prefix={<GlobalOutlined />} placeholder="e.g. UAE" size="large" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="websiteUrl" label="Website URL">
+                <Input prefix={<LinkOutlined />} placeholder="https://..." size="large" />
+              </Form.Item>
+            </Col>
+          </Row>
 
-            <Form.Item name="description" label="Description">
-                <TextArea rows={3} placeholder="Short bio about the brand..." />
-            </Form.Item>
+          <Form.Item label="Brand Logo" required tooltip="Accepts JPG/PNG files">
+             <Upload
+                listType="picture-card"
+                fileList={fileList}
+                onPreview={handlePreview}
+                onChange={handleChange}
+                beforeUpload={() => false} 
+                maxCount={1}
+                accept="image/*"
+             >
+                {fileList.length >= 1 ? null : uploadButton}
+             </Upload>
+          </Form.Item>
 
-            <div className="flex justify-end gap-3 mt-6">
-                <Button size="large" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-                <Button 
-                    type="primary" 
-                    htmlType="submit" 
-                    loading={isLoadingForm}
-                    size="large"
-                    style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
-                >
-                    Create Brand
-                </Button>
-            </div>
+          <Form.Item name="description" label="Description" rules={[{ required: true }]}>
+            <TextArea rows={4} placeholder="Short description..." showCount maxLength={300} />
+          </Form.Item>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button size="large" onClick={closeModal}>Cancel</Button>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              loading={saving} 
+              size="large"
+              style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+            >
+              {editingId ? 'Update Brand' : 'Create Brand'}
+            </Button>
+          </div>
         </Form>
       </Modal>
 
-      {/* 4. EDIT BRAND MODAL */}
-      <Modal
-        title={
-            <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
-                <EditOutlined style={{ color: THEME.secondary }} /> Edit Brand
-            </div>
-        }
-        open={showEditModal}
-        onCancel={() => setShowEditModal(false)}
-        footer={null}
-        width={600}
-        destroyOnClose
-        centered
-      >
-        <Divider className="my-4" />
-        <Form form={editForm} onFinish={handleEditSubmit} layout="vertical">
-            <Row gutter={16}>
-                <Col span={24} className="flex justify-center mb-4">
-                    <Form.Item name="logo">
-                        <Upload {...getUploadProps(setEditLogoPreview)} listType="picture-card" showUploadList={false}>
-                            {editLogoPreview ? (
-                                <img src={editLogoPreview} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                <div>
-                                    <PlusOutlined />
-                                    <div style={{ marginTop: 8 }}>Change Logo</div>
-                                </div>
-                            )}
-                        </Upload>
-                    </Form.Item>
-                </Col>
-            </Row>
-
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Form.Item name="name" label="Brand Name" rules={[{ required: true }]}>
-                        <Input size="large" />
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item name="country" label="Country">
-                        <Input size="large" />
-                    </Form.Item>
-                </Col>
-            </Row>
-
-            <Form.Item name="website" label="Website URL">
-                <Input size="large" prefix={<GlobalOutlined className="text-gray-400" />} />
-            </Form.Item>
-
-            <Form.Item name="description" label="Description">
-                <TextArea rows={3} />
-            </Form.Item>
-
-            <div className="flex justify-end gap-3 mt-6">
-                <Button size="large" onClick={() => setShowEditModal(false)}>Cancel</Button>
-                <Button 
-                    type="primary" 
-                    htmlType="submit" 
-                    loading={isLoadingForm}
-                    size="large"
-                    style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
-                >
-                    Update Brand
-                </Button>
-            </div>
-        </Form>
+      {/* PREVIEW MODAL */}
+      <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancelPreview}>
+        <img alt="example" style={{ width: '100%' }} src={previewImage} />
       </Modal>
-
-      {/* 5. VIEW MODAL */}
-      <Modal
-        title="Brand Details"
-        open={showViewModal}
-        onCancel={() => setShowViewModal(false)}
-        footer={[<Button key="close" onClick={() => setShowViewModal(false)}>Close</Button>]}
-        centered
-      >
-        {selectedBrand && (
-            <div className="text-center">
-                <Avatar 
-                    size={80} 
-                    src={selectedBrand.logo ? `http://localhost:5000/${selectedBrand.logo}` : null} 
-                    icon={<ShopOutlined />}
-                    className="mb-4 bg-purple-50 text-purple-500 border border-purple-100"
-                    shape="square"
-                />
-                <Title level={4} style={{ margin: 0 }}>{selectedBrand.name}</Title>
-                <Text type="secondary">{selectedBrand.country}</Text>
-                
-                <Divider />
-                
-                <div className="text-left space-y-3">
-                    <div>
-                        <Text strong className="block text-gray-600">Website:</Text>
-                        {selectedBrand.website ? <a href={selectedBrand.website} target="_blank" rel="noreferrer">{selectedBrand.website}</a> : <Text type="secondary">N/A</Text>}
-                    </div>
-                    <div>
-                        <Text strong className="block text-gray-600">Description:</Text>
-                        <p className="text-gray-700">{selectedBrand.description || 'No description provided.'}</p>
-                    </div>
-                    <div className="flex justify-between mt-4 text-xs text-gray-400">
-                        <span>Created: {format(new Date(selectedBrand.created_at || new Date()), 'dd MMM yyyy')}</span>
-                    </div>
-                </div>
-            </div>
-        )}
-      </Modal>
-
     </div>
   );
 };
 
-export default AddBrand;
+export default CreateBrand;

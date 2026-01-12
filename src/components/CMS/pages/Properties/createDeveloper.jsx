@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios'; 
 import {
   Button, Modal, Form, Input, Popconfirm, Card, Table,
-  Typography, Avatar, Row, Col, Statistic, Space, Divider, message, notification, Tooltip
+  Typography, Avatar, Row, Col, Statistic, Space, Divider, message, notification, Tooltip, Grid
 } from 'antd';
 import {
   PlusOutlined, UserOutlined, MailOutlined, PhoneOutlined,
@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const THEME = {
   primary: "#7c3aed", 
@@ -19,6 +20,9 @@ const THEME = {
 
 const CreateDeveloper = () => {
   const BASE_URL = "https://xoto.ae/api/property"; 
+  
+  // Ant Design Hook for Javascript-level responsiveness (useful for Modal width)
+  const screens = useBreakpoint();
 
   const [developers, setDevelopers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,7 +64,7 @@ const CreateDeveloper = () => {
     return () => clearTimeout(delayDebounce);
   }, [currentPage, pageSize, searchText]);
 
-  // --- 2. GET SINGLE DEVELOPER BY ID (For Editing) ---
+  // --- 2. GET SINGLE DEVELOPER BY ID ---
   const fetchDeveloperById = async (id) => {
     setLoading(true);
     try {
@@ -85,7 +89,7 @@ const CreateDeveloper = () => {
     }
   };
 
-  // --- 3. CREATE OR UPDATE (EDIT) DEVELOPER ---
+  // --- 3. CREATE OR UPDATE ---
   const handleSave = async (values) => {
     setLoading(true);
     try {
@@ -98,7 +102,6 @@ const CreateDeveloper = () => {
 
       let response;
       if (editingId) {
-        // Updated to use your Edit API format: edit-developer?id=XYZ
         response = await axios.post(`${BASE_URL}/edit-developer`, payload, {
           params: { id: editingId }
         });
@@ -122,7 +125,7 @@ const CreateDeveloper = () => {
     }
   };
 
-  // --- 4. DELETE DEVELOPER ---
+  // --- 4. DELETE ---
   const deleteDeveloper = async (id) => {
     try {
       setLoading(true);
@@ -150,6 +153,8 @@ const CreateDeveloper = () => {
       title: 'Developer Name',
       dataIndex: 'name',
       key: 'name',
+      fixed: screens.md ? 'left' : false, // Fix column on desktop only
+      width: 200,
       render: (text) => (
         <Space>
           <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: THEME.primary }} />
@@ -161,6 +166,7 @@ const CreateDeveloper = () => {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      width: 250,
       render: (email) => (
         <Text type="secondary"><MailOutlined /> {email}</Text>
       ),
@@ -168,6 +174,7 @@ const CreateDeveloper = () => {
     {
       title: 'Contact',
       key: 'contact',
+      width: 180,
       render: (_, record) => (
         <Text><PhoneOutlined /> {record.country_code} {record.phone_number}</Text>
       ),
@@ -176,6 +183,8 @@ const CreateDeveloper = () => {
       title: 'Action',
       key: 'actions',
       align: 'center',
+      fixed: screens.md ? 'right' : false, // Fix column on desktop only
+      width: 120,
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Edit">
@@ -203,8 +212,11 @@ const CreateDeveloper = () => {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
+    // Changed p-6 to p-4 md:p-6 for better mobile spacing
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+      
+      {/* 1. HEADER: Flex-col on mobile, Flex-row on desktop */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <Title level={3} style={{ margin: 0 }}>Developer Management</Title>
           <Text type="secondary">Manage your real estate developers professionally.</Text>
@@ -215,13 +227,14 @@ const CreateDeveloper = () => {
           icon={<PlusOutlined />} 
           onClick={() => setModalVisible(true)}
           style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+          className="w-full md:w-auto" // Full width button on mobile
         >
           Add New Developer
         </Button>
       </div>
 
       <Row gutter={[16, 16]} className="mb-6">
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12} md={8}>
           <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
             <Statistic 
               title="Total Developers" 
@@ -234,10 +247,11 @@ const CreateDeveloper = () => {
 
       <Card bordered={false} className="shadow-md" bodyStyle={{ padding: 0 }}>
         <div className="p-4 border-b bg-white rounded-t-lg">
+          {/* 2. SEARCH: 100% width on mobile, 400px on desktop */}
           <Input 
             prefix={<SearchOutlined className="text-gray-400" />} 
             placeholder="Search by name or email..." 
-            style={{ maxWidth: 400 }}
+            className="w-full md:w-[400px]"
             onChange={(e) => {
                 setSearchText(e.target.value);
                 setCurrentPage(1);
@@ -247,11 +261,13 @@ const CreateDeveloper = () => {
           />
         </div>
 
+        {/* 3. TABLE: Added scroll prop for horizontal scrolling on mobile */}
         <Table 
           columns={columns} 
           dataSource={developers} 
           loading={loading}
           rowKey={(record) => record._id || record.id}
+          scroll={{ x: 800 }} // Enables horizontal scroll if screen < 800px
           pagination={{
             current: currentPage,
             pageSize: pageSize,
@@ -261,6 +277,8 @@ const CreateDeveloper = () => {
               setCurrentPage(page);
               setPageSize(size);
             },
+            // Repsonsive Pagination position
+            position: ['bottomRight']
           }}
         />
       </Card>
@@ -272,7 +290,8 @@ const CreateDeveloper = () => {
         footer={null}
         centered
         destroyOnClose
-        width={500}
+        // 4. MODAL: Responsive width logic
+        width={screens.xs ? '95%' : 500}
       >
         <Divider style={{ margin: '10px 0 25px 0' }} />
         <Form form={form} layout="vertical" onFinish={handleSave} initialValues={{ country_code: '+91' }}>
@@ -285,12 +304,12 @@ const CreateDeveloper = () => {
           </Form.Item>
 
           <Row gutter={10}>
-            <Col span={7}>
+            <Col xs={8} sm={7}>
               <Form.Item name="country_code" label="Code">
                 <Input prefix={<GlobalOutlined />} readOnly style={{ backgroundColor: '#f5f5f5' }} size="large" />
               </Form.Item>
             </Col>
-            <Col span={17}>
+            <Col xs={16} sm={17}>
               <Form.Item 
                 name="phone_number" 
                 label="Phone Number" 
@@ -310,7 +329,7 @@ const CreateDeveloper = () => {
               size="large"
               style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
             >
-              {editingId ? 'Update Changes' : 'Save Developer'}
+              {editingId ? 'Update' : 'Save'}
             </Button>
           </div>
         </Form>
