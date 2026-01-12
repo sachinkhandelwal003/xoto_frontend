@@ -6,7 +6,7 @@ import herobg from "../../assets/img/serviceimg1.png";
 /* Inject DM Sans font inside component */
 const dmSans = {
   fontFamily: "'DM Sans', sans-serif",
-};
+}; 
 
 export default function HomeLoanHero() {
   const { t, i18n } = useTranslation("mort1");
