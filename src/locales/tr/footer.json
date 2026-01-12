@@ -28,14 +28,14 @@
   ],
   "knowledge": [
     { "label": "Bilgi Merkezi", "path": "/about" },
-    { "label": "Sürdürülebilirliğimiz", "path": "/about" },
-    { "label": "Odak", "path": "/about" },
+    { "label": "Sürdürülebilirliğimiz Odak", "path": "/about" },
+    
     { "label": "Geri Bildirim Gönder", "path": "/about" },
     { "label": "Bize Ulaşın", "path": "/contact" },
     { "label": "Gizlilik Politikası", "path": "/about" },
     { "label": "Kullanım Şartları", "path": "/about" }
   ],
-  "locations": "Hindistan | BAE | Suudi Arabistan",
+  "locations": " BAE | Suudi Arabistan",
   "email": {
     "labels": {
       "partners": "Partnerler için",

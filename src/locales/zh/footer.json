@@ -28,14 +28,14 @@
   ],
   "knowledge": [
     { "label": "知识中心", "path": "/about" },
-    { "label": "我们的可持续性", "path": "/about" },
-    { "label": "重点", "path": "/about" },
+    { "label": "我们的可持续性 重点", "path": "/about" },
+    { "label": "", "path": "/about" },
     { "label": "提交反馈", "path": "/about" },
     { "label": "联系我们", "path": "/contact" },
     { "label": "隐私政策", "path": "/about" },
     { "label": "使用条款", "path": "/about" }
   ],
-  "locations": "印度 | 阿联酋 | 沙特阿拉伯",
+  "locations": " 阿联酋 | 沙特阿拉伯",
   "email": {
     "labels": {
       "partners": "合作伙伴",

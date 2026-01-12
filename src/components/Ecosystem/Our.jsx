@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import wave1 from "../../assets/img/wave/waveint2.png";
-import round from "../../assets/img/round231.mp4";
+// import round from "../../assets/img/round231.mp4";
 import rating from "../../assets/icons/Homeicons/rating.png";
 import partner from "../../assets/img/ecosystem/finance.png";
 import vector from "../../assets/img/ecosystem/business.png";
@@ -74,7 +74,7 @@ const BuiltForEveryone = () => {
         <div className="flex flex-col lg:flex-row items-center justify-between ">
           <div className="w-full lg:w-1/2 flex justify-start items-start mb-10 lg:mb-25">
             <div className="relative w-60 h-60 sm:w-100 sm:h-100 lg:w-110 lg:h-110 mx-auto">
-              <video src={round} autoPlay loop muted playsInline className="w-full object-contain" />
+              <video src={"https://xotostaging.s3.me-central-1.amazonaws.com/properties/1768044487658-round231.mp4"} autoPlay loop muted playsInline className="w-full object-contain" />
             </div>
           </div>
 

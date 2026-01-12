@@ -1,439 +1,355 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; 
 import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Form,
-  Input,
-  message,
-  Row,
-  Space,
-  Switch,
-  Tree,
-  Upload,
-  Select,
-} from "antd";
+  Button, Modal, Form, Input, Popconfirm, Card, Table,
+  Typography, Avatar, Row, Col, Statistic, Space, Divider, message, notification, Tooltip, Switch, Tag
+} from 'antd';
 import {
   PlusOutlined,
-  ReloadOutlined,
-  EditOutlined,
-  UploadOutlined,
-  BranchesOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
-import axios from "axios";
-import CustomTable from "../../../CMS/pages/custom/CustomTable"; // Import your table component
-import { FiRefreshCw } from "react-icons/fi";
+  DeleteOutlined, EditOutlined, SearchOutlined, AppstoreOutlined
+} from '@ant-design/icons';
 
-const { Option } = Select;
+const { Title, Text } = Typography;
+const { TextArea } = Input;
+
+// Theme colors
+const THEME = {
+  primary: "#7c3aed", 
+  success: "#10b981",
+  error: "#ef4444",
+};
 
 const AddCategory = () => {
-  const [form] = Form.useForm();
-  const [categories, setCategories] = useState([]);
-  const [treeData, setTreeData] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedParent, setSelectedParent] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [trashedCategories, setTrashedCategories] = useState([]);
-  const [trashedLoading, setTrashedLoading] = useState(false);
+ 
+  // Base URL
+  const BASE_URL = "https://xoto.ae/api/products"; 
 
-  // Fetch all categories
-  const fetchCategories = async () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchText, setSearchText] = useState('');
+  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingId, setEditingId] = useState(null); 
+  const [form] = Form.useForm();
+
+  // --- 1. GET ALL CATEGORIES ---
+  const fetchCategories = async (page = 1, limit = 10, search = '') => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await axios.get("https://kotiboxglobaltech.online/api/categories");
-      if (res.data.success) {
-        setCategories(res.data.categories);
-        setTreeData(transformHierarchy(res.data.hierarchy));
-      }
+      const response = await axios.get(`${BASE_URL}/get-all-category`, {
+        params: { 
+            page: page, 
+            limit: limit, 
+            search: search || undefined
+        }
+      });
+      
+      const resData = response.data;
+      const rawList = resData?.data || resData || [];
+      setCategories(rawList);
+
+      const count = resData?.pagination?.total || resData?.total || rawList.length || 0;
+      setTotal(count);
+      
     } catch (err) {
-      message.error("Failed to load categories");
+      console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Fetch trashed categories
-  const fetchTrashedCategories = async () => {
-    try {
-      setTrashedLoading(true);
-      const res = await axios.get(
-        "https://kotiboxglobaltech.online/api/categories?includeDeleted=true&status=0"
-      );
-      if (res.data.success) {
-        setTrashedCategories(res.data.categories);
-      }
-    } catch (err) {
-      message.error("Failed to load trashed categories");
-    } finally {
-      setTrashedLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCategories();
-    fetchTrashedCategories();
-  }, []);
+    const delayDebounce = setTimeout(() => {
+        fetchCategories(currentPage, pageSize, searchText);
+    }, 400);
+    return () => clearTimeout(delayDebounce);
+  }, [currentPage, pageSize, searchText]);
 
-  // Transform backend hierarchy to Ant Tree format
-  const transformHierarchy = (data) =>
-    data.map((item) => ({
-      key: item._id,
-      title: (
-        <span>
-          {item.icon && (
-            <span
-              dangerouslySetInnerHTML={{ __html: item.icon }}
-              style={{ marginRight: 5 }}
-            />
-          )}
-          {item.name}
-        </span>
-      ),
-      children: item.children ? transformHierarchy(item.children) : [],
-    }));
-
-  const onTreeSelect = (selectedKeys) => {
-    const selected = categories.find((c) => c._id === selectedKeys[0]);
-    if (selected) {
-      setSelectedCategory(selected);
-      setSelectedParent(null);
-      form.setFieldsValue({
-        ...selected,
-        metaKeywords: selected.metaKeywords || [],
-      });
-      setImagePreview(selected.image || null);
-    } else {
-      setSelectedCategory(null);
-      setSelectedParent(null);
-      form.resetFields();
-      setImagePreview(null);
-    }
-  };
-
-  const handleImageChange = (info) => {
-    const file = info.file.originFileObj;
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-      form.setFieldValue("image", file);
-    }
-  };
-
-  const handleSubmit = async (values) => {
-    const formData = new FormData();
-
-    Object.keys(values).forEach((key) => {
-      if (key === "metaKeywords" && Array.isArray(values[key])) {
-        values[key].forEach((kw, index) => {
-          if (kw && kw.trim() !== "") {
-            formData.append(`metaKeywords[${index}]`, kw.trim());
-          }
-        });
-      } else if (key === "image" && values[key]) {
-        formData.append("image", values[key]);
-      } else if (values[key] !== undefined && values[key] !== null) {
-        formData.append(key, values[key]);
-      }
-    });
-
-    // Always send parent (empty string if no parent)
-    formData.append("parent", selectedParent || "");
-
+  // --- 2. GET SINGLE CATEGORY ---
+  const fetchCategoryById = async (id) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      if (selectedCategory && !selectedParent) {
-        await axios.put(
-          `https://kotiboxglobaltech.online/api/categories/${selectedCategory._id}`,
-          formData
-        );
-        message.success("Category updated successfully");
-      } else {
-        await axios.post("https://kotiboxglobaltech.online/api/categories", formData);
-        message.success("Category created successfully");
+      const response = await axios.get(`${BASE_URL}/get-category-by-id`, {
+        params: { id: id } 
+      });
+      const cat = response.data?.data || response.data;
+      if (cat) {
+        form.setFieldsValue({
+          name: cat.name,
+          description: cat.description,
+          isActive: cat.isActive 
+        });
+        setEditingId(id);
+        setModalVisible(true);
       }
-      form.resetFields();
-      setImagePreview(null);
-      setSelectedCategory(null);
-      setSelectedParent(null);
-      fetchCategories();
-      fetchTrashedCategories();
     } catch (err) {
-      console.error(err);
-      message.error(err.response?.data?.message || "Failed to save category");
+      message.error("Failed to fetch category details.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
+  // --- 3. CREATE OR UPDATE CATEGORY (UPDATED) ---
+  const handleSave = async (values) => {
+    setLoading(true);
     try {
-      await axios.delete(`https://kotiboxglobaltech.online/api/categories/${id}`);
-      message.success("Category soft deleted successfully");
-      fetchCategories();
-      fetchTrashedCategories();
-      setSelectedCategory(null);
-      setSelectedParent(null);
-      form.resetFields();
-      setImagePreview(null);
+      // JSON Payload construction
+      const payload = {
+        name: values.name,
+        description: values.description,
+        isActive: values.isActive || false, 
+      };
+
+      let response;
+      if (editingId) {
+        // ✅ UPDATED: /edit-category-by-id endpoint use kiya hai
+        response = await axios.post(`${BASE_URL}/edit-category-by-id`, payload, {
+          params: { id: editingId } // Query param mein ID jayega
+        });
+      } else {
+        // Create Logic
+        response = await axios.post(`${BASE_URL}/create-category`, payload);
+      }
+      
+      if (response.status === 200 || response.status === 201) {
+        notification.success({
+          message: editingId ? 'Category Updated' : 'Category Created',
+          description: `Category "${values.name}" has been successfully saved.`,
+          placement: 'topRight'
+        });
+        closeModal();
+        fetchCategories(currentPage, pageSize);
+      }
     } catch (err) {
-      message.error(err.response?.data?.message || "Failed to delete category");
+      message.error(err.response?.data?.message || "Failed to save category.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRestore = async (id) => {
+  // --- 4. DELETE CATEGORY ---
+  const deleteCategory = async (id) => {
     try {
-      await axios.post(`https://kotiboxglobaltech.online/api/categories/${id}/restore`);
-      message.success("Category restored successfully");
-      fetchCategories();
-      fetchTrashedCategories();
+      setLoading(true);
+      const response = await axios.post(`${BASE_URL}/delete-category-by-id?id=${id}`); 
+
+      if (response.status === 200 || response.status === 204) {
+          message.success("Category deleted successfully.");
+          fetchCategories(currentPage, pageSize, searchText);
+      }
     } catch (err) {
-      message.error(err.response?.data?.message || "Failed to restore category");
+      message.error(err.response?.data?.message || "Deletion failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const trashedColumns = [
-  {
-    title: "S.No",
-    key: "sno",
-    render: (_, __, index) => index + 1, // Ensure index is properly received
-  },
-  { title: "Name", key: "name", sortable: true },
-  { title: "Slug", key: "slug" },
-  { title: "Status", key: "status", render: () => "Inactive" },
-  {
-    title: "Actions",
-    key: "actions",
-    render: (_, record) => (
-      <Button onClick={() => handleRestore(record._id)} type="primary">
-        Restore
-      </Button>
-    ),
-  },
-];
-  return (
-    <Row gutter={16} >
-      {/* LEFT: Category Tree */}
-      <Col span={8}>
-        <Card
-          title="Category Hierarchy"
-          extra={
-            <Button icon={<ReloadOutlined />} onClick={fetchCategories}>
-              Refresh
-            </Button>
-          }
-        >
-          <Tree
-            showLine
-            defaultExpandAll
-            treeData={treeData}
-            onSelect={onTreeSelect}
-            style={{ background: "#fff", padding: 10, borderRadius: 8, minHeight: 500 }}
-          />
-        </Card>
-      </Col>
+  const closeModal = () => {
+    setModalVisible(false);
+    setEditingId(null);
+    form.resetFields();
+  };
 
-      {/* RIGHT: Add/Edit Form */}
-      <Col span={16}>
-        <Card
-          title={
-            selectedParent
-              ? "Add Child Category"
-              : selectedCategory
-              ? "Edit Category"
-              : "Add New Category"
-          }
-          extra={
-            <Space>
-              <Button
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  setSelectedCategory(null);
-                  setSelectedParent(null);
-                  form.resetFields();
-                  setImagePreview(null);
-                }}
-              >
-                Trashed
-              </Button>
-              {selectedCategory && (
-                <Button
-                  icon={<BranchesOutlined />}
-                  onClick={() => {
-                    setSelectedParent(selectedCategory._id);
-                    setSelectedCategory(null);
-                    form.resetFields();
-                    setImagePreview(null);
-                  }}
-                >
-                  Add Child
-                </Button>
-              )}
-              {selectedCategory && (
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(selectedCategory._id)}
-                >
-                  Delete
-                </Button>
-              )}
-              <Button
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  setSelectedCategory(null);
-                  setSelectedParent(null);
-                  form.resetFields();
-                  setImagePreview(null);
-                }}
-              >
-                New
-              </Button>
-            </Space>
-          }
-        >
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleSubmit}
-            initialValues={{
-              status: 1,
-              isHighlighted: false,
-              isSpecial: false,
-              showInFilterMenu: false,
-            }}
+  // Table Columns
+  const columns = [
+    {
+      title: 'Category Name',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text) => (
+        <Space>
+          <Avatar size="small" icon={<AppstoreOutlined />} style={{ backgroundColor: THEME.primary }} />
+          <Text strong>{text}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      ellipsis: true, 
+      render: (text) => (
+        <Text type="secondary" title={text}>
+             {text || "No description"}
+        </Text>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      render: (isActive) => (
+        <Tag color={isActive ? THEME.success : THEME.error}>
+          {isActive ? "ACTIVE" : "INACTIVE"}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'actions',
+      align: 'center',
+      render: (_, record) => (
+        <Space size="middle">
+          <Tooltip title="Edit">
+            <Button 
+              type="text" 
+              icon={<EditOutlined style={{ color: THEME.primary }} />} 
+              onClick={() => fetchCategoryById(record._id || record.id)}
+            />
+          </Tooltip>
+          
+          <Popconfirm 
+            title="Delete this category?" 
+            onConfirm={() => deleteCategory(record._id || record.id)} 
+            okText="Yes, Delete" 
+            cancelText="No"
+            okButtonProps={{ danger: true, loading: loading }}
           >
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  label="Category Name"
-                  name="name"
-                  rules={[{ required: true, message: "Enter category name" }]}
-                >
-                  <Input placeholder="Enter category name"  size="large" />
-                </Form.Item>
-              </Col>
+            <Tooltip title="Delete">
+              <Button type="text" danger icon={<DeleteOutlined />} />
+            </Tooltip>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
 
-              <Col span={12}>
-                <Form.Item label="Meta Title" name="metaTitle">
-                  <Input placeholder="Enter meta title"   size="large"/>
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Meta Description" name="metaDescription">
-                  <Input.TextArea placeholder="Enter meta description"  size="large" />
-                </Form.Item>
-              </Col>
-              <Col span={24}>
-                <Form.Item label="Meta Keywords" name="metaKeywords" >
-                  <Select
-                    mode="tags" size="large"
-                    style={{ width: "100%" }}
-                    placeholder="Type and press Enter to add keywords"
-                    tokenSeparators={[","]}
-                  />
-                </Form.Item>
-              </Col>
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <Title level={3} style={{ margin: 0 }}>Category Management</Title>
+          <Text type="secondary">Manage product categories for your store.</Text>
+        </div>
+        <Button 
+          type="primary" 
+          size="large" 
+          icon={<PlusOutlined />} 
+          onClick={() => {
+              form.resetFields();
+              form.setFieldsValue({ isActive: true }); 
+              setModalVisible(true);
+          }}
+          style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+        >
+          Add New Category
+        </Button>
+      </div>
 
-              <Col span={12}>
-                <Form.Item label="Icon HTML" name="icon">
-                  <Input.TextArea placeholder="Enter icon HTML code" />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Upload Image" name="image">
-                  <Upload
-                    listType="picture"
-                    maxCount={1}
-                    beforeUpload={() => false}
-                    onChange={handleImageChange}
-                  >
-                    <Button icon={<UploadOutlined />}>Select Image</Button>
-                  </Upload>
-                  {imagePreview && (
-                    <img
-                      src={imagePreview}
-                      alt="preview"
-                      style={{
-                        width: 120,
-                        height: 120,
-                        objectFit: "cover",
-                        marginTop: 10,
-                        borderRadius: 5,
-                        border: "1px solid #d9d9d9",
-                      }}
-                    />
-                  )}
-                </Form.Item>
-              </Col>
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={8}>
+          <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+            <Statistic 
+              title="Total Categories" 
+              value={total} 
+              prefix={<AppstoreOutlined style={{ color: THEME.primary }} />} 
+            />
+          </Card>
+        </Col>
+      </Row>
 
-              <Col span={8}>
-                <Form.Item label="Highlighted" name="isHighlighted" valuePropName="checked">
-                  <Switch />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="Special" name="isSpecial" valuePropName="checked">
-                  <Switch />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item
-                  label="Show in Filter Menu"
-                  name="showInFilterMenu"
-                  valuePropName="checked"
-                >
-                  <Switch />
-                </Form.Item>
-              </Col>
-            </Row>
+      <Card bordered={false} className="shadow-md" bodyStyle={{ padding: 0 }}>
+        <div className="p-4 border-b bg-white rounded-t-lg">
+          <Input 
+            prefix={<SearchOutlined className="text-gray-400" />} 
+            placeholder="Search categories..." 
+            style={{ maxWidth: 400 }}
+            onChange={(e) => {
+                setSearchText(e.target.value);
+                setCurrentPage(1);
+            }}
+            allowClear
+            size="large"
+          />
+        </div>
 
-            <Divider />
+        <Table 
+          columns={columns} 
+          dataSource={categories} 
+          loading={loading}
+          rowKey={(record) => record._id || record.id}
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            onChange: (page, size) => {
+              setCurrentPage(page);
+              setPageSize(size);
+            },
+          }}
+        />
+      </Card>
 
-            <Form.Item>
-              <Space>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  icon={<EditOutlined />}
-                >
-                  {selectedCategory ? "Update" : "Save"} Category
-                </Button>
-                <Button
-                  onClick={() => {
-                    form.resetFields();
-                    setSelectedCategory(null);
-                    setSelectedParent(null);
-                    setImagePreview(null);
-                  }}
-                >
-                  Reset
-                </Button>
-              </Space>
-            </Form.Item>
-          </Form>
-        </Card>
+      <Modal
+        title={<div className="font-bold text-lg">{editingId ? <EditOutlined /> : <PlusOutlined />} {editingId ? 'Edit Category' : 'Create Category'}</div>}
+        open={modalVisible}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        destroyOnClose
+        width={500}
+      >
+        <Divider style={{ margin: '10px 0 25px 0' }} />
+        
+        <Form 
+            form={form} 
+            layout="vertical" 
+            onFinish={handleSave} 
+            initialValues={{ isActive: true }}
+        >
+          <Form.Item 
+            name="name" 
+            label="Category Name" 
+            rules={[{ required: true, message: 'Please enter category name' }]}
+          >
+            <Input prefix={<AppstoreOutlined />} placeholder="e.g. ELECTRONICS" size="large" />
+          </Form.Item>
 
-        {/* Trashed Categories Table */}
-        <Card title="Trashed Categories" style={{ marginTop: 20 }}>
-        <CustomTable
-  columns={trashedColumns}
-  data={trashedCategories.map((item, index) => ({ ...item, key: item._id || index }))}
-  totalItems={trashedCategories.length}
-  currentPage={1}
-  itemsPerPage={10}
-  onPageChange={(page) => {}}
-  onFilter={() => {}}
-  loading={trashedLoading}
-/>
-        </Card>
-      </Col>
-      <Col>
-      </Col>
-    </Row>
+          <Form.Item 
+            name="description" 
+            label="Description" 
+            rules={[{ required: true, message: 'Please enter description' }]}
+          >
+            <TextArea 
+                rows={4} 
+                placeholder="e.g. All types of home and office furniture..." 
+                maxLength={300}
+                showCount
+            />
+          </Form.Item>
+
+          <Form.Item 
+            name="isActive" 
+            label="Status" 
+            valuePropName="checked" 
+          >
+            <Switch 
+                checkedChildren="Active" 
+                unCheckedChildren="Inactive" 
+                defaultChecked 
+            />
+          </Form.Item>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button size="large" onClick={closeModal}>Cancel</Button>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              loading={loading} 
+              size="large"
+              style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+            >
+              {editingId ? 'Update Category' : 'Create Category'}
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+    </div>
   );
 };
 

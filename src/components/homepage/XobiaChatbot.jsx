@@ -22,15 +22,38 @@ function XobiaChatbot() {
   const chatEndRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-  const audioRef = useRef(null);
+ 
+  // We initialize this once to reuse the same object (Crucial for iOS)
+  const audioRef = useRef(typeof Audio !== "undefined" ? new Audio() : null);
+ 
   const holdTimerRef = useRef(null);
   const recordingTimerRef = useRef(null);
   const inputTextareaRef = useRef(null);
   const startTimeRef = useRef(null);
 
   const touchActiveRef = useRef(false);
-  
+ 
   const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  /* ================= IOS AUDIO UNLOCKER ================= */
+  // This function plays silence immediately on user interaction to "unlock" the audio player
+  const prepareAudioForiOS = () => {
+    if (!audioRef.current) {
+        audioRef.current = new Audio();
+    }
+    const audio = audioRef.current;
+   
+    // A tiny silent wav file base64
+    audio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAGZGF0YQAAAAA=";
+   
+    // We play it, then pause it, just to get the "permission" from iOS
+    audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+    }).catch(err => {
+        console.warn("Audio unlock failed (likely no interaction):", err);
+    });
+  };
 
   /* ================= AUTO-ADJUST TEXTAREA HEIGHT ================= */
   useEffect(() => {
@@ -46,8 +69,7 @@ function XobiaChatbot() {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-      audioRef.current.src = "";
-      audioRef.current = null;
+      // Do NOT nullify audioRef.current, we need to reuse the instance for iOS
       setBotSpeaking(false);
       setSpeakingMessageId(null);
     }
@@ -134,23 +156,35 @@ function XobiaChatbot() {
 
   /* ================= AUDIO PLAYER ================= */
   const playBotAudio = (url, messageId) => {
-    stopAllAudio();
-    const audio = new Audio(url);
-    audioRef.current = audio;
+    // Reuse the existing ref (which is unlocked on iOS)
+    if(!audioRef.current) audioRef.current = new Audio();
+   
+    const audio = audioRef.current;
+   
+    // Pause any current playback
+    audio.pause();
+   
+    // Set the REAL url
+    audio.src = url;
+    audio.currentTime = 0;
 
     setBotSpeaking(true);
     setSpeakingMessageId(messageId);
 
-    audio.play().catch((err) => {
-      console.error("Audio play error:", err);
-      setBotSpeaking(false);
-      setSpeakingMessageId(null);
-    });
+    // Play
+    const playPromise = audio.play();
+   
+    if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+            console.error("Audio play error (iOS blockage or network):", err);
+            setBotSpeaking(false);
+            setSpeakingMessageId(null);
+        });
+    }
 
     audio.onended = () => {
       setBotSpeaking(false);
       setSpeakingMessageId(null);
-      audioRef.current = null;
     };
   };
 
@@ -163,8 +197,7 @@ function XobiaChatbot() {
       lastMessage?.audioUrl &&
       lastMessage.autoPlay
     ) {
-        // On iOS, autoplay is often blocked unless we play immediately after a user touch.
-        // We call it here, but it may still require a manual tap on iOS.
+        // Because we unlocked the audioRef in sendMessage/Record, this will now work on iOS
         playBotAudio(lastMessage.audioUrl, lastMessage.id);
     }
   }, [messages]);
@@ -184,6 +217,10 @@ function XobiaChatbot() {
   /* ================= SEND TEXT ================= */
   const sendMessage = async () => {
     if (!input.trim()) return;
+   
+    // 1. IOS FIX: Unlock audio immediately on user click
+    prepareAudioForiOS();
+   
     stopAllRecording();
 
     const userMsg = {
@@ -249,7 +286,6 @@ function XobiaChatbot() {
       setVoiceLoading(true);
 
       const formData = new FormData();
-      // Dynamically use the correct extension (webm for Android/Chrome, mp4 for iOS)
       formData.append("audio", audioBlob, `voice.${extension}`);
       formData.append("session_id", getChatSessionId());
 
@@ -286,6 +322,9 @@ function XobiaChatbot() {
   const startRecordingProcess = () => {
     if (loading || voiceLoading) return;
     if (botSpeaking) stopAllAudio();
+   
+    // IOS FIX: Unlock audio here too (user touched the mic)
+    prepareAudioForiOS();
 
     setIsHolding(true);
     startTimeRef.current = Date.now();
@@ -328,14 +367,13 @@ function XobiaChatbot() {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { 
-            echoCancellation: true, 
-            noiseSuppression: true, 
-            autoGainControl: true 
+        audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
         }
       });
 
-      // iOS Safari usually only supports audio/mp4
       let options = {};
       if (MediaRecorder.isTypeSupported("audio/mp4")) {
           options = { mimeType: "audio/mp4" };
@@ -356,7 +394,7 @@ function XobiaChatbot() {
           const actualType = mediaRecorderRef.current.mimeType || "audio/webm";
           const extension = actualType.includes("mp4") ? "mp4" : "webm";
           const blob = new Blob(audioChunksRef.current, { type: actualType });
-          
+         
           setMessages((prev) => [
             ...prev,
             {
@@ -463,7 +501,7 @@ function XobiaChatbot() {
           <div className="absolute inset-0 bg-black/60 md:bg-transparent pointer-events-auto" onClick={handleCloseChat}></div>
 
           <div className="pointer-events-auto relative w-[95%] max-w-[400px] md:max-w-md h-[85vh] md:h-[600px] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:absolute md:bottom-8 md:right-8 animate-in fade-in zoom-in duration-300">
-            
+           
             {/* Header */}
             <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white shrink-0">
               <div className="flex items-center gap-3">
@@ -502,8 +540,8 @@ function XobiaChatbot() {
                           </div>
                         )}
                         {m.role === "bot" && m.type === "audio" && (
-                          botSpeaking && speakingMessageId === m.id ? 
-                          <SpeakingIndicator /> : 
+                          botSpeaking && speakingMessageId === m.id ?
+                          <SpeakingIndicator /> :
                           <button onClick={() => playBotAudio(m.audioUrl, m.id)} className="text-sm font-medium flex items-center gap-2">
                             <span>🔊 Play Response</span>
                           </button>
@@ -523,7 +561,7 @@ function XobiaChatbot() {
             {/* FOOTER */}
             <div className="p-3 bg-white border-t border-gray-100 shrink-0">
               <div className="flex items-end gap-2 h-full min-h-[50px]">
-                
+               
                 {/* Voice Button */}
                 <button
                   onMouseDown={handleMouseDown}
@@ -535,15 +573,15 @@ function XobiaChatbot() {
                   onContextMenu={(e) => e.preventDefault()} // Critical for iOS
                   disabled={loading || voiceLoading || botSpeaking}
                   className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 select-none touch-none ${
-                    isHolding 
-                      ? "bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] scale-110" 
+                    isHolding
+                      ? "bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] scale-110"
                       : "bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
                   } ${(loading || voiceLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  style={{ 
-                    touchAction: 'none', 
-                    WebkitUserSelect: 'none', 
+                  style={{
+                    touchAction: 'none',
+                    WebkitUserSelect: 'none',
                     userSelect: 'none',
-                    WebkitTouchCallout: 'none' 
+                    WebkitTouchCallout: 'none'
                   }}
                 >
                   <FiMic className={`w-5 h-5 ${isHolding ? 'animate-bounce' : ''}`} />
@@ -552,7 +590,7 @@ function XobiaChatbot() {
                 {/* Input Area */}
                 <div className="flex-1 relative h-12 flex items-center">
                   {isHolding ? (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="absolute inset-0 bg-red-50 rounded-2xl border border-red-100 flex items-center justify-between px-4 overflow-hidden"

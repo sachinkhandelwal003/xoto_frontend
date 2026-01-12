@@ -91,16 +91,16 @@ const logos = [
       src={logo.icon}
       alt={logo.name}
       className="
-        max-w-[65%] max-h-[65%]
-        sm:max-w-[70%] sm:max-h-[70%]
-        md:max-w-[75%] md:max-h-[75%]
+        max-w-[75%] max-h-[95%]
+        sm:max-w-[80%] sm:max-h-[90%]
+        md:max-w-[75%] md:max-h-[95%]
         object-contain
         transition-all duration-300
         group-hover:scale-110
       "
     />
 
-    <div className="absolute inset-0 rounded-full bg-purple-200/30 blur-2xl opacity-0 group-hover:opacity-100 transition"></div>
+    <div className="absolute inset-0 rounded-full bg-purple-200/30 blur-2xl opacity-0  transition"></div>
   </div>
 </SwiperSlide>
 

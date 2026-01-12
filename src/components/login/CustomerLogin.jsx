@@ -1,4 +1,9 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
+import { 
+  UserOutlined, 
+  ArrowLeftOutlined, 
+  MobileOutlined 
+} from '@ant-design/icons';
 import {
   Form,
   Input,
@@ -11,21 +16,15 @@ import {
   ConfigProvider,
   Select
 } from 'antd';
-import { motion } from 'framer-motion';
+// import { motion } from 'framer-motion'; // Unused in provided code, but kept if you need it
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../manageApi/context/AuthContext.jsx';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
-
 // Assets
 import loginimage from '../../assets/img/one.png';
 import logoNew from '../../assets/img/logoNew.png';
-import {
-  UserOutlined,
-  MobileOutlined,
-  SmileFilled
-} from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -40,7 +39,6 @@ const COUNTRY_CONFIG = {
   UK: { label: 'UK', code: '+44', digits: 10 },
   AU: { label: 'Australia', code: '+61', digits: 9 },
 };
-
 
 /* ---------------- STYLED COMPONENTS ---------------- */
 
@@ -115,23 +113,23 @@ const CustomerLogin = () => {
 
   /* ---------------- FORM SUBMIT ---------------- */
 
- const onFinish = async (values) => {
-  setLoading(true);
-  try {
-    await login('/users/login/customer', {
-      mobile: {
-        country_code: COUNTRY_CONFIG[country].code, 
-        number: values.mobile,                      
-      },
-    });
-  } catch (err) {
-    toast.error(err?.message || 'Login failed', {
-      position: 'top-center',
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      await login('/users/login/customer', {
+        mobile: {
+          country_code: COUNTRY_CONFIG[country].code,
+          number: values.mobile,
+        },
+      });
+    } catch (err) {
+      toast.error(err?.message || 'Login failed', {
+        position: 'top-center',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* ---------------- UI ---------------- */
 
@@ -166,7 +164,27 @@ const CustomerLogin = () => {
             <Col xs={24} lg={12} style={{ display: 'flex', justifyContent: 'center' }}>
               <GlassCard bordered={false} $isMobile={isMobile}>
 
-                <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                <div style={{ textAlign: 'center', marginBottom: 32, position: 'relative' }}>
+
+                  {/* --- BACK BUTTON SECTION --- */}
+                  <div
+                    onClick={() => navigate('/')} // ✅ UPDATED: Navigates to Home
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      cursor: 'pointer',
+                      fontSize: 20,
+                      color: '#595959', 
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: 28 
+                    }}
+                  >
+                    <ArrowLeftOutlined />
+                  </div>
+                  {/* --------------------------- */}
+
                   <div style={{
                     width: 64,
                     height: 64,
