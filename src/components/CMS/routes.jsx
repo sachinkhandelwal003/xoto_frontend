@@ -159,7 +159,7 @@ const CmsRoutes = () => {
 
   // Redirect root dashboard to role-specific
   if (
-    location.pathname === "/dashboard" ||
+    // location.pathname === "/dashboard" ||
     location.pathname === "/dashboard/"
   ) {
     return <Navigate to={base} replace />;

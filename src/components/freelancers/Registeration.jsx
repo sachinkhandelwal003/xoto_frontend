@@ -309,7 +309,7 @@ const Registration = () => {
           </div>
 
           <div className="lg:col-span-3 p-10">
-            <h2 className="text-4xl font-bold text-gray-800 mb-2">Execution Partner Registration</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-2">Execution Partners Registration</h2>
             <p className="text-gray-600 mb-8">Step {step + 1} of 3</p>
 
             <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>

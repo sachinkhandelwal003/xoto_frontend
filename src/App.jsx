@@ -262,6 +262,7 @@ function App() {
       <ScrollToTop />
       <Suspense fallback={<Loader />}>
         <Routes>
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
           <Route path="/" element={<Home />} />
           <Route path="/landscaping" element={<Landspackng />} />
                     <Route path="/aiPlanner" element={<AITools />} />
