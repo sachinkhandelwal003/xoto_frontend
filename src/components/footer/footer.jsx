@@ -94,7 +94,7 @@ export default function Footer() {
             <Link
               key={k}
               to={i.path}
-              className="block text-purple-200 text-sm font-bold py-1 hover:text-white"
+              className="block text-purple-200 text-sm font-semibold py-1 hover:text-white"
             >
               {i.label}
             </Link>

@@ -93,7 +93,7 @@ const logos = [
       className="
         max-w-[75%] max-h-[95%]
         sm:max-w-[80%] sm:max-h-[90%]
-        md:max-w-[75%] md:max-h-[95%]
+        md:max-w-[75%] md:max-h-[9  5%]
         object-contain
         transition-all duration-300
         group-hover:scale-110
