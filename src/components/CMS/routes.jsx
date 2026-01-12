@@ -64,6 +64,7 @@ import TypesGallery from "./pages/estimateMaster/TypesGallery";
 import Questions from "./pages/estimateMaster/Questions";
 import CreateDeveloper from "./pages/Properties/createDeveloper";
 import Propertymanagement from "./pages/Properties/Propertymanagement";
+// import AddBrand from "../ecommerce/B2C/products/AddBrand"
 const roleSlugMap = {
   0: "superadmin",
   1: "admin",
@@ -127,7 +128,11 @@ warehouse:<ManageWarehouses/>,
 enquiries:<Enquiry/>,
 packages:<Packages/>,
 "developer/create":<CreateDeveloper/>,
-"developer/property":<Propertymanagement/>,};
+"developer/property":<Propertymanagement/>
+
+,
+"products/brands":<AddBrand/>
+};
 
 
 // Placeholder for missing components
