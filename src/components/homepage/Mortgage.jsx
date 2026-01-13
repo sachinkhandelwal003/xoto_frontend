@@ -263,7 +263,7 @@ const SuccessModal = ({ email, navigate }) => {
   useEffect(() => {
       const timer = setTimeout(() => {
           navigate('/');
-      }, 5000);
+      }, 20000);
       return () => clearTimeout(timer);
   }, [navigate]);
 
