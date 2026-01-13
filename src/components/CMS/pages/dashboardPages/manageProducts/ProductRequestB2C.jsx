@@ -1,751 +1,828 @@
-// src/pages/admin/ProductRequestB2C.jsx
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; 
 import {
-  FiRefreshCw,
-  FiEye,
-  FiCheck,
-  FiX,
-  FiShoppingBag,
-  FiClock,
-  FiPackage,
-  FiSearch,
-  FiEdit2,
-  FiTrendingUp,
-  FiArrowRight
-} from "react-icons/fi";
+  Button, Modal, Form, Input, Popconfirm, Card, Table,
+  Typography, Row, Col, Statistic, Space, Divider, message, notification, Tooltip,
+  InputNumber, Select, Switch, Tag, Upload
+} from 'antd';
 import {
-  Button,
-  Modal,
-  Input,
-  Tabs,
-  Card,
-  Tag,
-  Select as AntdSelect,
-  Statistic,
-  DatePicker,
-  Space,
-  Form,
-  Row,
-  Col,
-  Tooltip,
-  Alert,
-  Avatar,
-  Typography,
-  Badge,
-  InputNumber,
-  Divider
-} from "antd";
-import CustomTable from "../../custom/CustomTable";
-import { apiService } from "../../../../../manageApi/utils/custom.apiservice";
-import { showToast } from "../../../../../manageApi/utils/toast";
-import { showConfirmDialog } from "../../../../../manageApi/utils/sweetAlert";
-import dayjs from "dayjs";
-import { format } from "date-fns";
+  PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined, 
+  ShoppingOutlined, AppstoreOutlined
+} from '@ant-design/icons';
 
-const { Option } = AntdSelect;
-const { TextArea } = Input;
 const { Title, Text } = Typography;
+const { Option } = Select;
+const { TextArea } = Input;
 
 const THEME = {
-  primary: "#722ed1",
-  secondary: "#1890ff",
-  success: "#52c41a",
-  warning: "#faad14",
-  error: "#ff4d4f",
-  bgLight: "#f9f0ff",
+  primary: "#7c3aed", 
+  success: "#10b981",
+  error: "#ef4444",
 };
 
-const useProductPermission = () => {
-  const { permissions } = useSelector((s) => s.auth);
-  const p = permissions?.["Request→All Sellers"] ?? {};
-  return {
-    canView: !!p.canView,
-    canEdit: !!p.canEdit,
-    canDelete: !!p.canDelete,
-  };
-};
-
-const ROLE_SLUG_MAP = {
-  0: "superadmin",
-  1: "admin",
-  5: "vendor-b2c",
-  6: "vendor-b2b",
-  7: "freelancer",
-  11: "accountant",
-};
-
-const PricingPreview = ({ form, basePrice, currencySymbol = "$" }) => {
-  const values = Form.useWatch([], form);
-
-  if (!values) return null;
-
-  const salePrice = Number(values.sale_price) || 0;
-  const discountVal = Number(values.discount_value) || 0;
-  const discountType = values.discount_type || 'percentage';
-  const taxRate = Number(values.rate) || 0;
-
-  let discountAmount = 0;
-  if (discountType === 'percentage') {
-    discountAmount = salePrice * (discountVal / 100);
-  } else {
-    discountAmount = discountVal;
-  }
-  const priceAfterDiscount = Math.max(salePrice - discountAmount, 0);
-  const taxAmount = priceAfterDiscount * (taxRate / 100);
-  const finalPrice = priceAfterDiscount + taxAmount;
-
-  const margin = priceAfterDiscount - basePrice;
-  const marginPercent = basePrice > 0 ? (margin / basePrice) * 100 : 0;
-
-  return (
-    <Card className="bg-gray-50 border-gray-200 mt-4 md:mt-0 h-full">
-      <Title level={5} className="mb-4 text-purple-700 flex items-center gap-2">
-        <FiTrendingUp /> Pricing Impact
-      </Title>
-      <div className="space-y-4">
-        <div className="flex justify-between items-center bg-white p-3 rounded border">
-          <div>
-            <Text type="secondary" className="text-xs">Vendor Base Cost</Text>
-            <div className="font-semibold text-gray-600">
-              {currencySymbol} {basePrice.toFixed(2)}
-            </div>
-          </div>
-          <FiArrowRight className="text-gray-400" />
-          <div className="text-right">
-            <Text type="secondary" className="text-xs">Your Sale Price</Text>
-            <div className="font-bold text-blue-600">
-              {currencySymbol} {salePrice.toFixed(2)}
-            </div>
-          </div>
-        </div>
-        <Divider style={{ margin: '12px 0' }} />
-        <Row gutter={16}>
-          <Col span={12}>
-            <Statistic
-              title={`Net Margin (${currencySymbol})`}
-              value={margin}
-              precision={2}
-              valueStyle={{ color: margin >= 0 ? THEME.success : THEME.error, fontSize: '1.2rem' }}
-              prefix={currencySymbol}
-            />
-          </Col>
-          <Col span={12}>
-            <Statistic
-              title="Margin %"
-              value={marginPercent}
-              precision={1}
-              valueStyle={{ color: margin >= 0 ? THEME.success : THEME.error, fontSize: '1.2rem' }}
-              suffix="%"
-            />
-          </Col>
-        </Row>
-        <div className="bg-white p-3 rounded border mt-2">
-          <div className="flex justify-between text-sm mb-1">
-            <span>Price after Disc:</span>
-            <span>{currencySymbol} {priceAfterDiscount.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-sm mb-1">
-            <span>Tax ({taxRate}%):</span>
-            <span>+{currencySymbol} {taxAmount.toFixed(2)}</span>
-          </div>
-          <Divider style={{ margin: '6px 0' }} />
-          <div className="flex justify-between font-bold text-base">
-            <span>Final Customer Price:</span>
-            <span className="text-purple-700">
-              {currencySymbol} {finalPrice.toFixed(2)}
-            </span>
-          </div>
-        </div>
-      </div>
-    </Card>
-  );
-};
-
-const ProductRequestB2C = () => {
-  const { user, token } = useSelector((state) => state.auth);
-  const { id: vendorId } = useParams();
-  const [form] = Form.useForm();
-  const perm = useProductPermission();
-  const roleSlug = ROLE_SLUG_MAP[user?.role?.code] ?? "dashboard";
-  const isAdmin = ["superadmin", "admin"].includes(roleSlug);
-  const effectiveVendorId = isAdmin ? vendorId : user.id;
-  const isValidVendorId = effectiveVendorId && effectiveVendorId !== "undefined";
+const ProductManagement = () => {
+  const BASE_URL = "https://xoto.ae"; // Make sure this is correct
 
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("pending");
-  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]); 
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchText, setSearchText] = useState('');
+  
+  const [brandSearchLoading, setBrandSearchLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingId, setEditingId] = useState(null); 
+  const [editingData, setEditingData] = useState(null);
+  const [form] = Form.useForm();
 
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalResults: 0,
-    itemsPerPage: 10,
-  });
+  // --- HELPER: Handle Upload Files in Form ---
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
 
-  const [filters, setFilters] = useState({
-    search: "",
-    category_id: "",
-  });
+  // --- 1. FETCH BRANDS ---
+  const fetchBrands = async (search = '') => {
+    setBrandSearchLoading(true);
+    try {
+      const response = await axios.get(`${BASE_URL}/api/products/get-all-brand`, {
+        params: { page: 1, limit: 50, search: search }
+      });
+      const brandData = response.data?.data || response.data?.brands || [];
+      setBrands(brandData);
+    } catch (err) {
+      console.error("Failed to fetch brands", err);
+    } finally {
+        setBrandSearchLoading(false);
+    }
+  };
 
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [showPricingModal, setShowPricingModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const [rejectionReason, setRejectionReason] = useState("");
-  const [rejectionSuggestion, setRejectionSuggestion] = useState("");
-
-  const [categories, setCategories] = useState([]);
-  const [serverErrors, setServerErrors] = useState([]); // For pricing modal errors
-const navigate = useNavigate();
-
+  // --- 2. FETCH CATEGORIES ---
   const fetchCategories = async () => {
     try {
-      const res = await apiService.get("/categories");
-      setCategories(res.categories || []);
+      const response = await axios.get(`${BASE_URL}/api/products/get-all-category`, {
+        params: { page: 1, limit: 100, search: '' } 
+      });
+      const catData = response.data?.data || response.data?.categories || [];
+      setCategories(catData);
     } catch (err) {
-      console.error("Categories fetch failed");
+      console.error("Failed to fetch categories", err);
     }
   };
 
-  const fetchProducts = useCallback(
-    async (page = 1, limit = 10, currentFilters = filters) => {
-      if (!token || !perm.canView) return;
-      setLoading(true);
-      try {
-        const params = {
-          page,
-          limit,
-          verification_status: activeTab,
-          vendor_id: isValidVendorId ? effectiveVendorId : undefined,
-          ...currentFilters
-        };
-        Object.keys(params).forEach(key => {
-          if (params[key] === "" || params[key] === undefined) delete params[key];
-        });
-        const res = await apiService.get("/products",params );
-        setProducts(res.products || []);
+  // --- 3. FETCH PRODUCTS ---
+  const fetchProducts = async (page = 1, limit = 10, search = '') => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${BASE_URL}/api/products/get-all-products`, {
+        params: { page, limit, search: search || undefined }
+      });
+      
+      const resData = response.data;
+      let rawList = [];
 
-        setPagination({
-          currentPage: res.pagination?.currentPage || 1,
-          totalPages: res.pagination?.totalPages || 1,
-          totalResults: res.pagination?.totalRecords || 0,
-          itemsPerPage: res.pagination?.perPage || 10,
-        });
-        if (res.stats) {
-          setStats(prev => ({ ...prev, ...res.stats }));
-        }
-      } catch (err) {
-        showToast(err.response?.data?.message || "Failed to load products", "error");
-        setProducts([]);
-      } finally {
-        setLoading(false);
+      if (Array.isArray(resData)) {
+          rawList = resData;
+      } else if (resData?.data && Array.isArray(resData.data)) {
+          rawList = resData.data;
+      } else if (resData?.products && Array.isArray(resData.products)) {
+          rawList = resData.products;
+      } else if (resData?.data?.products && Array.isArray(resData.data.products)) {
+          rawList = resData.data.products;
+      } else if (resData?.data?.data && Array.isArray(resData.data.data)) {
+          rawList = resData.data.data;
       }
-    },
-    [token, perm.canView, effectiveVendorId, isValidVendorId, activeTab, filters]
-  );
+
+      setProducts(rawList);
+      setTotal(resData?.pagination?.total || resData?.total || rawList.length || 0);
+      
+    } catch (err) {
+      message.error("Failed to load products list.");
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
+    fetchBrands(''); 
     fetchCategories();
-  }, []);
+    const delayDebounce = setTimeout(() => {
+        fetchProducts(currentPage, pageSize, searchText);
+    }, 400);
+    return () => clearTimeout(delayDebounce);
+  }, [currentPage, pageSize, searchText]);
 
-  useEffect(() => {
-    fetchProducts(pagination.currentPage, pagination.itemsPerPage, filters);
-  }, [activeTab, fetchProducts]);
+  // --- 4. IMAGE UPLOAD ---
+  const customUploadRequest = async ({ file, onSuccess, onError }) => {
+    const formData = new FormData();
+    formData.append('file', file); 
 
-  const handlePageChange = (page, limit) => {
-    fetchProducts(page, limit, filters);
-  };
-
-  const handleRefresh = () => {
-    fetchProducts(pagination.currentPage, pagination.itemsPerPage, filters);
-  };
-
-  const handleVerifyAll = async (id, status, reason = "", suggestion = "") => {
     try {
-      const payload = { status };
-      if (status === "rejected") {
-        payload.rejection_reason = reason;
-        payload.suggestion = suggestion;
+      const response = await axios.post(`${BASE_URL}/api/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      
+      console.log("📤 Upload API Response:", response.data);
+      
+      let imageUrl = '';
+      if (typeof response.data === 'string') {
+        imageUrl = response.data;
+      } else if (response.data?.url) {
+        imageUrl = response.data.url;
+      } else if (response.data?.secure_url) {
+        imageUrl = response.data.secure_url;
+      } else if (response.data?.data?.url) {
+        imageUrl = response.data.data.url;
+      } else {
+        imageUrl = response.data;
       }
-      await apiService.put(`/products/${id}/verify-all`, payload);
-      showToast(`Product ${status} successfully`, "success");
-      fetchProducts(pagination.currentPage, pagination.itemsPerPage, filters);
-      setShowRejectModal(false);
+      
+      onSuccess(imageUrl);
+      message.success("Image uploaded");
     } catch (err) {
-      showToast(err.response?.data?.message || "Update failed", "error");
+      console.error("📤 Upload Error:", err);
+      onError(err);
+      message.error("Upload failed");
     }
   };
 
-  // === IMPROVED PRICING UPDATE WITH SERVER VALIDATION ===
-  const handlePricingUpdate = async (values) => {
-    if (!selectedProduct) return;
-
-    setServerErrors([]); // Clear previous errors
-
- const isConfirmed = await showConfirmDialog(
-  "Update Pricing?",
-  "This will immediately change the price visible to customers.",
-  "Yes, Update It",
-  "Cancel"
-);
-
-if (!isConfirmed) return;
-
-
+  // --- 5. SAVE PRODUCT ---
+  const handleSave = async () => {
     try {
+      const values = await form.validateFields();
+      setLoading(true);
+
+      // Convert strings back to arrays
+      const keyFeaturesArray = values.keyFeatures 
+        ? values.keyFeatures.split(',').map(item => item.trim()).filter(item => item)
+        : [];
+      
+      const materialArray = values.material 
+        ? values.material.split(',').map(item => item.trim()).filter(item => item)
+        : [];
+
       const payload = {
-        sale_price: values.sale_price,
-        discount: {
-          type: values.discount_type,
-          value: values.discount_value,
-          valid_till: values.valid_till ? values.valid_till.toISOString() : null
+        product: {
+          name: values.name,
+          category: values.category, 
+          brandName: values.brandName, 
+          description: values.description,
+          price: values.price,
+          discountedPrice: values.discountedPrice,
+          currency: values.currency,
+          quantity: values.quantity,
+          warrantyYears: values.warrantyYears,
+          returnPolicyDays: values.returnPolicyDays,
+          noCostEmiAvailable: values.noCostEmiAvailable,
+          keyFeatures: keyFeaturesArray,
+          material: materialArray,
+          finish: values.finish,
+          assemblyRequired: values.assemblyRequired,
+          assemblyToolsProvided: values.assemblyToolsProvided,
+          careInstructions: values.careInstructions,
+          originCountry: values.originCountry,
+          isActive: values.isActive,
+          isFeatured: values.isFeatured
         },
-        tax: {
-          rate: values.rate
-        }
+        colours: values.colours?.map(col => {
+            let extractedUrls = [];
+            // Handle FileList from Ant Design Upload
+            if (col.photos && Array.isArray(col.photos)) {
+                extractedUrls = col.photos.map(file => {
+                    // New upload response
+                    if (file.response) {
+                        if (typeof file.response === 'string') return file.response;
+                        if (typeof file.response === 'object') {
+                             return file.response.url || file.response.secure_url || file.response.data?.url;
+                        }
+                    }
+                    // Existing image
+                    if (file.url) return file.url;
+                    // Direct string
+                    if (typeof file === 'string') return file;
+                    
+                    return null; 
+                }).filter(item => item !== null);
+            }
+
+            // Keep ID if editing
+            const validId = (col._id && typeof col._id === 'string' && col._id.trim().length > 0) ? col._id : undefined;
+
+            return {
+                ...(validId && { _id: validId }),
+                colourName: col.colourName,
+                photos: extractedUrls, 
+                isActive: col.isActive !== undefined ? col.isActive : true
+            };
+        }) || []
       };
 
-      await apiService.put(`/products/${selectedProduct._id}/pricing`, payload);
+      console.log("🚀 Payload being sent:", JSON.stringify(payload, null, 2));
 
-      showToast("Pricing updated successfully", "success");
-      setShowPricingModal(false);
-      fetchProducts(pagination.currentPage, pagination.itemsPerPage, filters);
-    } catch (err) {
-      const res = err.response?.data;
-
-      if (res?.errors && Array.isArray(res.errors)) {
-        const errors = res.errors;
-        setServerErrors(errors);
-
-        // Map backend field names to form field names
-        const fieldErrors = errors.map(error => {
-          let fieldName = error.field;
-
-          if (fieldName === 'sale_price') return { name: 'sale_price', errors: [error.message] };
-          if (fieldName === 'discount.value') return { name: 'discount_value', errors: [error.message] };
-          if (fieldName === 'discount.type') return { name: 'discount_type', errors: [error.message] };
-          if (fieldName === 'tax.rate') return { name: 'rate', errors: [error.message] };
-          if (fieldName === 'discount.valid_till') return { name: 'valid_till', errors: [error.message] };
-
-          return { name: fieldName, errors: [error.message] };
-        });
-
-        form.setFields(fieldErrors);
-
-        // Scroll to first error
-        setTimeout(() => {
-          const firstError = errors[0];
-          const selector = `[name="${firstError.field === 'discount.value' ? 'discount_value' : firstError.field}"]`;
-          const el = document.querySelector(selector);
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        }, 100);
-
-        // showToast(`Please fix ${errors.length} error(s) in the form`, "error");
+      let response;
+      if (editingId) {
+        response = await axios.post(`${BASE_URL}/api/products/edit-product-by-id?id=${editingId}`, payload);
       } else {
-        const msg = res?.message || "Pricing update failed";
-        // showToast(msg, "error");
-        setServerErrors([{ field: 'general', message: msg }]);
+        response = await axios.post(`${BASE_URL}/api/products/create-products`, payload);
       }
+      
+      if (response.status === 200 || response.status === 201) {
+        notification.success({
+          message: editingId ? 'Product Updated' : 'Product Created',
+          description: `Product ${values.name} saved successfully.`,
+          placement: 'topRight'
+        });
+        closeModal();
+        fetchProducts(currentPage, pageSize);
+      }
+    } catch (err) {
+      console.error("Save Error:", err);
+      const errorMsg = err.response?.data?.message || err.message || "Something went wrong";
+      message.error(`Failed: ${errorMsg}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const openPricingModal = (product) => {
-    setSelectedProduct(product);
-    setServerErrors([]);
+  // --- 6. DELETE PRODUCT ---
+  const deleteProduct = async (id) => {
+    try {
+      setLoading(true);
+      await axios.post(`${BASE_URL}/api/products/delete-product-by-id?id=${id}`); 
+      message.success("Product deleted successfully.");
+      fetchProducts(currentPage, pageSize, searchText);
+    } catch (err) {
+      console.error("Delete Error:", err);
+      message.error(err.response?.data?.message || "Deletion failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setEditingId(null);
+    setEditingData(null);
     form.resetFields();
-    form.setFieldsValue({
-      sale_price: product.pricing?.sale_price || product.pricing?.base_price,
-      discount_type: product.pricing?.discount?.type || "percentage",
-      discount_value: product.pricing?.discount?.value || 0,
-      valid_till: product.pricing?.discount?.valid_till ? dayjs(product.pricing.discount.valid_till) : null,
-      rate: product.pricing?.tax?.rate || 0
-    });
-    setShowPricingModal(true);
   };
 
-  const onStatusDropdownChange = (id, value) => {
-    if (value === 'rejected') {
-      const prod = products.find(p => p._id === id);
-      setSelectedProduct(prod);
-      setRejectionReason("");
-      setRejectionSuggestion("");
-      setShowRejectModal(true);
-    } else {
-      Modal.confirm({
-        title: 'Confirm Approval',
-        content: 'Are you sure you want to approve this product?',
-        onOk: () => handleVerifyAll(id, 'approved')
+  // --- 7. HANDLE EDIT (UPDATED WITH FETCH LOGIC) ---
+  const handleEdit = async (record) => {
+    const productId = record._id || record.id || (record.product && record.product._id);
+    console.log("🔄 Fetching full data for ID:", productId);
+    
+    setEditingId(productId);
+    setEditingData(record);
+    
+    // Modal open & form reset
+    setModalVisible(true);
+    form.resetFields();
+    
+    // Start Loading
+    setLoading(true);
+
+    try {
+      // API call to get FULL DETAILS
+      // Agar API route alag hai to yahan change karein
+      const response = await axios.get(`${BASE_URL}/api/products/get-product-by-id?id=${productId}`);
+      
+      console.log("✅ Server Response:", response.data);
+
+      const serverData = response.data.data || response.data.product || response.data;
+      
+      const productDetails = serverData.product ? serverData.product : serverData;
+      const coloursDetails = serverData.colours || serverData.product?.colours || productDetails.colours || [];
+
+      // Extract IDs
+      const brandId = typeof productDetails.brandName === 'object' 
+        ? productDetails.brandName?._id 
+        : productDetails.brandName;
+
+      const categoryId = typeof productDetails.category === 'object'
+        ? productDetails.category?._id 
+        : productDetails.category;
+
+      // Arrays -> String
+      const keyFeaturesString = Array.isArray(productDetails.keyFeatures) 
+        ? productDetails.keyFeatures.join(', ') 
+        : (productDetails.keyFeatures || '');
+      
+      const materialString = Array.isArray(productDetails.material) 
+        ? productDetails.material.join(', ') 
+        : (productDetails.material || '');
+
+      // FORMAT COLOURS AND IMAGES FOR ANTD UPLOAD
+      const formattedColours = coloursDetails.map((col, index) => {
+          const photosList = (col.photos || []).map((photo, pIndex) => {
+              let url = '';
+              if (typeof photo === 'string') url = photo;
+              else if (photo?.url) url = photo.url;
+              else if (photo?.secure_url) url = photo.secure_url;
+
+              if (!url) return null;
+
+              return {
+                  uid: `server-img-${index}-${pIndex}`,
+                  name: `image-${pIndex}.png`,
+                  status: 'done', // Crucial for displaying image
+                  url: url,
+                  thumbUrl: url
+              };
+          }).filter(Boolean);
+
+          return {
+              _id: col._id,
+              colourName: col.colourName,
+              isActive: col.isActive !== undefined ? col.isActive : true,
+              photos: photosList 
+          };
       });
+
+      console.log("🎨 Formatted Colours for Form:", formattedColours);
+
+      // Set Values
+      const finalValues = {
+          name: productDetails.name,
+          brandName: brandId,
+          category: categoryId,
+          description: productDetails.description,
+          price: productDetails.price,
+          discountedPrice: productDetails.discountedPrice,
+          currency: productDetails.currency || 'AED',
+          quantity: productDetails.quantity,
+          warrantyYears: productDetails.warrantyYears,
+          returnPolicyDays: productDetails.returnPolicyDays,
+          noCostEmiAvailable: productDetails.noCostEmiAvailable,
+          keyFeatures: keyFeaturesString,
+          material: materialString,
+          finish: productDetails.finish,
+          assemblyRequired: productDetails.assemblyRequired,
+          assemblyToolsProvided: productDetails.assemblyToolsProvided,
+          careInstructions: productDetails.careInstructions,
+          originCountry: productDetails.originCountry,
+          isActive: productDetails.isActive,
+          isFeatured: productDetails.isFeatured,
+          colours: formattedColours
+      };
+
+      form.setFieldsValue(finalValues);
+
+    } catch (error) {
+      console.error("❌ Error fetching product details:", error);
+      message.error("Failed to load full product details. Check console.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const columns = useMemo(
-    () => [
-      // ... (your existing columns remain unchanged)
-      {
-        title: "Product Info",
-        width: 300,
-        render: (_, r) => (
-          <div className="flex items-center gap-3">
-            <Avatar
-              shape="square"
-              size={50}
-              src={r.color_variants?.[0]?.images?.[0]?.url ? `http://localhost:5000/${r.color_variants[0].images[0].url}` : null}
-              icon={<FiShoppingBag />}
-              style={{ backgroundColor: THEME.bgLight, color: THEME.primary, border: '1px solid #eee' }}
-            />
-            <div>
-              <div className="font-semibold text-gray-800">{r.name}</div>
-              <div className="text-xs text-gray-500">Code: {r.product_code || "N/A"}</div>
-              <div className="text-xs text-purple-600">{r.category?.name}</div>
+  const columns = [
+    {
+      title: 'Product Name',
+      key: 'name',
+      render: (text, record) => {
+        const name = record.product?.name || record.name || "No Name";
+        return (
+            <Space>
+            <div style={{ backgroundColor: THEME.primary, padding: 8, borderRadius: '50%', color: '#fff' }}>
+                <AppstoreOutlined />
             </div>
-          </div>
-        ),
+            <Text strong>{name}</Text>
+            </Space>
+        );
       },
-      {
-        title: "Pricing",
-        width: 150,
-        render: (_, r) => {
-          const price = r.pricing?.sale_price || r.pricing?.base_price || 0;
-          const currency = r.pricing?.currency?.symbol || "$";
-          return (
-            <div>
-              <div className="font-medium text-gray-700">
-                {currency} {price.toFixed(2)}
-              </div>
-              {r.pricing?.discount?.value > 0 && (
-                <div className="text-xs text-green-600">
-                  {r.pricing.discount.type === 'percentage' ? `${r.pricing.discount.value}% Off` : `-${currency} ${r.pricing.discount.value}`}
-                </div>
-              )}
-            </div>
-          )
-        },
-      },
-      {
-        title: "Stock",
-        width: 120,
-        render: (_, r) => (
-          <Tag color={r.stock?.total_available > 0 ? "green" : "red"}>
-            {r.stock?.total_available || 0} In Stock
-          </Tag>
-        ),
-      },
-      {
-        title: "Vendor",
-        width: 200,
-        render: (_, r) => (
-          <div>
-            <div className="text-sm font-medium">{r.vendor?.email}</div>
-            <div className="text-xs text-gray-400">ID: {r.vendor?._id}</div>
-          </div>
-        )
-      },
-      {
-        title: "Status",
-        width: 150,
-        render: (_, r) => {
-          const v = r.verification_status?.status || "pending";
-          if (v === 'pending' && perm.canEdit) {
-            return (
-              <AntdSelect
-                defaultValue="pending"
-                style={{ width: 120 }}
-                onChange={(val) => onStatusDropdownChange(r._id, val)}
-              >
-                <Option value="pending">Pending</Option>
-                <Option value="approved" className="text-green-600">Approve</Option>
-                <Option value="rejected" className="text-red-600">Reject</Option>
-              </AntdSelect>
-            );
-          }
-          const map = { pending: "warning", approved: "success", rejected: "error" };
-          return <Badge status={map[v]} text={v.toUpperCase()} />;
-        },
-      },
-      {
-        title: "Created",
-        width: 120,
-        render: (_, r) => (
-          <span className="text-gray-500 text-xs">
-            {r.createdAt ? format(new Date(r.createdAt), "dd MMM yyyy") : "--"}
-          </span>
-        )
-      },
-      {
-        title: "Actions",
-        fixed: "right",
-        width: 120,
-        render: (_, r) => (
-          <Space>
-            <Tooltip title="View Details">
-             <Button
-  type="text"
-  shape="circle"
-  icon={<FiEye style={{ color: THEME.primary }} />}
-  onClick={() =>
-    navigate(`/dashboard/${roleSlug}/products?productId=${r._id}`)
-  }
-/>
+    },
+    {
+      title: 'Brand & Category',
+      key: 'brand_cat',
+      render: (_, r) => {
+         const p = r.product || r;
+         const brandName = typeof p.brandName === 'object' ? p.brandName?.name : "Brand ID"; 
+         const catName = typeof p.category === 'object' ? p.category?.name : "Cat ID";
 
+         const brandObj = brands.find(b => b._id === (p.brandName?._id || p.brandName));
+         const catObj = categories.find(c => c._id === (p.category?._id || p.category));
+
+         return (
+             <Space direction="vertical" size={0}>
+                 <Tag color="blue">{brandObj ? (brandObj.name || brandObj.brandName) : brandName}</Tag>
+                 <Text type="secondary" style={{ fontSize: 12 }}>{catObj ? (catObj.name || catObj.categoryName) : catName}</Text>
+             </Space>
+         );
+      },
+    },
+    {
+      title: 'Price & Stock',
+      key: 'price',
+      render: (_, record) => {
+        const p = record.product || record || {};
+        return (
+            <div className="flex flex-col">
+                <Text>{p.currency} {p.discountedPrice} <Text type="secondary" delete>{p.price}</Text></Text>
+                <Tag color={p.quantity > 0 ? "success" : "error"} style={{ width: 'fit-content', marginTop: 4 }}>
+                    {p.quantity > 0 ? `${p.quantity} in Stock` : "Out of Stock"}
+                </Tag>
+            </div>
+        )
+      },
+    },
+    {
+      title: 'Action',
+      key: 'actions',
+      align: 'center',
+      render: (_, record) => (
+        <Space size="middle">
+          <Tooltip title="Edit">
+            <Button type="text" icon={<EditOutlined style={{ color: THEME.primary }} />} onClick={() => handleEdit(record)} />
+          </Tooltip>
+          <Popconfirm 
+            title="Delete product?" 
+            onConfirm={() => deleteProduct(record._id || record.id || record.product?._id)} 
+            okButtonProps={{ danger: true, loading: loading }}
+          >
+            <Tooltip title="Delete">
+              <Button type="text" danger icon={<DeleteOutlined />} />
             </Tooltip>
-            {perm.canEdit && (
-              <Tooltip title="Edit Pricing">
-                <Button
-                  type="text"
-                  shape="circle"
-                  icon={<FiEdit2 style={{ color: THEME.secondary }} />}
-                  onClick={() => openPricingModal(r)}
-                />
-              </Tooltip>
-            )}
-          </Space>
-        ),
-      },
-    ],
-    [perm, roleSlug, products]
-  );
-
-  const tabItems = [
-    // ... (your tab items remain unchanged)
-    {
-      key: 'pending',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <FiClock size={16} />
-          <span>Pending</span>
-          <Badge count={stats.pending || 0} style={{ backgroundColor: THEME.warning }} />
-        </span>
-      )
+          </Popconfirm>
+        </Space>
+      ),
     },
-    {
-      key: 'approved',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <FiCheck size={16} />
-          <span>Approved</span>
-          <Badge count={stats.approved || 0} style={{ backgroundColor: THEME.success }} />
-        </span>
-      )
-    },
-    {
-      key: 'rejected',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <FiX size={16} />
-          <span>Rejected</span>
-          <Badge count={stats.rejected || 0} style={{ backgroundColor: THEME.error }} />
-        </span>
-      )
-    }
   ];
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header & Stats - unchanged */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <Title level={3} style={{ margin: 0 }}>Product Requests (B2C)</Title>
-            <Text type="secondary">Manage product approvals and pricing.</Text>
-          </div>
-          <Button
-            icon={<FiRefreshCw />}
-            onClick={handleRefresh}
-            loading={loading}
-            size="large"
-          >
-            Refresh
-          </Button>
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <Title level={3} style={{ margin: 0 }}>Product Management</Title>
         </div>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={8}>
-            <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
-              <Statistic
-                title="Total Products"
-                value={pagination.totalResults}
-                prefix={<FiPackage style={{ color: THEME.primary }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.warning }}>
-              <Statistic
-                title="Pending Review"
-                value={stats.pending || 0}
-                prefix={<FiClock style={{ color: THEME.warning }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card bordered={false} className="shadow-sm border-t-4" style={{ borderColor: THEME.success }}>
-              <Statistic
-                title="Approved"
-                value={stats.approved || 0}
-                prefix={<FiCheck style={{ color: THEME.success }} />}
-              />
-            </Card>
-          </Col>
-        </Row>
+        <Button 
+          type="primary" 
+          size="large" 
+          icon={<PlusOutlined />} 
+          onClick={() => {
+              setEditingId(null);
+              setEditingData(null);
+              form.resetFields();
+              setModalVisible(true);
+          }}
+          style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
+        >
+          Add Product
+        </Button>
       </div>
 
-      <Card bordered={false} className="shadow-md rounded-lg" bodyStyle={{ padding: 0 }}>
-        <div className="p-4 border-b border-gray-100 bg-white rounded-t-lg flex flex-wrap gap-4">
-          <Input
-            prefix={<FiSearch className="text-gray-400" />}
-            placeholder="Search products..."
-            size="large"
-            onPressEnter={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-            style={{ maxWidth: 300 }}
+      {/* Stats */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={8}>
+          <Card variant="borderless" className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
+            <Statistic title="Total Products" value={total} prefix={<ShoppingOutlined style={{ color: THEME.primary }} />} />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Table */}
+      <Card variant="borderless" className="shadow-md" styles={{ body: { padding: 0 } }}>
+        <div className="p-4 border-b bg-white rounded-t-lg">
+          <Input 
+            prefix={<SearchOutlined className="text-gray-400" />} 
+            placeholder="Search products..." 
+            style={{ maxWidth: 400 }}
+            onChange={(e) => { setSearchText(e.target.value); setCurrentPage(1); }}
             allowClear
+            size="large"
           />
-          <AntdSelect
-            placeholder="Filter by Category"
-            size="large"
-            style={{ width: 200 }}
-            allowClear
-            onChange={(val) => setFilters(prev => ({ ...prev, category_id: val }))}
-          >
-            {categories.map(c => <Option key={c._id} value={c._id}>{c.name}</Option>)}
-          </AntdSelect>
         </div>
-        <Tabs
-          activeKey={activeTab}
-          onChange={(key) => setActiveTab(key)}
-          size="large"
-          tabBarStyle={{ margin: 0, paddingLeft: 16, paddingTop: 16, background: '#fafafa' }}
-          items={tabItems}
-          type="card"
+
+        <Table 
+          columns={columns} 
+          dataSource={products} 
+          loading={loading}
+          rowKey={(record) => record._id || record.id || record.product?._id || Math.random()}
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            onChange: (page, size) => { setCurrentPage(page); setPageSize(size); },
+          }}
         />
-        <div className="p-0">
-          <CustomTable
-            columns={columns}
-            data={products}
-            loading={loading}
-            totalItems={pagination.totalResults}
-            currentPage={pagination.currentPage}
-            itemsPerPage={pagination.itemsPerPage}
-            onPageChange={handlePageChange}
-            scroll={{ x: 1200 }}
-          />
-        </div>
       </Card>
 
-      {/* Reject Modal - unchanged */}
+      {/* Modal Form */}
       <Modal
-        open={showRejectModal}
-        title={<div className="flex items-center gap-2 text-red-600"><FiX /> Reject Product</div>}
-        onCancel={() => setShowRejectModal(false)}
-        footer={null}
+        title={<div className="font-bold text-lg">{editingId ? 'Edit Product' : 'Add New Product'}</div>}
+        open={modalVisible}
+        onCancel={closeModal}
+        width={950}
+        centered
+        forceRender={true}
+        footer={[
+           <Button key="back" onClick={closeModal} size="large">Cancel</Button>,
+           <Button key="submit" type="primary" size="large" onClick={handleSave} loading={loading} style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}>
+             {editingId ? 'Update' : 'Save'}
+           </Button>
+        ]}
       >
-        {selectedProduct && (
-          <div className="space-y-4 pt-2">
-            <Alert message={`Rejecting: ${selectedProduct.name}`} type="warning" showIcon />
-            <TextArea
-              rows={3}
-              placeholder="Reason for rejection (Required)"
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-            />
-            <TextArea
-              rows={2}
-              placeholder="Suggestion for improvement (Optional)"
-              value={rejectionSuggestion}
-              onChange={(e) => setRejectionSuggestion(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <Button onClick={() => setShowRejectModal(false)}>Cancel</Button>
-              <Button
-                type="primary"
-                danger
-                disabled={!rejectionReason.trim()}
-                onClick={() => handleVerifyAll(selectedProduct._id, "rejected", rejectionReason, rejectionSuggestion)}
-              >
-                Confirm Rejection
-              </Button>
-            </div>
+        <Divider style={{ margin: '10px 0 25px 0' }} />
+        <Form 
+          form={form} 
+          layout="vertical" 
+          initialValues={{ 
+            currency: 'AED', 
+            isActive: true, 
+            isFeatured: false,
+            noCostEmiAvailable: false,
+            assemblyRequired: false,
+            assemblyToolsProvided: false
+          }}
+          preserve={false}
+        >
+          
+          {/* Section 1: Basic Info */}
+          <div className="mb-6">
+             <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Basic Information</Text>
+             <Row gutter={16}>
+                <Col span={24}>
+                    <Form.Item name="name" label="Product Name" rules={[{ required: true, message: 'Product name is required' }]}>
+                        <Input size="large" placeholder="Enter product name" />
+                    </Form.Item>
+                </Col>
+                
+                <Col span={12}>
+                    <Form.Item name="brandName" label="Brand" rules={[{ required: true, message: 'Brand is required' }]}>
+                        <Select 
+                            placeholder="Select Brand" 
+                            loading={brandSearchLoading} 
+                            showSearch
+                            filterOption={false} 
+                            onSearch={(val) => fetchBrands(val)} 
+                            notFoundContent={brandSearchLoading ? <div style={{padding:8}}>Searching...</div> : null}
+                            size="large"
+                        >
+                            {brands.map(brand => (
+                                <Option key={brand._id} value={brand._id}>
+                                    {brand.name || brand.brandName || "Unnamed"}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                </Col>
+
+                <Col span={12}>
+                    <Form.Item name="category" label="Category" rules={[{ required: true, message: 'Category is required' }]}>
+                        <Select placeholder="Select Category" loading={categories.length === 0} showSearch optionFilterProp="children" size="large">
+                            {categories.map(cat => (
+                                <Option key={cat._id} value={cat._id}>{cat.name || cat.categoryName}</Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                </Col>
+
+                <Col span={24}>
+                    <Form.Item name="description" label="Description">
+                        <TextArea rows={3} placeholder="Enter detailed description..." />
+                    </Form.Item>
+                </Col>
+             </Row>
           </div>
-        )}
-      </Modal>
 
-      {/* Pricing Modal - NOW WITH SERVER ERROR HANDLING */}
-      <Modal
-        open={showPricingModal}
-        title="Update Pricing & Margin"
-        footer={null}
-        onCancel={() => {
-          setShowPricingModal(false);
-          setServerErrors([]);
-          form.resetFields();
-        }}
-        destroyOnClose
-        width={800}
-      >
-      
-
-        <Form form={form} layout="vertical" onFinish={handlePricingUpdate}>
-          <Row gutter={24}>
-            <Col xs={24} md={12}>
-              <Form.Item name="sale_price" label="Sale Price (Base Price)" rules={[{ required: true, message: 'Sale Price is required' }]}>
-                <InputNumber
-                  style={{ width: '100%' }}
-                  min={0}
-                  prefix={selectedProduct?.pricing?.currency?.symbol || "$"}
-                  placeholder="e.g. 150"
-                />
-              </Form.Item>
-
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item name="discount_type" label="Discount Type" initialValue="percentage">
-                    <AntdSelect>
-                      <Option value="percentage">Percentage</Option>
-                      <Option value="fixed">Fixed Amount</Option>
-                    </AntdSelect>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="discount_value" label="Value">
-                    <InputNumber style={{ width: '100%' }} min={0} placeholder="0" />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Form.Item name="valid_till" label="Discount Valid Till">
-                <DatePicker style={{ width: '100%' }} />
-              </Form.Item>
-              <Form.Item name="rate" label="Tax Rate (%)">
-                <InputNumber style={{ width: '100%' }} min={0} max={100} placeholder="0" />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={12}>
-              {selectedProduct && (
-                <PricingPreview
-                  form={form}
-                  basePrice={selectedProduct.pricing?.base_price || 0}
-                  currencySymbol={selectedProduct.pricing?.currency?.symbol || "$"}
-                />
-              )}
-            </Col>
-          </Row>
           <Divider />
-          <div className="flex justify-end gap-2">
-            <Button onClick={() => setShowPricingModal(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit">
-              Update Pricing
-            </Button>
+
+          {/* Section 2: Pricing */}
+          <div className="mb-6">
+             <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Pricing & Inventory</Text>
+             <Row gutter={16}>
+                <Col span={8}>
+                    <Form.Item name="price" label="Original Price (AED)" rules={[{ required: true, message: 'Price is required' }]}>
+                        <InputNumber 
+                          style={{ width: '100%' }} 
+                          size="large" 
+                          min={0}
+                          formatter={value => `AED ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          parser={value => value.replace(/AED\s?|(,*)/g, '')}
+                        />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item name="discountedPrice" label="Discounted Price (AED)">
+                        <InputNumber 
+                          style={{ width: '100%' }} 
+                          size="large" 
+                          min={0}
+                          formatter={value => `AED ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          parser={value => value.replace(/AED\s?|(,*)/g, '')}
+                        />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item name="currency" label="Currency">
+                        <Select size="large">
+                            <Option value="AED">AED</Option>
+                            <Option value="USD">USD</Option>
+                            <Option value="INR">INR</Option>
+                        </Select>
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item name="quantity" label="Stock Quantity" rules={[{ required: true, message: 'Quantity is required' }]}>
+                        <InputNumber style={{ width: '100%' }} size="large" min={0} />
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item name="noCostEmiAvailable" valuePropName="checked" label="No Cost EMI Available">
+                        <Switch />
+                    </Form.Item>
+                </Col>
+             </Row>
           </div>
+
+          <Divider />
+
+          {/* Section 3: Specs */}
+          <div className="mb-6">
+             <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Specifications</Text>
+             <Row gutter={16}>
+                <Col span={24}>
+                    <Form.Item name="keyFeatures" label="Key Features (comma separated)">
+                        <TextArea 
+                          rows={2} 
+                          placeholder="Enter key features separated by commas, e.g., Scratch Resistant, Water Proof" 
+                        />
+                    </Form.Item>
+                </Col>
+                <Col span={24}>
+                    <Form.Item name="material" label="Materials (comma separated)">
+                        <TextArea 
+                          rows={2} 
+                          placeholder="Enter materials separated by commas, e.g., Solid Wood, Metal, Glass" 
+                        />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item name="finish" label="Finish">
+                        <Input placeholder="e.g. Matte, Glossy, Wooden" />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item name="warrantyYears" label="Warranty (Years)">
+                        <InputNumber style={{ width: '100%' }} min={0} max={10} />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item name="returnPolicyDays" label="Return Policy (Days)">
+                        <InputNumber style={{ width: '100%' }} min={0} max={365} />
+                    </Form.Item>
+                </Col>
+                <Col span={24}>
+                    <Form.Item name="careInstructions" label="Care Instructions">
+                        <TextArea rows={2} placeholder="Enter care instructions..." />
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                   <Form.Item name="originCountry" label="Origin Country">
+                       <Input placeholder="e.g. India, China, UAE" />
+                   </Form.Item>
+                </Col>
+                <Col span={4}>
+                   <Form.Item name="isActive" valuePropName="checked" label="Active">
+                       <Switch />
+                   </Form.Item>
+                </Col>
+                <Col span={4}>
+                   <Form.Item name="isFeatured" valuePropName="checked" label="Featured">
+                       <Switch />
+                   </Form.Item>
+                </Col>
+                <Col span={4}>
+                   <Form.Item name="assemblyRequired" valuePropName="checked" label="Assembly Required">
+                       <Switch />
+                   </Form.Item>
+                </Col>
+                <Col span={4}>
+                   <Form.Item name="assemblyToolsProvided" valuePropName="checked" label="Tools Provided">
+                       <Switch />
+                   </Form.Item>
+                </Col>
+             </Row>
+          </div>
+
+          <Divider />
+
+          {/* Section 4: Colours & Images */}
+          <div className="mb-4">
+             <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Colour Variants & Images</Text>
+             
+             <Form.List 
+                name="colours"
+                rules={[
+                  {
+                    validator: async (_, names) => {
+                      if (!names || names.length < 1) {
+                        return Promise.reject(new Error('At least one color variant is required'));
+                      }
+                    },
+                  },
+                ]}
+             >
+               {(fields, { add, remove }, { errors }) => (
+                 <div className="flex flex-col gap-4">
+                   {fields.map(({ key, name, ...restField }) => {
+                     const colourName = form.getFieldValue(['colours', name, 'colourName']);
+                     const photos = form.getFieldValue(['colours', name, 'photos']);
+                     
+                     return (
+                       <Card
+                         variant="outlined"
+                         size="small"
+                         key={key}
+                         title={colourName ? `Color: ${colourName}` : `Variant #${name + 1}`}
+                         extra={<Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(name)}>Remove</Button>}
+                         style={{ background: '#fafafa', borderColor: '#e5e7eb' }}
+                       >
+                          {/* Hidden field for colour ID */}
+                          <Form.Item {...restField} name={[name, '_id']} noStyle>
+                              <Input type="hidden" />
+                          </Form.Item>
+
+                         <Row gutter={16}>
+                            <Col span={12}>
+                                 <Form.Item 
+                                   {...restField} 
+                                   name={[name, 'colourName']} 
+                                   label="Colour Name" 
+                                   rules={[{ required: true, message: 'Color name is required' }]}
+                                 >
+                                    <Input placeholder="e.g. Walnut Brown, Black, White" />
+                                 </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                 <Form.Item 
+                                   {...restField} 
+                                   name={[name, 'isActive']} 
+                                   valuePropName="checked" 
+                                   label="Active Variant"
+                                 >
+                                    <Switch />
+                                 </Form.Item>
+                            </Col>
+                            <Col span={24}>
+                                 <Form.Item 
+                                   {...restField} 
+                                   name={[name, 'photos']} 
+                                   label="Product Images"
+                                   valuePropName="fileList"
+                                   getValueFromEvent={normFile}
+                                   rules={[
+                                     { required: true, message: 'At least one image is required' }
+                                   ]}
+                                   extra="Upload product images for this color variant"
+                                 >
+                                    <Upload 
+                                         customRequest={customUploadRequest}
+                                         listType="picture-card"
+                                         multiple={true}
+                                         accept="image/*"
+                                         maxCount={8}
+                                     >
+                                         {(!photos || photos.length < 8) && (
+                                           <div>
+                                              <PlusOutlined />
+                                              <div style={{ marginTop: 8 }}>Upload</div>
+                                           </div>
+                                         )}
+                                    </Upload>
+                                 </Form.Item>
+                            </Col>
+                         </Row>
+                       </Card>
+                     );
+                   })}
+                   
+                   <Button 
+                     type="dashed" 
+                     onClick={() => add({ colourName: '', photos: [], isActive: true })} 
+                     block 
+                     icon={<PlusOutlined />} 
+                     size="large"
+                   >
+                     Add Colour Variant
+                   </Button>
+                   <Form.ErrorList errors={errors} />
+                 </div>
+               )}
+             </Form.List>
+          </div>
+
         </Form>
       </Modal>
     </div>
   );
 };
 
-export default ProductRequestB2C;
+export default ProductManagement;
