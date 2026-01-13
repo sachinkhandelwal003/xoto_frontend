@@ -21,7 +21,7 @@ const THEME = {
 };
 
 const ProductManagement = () => {
-  const BASE_URL = "https://xoto.ae"; // Make sure this is correct
+  const BASE_URL = "https://xoto.ae"; 
 
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -131,6 +131,7 @@ const ProductManagement = () => {
       console.log("📤 Upload API Response:", response.data);
       
       let imageUrl = '';
+      
       if (typeof response.data === 'string') {
         imageUrl = response.data;
       } else if (response.data?.url) {
@@ -142,6 +143,8 @@ const ProductManagement = () => {
       } else {
         imageUrl = response.data;
       }
+      
+      console.log("📤 Extracted Image URL:", imageUrl);
       
       onSuccess(imageUrl);
       message.success("Image uploaded");
@@ -158,7 +161,7 @@ const ProductManagement = () => {
       const values = await form.validateFields();
       setLoading(true);
 
-      // Convert strings back to arrays
+      // Convert comma separated strings to arrays for keyFeatures and material
       const keyFeaturesArray = values.keyFeatures 
         ? values.keyFeatures.split(',').map(item => item.trim()).filter(item => item)
         : [];
@@ -191,28 +194,24 @@ const ProductManagement = () => {
           isFeatured: values.isFeatured
         },
         colours: values.colours?.map(col => {
-            let extractedUrls = [];
-            // Handle FileList from Ant Design Upload
-            if (col.photos && Array.isArray(col.photos)) {
-                extractedUrls = col.photos.map(file => {
-                    // New upload response
-                    if (file.response) {
-                        if (typeof file.response === 'string') return file.response;
-                        if (typeof file.response === 'object') {
-                             return file.response.url || file.response.secure_url || file.response.data?.url;
-                        }
-                    }
-                    // Existing image
-                    if (file.url) return file.url;
-                    // Direct string
-                    if (typeof file === 'string') return file;
-                    
-                    return null; 
-                }).filter(item => item !== null);
-            }
+           let extractedUrls = [];
+           if (col.photos && Array.isArray(col.photos)) {
+               extractedUrls = col.photos.map(file => {
+                   if (file.response && typeof file.response === 'string') return file.response;
+                   
+                   if (file.response && typeof file.response === 'object') {
+                       return file.response.url || file.response.secure_url || file.response;
+                   }
 
-            // Keep ID if editing
-            const validId = (col._id && typeof col._id === 'string' && col._id.trim().length > 0) ? col._id : undefined;
+                   if (file.url) return file.url;
+                   
+                   if (typeof file === 'string') return file;
+                   
+                   return null; 
+               }).filter(item => item !== null);
+           }
+
+           const validId = (col._id && typeof col._id === 'string' && col._id.trim().length > 0) ? col._id : undefined;
 
             return {
                 ...(validId && { _id: validId }),
@@ -272,113 +271,115 @@ const ProductManagement = () => {
     form.resetFields();
   };
 
-  // --- 7. HANDLE EDIT (UPDATED WITH FETCH LOGIC) ---
-  const handleEdit = async (record) => {
-    const productId = record._id || record.id || (record.product && record.product._id);
-    console.log("🔄 Fetching full data for ID:", productId);
+  // --- 7. HANDLE EDIT - SIMPLIFIED VERSION ---
+  const handleEdit = (record) => {
+    console.log("📝 Editing Record:", record);
     
-    setEditingId(productId);
     setEditingData(record);
+    const productId = record._id || record.id;
+    setEditingId(productId);
     
-    // Modal open & form reset
-    setModalVisible(true);
+    // Reset form
     form.resetFields();
     
-    // Start Loading
-    setLoading(true);
+    // Open modal
+    setModalVisible(true);
+    
+    // Set form values after a small delay to ensure modal is rendered
+    setTimeout(() => {
+      try {
+        const productData = record.product || record;
+        
+        console.log("📝 Product Data:", productData);
+        console.log("📝 Colours Data:", record.colours);
+        
+        // Get brand and category IDs
+        const brandId = typeof productData.brandName === 'object' 
+          ? productData.brandName?._id || productData.brandName 
+          : productData.brandName;
 
-    try {
-      // API call to get FULL DETAILS
-      // Agar API route alag hai to yahan change karein
-      const response = await axios.get(`${BASE_URL}/api/products/get-product-by-id?id=${productId}`);
-      
-      console.log("✅ Server Response:", response.data);
+        const categoryId = typeof productData.category === 'object'
+          ? productData.category?._id || productData.category
+          : productData.category;
 
-      const serverData = response.data.data || response.data.product || response.data;
-      
-      const productDetails = serverData.product ? serverData.product : serverData;
-      const coloursDetails = serverData.colours || serverData.product?.colours || productDetails.colours || [];
+        // Convert arrays to comma-separated strings for keyFeatures and material
+        const keyFeaturesString = Array.isArray(productData.keyFeatures) 
+          ? productData.keyFeatures.join(', ') 
+          : '';
+        
+        const materialString = Array.isArray(productData.material) 
+          ? productData.material.join(', ') 
+          : '';
 
-      // Extract IDs
-      const brandId = typeof productDetails.brandName === 'object' 
-        ? productDetails.brandName?._id 
-        : productDetails.brandName;
-
-      const categoryId = typeof productDetails.category === 'object'
-        ? productDetails.category?._id 
-        : productDetails.category;
-
-      // Arrays -> String
-      const keyFeaturesString = Array.isArray(productDetails.keyFeatures) 
-        ? productDetails.keyFeatures.join(', ') 
-        : (productDetails.keyFeatures || '');
-      
-      const materialString = Array.isArray(productDetails.material) 
-        ? productDetails.material.join(', ') 
-        : (productDetails.material || '');
-
-      // FORMAT COLOURS AND IMAGES FOR ANTD UPLOAD
-      const formattedColours = coloursDetails.map((col, index) => {
-          const photosList = (col.photos || []).map((photo, pIndex) => {
-              let url = '';
-              if (typeof photo === 'string') url = photo;
-              else if (photo?.url) url = photo.url;
-              else if (photo?.secure_url) url = photo.secure_url;
-
-              if (!url) return null;
-
-              return {
-                  uid: `server-img-${index}-${pIndex}`,
-                  name: `image-${pIndex}.png`,
-                  status: 'done', // Crucial for displaying image
-                  url: url,
-                  thumbUrl: url
-              };
+        // Prepare colours data
+        const coloursData = (record.colours || []).map((color, index) => {
+          const photosData = (color.photos || []).map((photo, photoIndex) => {
+            let imageUrl = '';
+            
+            if (typeof photo === 'string') {
+              imageUrl = photo;
+            } else if (photo?.url) {
+              imageUrl = photo.url;
+            } else if (photo?.secure_url) {
+              imageUrl = photo.secure_url;
+            } else if (photo) {
+              imageUrl = String(photo);
+            }
+            
+            if (!imageUrl) return null;
+            
+            return {
+              uid: `color-${index}-photo-${photoIndex}-${Date.now()}`,
+              name: `image-${photoIndex}.jpg`,
+              status: 'done',
+              url: imageUrl,
+              thumbUrl: imageUrl,
+              response: imageUrl
+            };
           }).filter(Boolean);
 
           return {
-              _id: col._id,
-              colourName: col.colourName,
-              isActive: col.isActive !== undefined ? col.isActive : true,
-              photos: photosList 
+            _id: color._id || '',
+            colourName: color.colourName || `Color ${index + 1}`,
+            photos: photosData,
+            isActive: color.isActive !== undefined ? color.isActive : true
           };
-      });
+        });
 
-      console.log("🎨 Formatted Colours for Form:", formattedColours);
+        // Set form values
+        const formValues = {
+          name: productData.name || '',
+          brandName: brandId || '',
+          category: categoryId || '',
+          description: productData.description || '',
+          price: productData.price || 0,
+          discountedPrice: productData.discountedPrice || 0,
+          currency: productData.currency || 'AED',
+          quantity: productData.quantity || 0,
+          warrantyYears: productData.warrantyYears || 0,
+          returnPolicyDays: productData.returnPolicyDays || 0,
+          noCostEmiAvailable: productData.noCostEmiAvailable || false,
+          keyFeatures: keyFeaturesString, // Now as string
+          material: materialString, // Now as string
+          finish: productData.finish || '',
+          assemblyRequired: productData.assemblyRequired || false,
+          assemblyToolsProvided: productData.assemblyToolsProvided || false,
+          careInstructions: productData.careInstructions || '',
+          originCountry: productData.originCountry || '',
+          isActive: productData.isActive !== undefined ? productData.isActive : true,
+          isFeatured: productData.isFeatured !== undefined ? productData.isFeatured : false,
+          colours: coloursData.length > 0 ? coloursData : undefined
+        };
 
-      // Set Values
-      const finalValues = {
-          name: productDetails.name,
-          brandName: brandId,
-          category: categoryId,
-          description: productDetails.description,
-          price: productDetails.price,
-          discountedPrice: productDetails.discountedPrice,
-          currency: productDetails.currency || 'AED',
-          quantity: productDetails.quantity,
-          warrantyYears: productDetails.warrantyYears,
-          returnPolicyDays: productDetails.returnPolicyDays,
-          noCostEmiAvailable: productDetails.noCostEmiAvailable,
-          keyFeatures: keyFeaturesString,
-          material: materialString,
-          finish: productDetails.finish,
-          assemblyRequired: productDetails.assemblyRequired,
-          assemblyToolsProvided: productDetails.assemblyToolsProvided,
-          careInstructions: productDetails.careInstructions,
-          originCountry: productDetails.originCountry,
-          isActive: productDetails.isActive,
-          isFeatured: productDetails.isFeatured,
-          colours: formattedColours
-      };
-
-      form.setFieldsValue(finalValues);
-
-    } catch (error) {
-      console.error("❌ Error fetching product details:", error);
-      message.error("Failed to load full product details. Check console.");
-    } finally {
-      setLoading(false);
-    }
+        console.log("📝 Form Values to Set:", formValues);
+        
+        form.setFieldsValue(formValues);
+        
+      } catch (error) {
+        console.error("📝 Error setting form values:", error);
+        message.error("Failed to load product data");
+      }
+    }, 100);
   };
 
   const columns = [
@@ -514,7 +515,7 @@ const ProductManagement = () => {
         />
       </Card>
 
-      {/* Modal Form */}
+      {/* Modal Form - UPDATED STRUCTURE */}
       <Modal
         title={<div className="font-bold text-lg">{editingId ? 'Edit Product' : 'Add New Product'}</div>}
         open={modalVisible}
@@ -644,7 +645,7 @@ const ProductManagement = () => {
 
           <Divider />
 
-          {/* Section 3: Specs */}
+          {/* Section 3: Specs - UPDATED TO USE TEXT INPUTS */}
           <div className="mb-6">
              <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Specifications</Text>
              <Row gutter={16}>
@@ -652,7 +653,7 @@ const ProductManagement = () => {
                     <Form.Item name="keyFeatures" label="Key Features (comma separated)">
                         <TextArea 
                           rows={2} 
-                          placeholder="Enter key features separated by commas, e.g., Scratch Resistant, Water Proof" 
+                          placeholder="Enter key features separated by commas, e.g., Scratch Resistant, Water Proof, Easy to Clean" 
                         />
                     </Form.Item>
                 </Col>
@@ -714,12 +715,13 @@ const ProductManagement = () => {
 
           <Divider />
 
-          {/* Section 4: Colours & Images */}
+          {/* Section 4: Colours & Images - FIXED STRUCTURE */}
           <div className="mb-4">
              <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Colour Variants & Images</Text>
              
              <Form.List 
                 name="colours"
+                initialValue={[]}
                 rules={[
                   {
                     validator: async (_, names) => {
@@ -730,28 +732,32 @@ const ProductManagement = () => {
                   },
                 ]}
              >
-               {(fields, { add, remove }, { errors }) => (
-                 <div className="flex flex-col gap-4">
-                   {fields.map(({ key, name, ...restField }) => {
-                     const colourName = form.getFieldValue(['colours', name, 'colourName']);
-                     const photos = form.getFieldValue(['colours', name, 'photos']);
-                     
-                     return (
-                       <Card
-                         variant="outlined"
-                         size="small"
-                         key={key}
-                         title={colourName ? `Color: ${colourName}` : `Variant #${name + 1}`}
-                         extra={<Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(name)}>Remove</Button>}
-                         style={{ background: '#fafafa', borderColor: '#e5e7eb' }}
-                       >
-                          {/* Hidden field for colour ID */}
-                          <Form.Item {...restField} name={[name, '_id']} noStyle>
-                              <Input type="hidden" />
-                          </Form.Item>
+               {(fields, { add, remove }, { errors }) => {
+                 console.log("🎨 Form List Fields:", fields); // Debug
+                 return (
+                   <div className="flex flex-col gap-4">
+                     {fields.map(({ key, name, ...restField }) => {
+                       const colourName = form.getFieldValue(['colours', name, 'colourName']);
+                       const photos = form.getFieldValue(['colours', name, 'photos']);
+                       
+                       console.log(`🎨 Color ${name}:`, { colourName, photosCount: photos?.length });
+                       
+                       return (
+                         <Card
+                           variant="outlined"
+                           size="small"
+                           key={key}
+                           title={colourName ? `Color: ${colourName}` : `Variant #${name + 1}`}
+                           extra={<Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(name)}>Remove</Button>}
+                           style={{ background: '#fafafa', borderColor: '#e5e7eb' }}
+                         >
+                            {/* Hidden field for colour ID */}
+                            <Form.Item {...restField} name={[name, '_id']} noStyle>
+                                <Input type="hidden" />
+                            </Form.Item>
 
-                         <Row gutter={16}>
-                            <Col span={12}>
+                           <Row gutter={16}>
+                              <Col span={12}>
                                  <Form.Item 
                                    {...restField} 
                                    name={[name, 'colourName']} 
@@ -760,18 +766,18 @@ const ProductManagement = () => {
                                  >
                                     <Input placeholder="e.g. Walnut Brown, Black, White" />
                                  </Form.Item>
-                            </Col>
-                            <Col span={12}>
+                              </Col>
+                              <Col span={12}>
                                  <Form.Item 
                                    {...restField} 
                                    name={[name, 'isActive']} 
                                    valuePropName="checked" 
                                    label="Active Variant"
                                  >
-                                    <Switch />
+                                    <Switch defaultChecked />
                                  </Form.Item>
-                            </Col>
-                            <Col span={24}>
+                              </Col>
+                              <Col span={24}>
                                  <Form.Item 
                                    {...restField} 
                                    name={[name, 'photos']} 
@@ -779,43 +785,53 @@ const ProductManagement = () => {
                                    valuePropName="fileList"
                                    getValueFromEvent={normFile}
                                    rules={[
-                                     { required: true, message: 'At least one image is required' }
+                                     { required: true, message: 'At least one image is required' },
+                                     {
+                                        validator: (_, value) => {
+                                          if (value && value.length > 0) {
+                                            return Promise.resolve();
+                                          }
+                                          return Promise.reject(new Error('At least one image is required'));
+                                        }
+                                     }
                                    ]}
                                    extra="Upload product images for this color variant"
                                  >
                                     <Upload 
-                                         customRequest={customUploadRequest}
-                                         listType="picture-card"
-                                         multiple={true}
-                                         accept="image/*"
-                                         maxCount={8}
-                                     >
-                                         {(!photos || photos.length < 8) && (
-                                           <div>
-                                              <PlusOutlined />
-                                              <div style={{ marginTop: 8 }}>Upload</div>
-                                           </div>
-                                         )}
+                                       customRequest={customUploadRequest}
+                                       listType="picture-card"
+                                       multiple={true}
+                                       accept="image/*"
+                                       beforeUpload={() => false}
+                                       maxCount={8}
+                                    >
+                                       {photos?.length >= 8 ? null : (
+                                         <div>
+                                           <PlusOutlined />
+                                           <div style={{ marginTop: 8 }}>Upload</div>
+                                         </div>
+                                       )}
                                     </Upload>
                                  </Form.Item>
-                            </Col>
-                         </Row>
-                       </Card>
-                     );
-                   })}
+                              </Col>
+                           </Row>
+                         </Card>
+                       );
+                     })}
                    
-                   <Button 
-                     type="dashed" 
-                     onClick={() => add({ colourName: '', photos: [], isActive: true })} 
-                     block 
-                     icon={<PlusOutlined />} 
-                     size="large"
-                   >
-                     Add Colour Variant
-                   </Button>
-                   <Form.ErrorList errors={errors} />
-                 </div>
-               )}
+                     <Button 
+                       type="dashed" 
+                       onClick={() => add({ colourName: '', photos: [], isActive: true })} 
+                       block 
+                       icon={<PlusOutlined />} 
+                       size="large"
+                     >
+                       Add Colour Variant
+                     </Button>
+                     <Form.ErrorList errors={errors} />
+                   </div>
+                 );
+               }}
              </Form.List>
           </div>
 
