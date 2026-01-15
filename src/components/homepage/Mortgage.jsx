@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Check, ChevronDown, X, AlertCircle } from 'lucide-react'; 
+import { ChevronLeft, Check, ChevronDown, X, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Mortgage from '../homepage/MortgagesProduct'; // Ensure the path is correct
 
 // --- UI COMPONENTS (Defined OUTSIDE to prevent re-rendering/blinking) ---
 
@@ -49,8 +50,14 @@ const RadioCard = ({ label, name, value, checked, onChange, width = "w-full" }) 
     } ${width}`}
   >
     <span className="text-base text-gray-800 font-normal">{label}</span>
-    <input type="radio" name={name} className="hidden" checked={checked} onChange={() => onChange(value)} />
-    <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${checked ? 'border-black' : 'border-gray-300'}`}>
+    <input 
+      type="radio" 
+      name={name} 
+      className="hidden" 
+      checked={checked} 
+      onChange={() => onChange(value)} 
+    />
+    <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${checked ? 'border-black' : 'border-gray-300'}`}>
       {checked && <div className="w-2.5 h-2.5 bg-black rounded-full"></div>}
     </div>
   </label>
@@ -59,12 +66,12 @@ const RadioCard = ({ label, name, value, checked, onChange, width = "w-full" }) 
 const SuffixInput = ({ label, value, onChange, placeholder, suffix, error }) => (
   <div className="w-full">
     <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>
-    <div className={`flex items-center border rounded-md overflow-hidden transition-all ${
+    <div className={`flex items-center border rounded-md overflow-hidden transition-all bg-white ${
         error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:border-black focus-within:ring-1 focus-within:ring-black'
     }`}>
       <input 
         type="number" 
-        className="flex-1 px-4 py-3 outline-none text-gray-900 placeholder-gray-400 w-full" 
+        className="flex-1 px-4 py-3.5 outline-none text-gray-900 placeholder-gray-400 w-full" 
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -84,7 +91,7 @@ const TextInput = ({ label, value, onChange, placeholder, error }) => (
     {label && <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>}
     <input 
       type="text" 
-      className={`w-full p-3.5 border rounded-md outline-none transition-all ${
+      className={`w-full px-4 py-3.5 border rounded-md outline-none transition-all placeholder-gray-400 ${
           error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:ring-1 focus:ring-black focus:border-black'
       }`}
       placeholder={placeholder}
@@ -259,16 +266,18 @@ const Step3 = ({ formData, handleChange, errors }) => (
   </div>
 );
 
+// --- Modal Component (Outside) ---
+
 const SuccessModal = ({ email, navigate }) => {
   useEffect(() => {
       const timer = setTimeout(() => {
-          navigate('/');
-      }, 20000);
+          navigate('/mortgages-product'); // Navigates to Mortgage page
+      }, 5000);
       return () => clearTimeout(timer);
   }, [navigate]);
 
   const handleContinue = () => {
-      navigate('/');
+      navigate('/mortgages-product'); // Navigates to Mortgage page
   };
 
   return (
