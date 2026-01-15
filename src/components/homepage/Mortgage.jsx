@@ -1,130 +1,148 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Check, ChevronDown, X, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Check, ChevronDown, X, AlertCircle, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Mortgage from '../homepage/MortgagesProduct'; // Ensure the path is correct
 
-// --- UI COMPONENTS (Defined OUTSIDE to prevent re-rendering/blinking) ---
+const BASE_URL = "https://xoto.ae"; 
+
+// --- 1. COUNTRY CODES DATA ---
+const countryCodes = [
+  { code: "+971", flag: "🇦🇪", name: "UAE" },
+  { code: "+91", flag: "🇮🇳", name: "India" },
+  { code: "+1", flag: "🇺🇸", name: "USA" },
+  { code: "+44", flag: "🇬🇧", name: "UK" },
+  { code: "+966", flag: "🇸🇦", name: "KSA" },
+  { code: "+974", flag: "🇶🇦", name: "Qatar" },
+  { code: "+973", flag: "🇧🇭", name: "Bahrain" },
+  { code: "+965", flag: "🇰🇼", name: "Kuwait" },
+  { code: "+968", flag: "🇴🇲", name: "Oman" },
+  { code: "+61", flag: "🇦🇺", name: "Australia" },
+  { code: "+1", flag: "🇨🇦", name: "Canada" },
+];
+
+// --- UI COMPONENTS ---
+// (HeroSection, ProgressBar, RadioCard, SuffixInput, TextInput, SelectInput - Inko same rakhein, koi change nahi)
+// ... Keep previous UI components as is ...
 
 const HeroSection = ({ step }) => {
-  let title = "The right mortgage for your property!";
-  if (step === 2) title = "Let's get to know you!";
-  if (step === 3) title = "You are almost done!";
-
-  return (
-    <div className="hidden lg:flex flex-col w-5/12 bg-gray-50 p-12 justify-center sticky top-0 h-screen overflow-hidden">
-      <div className="max-w-md mx-auto w-full z-10">
-        <h1 className="text-5xl font-extrabold text-gray-900 leading-[1.15] mb-12 tracking-tight">
-          {title}
-        </h1>
-        <div className="relative w-full aspect-square bg-[#F0F0F0] rounded-[3rem] flex items-center justify-center shadow-inner">
-           <div className="relative w-48 h-80 bg-white rounded-[2.5rem] border-[6px] border-gray-800 shadow-2xl transform -rotate-12 flex flex-col items-center pt-4 overflow-hidden z-20">
-              <div className="w-16 h-4 bg-gray-100 rounded-full mb-4"></div>
-              <div className="w-full px-4 space-y-3">
-                 <div className="h-2 w-full bg-gray-100 rounded"></div>
-                 <div className="h-8 w-full bg-blue-50 rounded border border-blue-100"></div>
-                 <div className="h-2 w-2/3 bg-gray-100 rounded"></div>
-                 <div className="h-8 w-full bg-gray-50 rounded border border-gray-100"></div>
-              </div>
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-orange-100 rounded-full opacity-50 blur-2xl"></div>
-           </div>
-           <div className="absolute top-1/4 right-10 w-20 h-20 bg-purple-200 rounded-full blur-xl opacity-60"></div>
-           <div className="absolute bottom-1/4 left-10 w-24 h-24 bg-blue-200 rounded-full blur-xl opacity-60"></div>
+    let title = "The right mortgage for your property!";
+    if (step === 2) title = "Let's get to know you!";
+    if (step === 3) title = "You are almost done!";
+  
+    return (
+      <div className="hidden lg:flex flex-col w-5/12 bg-gray-50 p-12 justify-center sticky top-0 h-screen overflow-hidden">
+        <div className="max-w-md mx-auto w-full z-10">
+          <h1 className="text-5xl font-extrabold text-gray-900 leading-[1.15] mb-12 tracking-tight">
+            {title}
+          </h1>
+          <div className="relative w-full aspect-square bg-[#F0F0F0] rounded-[3rem] flex items-center justify-center shadow-inner">
+             <div className="relative w-48 h-80 bg-white rounded-[2.5rem] border-[6px] border-gray-800 shadow-2xl transform -rotate-12 flex flex-col items-center pt-4 overflow-hidden z-20">
+                <div className="w-16 h-4 bg-gray-100 rounded-full mb-4"></div>
+                <div className="w-full px-4 space-y-3">
+                   <div className="h-2 w-full bg-gray-100 rounded"></div>
+                   <div className="h-8 w-full bg-blue-50 rounded border border-blue-100"></div>
+                   <div className="h-2 w-2/3 bg-gray-100 rounded"></div>
+                   <div className="h-8 w-full bg-gray-50 rounded border border-gray-100"></div>
+                </div>
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-orange-100 rounded-full opacity-50 blur-2xl"></div>
+             </div>
+             <div className="absolute top-1/4 right-10 w-20 h-20 bg-purple-200 rounded-full blur-xl opacity-60"></div>
+             <div className="absolute bottom-1/4 left-10 w-24 h-24 bg-blue-200 rounded-full blur-xl opacity-60"></div>
+          </div>
         </div>
       </div>
+    );
+  };
+  
+  const ProgressBar = ({ step }) => (
+    <div className="flex space-x-3 mb-8 w-full max-w-3xl">
+      <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 1 ? 'bg-black' : 'bg-gray-200'}`}></div>
+      <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 2 ? 'bg-black' : 'bg-gray-200'}`}></div>
+      <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 3 ? 'bg-black' : 'bg-gray-200'}`}></div>
     </div>
   );
-};
-
-const ProgressBar = ({ step }) => (
-  <div className="flex space-x-3 mb-8 w-full max-w-3xl">
-    <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 1 ? 'bg-black' : 'bg-gray-200'}`}></div>
-    <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 2 ? 'bg-black' : 'bg-gray-200'}`}></div>
-    <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 3 ? 'bg-black' : 'bg-gray-200'}`}></div>
-  </div>
-);
-
-const RadioCard = ({ label, name, value, checked, onChange, width = "w-full" }) => (
-  <label 
-    className={`cursor-pointer border rounded-md px-4 py-3.5 flex items-center justify-between transition-all bg-white hover:border-gray-400 ${
-      checked ? 'border-black ring-1 ring-black' : 'border-gray-300'
-    } ${width}`}
-  >
-    <span className="text-base text-gray-800 font-normal">{label}</span>
-    <input 
-      type="radio" 
-      name={name} 
-      className="hidden" 
-      checked={checked} 
-      onChange={() => onChange(value)} 
-    />
-    <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${checked ? 'border-black' : 'border-gray-300'}`}>
-      {checked && <div className="w-2.5 h-2.5 bg-black rounded-full"></div>}
-    </div>
-  </label>
-);
-
-const SuffixInput = ({ label, value, onChange, placeholder, suffix, error }) => (
-  <div className="w-full">
-    <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>
-    <div className={`flex items-center border rounded-md overflow-hidden transition-all bg-white ${
-        error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:border-black focus-within:ring-1 focus-within:ring-black'
-    }`}>
+  
+  const RadioCard = ({ label, name, value, checked, onChange, width = "w-full" }) => (
+    <label 
+      className={`cursor-pointer border rounded-md px-4 py-3.5 flex items-center justify-between transition-all bg-white hover:border-gray-400 ${
+        checked ? 'border-black ring-1 ring-black' : 'border-gray-300'
+      } ${width}`}
+    >
+      <span className="text-base text-gray-800 font-normal">{label}</span>
       <input 
-        type="number" 
-        className="flex-1 px-4 py-3.5 outline-none text-gray-900 placeholder-gray-400 w-full" 
+        type="radio" 
+        name={name} 
+        className="hidden" 
+        checked={checked} 
+        onChange={() => onChange(value)} 
+      />
+      <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${checked ? 'border-black' : 'border-gray-300'}`}>
+        {checked && <div className="w-2.5 h-2.5 bg-black rounded-full"></div>}
+      </div>
+    </label>
+  );
+  
+  const SuffixInput = ({ label, value, onChange, placeholder, suffix, error }) => (
+    <div className="w-full">
+      <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>
+      <div className={`flex items-center border rounded-md overflow-hidden transition-all bg-white ${
+          error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:border-black focus-within:ring-1 focus-within:ring-black'
+      }`}>
+        <input 
+          type="number" 
+          className="flex-1 px-4 py-3.5 outline-none text-gray-900 placeholder-gray-400 w-full" 
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {suffix && (
+          <div className="bg-white border-l border-gray-300 px-4 py-3 text-gray-500 text-sm font-medium tracking-wide">
+            {suffix}
+          </div>
+        )}
+      </div>
+      {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
+    </div>
+  );
+  
+  const TextInput = ({ label, value, onChange, placeholder, error }) => (
+    <div className="w-full">
+      {label && <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>}
+      <input 
+        type="text" 
+        className={`w-full px-4 py-3.5 border rounded-md outline-none transition-all placeholder-gray-400 ${
+            error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:ring-1 focus:ring-black focus:border-black'
+        }`}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
-      {suffix && (
-        <div className="bg-white border-l border-gray-300 px-4 py-3 text-gray-500 text-sm font-medium tracking-wide">
-          {suffix}
+       {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
+    </div>
+  );
+  
+  const SelectInput = ({ label, value, onChange, options, placeholder, error }) => (
+    <div className="w-full">
+      <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>
+      <div className="relative">
+        <select 
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full appearance-none border rounded-md px-4 py-3.5 outline-none bg-white text-gray-900 transition-all ${
+            error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-black focus:ring-1 focus:ring-black'
+          }`}
+        >
+            <option value="" disabled>{placeholder}</option>
+            {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+        </select>
+        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+          <ChevronDown className="w-4 h-4 text-gray-500" />
         </div>
-      )}
-    </div>
-    {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
-  </div>
-);
-
-const TextInput = ({ label, value, onChange, placeholder, error }) => (
-  <div className="w-full">
-    {label && <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>}
-    <input 
-      type="text" 
-      className={`w-full px-4 py-3.5 border rounded-md outline-none transition-all placeholder-gray-400 ${
-          error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:ring-1 focus:ring-black focus:border-black'
-      }`}
-      placeholder={placeholder}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-     {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
-  </div>
-);
-
-const SelectInput = ({ label, value, onChange, options, placeholder, error }) => (
-  <div className="w-full">
-    <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>
-    <div className="relative">
-      <select 
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`w-full appearance-none border rounded-md px-4 py-3.5 outline-none bg-white text-gray-900 transition-all ${
-          error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-black focus:ring-1 focus:ring-black'
-        }`}
-      >
-          <option value="" disabled>{placeholder}</option>
-          {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-      </select>
-      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-        <ChevronDown className="w-4 h-4 text-gray-500" />
       </div>
+      {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
     </div>
-    {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
-  </div>
-);
+  );
 
-// --- STEP COMPONENTS (Defined OUTSIDE) ---
+// --- STEP COMPONENTS ---
 
 const Step1 = ({ formData, handleChange, errors }) => (
   <div className="space-y-7 animate-fade-in">
@@ -216,6 +234,7 @@ const Step2 = ({ formData, handleChange, errors }) => (
   </div>
 );
 
+// --- 2. UPDATED STEP 3 WITH COUNTRY SELECTOR ---
 const Step3 = ({ formData, handleChange, errors }) => (
   <div className="space-y-7 animate-fade-in">
     <div className="bg-white rounded-lg">
@@ -246,14 +265,25 @@ const Step3 = ({ formData, handleChange, errors }) => (
           <div className={`flex border rounded-md overflow-hidden bg-white transition-all ${
               errors.phone ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:ring-1 focus-within:ring-black focus-within:border-black'
           }`}>
-              <div className="bg-white px-3 py-3.5 border-r border-gray-300 flex items-center cursor-pointer min-w-[80px] justify-between hover:bg-gray-50">
-                  <span className="text-xl">🇦🇪</span>
-                  <ChevronDown size={14} className="text-gray-500" />
+              {/* Country Code Dropdown */}
+              <div className="bg-white border-r border-gray-300 flex items-center min-w-[100px] hover:bg-gray-50 relative">
+                  <select 
+                    value={formData.countryCode}
+                    onChange={(e) => handleChange('countryCode', e.target.value)}
+                    className="appearance-none bg-transparent w-full py-3.5 pl-3 pr-8 outline-none text-gray-900 font-medium cursor-pointer z-10"
+                  >
+                     {countryCodes.map((country) => (
+                       <option key={country.code} value={country.code}>
+                         {country.flag} {country.code}
+                       </option>
+                     ))}
+                  </select>
+                  <ChevronDown size={14} className="text-gray-500 absolute right-2 z-0" />
               </div>
-              <div className="py-3.5 px-3 text-gray-900 font-medium">+971</div>
+
               <input 
                   type="number" 
-                  className="flex-1 px-2 py-3.5 outline-none text-gray-900 w-full" 
+                  className="flex-1 px-4 py-3.5 outline-none text-gray-900 w-full" 
                   placeholder="50 123 4567"
                   value={formData.phone}
                   onChange={(e) => handleChange('phone', e.target.value)}
@@ -266,18 +296,17 @@ const Step3 = ({ formData, handleChange, errors }) => (
   </div>
 );
 
-// --- Modal Component (Outside) ---
-
+// --- Modal Component ---
 const SuccessModal = ({ email, navigate }) => {
   useEffect(() => {
       const timer = setTimeout(() => {
-          navigate('/mortgages-product'); // Navigates to Mortgage page
+          navigate('/mortgages-product');
       }, 5000);
       return () => clearTimeout(timer);
   }, [navigate]);
 
   const handleContinue = () => {
-      navigate('/mortgages-product'); // Navigates to Mortgage page
+      navigate('/mortgages-product');
   };
 
   return (
@@ -312,12 +341,13 @@ const SuccessModal = ({ email, navigate }) => {
 };
 
 // --- MAIN COMPONENT ---
-
 const MortgageWizard = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
+  // --- 3. ADDED countryCode to initial state ---
   const [formData, setFormData] = useState({
     intent: 'buy', 
     propertyFound: 'yes',
@@ -333,9 +363,11 @@ const MortgageWizard = () => {
     age: '',
     fullName: '',
     email: '',
+    countryCode: '+971', // Default
     phone: ''
   });
 
+  // --- 4. UPDATED VALIDATION LOGIC ---
   const validateStep = (currentStep) => {
     let newErrors = {};
     let isValid = true;
@@ -364,10 +396,14 @@ const MortgageWizard = () => {
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = "Please enter a valid email address";
         }
+
+        // Phone Validation (Only Numbers + Length Check)
         if (!formData.phone) {
             newErrors.phone = "Phone number is required";
-        } else if (formData.phone.length < 7) {
-            newErrors.phone = "Phone number is too short";
+        } else if (!/^\d+$/.test(formData.phone)) {
+            newErrors.phone = "Phone must only contain numbers";
+        } else if (formData.phone.length < 7 || formData.phone.length > 15) {
+            newErrors.phone = "Invalid phone number length";
         }
     }
 
@@ -378,10 +414,83 @@ const MortgageWizard = () => {
     return isValid;
   };
 
+  const submitFormData = async () => {
+    setIsLoading(true);
+    
+    const nameParts = formData.fullName.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || ".";
+
+    let residencyStatus = "resident";
+    if (formData.residency === 'non-resident') residencyStatus = "non_resident";
+    
+    let payload = {
+        type: "mortgage",
+        has_property: true, 
+        occupation: formData.employment === 'salaried' ? "Salaried" : "Self-Employed",
+        monthly_income: parseInt(formData.income),
+        age: parseInt(formData.age),
+        name: {
+            first_name: firstName,
+            last_name: lastName
+        },
+        email: formData.email,
+        // --- 5. USE DYNAMIC COUNTRY CODE ---
+        mobile: {
+            country_code: formData.countryCode, 
+            number: formData.phone
+        },
+        preferred_contact: "whatsapp",
+        residency_status: residencyStatus
+    };
+
+    if (formData.intent === 'buy') {
+        payload.lead_sub_type = "home_loan";
+        payload.has_property = formData.propertyFound === 'yes';
+        payload.price = parseInt(formData.propertyPrice);
+        payload.city = "Dubai"; 
+        payload.area = formData.location;
+        payload.has_existing_mortgage = formData.hasMortgage === 'yes';
+    } else {
+        payload.lead_sub_type = "refinance";
+        payload.price = parseInt(formData.homeValue);
+        payload.budget = `${formData.loanBalance} remaining`;
+        payload.country = "UAE";
+        payload.bank_name = formData.bankName;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/property/lead/create-mortgage-lead`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+            setStep((prev) => prev + 1); 
+            setErrors({});
+        } else {
+            console.error('Failed to submit lead');
+            alert("Something went wrong. Please try again.");
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert("Network error. Please try again.");
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
   const handleNext = () => {
     if (validateStep(step)) {
-        setStep((prev) => prev + 1);
-        setErrors({});
+        if (step === 3) {
+            submitFormData();
+        } else {
+            setStep((prev) => prev + 1);
+            setErrors({});
+        }
     }
   };
 
@@ -421,7 +530,8 @@ const MortgageWizard = () => {
             <button 
                 type="button" 
                 onClick={handleBack}
-                className="flex items-center text-gray-600 font-semibold px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                disabled={isLoading}
+                className="flex items-center text-gray-600 font-semibold px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
                 <ChevronLeft className="w-5 h-5 mr-2" />
                 Back
@@ -433,9 +543,16 @@ const MortgageWizard = () => {
             <button 
             type="button" 
             onClick={handleNext}
-            className="bg-gray-600 text-white px-12 py-3.5 rounded-md font-bold text-lg hover:bg-black transition-colors shadow-sm"
+            disabled={isLoading}
+            className="bg-gray-600 text-white px-12 py-3.5 rounded-md font-bold text-lg hover:bg-black transition-colors shadow-sm flex items-center justify-center disabled:bg-gray-400"
             >
-            {step === 3 ? 'Explore mortgages' : 'Next'}
+            {isLoading ? (
+                <>
+                 <Loader2 className="animate-spin mr-2 h-5 w-5" /> Processing...
+                </>
+            ) : (
+                step === 3 ? 'Explore mortgages' : 'Next'
+            )}
             </button>
           </div>
         </div>
