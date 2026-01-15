@@ -61,6 +61,10 @@ import Casestudy from "./components/homepage/Casestudy"
 import Training from "./components/homepage/Trainning";
 import RegisterNowPage from "./components/RegisterNowPage";
 import Mortgage from "./components/homepage/Mortgage"
+import MortgagesProduct from "./components/homepage/MortgagesProduct";
+import UploadDocuments from "./components/homepage/UploadDocuments";  
+import ProductRequirementsEdit from "./components/homepage/ProductRequirementsEdit";
+import MyApplications from "./components/homepage/MyApplications";
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
 const Consult = lazy(() => import("./components/consultation/Consult"));
@@ -268,6 +272,10 @@ function App() {
                     <Route path="/aiPlanner" element={<AITools />} />
                     <Route path="/aiPlanner/demo" element={<AIPlannerDemoPage />} />
  <Route path="/mortgages" element={<Mortgage />} />
+ <Route path="/mortgages-product" element={<MortgagesProduct />} />
+ <Route path="/mortgages-product-upload-document" element={<UploadDocuments />} />
+ <Route path="/product-requirements-edit" element={<ProductRequirementsEdit />} />
+<Route path="/my-applications" element={<MyApplications />} />
                                         <Route path="/aiPlanner/interior" element={<ComingSoon />} />
                                         <Route path="/aiPlanner/landscape" element={<AIPlanner />} />
                                             <Route path="/register" element={<RegisterNowPage />} />

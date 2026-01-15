@@ -38,6 +38,7 @@
     "@tinymce/tinymce-react": "^6.2.1",
     "@toolpad/core": "^0.16.0",
     "@types/gsap": "^1.20.2",
+    "@vapi-ai/web": "^2.5.2",
     "antd": "^5.28.0",
     "antd-style": "^3.7.1",
     "aos": "^2.3.4",
