@@ -4,24 +4,22 @@ import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = "https://xoto.ae"; 
 
-// --- 1. COUNTRY CODES DATA ---
+// --- 1. UPDATED COUNTRY CODES WITH MAX LENGTH ---
 const countryCodes = [
-  { code: "+971", flag: "🇦🇪", name: "UAE" },
-  { code: "+91", flag: "🇮🇳", name: "India" },
-  { code: "+1", flag: "🇺🇸", name: "USA" },
-  { code: "+44", flag: "🇬🇧", name: "UK" },
-  { code: "+966", flag: "🇸🇦", name: "KSA" },
-  { code: "+974", flag: "🇶🇦", name: "Qatar" },
-  { code: "+973", flag: "🇧🇭", name: "Bahrain" },
-  { code: "+965", flag: "🇰🇼", name: "Kuwait" },
-  { code: "+968", flag: "🇴🇲", name: "Oman" },
-  { code: "+61", flag: "🇦🇺", name: "Australia" },
-  { code: "+1", flag: "🇨🇦", name: "Canada" },
+  { code: "+971", flag: "🇦🇪", name: "UAE", maxDigits: 9 }, // UAE usually 9 (50 123 4567)
+  { code: "+91", flag: "🇮🇳", name: "India", maxDigits: 10 },
+  { code: "+1", flag: "🇺🇸", name: "USA", maxDigits: 10 },
+  { code: "+44", flag: "🇬🇧", name: "UK", maxDigits: 10 },
+  { code: "+966", flag: "🇸🇦", name: "KSA", maxDigits: 9 },
+  { code: "+974", flag: "🇶🇦", name: "Qatar", maxDigits: 8 },
+  { code: "+973", flag: "🇧🇭", name: "Bahrain", maxDigits: 8 },
+  { code: "+965", flag: "🇰🇼", name: "Kuwait", maxDigits: 8 },
+  { code: "+968", flag: "🇴🇲", name: "Oman", maxDigits: 8 },
+  { code: "+61", flag: "🇦🇺", name: "Australia", maxDigits: 9 },
+  { code: "+1", flag: "🇨🇦", name: "Canada", maxDigits: 10 },
 ];
 
 // --- UI COMPONENTS ---
-// (HeroSection, ProgressBar, RadioCard, SuffixInput, TextInput, SelectInput - Inko same rakhein, koi change nahi)
-// ... Keep previous UI components as is ...
 
 const HeroSection = ({ step }) => {
     let title = "The right mortgage for your property!";
@@ -234,67 +232,73 @@ const Step2 = ({ formData, handleChange, errors }) => (
   </div>
 );
 
-// --- 2. UPDATED STEP 3 WITH COUNTRY SELECTOR ---
-const Step3 = ({ formData, handleChange, errors }) => (
-  <div className="space-y-7 animate-fade-in">
-    <div className="bg-white rounded-lg">
-       <h3 className="text-2xl font-bold text-gray-900 mb-8">One step left before you view your mortgage options</h3>
-       
-       <div className="mb-6">
-          <label className="block text-base font-semibold text-gray-800 mb-2">Full Name</label>
-          <TextInput 
-              placeholder="Enter your full name" 
-              value={formData.fullName} 
-              onChange={(val) => handleChange('fullName', val)} 
-              error={errors.fullName}
-          />
-       </div>
-       
-       <div className="mb-6">
-          <label className="block text-base font-semibold text-gray-800 mb-2">Email Address</label>
-          <TextInput 
-              placeholder="Enter your email address" 
-              value={formData.email} 
-              onChange={(val) => handleChange('email', val)} 
-              error={errors.email}
-          />
-       </div>
-       
-       <div className="mb-8">
-          <label className="block text-base font-semibold text-gray-800 mb-2">Phone Number</label>
-          <div className={`flex border rounded-md overflow-hidden bg-white transition-all ${
-              errors.phone ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:ring-1 focus-within:ring-black focus-within:border-black'
-          }`}>
-              {/* Country Code Dropdown */}
-              <div className="bg-white border-r border-gray-300 flex items-center min-w-[100px] hover:bg-gray-50 relative">
-                  <select 
-                    value={formData.countryCode}
-                    onChange={(e) => handleChange('countryCode', e.target.value)}
-                    className="appearance-none bg-transparent w-full py-3.5 pl-3 pr-8 outline-none text-gray-900 font-medium cursor-pointer z-10"
-                  >
-                     {countryCodes.map((country) => (
-                       <option key={country.code} value={country.code}>
-                         {country.flag} {country.code}
-                       </option>
-                     ))}
-                  </select>
-                  <ChevronDown size={14} className="text-gray-500 absolute right-2 z-0" />
-              </div>
+// --- 2. UPDATED STEP 3 WITH DYNAMIC PLACEHOLDER AND LIMIT ---
+const Step3 = ({ formData, handleChange, errors }) => {
+  // Determine placeholder and max length based on selected country
+  const selectedCountry = countryCodes.find(c => c.code === formData.countryCode) || countryCodes[0];
+  const placeholder = "0".repeat(selectedCountry.maxDigits).replace(/(.{3})/g, '$1 ').trim();
 
-              <input 
-                  type="number" 
-                  className="flex-1 px-4 py-3.5 outline-none text-gray-900 w-full" 
-                  placeholder="50 123 4567"
-                  value={formData.phone}
-                  onChange={(e) => handleChange('phone', e.target.value)}
-              />
-          </div>
-          {errors.phone && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {errors.phone}</p>}
-       </div>
-       <p className="text-gray-500 leading-relaxed text-sm">While we review your details, feel free to explore your dashboard and check out different mortgage options tailored for you!</p>
+  return (
+    <div className="space-y-7 animate-fade-in">
+      <div className="bg-white rounded-lg">
+         <h3 className="text-2xl font-bold text-gray-900 mb-8">One step left before you view your mortgage options</h3>
+         
+         <div className="mb-6">
+            <label className="block text-base font-semibold text-gray-800 mb-2">Full Name</label>
+            <TextInput 
+                placeholder="Enter your full name" 
+                value={formData.fullName} 
+                onChange={(val) => handleChange('fullName', val)} 
+                error={errors.fullName}
+            />
+         </div>
+         
+         <div className="mb-6">
+            <label className="block text-base font-semibold text-gray-800 mb-2">Email Address</label>
+            <TextInput 
+                placeholder="Enter your email address" 
+                value={formData.email} 
+                onChange={(val) => handleChange('email', val)} 
+                error={errors.email}
+            />
+         </div>
+         
+         <div className="mb-8">
+            <label className="block text-base font-semibold text-gray-800 mb-2">Phone Number</label>
+            <div className={`flex border rounded-md overflow-hidden bg-white transition-all ${
+                errors.phone ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:ring-1 focus-within:ring-black focus-within:border-black'
+            }`}>
+                {/* Country Code Dropdown */}
+                <div className="bg-white border-r border-gray-300 flex items-center min-w-[100px] hover:bg-gray-50 relative">
+                    <select 
+                      value={formData.countryCode}
+                      onChange={(e) => handleChange('countryCode', e.target.value)}
+                      className="appearance-none bg-transparent w-full py-3.5 pl-3 pr-8 outline-none text-gray-900 font-medium cursor-pointer z-10"
+                    >
+                       {countryCodes.map((country) => (
+                         <option key={country.code} value={country.code}>
+                           {country.flag} {country.code}
+                         </option>
+                       ))}
+                    </select>
+                    <ChevronDown size={14} className="text-gray-500 absolute right-2 z-0" />
+                </div>
+  
+                <input 
+                    type="number" 
+                    className="flex-1 px-4 py-3.5 outline-none text-gray-900 w-full" 
+                    placeholder={placeholder}
+                    value={formData.phone}
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                />
+            </div>
+            {errors.phone && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {errors.phone}</p>}
+         </div>
+         <p className="text-gray-500 leading-relaxed text-sm">While we review your details, feel free to explore your dashboard and check out different mortgage options tailored for you!</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // --- Modal Component ---
 const SuccessModal = ({ email, navigate }) => {
@@ -347,7 +351,6 @@ const MortgageWizard = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- 3. ADDED countryCode to initial state ---
   const [formData, setFormData] = useState({
     intent: 'buy', 
     propertyFound: 'yes',
@@ -367,7 +370,39 @@ const MortgageWizard = () => {
     phone: ''
   });
 
-  // --- 4. UPDATED VALIDATION LOGIC ---
+  // --- 3. HANDLE CHANGE WITH STRICT LENGTH CHECK ---
+  const handleChange = (field, value) => {
+    // Handling Country Code Change
+    if (field === 'countryCode') {
+        const newCountry = countryCodes.find(c => c.code === value);
+        // If current phone number is longer than new allowed max digits, slice it
+        if (formData.phone.length > newCountry.maxDigits) {
+            setFormData(prev => ({
+                ...prev,
+                countryCode: value,
+                phone: prev.phone.slice(0, newCountry.maxDigits)
+            }));
+            return;
+        }
+    }
+
+    // Handling Phone Input
+    if (field === 'phone') {
+        const selectedCountry = countryCodes.find(c => c.code === formData.countryCode) || countryCodes[0];
+        // STRICT CHECK: Do not allow input if length exceeds maxDigits
+        if (value.length > selectedCountry.maxDigits) {
+            return; // Ignore key press
+        }
+    }
+
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error if field is modified
+    if (errors[field]) {
+        setErrors({ ...errors, [field]: null });
+    }
+  };
+
   const validateStep = (currentStep) => {
     let newErrors = {};
     let isValid = true;
@@ -397,13 +432,14 @@ const MortgageWizard = () => {
             newErrors.email = "Please enter a valid email address";
         }
 
-        // Phone Validation (Only Numbers + Length Check)
+        // Phone Validation (Strict Length Match)
+        const selectedCountry = countryCodes.find(c => c.code === formData.countryCode);
+        const maxDigits = selectedCountry ? selectedCountry.maxDigits : 15;
+
         if (!formData.phone) {
             newErrors.phone = "Phone number is required";
-        } else if (!/^\d+$/.test(formData.phone)) {
-            newErrors.phone = "Phone must only contain numbers";
-        } else if (formData.phone.length < 7 || formData.phone.length > 15) {
-            newErrors.phone = "Invalid phone number length";
+        } else if (formData.phone.length !== maxDigits) {
+            newErrors.phone = `Phone number must be exactly ${maxDigits} digits`;
         }
     }
 
@@ -435,7 +471,6 @@ const MortgageWizard = () => {
             last_name: lastName
         },
         email: formData.email,
-        // --- 5. USE DYNAMIC COUNTRY CODE ---
         mobile: {
             country_code: formData.countryCode, 
             number: formData.phone
@@ -497,13 +532,6 @@ const MortgageWizard = () => {
   const handleBack = () => {
     setStep((prev) => Math.max(prev - 1, 1));
     setErrors({});
-  };
-  
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-    if (errors[field]) {
-        setErrors({ ...errors, [field]: null });
-    }
   };
 
   return (
