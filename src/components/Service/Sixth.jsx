@@ -86,12 +86,12 @@ export default function Sixth() {
               </button>
 
               {/* SECONDARY → Navigate to Calculate page */}
-              <button
-                onClick={() => navigate("/mortgages")}
-                className="w-full sm:w-auto px-8 py-4 border-2 border-[#5C039B] text-[#5C039B] rounded-xl font-semibold text-base hover:bg-[#5C039B] hover:text-white transition"
-              >
-                {t("hero.secondaryCta")}
-              </button>
+        <button
+  onClick={() => window.open("https://wa.me/919785408712", "_blank")}
+  className="w-full sm:w-auto px-8 py-4 border-2 border-[#5C039B] text-[#5C039B] rounded-xl font-semibold text-base hover:bg-[#5C039B] hover:text-white transition"
+>
+  {t("hero.secondaryCta")}
+</button>
             </div>
           </div>
 

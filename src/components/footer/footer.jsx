@@ -65,22 +65,62 @@ export default function Footer() {
         </p>
 
         {/* Mobile Social Icons */}
-        <div className="flex justify-center gap-7 mt-4 py-5">
-          <img src={facebookIcon} alt="Facebook" className="w-[22px] h-[22px]" />
-          <img src={instagramIcon} alt="Instagram" className="w-[22px] h-[22px]" />
-          <img src={twitterIcon} alt="Twitter" className="w-[22px] h-[22px]" />
-          <img src={linkedinIcon} alt="LinkedIn" className="w-[22px] h-[22px]" />
-        </div>
+      <div className="flex justify-center gap-7 mt-4 py-5">
+  {/* Facebook */}
+  <a href="https://www.facebook.com/profile.php?id=61573697300861" target="_blank" rel="noopener noreferrer">
+    <img 
+      src={facebookIcon} 
+      alt="Facebook" 
+      className="w-[22px] h-[22px] cursor-pointer hover:scale-110 transition-transform" 
+    />
+  </a>
+
+  {/* Instagram */}
+  <a href="https://www.instagram.com/xotohome/" target="_blank" rel="noopener noreferrer">
+    <img 
+      src={instagramIcon} 
+      alt="Instagram" 
+      className="w-[22px] h-[22px] cursor-pointer hover:scale-110 transition-transform" 
+    />
+  </a>
+
+  {/* Twitter */}
+  <a href="https://www.linkedin.com/company/xotouae/?viewAsMember=true" target="_blank" rel="noopener noreferrer">
+    <img 
+      src={twitterIcon} 
+      alt="Twitter" 
+      className="w-[22px] h-[22px] cursor-pointer hover:scale-110 transition-transform" 
+    />
+  </a>
+
+  {/* LinkedIn */}
+  <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+    <img 
+      src={linkedinIcon} 
+      alt="LinkedIn" 
+      className="w-[22px] h-[22px] cursor-pointer hover:scale-110 transition-transform" 
+    />
+  </a>
+</div>
 
         {/* Floating WhatsApp + Chat */}
-        <div className="absolute right-2 top-12 flex flex-col gap-[14px]">
-          <div className="w-[53px] h-[53px] rounded-full bg-[#03A4F4] flex items-center justify-center">
-            <img src={whatsappIcon} alt="WhatsApp" className="w-[32px] h-[32px]" />
-          </div>
-          <div className="w-[53px] h-[53px] rounded-full bg-[#32CD32] flex items-center justify-center">
-            <img src={chatIcon} alt="Chat" className="w-[28px] h-[28px]" />
-          </div>
-        </div>
+       <div className="absolute right-2 top-12 flex flex-col gap-[14px]">
+  {/* --- WhatsApp Button --- */}
+  <div
+    onClick={() => window.open("https://wa.me/919785408712", "_blank")}
+    className="w-[53px] h-[53px] rounded-full bg-[#03A4F4] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
+  >
+    <img src={whatsappIcon} alt="WhatsApp" className="w-[32px] h-[32px]" />
+  </div>
+
+  {/* --- SMS / Chat Button --- */}
+  <div
+    onClick={() => (window.location.href = "sms:+919785408712")}
+    className="w-[53px] h-[53px] rounded-full bg-[#32CD32] flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
+  >
+    <img src={chatIcon} alt="Chat" className="w-[28px] h-[28px]" />
+  </div>
+</div>
       </div>
 
       {/* ================= MOBILE ACCORDIONS ================= */}
@@ -249,10 +289,18 @@ export default function Footer() {
           </p>
 
           <div className="flex gap-10">
-            <img src={facebookIcon} className="w-[24px]" />
-            <img src={instagramIcon} className="w-[24px]" />
-            <img src={twitterIcon} className="w-[24px]" />
-            <img src={linkedinIcon} className="w-[24px]" />
+            <a href="https://www.facebook.com/profile.php?id=61573697300861" target="_blank" rel="noopener noreferrer">
+              <img src={facebookIcon} className="w-[24px]" />
+            </a>
+            <a href="https://www.instagram.com/xotohome/" target="_blank" rel="noopener noreferrer">
+              <img src={instagramIcon} className="w-[24px]" />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+              <img src={twitterIcon} className="w-[24px]" />
+            </a>
+            <a href="https://www.linkedin.com/company/xotouae/?viewAsMember=true" target="_blank" rel="noopener noreferrer">
+              <img src={linkedinIcon} className="w-[24px]" />
+            </a>
           </div>
         </div>
 
