@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Check, ChevronDown, X, AlertCircle, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronLeft, Check, ChevronDown, X, AlertCircle, Loader2, AlertTriangle, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = "https://xoto.ae"; 
 
-// --- 1. UPDATED COUNTRY CODES WITH MAX LENGTH ---
+// --- 1. COUNTRY CODES ---
 const countryCodes = [
-  { code: "+971", flag: "🇦🇪", name: "UAE", maxDigits: 9 }, // UAE usually 9 (50 123 4567)
+  { code: "+971", flag: "🇦🇪", name: "UAE", maxDigits: 9 }, 
   { code: "+91", flag: "🇮🇳", name: "India", maxDigits: 10 },
   { code: "+1", flag: "🇺🇸", name: "USA", maxDigits: 10 },
   { code: "+44", flag: "🇬🇧", name: "UK", maxDigits: 10 },
@@ -19,6 +19,50 @@ const countryCodes = [
   { code: "+1", flag: "🇨🇦", name: "Canada", maxDigits: 10 },
 ];
 
+// --- TOAST COMPONENT (2-Line, Slide from Right) ---
+const Toast = ({ message, type, onClose }) => {
+    useEffect(() => {
+        const timer = setTimeout(onClose, 5000); 
+        return () => clearTimeout(timer);
+    }, [onClose]);
+
+    const styles = type === 'error' 
+        ? 'bg-red-50 border-red-200 text-red-800' 
+        : 'bg-green-50 border-green-200 text-green-800';
+    
+    const icon = type === 'error' 
+        ? <AlertTriangle size={20} className="text-red-600 mt-0.5 flex-shrink-0" /> 
+        : <Check size={20} className="text-green-600 mt-0.5 flex-shrink-0" />;
+
+    return (
+        <>
+            <style>{`
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `}</style>
+            <div 
+                className={`fixed top-6 right-6 z-50 flex items-start p-4 mb-4 border rounded-lg shadow-xl ${styles}`}
+                style={{ 
+                    animation: 'slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    maxWidth: '350px', 
+                    width: '100%' 
+                }}
+                role="alert"
+            >
+                <div className="mr-3">{icon}</div>
+                <div className="flex-1">
+                    <p className="text-sm font-semibold leading-snug break-words">{message}</p>
+                </div>
+                <button onClick={onClose} type="button" className="ml-3 -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 hover:bg-black/5 inline-flex h-8 w-8 items-center justify-center flex-shrink-0" aria-label="Close">
+                    <X size={16} />
+                </button>
+            </div>
+        </>
+    );
+};
+
 // --- UI COMPONENTS ---
 
 const HeroSection = ({ step }) => {
@@ -29,9 +73,7 @@ const HeroSection = ({ step }) => {
     return (
       <div className="hidden lg:flex flex-col w-5/12 bg-gray-50 p-12 justify-center sticky top-0 h-screen overflow-hidden">
         <div className="max-w-md mx-auto w-full z-10">
-          <h1 className="text-5xl font-extrabold text-gray-900 leading-[1.15] mb-12 tracking-tight">
-            {title}
-          </h1>
+          <h1 className="text-5xl font-extrabold text-gray-900 leading-[1.15] mb-12 tracking-tight">{title}</h1>
           <div className="relative w-full aspect-square bg-[#F0F0F0] rounded-[3rem] flex items-center justify-center shadow-inner">
              <div className="relative w-48 h-80 bg-white rounded-[2.5rem] border-[6px] border-gray-800 shadow-2xl transform -rotate-12 flex flex-col items-center pt-4 overflow-hidden z-20">
                 <div className="w-16 h-4 bg-gray-100 rounded-full mb-4"></div>
@@ -41,104 +83,201 @@ const HeroSection = ({ step }) => {
                    <div className="h-2 w-2/3 bg-gray-100 rounded"></div>
                    <div className="h-8 w-full bg-gray-50 rounded border border-gray-100"></div>
                 </div>
-                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-orange-100 rounded-full opacity-50 blur-2xl"></div>
              </div>
-             <div className="absolute top-1/4 right-10 w-20 h-20 bg-purple-200 rounded-full blur-xl opacity-60"></div>
-             <div className="absolute bottom-1/4 left-10 w-24 h-24 bg-blue-200 rounded-full blur-xl opacity-60"></div>
           </div>
         </div>
       </div>
     );
-  };
-  
-  const ProgressBar = ({ step }) => (
+};
+
+const ProgressBar = ({ step }) => (
     <div className="flex space-x-3 mb-8 w-full max-w-3xl">
       <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 1 ? 'bg-black' : 'bg-gray-200'}`}></div>
       <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 2 ? 'bg-black' : 'bg-gray-200'}`}></div>
       <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 3 ? 'bg-black' : 'bg-gray-200'}`}></div>
     </div>
-  );
-  
-  const RadioCard = ({ label, name, value, checked, onChange, width = "w-full" }) => (
-    <label 
-      className={`cursor-pointer border rounded-md px-4 py-3.5 flex items-center justify-between transition-all bg-white hover:border-gray-400 ${
-        checked ? 'border-black ring-1 ring-black' : 'border-gray-300'
-      } ${width}`}
-    >
+);
+
+const RadioCard = ({ label, name, value, checked, onChange, width = "w-full" }) => (
+    <label className={`cursor-pointer border rounded-md px-4 py-3.5 flex items-center justify-between transition-all bg-white hover:border-gray-400 ${checked ? 'border-black ring-1 ring-black' : 'border-gray-300'} ${width}`}>
       <span className="text-base text-gray-800 font-normal">{label}</span>
-      <input 
-        type="radio" 
-        name={name} 
-        className="hidden" 
-        checked={checked} 
-        onChange={() => onChange(value)} 
-      />
+      <input type="radio" name={name} className="hidden" checked={checked} onChange={() => onChange(value)} />
       <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${checked ? 'border-black' : 'border-gray-300'}`}>
         {checked && <div className="w-2.5 h-2.5 bg-black rounded-full"></div>}
       </div>
     </label>
-  );
-  
-  const SuffixInput = ({ label, value, onChange, placeholder, suffix, error }) => (
+);
+
+const SuffixInput = ({ label, value, onChange, placeholder, suffix, error }) => (
     <div className="w-full">
       <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>
-      <div className={`flex items-center border rounded-md overflow-hidden transition-all bg-white ${
-          error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:border-black focus-within:ring-1 focus-within:ring-black'
-      }`}>
-        <input 
-          type="number" 
-          className="flex-1 px-4 py-3.5 outline-none text-gray-900 placeholder-gray-400 w-full" 
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-        {suffix && (
-          <div className="bg-white border-l border-gray-300 px-4 py-3 text-gray-500 text-sm font-medium tracking-wide">
-            {suffix}
-          </div>
-        )}
+      <div className={`flex items-center border rounded-md overflow-hidden transition-all bg-white ${error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:border-black focus-within:ring-1 focus-within:ring-black'}`}>
+        <input type="number" className="flex-1 px-4 py-3.5 outline-none text-gray-900 placeholder-gray-400 w-full" placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
+        {suffix && <div className="bg-white border-l border-gray-300 px-4 py-3 text-gray-500 text-sm font-medium tracking-wide">{suffix}</div>}
       </div>
       {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
     </div>
-  );
-  
-  const TextInput = ({ label, value, onChange, placeholder, error }) => (
+);
+
+const TextInput = ({ label, value, onChange, placeholder, error }) => (
     <div className="w-full">
       {label && <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>}
-      <input 
-        type="text" 
-        className={`w-full px-4 py-3.5 border rounded-md outline-none transition-all placeholder-gray-400 ${
-            error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:ring-1 focus:ring-black focus:border-black'
-        }`}
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      <input type="text" className={`w-full px-4 py-3.5 border rounded-md outline-none transition-all placeholder-gray-400 ${error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:ring-1 focus:ring-black focus:border-black'}`} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
        {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
     </div>
-  );
-  
-  const SelectInput = ({ label, value, onChange, options, placeholder, error }) => (
+);
+
+const SelectInput = ({ label, value, onChange, options, placeholder, error }) => (
     <div className="w-full">
       <label className="block text-lg font-bold text-gray-900 mb-3">{label}</label>
       <div className="relative">
-        <select 
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`w-full appearance-none border rounded-md px-4 py-3.5 outline-none bg-white text-gray-900 transition-all ${
-            error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-black focus:ring-1 focus:ring-black'
-          }`}
-        >
+        <select value={value} onChange={(e) => onChange(e.target.value)} className={`w-full appearance-none border rounded-md px-4 py-3.5 outline-none bg-white text-gray-900 transition-all ${error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-black focus:ring-1 focus:ring-black'}`}>
             <option value="" disabled>{placeholder}</option>
             {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
         </select>
-        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-          <ChevronDown className="w-4 h-4 text-gray-500" />
-        </div>
+        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none"><ChevronDown className="w-4 h-4 text-gray-500" /></div>
       </div>
       {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
     </div>
-  );
+);
+
+// --- NEW ROBUST LOCATION AUTOCOMPLETE COMPONENT ---
+const LocationAutocomplete = ({ value, onChange, error }) => {
+    const [suggestions, setSuggestions] = useState([]);
+    const [allLocations, setAllLocations] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const wrapperRef = useRef(null);
+
+    // Default Fallback list (Safety net if API fails)
+    const fallbackLocations = [
+        "Dubai", "Abu Dhabi", "Sharjah", "Ajman", 
+        "Ras Al Khaimah", "Fujairah", "Umm Al Quwain", "Al Ain", "Downtown Dubai", "Dubai Marina", "Palm Jumeirah"
+    ];
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                // console.log("Fetching locations from:", `${BASE_URL}/api/mortgages/get-all-uae-states`);
+                const response = await fetch(`${BASE_URL}/api/mortgages/get-all-uae-states`);
+                
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+
+                const result = await response.json();
+                // console.log("API Response:", result);
+
+                let locationData = [];
+
+                // Handle diverse API structures (array, object with data key, etc.)
+                if (Array.isArray(result)) {
+                    locationData = result;
+                } else if (result.data && Array.isArray(result.data)) {
+                    locationData = result.data;
+                }
+
+                // Map logic to handle objects or strings
+                const mappedLocations = locationData.map(item => {
+                    if (typeof item === 'string') return item;
+                    // Adjust key names based on your actual API response
+                    return item.name || item.state_name || item.city_name || item.value || null;
+                }).filter(Boolean); // Remove nulls
+
+                if (mappedLocations.length > 0) {
+                    setAllLocations(mappedLocations);
+                } else {
+                    // API returned empty, use fallback
+                    setAllLocations(fallbackLocations);
+                }
+
+            } catch (err) {
+                console.warn("Failed to fetch locations, using fallback list.", err);
+                setAllLocations(fallbackLocations);
+            }
+        };
+
+        fetchLocations();
+
+        // Click outside listener to close dropdown
+        const handleClickOutside = (event) => {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleInputChange = (e) => {
+        const userInput = e.target.value;
+        onChange(userInput);
+
+        if (userInput.length > 0) {
+            const filtered = allLocations.filter(loc => 
+                loc.toLowerCase().includes(userInput.toLowerCase())
+            );
+            setSuggestions(filtered);
+            setShowDropdown(true);
+        } else {
+            setShowDropdown(false);
+        }
+    };
+
+    const handleSelect = (loc) => {
+        onChange(loc);
+        setShowDropdown(false);
+    };
+
+    return (
+        <div className="w-full relative" ref={wrapperRef}>
+             <label className="block text-xl font-bold text-gray-900 mb-4">Where is the property located?</label>
+             <div className="relative">
+                <input 
+                    type="text" 
+                    className={`w-full px-4 py-3.5 border rounded-md outline-none transition-all placeholder-gray-400 ${error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:ring-1 focus:ring-black focus:border-black'}`} 
+                    placeholder="Search by area (e.g., Dubai Marina)" 
+                    value={value} 
+                    onChange={handleInputChange} 
+                    onFocus={() => {
+                        // Show suggestions immediately on focus if there's a match or to show logic
+                        if (value) {
+                             const filtered = allLocations.filter(loc => loc.toLowerCase().includes(value.toLowerCase()));
+                             setSuggestions(filtered);
+                             setShowDropdown(true);
+                        }
+                    }}
+                />
+                <div className="absolute right-3 top-3.5 text-gray-400">
+                    <MapPin size={20} />
+                </div>
+             </div>
+             
+             {showDropdown && suggestions.length > 0 && (
+                 <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                     {suggestions.map((loc, index) => (
+                         <div 
+                            key={index} 
+                            onClick={() => handleSelect(loc)}
+                            className="px-4 py-3 hover:bg-gray-50 cursor-pointer text-gray-700 font-medium transition-colors border-b border-gray-100 last:border-0"
+                         >
+                            {loc}
+                         </div>
+                     ))}
+                 </div>
+             )}
+             
+             {/* Show "No results" only if user typed something and nothing matched */}
+             {showDropdown && suggestions.length === 0 && value && (
+                 <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg p-4 text-sm text-gray-500">
+                     No locations found. try "Dubai"
+                 </div>
+             )}
+             
+             {error && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {error}</p>}
+        </div>
+    );
+};
 
 // --- STEP COMPONENTS ---
 
@@ -171,15 +310,12 @@ const Step1 = ({ formData, handleChange, errors }) => (
           error={errors.propertyPrice} 
         />
         
-        <div>
-          <label className="block text-xl font-bold text-gray-900 mb-4">Where is the property located?</label>
-          <TextInput 
-              placeholder="Search by area (e.g., Dubai Marina ..)" 
-              value={formData.location} 
-              onChange={(val) => handleChange('location', val)} 
-              error={errors.location}
-          />
-        </div>
+        {/* USING THE NEW LOCATION AUTOCOMPLETE */}
+        <LocationAutocomplete 
+             value={formData.location} 
+             onChange={(val) => handleChange('location', val)} 
+             error={errors.location}
+        />
         
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-4">Do you already have a mortgage?</h3>
@@ -232,18 +368,16 @@ const Step2 = ({ formData, handleChange, errors }) => (
   </div>
 );
 
-// --- 2. UPDATED STEP 3 WITH DYNAMIC PLACEHOLDER AND LIMIT ---
 const Step3 = ({ formData, handleChange, errors }) => {
-  // Determine placeholder and max length based on selected country
   const selectedCountry = countryCodes.find(c => c.code === formData.countryCode) || countryCodes[0];
   const placeholder = "0".repeat(selectedCountry.maxDigits).replace(/(.{3})/g, '$1 ').trim();
 
   return (
     <div className="space-y-7 animate-fade-in">
       <div className="bg-white rounded-lg">
-         <h3 className="text-2xl font-bold text-gray-900 mb-8">One step left before you view your mortgage options</h3>
-         
-         <div className="mb-6">
+          <h3 className="text-2xl font-bold text-gray-900 mb-8">One step left before you view your mortgage options</h3>
+          
+          <div className="mb-6">
             <label className="block text-base font-semibold text-gray-800 mb-2">Full Name</label>
             <TextInput 
                 placeholder="Enter your full name" 
@@ -251,9 +385,9 @@ const Step3 = ({ formData, handleChange, errors }) => {
                 onChange={(val) => handleChange('fullName', val)} 
                 error={errors.fullName}
             />
-         </div>
-         
-         <div className="mb-6">
+          </div>
+          
+          <div className="mb-6">
             <label className="block text-base font-semibold text-gray-800 mb-2">Email Address</label>
             <TextInput 
                 placeholder="Enter your email address" 
@@ -261,9 +395,9 @@ const Step3 = ({ formData, handleChange, errors }) => {
                 onChange={(val) => handleChange('email', val)} 
                 error={errors.email}
             />
-         </div>
-         
-         <div className="mb-8">
+          </div>
+          
+          <div className="mb-8">
             <label className="block text-base font-semibold text-gray-800 mb-2">Phone Number</label>
             <div className={`flex border rounded-md overflow-hidden bg-white transition-all ${
                 errors.phone ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:ring-1 focus-within:ring-black focus-within:border-black'
@@ -275,11 +409,11 @@ const Step3 = ({ formData, handleChange, errors }) => {
                       onChange={(e) => handleChange('countryCode', e.target.value)}
                       className="appearance-none bg-transparent w-full py-3.5 pl-3 pr-8 outline-none text-gray-900 font-medium cursor-pointer z-10"
                     >
-                       {countryCodes.map((country) => (
-                         <option key={country.code} value={country.code}>
-                           {country.flag} {country.code}
-                         </option>
-                       ))}
+                        {countryCodes.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.flag} {country.code}
+                          </option>
+                        ))}
                     </select>
                     <ChevronDown size={14} className="text-gray-500 absolute right-2 z-0" />
                 </div>
@@ -293,8 +427,8 @@ const Step3 = ({ formData, handleChange, errors }) => {
                 />
             </div>
             {errors.phone && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle size={14} className="mr-1"/> {errors.phone}</p>}
-         </div>
-         <p className="text-gray-500 leading-relaxed text-sm">While we review your details, feel free to explore your dashboard and check out different mortgage options tailored for you!</p>
+          </div>
+          <p className="text-gray-500 leading-relaxed text-sm">While we review your details, feel free to explore your dashboard and check out different mortgage options tailored for you!</p>
       </div>
     </div>
   );
@@ -350,57 +484,32 @@ const MortgageWizard = () => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
   const [formData, setFormData] = useState({
-    intent: 'buy', 
-    propertyFound: 'yes',
-    propertyPrice: '',
-    location: '',
-    hasMortgage: 'no',
-    bankName: '',
-    homeValue: '',
-    loanBalance: '',
-    residency: 'uae-resident',
-    employment: 'salaried',
-    income: '',
-    age: '',
-    fullName: '',
-    email: '',
-    countryCode: '+971', // Default
-    phone: ''
+    intent: 'buy', propertyFound: 'yes', propertyPrice: '', location: '', hasMortgage: 'no',
+    bankName: '', homeValue: '', loanBalance: '', residency: 'uae-resident', employment: 'salaried', income: '', age: '',
+    fullName: '', email: '', countryCode: '+971', phone: ''
   });
 
-  // --- 3. HANDLE CHANGE WITH STRICT LENGTH CHECK ---
+  const triggerToast = (message, type = 'error') => setToast({ message, type });
+  const closeToast = () => setToast(null);
+
   const handleChange = (field, value) => {
-    // Handling Country Code Change
     if (field === 'countryCode') {
         const newCountry = countryCodes.find(c => c.code === value);
-        // If current phone number is longer than new allowed max digits, slice it
         if (formData.phone.length > newCountry.maxDigits) {
-            setFormData(prev => ({
-                ...prev,
-                countryCode: value,
-                phone: prev.phone.slice(0, newCountry.maxDigits)
-            }));
+            setFormData(prev => ({ ...prev, countryCode: value, phone: prev.phone.slice(0, newCountry.maxDigits) }));
             return;
         }
     }
-
-    // Handling Phone Input
     if (field === 'phone') {
         const selectedCountry = countryCodes.find(c => c.code === formData.countryCode) || countryCodes[0];
-        // STRICT CHECK: Do not allow input if length exceeds maxDigits
-        if (value.length > selectedCountry.maxDigits) {
-            return; // Ignore key press
-        }
+        if (!/^\d*$/.test(value)) return;
+        if (value.length > selectedCountry.maxDigits) return;
     }
-
     setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear error if field is modified
-    if (errors[field]) {
-        setErrors({ ...errors, [field]: null });
-    }
+    if (errors[field]) setErrors({ ...errors, [field]: null });
   };
 
   const validateStep = (currentStep) => {
@@ -417,13 +526,11 @@ const MortgageWizard = () => {
             if (!formData.loanBalance) newErrors.loanBalance = "Loan balance is required";
         }
     }
-
     if (currentStep === 2) {
         if (!formData.income) newErrors.income = "Monthly income is required";
         if (!formData.age) newErrors.age = "Age is required";
         else if (formData.age < 18 || formData.age > 75) newErrors.age = "Age must be between 18 and 75";
     }
-
     if (currentStep === 3) {
         if (!formData.fullName) newErrors.fullName = "Full name is required";
         if (!formData.email) {
@@ -432,14 +539,11 @@ const MortgageWizard = () => {
             newErrors.email = "Please enter a valid email address";
         }
 
-        // Phone Validation (Strict Length Match)
-        const selectedCountry = countryCodes.find(c => c.code === formData.countryCode);
-        const maxDigits = selectedCountry ? selectedCountry.maxDigits : 15;
-
+        const selectedCountry = countryCodes.find(c => c.code === formData.countryCode) || countryCodes[0];
         if (!formData.phone) {
             newErrors.phone = "Phone number is required";
-        } else if (formData.phone.length !== maxDigits) {
-            newErrors.phone = `Phone number must be exactly ${maxDigits} digits`;
+        } else if (formData.phone.length !== selectedCountry.maxDigits) {
+            newErrors.phone = `Phone number must be exactly ${selectedCountry.maxDigits} digits`;
         }
     }
 
@@ -453,42 +557,35 @@ const MortgageWizard = () => {
   const submitFormData = async () => {
     setIsLoading(true);
     
+    // PREPARE PAYLOAD (ALL FIELDS INCLUDED)
     const nameParts = formData.fullName.trim().split(" ");
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(" ") || ".";
+    const safeInt = (val) => { const parsed = parseInt(val, 10); return isNaN(parsed) ? 0 : parsed; };
 
-    let residencyStatus = "resident";
-    if (formData.residency === 'non-resident') residencyStatus = "non_resident";
-    
     let payload = {
         type: "mortgage",
-        has_property: true, 
+        has_property: true, // Default true for base
         occupation: formData.employment === 'salaried' ? "Salaried" : "Self-Employed",
-        monthly_income: parseInt(formData.income),
-        age: parseInt(formData.age),
-        name: {
-            first_name: firstName,
-            last_name: lastName
-        },
+        monthly_income: safeInt(formData.income),
+        age: safeInt(formData.age),
+        name: { first_name: firstName, last_name: lastName },
         email: formData.email,
-        mobile: {
-            country_code: formData.countryCode, 
-            number: formData.phone
-        },
+        mobile: { country_code: formData.countryCode, number: formData.phone },
         preferred_contact: "whatsapp",
-        residency_status: residencyStatus
+        residency_status: formData.residency === 'non-resident' ? "non_resident" : "resident"
     };
 
     if (formData.intent === 'buy') {
         payload.lead_sub_type = "home_loan";
         payload.has_property = formData.propertyFound === 'yes';
-        payload.price = parseInt(formData.propertyPrice);
+        payload.price = safeInt(formData.propertyPrice);
         payload.city = "Dubai"; 
         payload.area = formData.location;
         payload.has_existing_mortgage = formData.hasMortgage === 'yes';
     } else {
         payload.lead_sub_type = "refinance";
-        payload.price = parseInt(formData.homeValue);
+        payload.price = safeInt(formData.homeValue);
         payload.budget = `${formData.loanBalance} remaining`;
         payload.country = "UAE";
         payload.bank_name = formData.bankName;
@@ -503,16 +600,26 @@ const MortgageWizard = () => {
             body: JSON.stringify(payload),
         });
 
-        if (response.ok) {
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            // ✅ SAVE IDs TO LOCAL STORAGE
+            const leadId = result.data.lead._id;
+            const appId = result.data.mortgageApplication?.application_id || result.data.mortgage_application?.application_id;
+            
+            localStorage.setItem("mortgage_lead_id", leadId);
+            if(appId) localStorage.setItem("mortgage_app_id", appId);
+
             setStep((prev) => prev + 1); 
             setErrors({});
         } else {
-            console.error('Failed to submit lead');
-            alert("Something went wrong. Please try again.");
+            console.error('Failed to submit lead', result);
+            // ✅ 2-Line Toast Error
+            triggerToast(result.message || "Something went wrong. Please try again.", 'error');
         }
     } catch (error) {
         console.error('Error submitting form:', error);
-        alert("Network error. Please try again.");
+        triggerToast("Network error. Please try again.", 'error');
     } finally {
         setIsLoading(false);
     }
@@ -520,67 +627,32 @@ const MortgageWizard = () => {
 
   const handleNext = () => {
     if (validateStep(step)) {
-        if (step === 3) {
-            submitFormData();
-        } else {
-            setStep((prev) => prev + 1);
-            setErrors({});
-        }
+        if (step === 3) submitFormData();
+        else { setStep((prev) => prev + 1); setErrors({}); }
     }
   };
 
-  const handleBack = () => {
-    setStep((prev) => Math.max(prev - 1, 1));
-    setErrors({});
-  };
+  const handleBack = () => { setStep((prev) => Math.max(prev - 1, 1)); setErrors({}); };
 
   return (
     <div className="flex min-h-screen bg-white font-sans text-[#1a1a1a]">
-      
+      {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       {step === 4 && <SuccessModal email={formData.email} navigate={navigate} />}
-
       <HeroSection step={step} />
-
       <div className="flex-1 flex flex-col">
-        <div className="w-full max-w-3xl mx-auto pt-16 px-8 lg:px-0">
-            <ProgressBar step={step} />
-        </div>
-
+        <div className="w-full max-w-3xl mx-auto pt-16 px-8 lg:px-0"><ProgressBar step={step} /></div>
         <div className="w-full max-w-3xl mx-auto flex-1 px-8 lg:px-0 pb-16 flex flex-col">
           <div className="mt-2 flex-1">
             {step === 1 && <Step1 formData={formData} handleChange={handleChange} errors={errors} />}
             {step === 2 && <Step2 formData={formData} handleChange={handleChange} errors={errors} />}
             {step === 3 && <Step3 formData={formData} handleChange={handleChange} errors={errors} />}
           </div>
-
           <div className="flex justify-between items-center mt-12 pt-0">
             {step > 1 ? (
-            <button 
-                type="button" 
-                onClick={handleBack}
-                disabled={isLoading}
-                className="flex items-center text-gray-600 font-semibold px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
-            >
-                <ChevronLeft className="w-5 h-5 mr-2" />
-                Back
-            </button>
-            ) : (
-                <div></div> 
-            )}
-
-            <button 
-            type="button" 
-            onClick={handleNext}
-            disabled={isLoading}
-            className="bg-gray-600 text-white px-12 py-3.5 rounded-md font-bold text-lg hover:bg-black transition-colors shadow-sm flex items-center justify-center disabled:bg-gray-400"
-            >
-            {isLoading ? (
-                <>
-                 <Loader2 className="animate-spin mr-2 h-5 w-5" /> Processing...
-                </>
-            ) : (
-                step === 3 ? 'Explore mortgages' : 'Next'
-            )}
+            <button type="button" onClick={handleBack} disabled={isLoading} className="flex items-center text-gray-600 font-semibold px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"><ChevronLeft className="w-5 h-5 mr-2" />Back</button>
+            ) : <div></div>}
+            <button type="button" onClick={handleNext} disabled={isLoading} className="bg-gray-600 text-white px-12 py-3.5 rounded-md font-bold text-lg hover:bg-black transition-colors shadow-sm flex items-center justify-center disabled:bg-gray-400">
+            {isLoading ? <><Loader2 className="animate-spin mr-2 h-5 w-5" /> Processing...</> : (step === 3 ? 'Explore mortgages' : 'Next')}
             </button>
           </div>
         </div>

@@ -1,32 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  ChevronDown, 
-  ChevronUp, 
-  Edit2, 
-  Upload, 
-  FileText, 
-  User,
-  LayoutGrid,
-  CheckCircle,
-  Save,
-  Check,
-  Mail,
-  Phone
+  ChevronDown, ChevronUp, Edit2, Upload, FileText, User, LayoutGrid, CheckCircle, Save, Check, Mail, Phone, Loader2, AlertCircle 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const BASE_URL = "https://xoto.ae"; 
+
 // --- SUB-COMPONENTS ---
 
-const StatusBadge = ({ status }) => (
-  <span className="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-medium">
-    {status}
-  </span>
-);
+const StatusBadge = ({ status }) => {
+  const getStatusColor = (s) => {
+      if (!s) return 'bg-gray-100 text-gray-800';
+      const lower = s.toLowerCase();
+      if (lower.includes('submit') || lower.includes('in_progress')) return 'bg-yellow-100 text-yellow-800';
+      if (lower.includes('approved')) return 'bg-green-100 text-green-800';
+      if (lower.includes('rejected')) return 'bg-red-100 text-red-800';
+      return 'bg-gray-100 text-gray-800';
+  };
+  return (
+    <span className={`${getStatusColor(status)} text-xs px-3 py-1 rounded-full font-medium capitalize`}>
+      {status ? status.replace(/_/g, ' ') : 'Pending'}
+    </span>
+  );
+};
 
 const SummaryItem = ({ label, value }) => (
   <div className="flex flex-col">
     <span className="text-gray-500 text-xs mb-1">{label}</span>
-    <span className="text-gray-900 font-medium text-sm">{value}</span>
+    <span className="text-gray-900 font-medium text-sm truncate" title={value}>{value || '-'}</span>
   </div>
 );
 
@@ -34,13 +35,12 @@ const ApplicationReadyBanner = () => (
   <div className="bg-[#F0FDF4] border border-green-200 rounded-xl p-6 mb-6 animate-fade-in">
     <h3 className="text-lg font-bold text-gray-900 mb-2">Your application is almost ready!</h3>
     <p className="text-gray-600 text-sm leading-relaxed">
-      To help move the process along smoothly, please upload the required documents and complete your personal details. 
-      Your assigned agent will reach out with the next steps, and you can always return to this dashboard to track your progress.
+      To help move the process along smoothly, please upload the required documents and complete your personal details.
     </p>
   </div>
 );
 
-// --- FORM INPUTS (For Inline Editing) ---
+// --- FORM INPUTS ---
 
 const FormInput = ({ label, value, onChange, type = "text", placeholder, suffix, required }) => (
   <div className="flex flex-col">
@@ -50,7 +50,7 @@ const FormInput = ({ label, value, onChange, type = "text", placeholder, suffix,
     <div className="relative flex items-center">
       <input
         type={type}
-        value={value}
+        value={value || ''}
         onChange={onChange}
         placeholder={placeholder}
         className="w-full border border-gray-300 rounded-md px-3 py-2.5 outline-none focus:ring-1 focus:ring-black focus:border-black text-sm text-gray-900 transition-all shadow-sm"
@@ -71,7 +71,7 @@ const FormSelect = ({ label, value, onChange, options, required }) => (
     </label>
     <div className="relative">
       <select
-        value={value}
+        value={value || ''}
         onChange={onChange}
         className="w-full border border-gray-300 rounded-md px-3 py-2.5 outline-none focus:ring-1 focus:ring-black focus:border-black text-sm text-gray-900 appearance-none bg-white shadow-sm"
       >
@@ -83,12 +83,12 @@ const FormSelect = ({ label, value, onChange, options, required }) => (
   </div>
 );
 
-// --- CARD & LIST COMPONENTS ---
+// --- CARD COMPONENTS ---
 
 const DataRow = ({ label, value }) => (
   <div className="flex justify-between items-center py-3 border-b border-gray-50 last:border-0 min-h-[50px]">
     <span className="text-gray-500 text-sm">{label}</span>
-    <span className="text-gray-900 text-sm font-medium">{value}</span>
+    <span className="text-gray-900 text-sm font-medium">{value || '-'}</span>
   </div>
 );
 
@@ -109,21 +109,17 @@ const Card = ({ title, subTitle, children, onEdit, isEditing, onUpload, isExpand
         </div>
         
         <div className="flex items-center gap-4">
-          {/* Header Upload Button */}
           {onUpload && (
             <button onClick={onUpload} className="flex items-center text-gray-600 text-sm font-medium hover:text-black bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-md transition-colors">
               <Upload size={16} className="mr-2" /> Upload
             </button>
           )}
           
-          {/* Header Edit/Save Button */}
           {onEdit && (
             <button onClick={onEdit} className={`flex items-center text-sm font-medium px-3 py-1.5 rounded-md transition-colors ${isEditing ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-600 hover:text-black bg-gray-100 hover:bg-gray-200'}`}>
-              {isEditing ? <><Save size={16} className="mr-2" /> Save</> : <><Edit2 size={16} className="mr-2" /> Edit</>}
-            </button>
+              {isEditing ? <><Save size={16} className="mr-2" /> Save</> : <><Edit2 size={16} className="mr-2" /> Edit</>}</button>
           )}
           
-          {/* Expand/Collapse Toggle */}
           <button onClick={toggleExpand} className="text-gray-400 hover:text-gray-600 p-1">
             {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </button>
@@ -140,13 +136,20 @@ const Card = ({ title, subTitle, children, onEdit, isEditing, onUpload, isExpand
   );
 };
 
-const ProductOffer = ({ productId, bankName, tags, details, isSelected, onSelect, isDetailsOpen, onToggleDetails }) => {
+// --- PRODUCT OFFER COMPONENT ---
+const ProductOffer = ({ productData, isSelected, onSelect, isDetailsOpen, onToggleDetails }) => {
+  const { _id, bankInfo, offerSummary, costBreakdown, loanDetails, insurance } = productData;
+  const fmt = (val) => val ? Number(val).toLocaleString() + ` ${offerSummary?.currency || 'AED'}` : '0 AED';
+
+  const tags = [];
+  if (offerSummary?.popularityTag) tags.push(offerSummary.popularityTag);
+  if (offerSummary?.title && !offerSummary.title.includes(offerSummary.popularityTag)) tags.push(offerSummary.title);
+
   return (
     <div className={`border rounded-lg p-5 mb-4 relative group transition-all duration-300 ${isSelected ? 'border-purple-600 bg-purple-50 shadow-md' : 'border-gray-200 hover:border-gray-400 hover:shadow'}`}>
-      
       <div className="flex justify-between items-start mb-4">
-         <div className="flex gap-2">
-            {tags && tags.map((tag, idx) => (
+         <div className="flex gap-2 flex-wrap">
+            {tags.map((tag, idx) => (
                 <span key={idx} className={`text-xs px-2 py-1 rounded ${tag.includes('Popular') ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
                 {tag}
                 </span>
@@ -158,10 +161,7 @@ const ProductOffer = ({ productId, bankName, tags, details, isSelected, onSelect
                 Selected
             </span>
         ) : (
-            <button 
-                onClick={() => onSelect(productId)}
-                className="bg-black text-white text-sm font-medium px-5 py-2 rounded-full hover:bg-gray-800 transition-all shadow-sm"
-            >
+            <button onClick={() => onSelect(_id)} className="bg-black text-white text-sm font-medium px-5 py-2 rounded-full hover:bg-gray-800 transition-all shadow-sm">
                 Select Offer
             </button>
         )}
@@ -169,75 +169,49 @@ const ProductOffer = ({ productId, bankName, tags, details, isSelected, onSelect
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-4">
         <div className="flex items-center gap-3 w-full md:w-1/4">
-           <div className="font-bold text-xl text-gray-800">{bankName}</div> 
+           <div className="font-bold text-xl text-gray-800">{bankInfo?.bankName}</div> 
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-           <div>
-              <p className="text-gray-500 text-xs mb-1">Initial rate</p>
-              <p className="font-bold text-gray-900 text-lg">{details.rate}</p>
-           </div>
-           <div>
-              <p className="text-gray-500 text-xs mb-1">Monthly EMI</p>
-              <p className="font-bold text-gray-900 text-lg">{details.emi}</p>
-           </div>
-           <div>
-              <p className="text-gray-500 text-xs mb-1">Bank processing fee</p>
-              <p className="font-bold text-gray-900 text-lg">{details.fee}</p>
-           </div>
-           <div>
-              <p className="text-gray-500 text-xs mb-1">Total upfront cost</p>
-              <p className="font-bold text-gray-900 text-lg">{details.upfront}</p>
-           </div>
+           <div><p className="text-gray-500 text-xs mb-1">Initial rate</p><p className="font-bold text-gray-900 text-lg">{offerSummary?.initialRate}%</p></div>
+           <div><p className="text-gray-500 text-xs mb-1">Monthly EMI</p><p className="font-bold text-gray-900 text-lg">{fmt(offerSummary?.monthlyEMI)}</p></div>
+           <div><p className="text-gray-500 text-xs mb-1">Bank processing fee</p><p className="font-bold text-gray-900 text-lg">{fmt(costBreakdown?.bankProcessingFee)}</p></div>
+           <div><p className="text-gray-500 text-xs mb-1">Total upfront cost</p><p className="font-bold text-gray-900 text-lg">{fmt(offerSummary?.totalUpfrontCost)}</p></div>
         </div>
       </div>
 
       <div className="flex justify-start">
-        <button 
-            onClick={() => onToggleDetails(productId)}
-            className="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
-        >
-            {isDetailsOpen ? (
-                <><ChevronUp size={16} className="mr-1"/> Hide details</>
-            ) : (
-                <><ChevronDown size={16} className="mr-1"/> View details</>
-            )}
+        <button onClick={() => onToggleDetails(_id)} className="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
+            {isDetailsOpen ? <><ChevronUp size={16} className="mr-1"/> Hide details</> : <><ChevronDown size={16} className="mr-1"/> View details</>}
         </button>
       </div>
       
       {isDetailsOpen && (
           <div className="mt-6 pt-6 border-t border-gray-200 animate-fade-in bg-white/50">
-            <h4 className="font-medium text-gray-900 mb-2">5 year(s) FIXED | 65% Loan to value application | Conventional</h4>
-            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                Your monthly installment will be {details.emi} based on a loan over 25 years, with an initial rate of {details.rate}. 
-                At your purchase price, the total upfront cost including fees will be {details.upfront} with your bank financing the remaining balance.
-            </p>
-
+            <h4 className="font-medium text-gray-900 mb-2">
+                {loanDetails?.tenureYears} year(s) {offerSummary?.productType} | {loanDetails?.loanToValue}% Loan to value | {loanDetails?.interestType}
+            </h4>
             <div className="grid md:grid-cols-2 gap-10">
                 <div>
                     <h5 className="font-semibold text-gray-900 mb-4 border-b pb-2">Costs breakdown</h5>
                     <div className="space-y-3 text-sm">
-                        <div className="flex justify-between"><span className="text-gray-600">Down payment</span> <span className="font-medium">159,440 AED</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Dubai land department fee</span> <span className="font-medium">18,801.8 AED</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Mortgage registration fee</span> <span className="font-medium">1,030.26 AED</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Trustee fee</span> <span className="font-medium">4,200 AED</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Bank processing fee</span> <span className="font-medium">{details.fee}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Valuation</span> <span className="font-medium">2,625 AED</span></div>
-                        <div className="flex justify-between text-red-500"><span className="">Fees add to loan</span> <span className="font-medium">-0 AED</span></div>
-                        <div className="flex justify-between pt-2 border-t font-bold text-gray-900"><span className="">Total upfront cost</span> <span className="">{details.upfront}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Down payment</span> <span className="font-medium">{fmt(costBreakdown?.downPayment)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Dubai land department fee</span> <span className="font-medium">{fmt(costBreakdown?.dldFee)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Mortgage registration fee</span> <span className="font-medium">{fmt(costBreakdown?.mortgageRegistrationFee)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Trustee fee</span> <span className="font-medium">{fmt(costBreakdown?.trusteeFee)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Valuation</span> <span className="font-medium">{fmt(costBreakdown?.valuationFee)}</span></div>
+                        <div className="flex justify-between pt-2 border-t font-bold text-gray-900"><span className="">Total upfront cost</span> <span className="">{fmt(costBreakdown?.totalUpfrontCost)}</span></div>
                     </div>
                 </div>
-
                 <div>
                     <h5 className="font-semibold text-gray-900 mb-4 border-b pb-2">Loan breakdown</h5>
                     <div className="space-y-3 text-sm">
-                        <div className="flex justify-between"><span className="text-gray-600">Product type</span> <span className="font-medium">Fixed</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Initial interest rate</span> <span className="font-medium">{details.rate}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Follow on rate</span> <span className="font-medium">1.69% + 3 Months Eibor</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Bank processing fee</span> <span className="font-medium">{details.fee}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Life insurance</span> <span className="font-medium">--</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Property insurance</span> <span className="font-medium">--</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Over payments allowed</span> <span className="font-medium">25%</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Product type</span> <span className="font-medium">{offerSummary?.productType}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Initial interest rate</span> <span className="font-medium">{offerSummary?.initialRate}%</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Follow on rate</span> <span className="font-medium">{loanDetails?.followOnRate}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Bank processing fee</span> <span className="font-medium">{fmt(costBreakdown?.bankProcessingFee)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Life insurance</span> <span className="font-medium">{insurance?.lifeInsurance}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Property insurance</span> <span className="font-medium">{insurance?.propertyInsurance}</span></div>
                     </div>
                 </div>
             </div>
@@ -247,304 +221,291 @@ const ProductOffer = ({ productId, bankName, tags, details, isSelected, onSelect
   );
 };
 
-// --- MAIN COMPONENT STARTS HERE ---
+// --- MAIN COMPONENT ---
 
 const MortgageProduct = ({ uploadedFiles = {} }) => {
   const navigate = useNavigate();
 
   // --- STATES ---
-  const [expandedSections, setExpandedSections] = useState({
-    products: true,
-    documents: false, // Default Closed
-    personal: false,  // Default Closed
-    requirements: false // Default Closed
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [apiData, setApiData] = useState(null);
+  
+  const [bankProducts, setBankProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  
+  const [expandedSections, setExpandedSections] = useState({ 
+    products: true, 
+    documents: false, 
+    personal: false,  
+    requirements: false 
   });
 
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [openDetailsId, setOpenDetailsId] = useState(null); 
-  
-  // Helper to check if any files exist
   const hasFiles = Object.keys(uploadedFiles).length > 0;
 
-  // Initial Data
   const [personalDetails, setPersonalDetails] = useState({
-      name: "Shivam Mishra", dob: "1995-05-15", gender: "Male", marital: "Single", residence: "I'm a UAE resident", nationality: "Indian",
-      salary: "45,151", employer: "Tech Solutions", passportNo: "N1234567", passportCountry: "India", emiratesId: "784-1234-1234567-1", emiratesExpiry: "2026-10-10",
-      building: "Marina Heights", unit: "1204", street: "Al Marsa Street", country: "UAE", city: "Dubai", emirate: "Dubai"
+      name: "", dob: "", gender: "", marital: "", residence: "", nationality: "",
+      salary: "", employer: "", passportNo: "", passportCountry: "", emiratesId: "", emiratesExpiry: "",
+      building: "", unit: "", street: "", country: "", city: "", emirate: ""
   });
 
-  const productRequirements = {
-      purchaseType: "Buy Out", incomeType: "Salaried", propertyValue: "455,545", loanPeriod: "25 Years", ltv: "80%", income: "45,151", age: "21"
-  };
+  // --- API FETCH (LEAD DATA) ---
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const leadId = localStorage.getItem("mortgage_lead_id");
+            
+            if (!leadId) {
+                console.warn("No Lead ID found in storage");
+                setErrorMsg("No application found. Please start from the Wizard.");
+                setLoading(false);
+                return;
+            }
 
-  // --- HANDLERS ---
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
+            const response = await fetch(`${BASE_URL}/api/mortgages/get-lead-data?lead_id=${leadId}`);
+            if (!response.ok) throw new Error("Failed to fetch");
+            const result = await response.json();
 
-  const handlePersonalChange = (field, value) => {
-    setPersonalDetails(prev => ({ ...prev, [field]: value }));
-  };
+            if (result.success && result.data) {
+                setApiData(result.data);
+                
+                // --- ROBUST PREFILL LOGIC ---
+                const lead = result.data.lead || {};
+                const pd = result.data.personal_details || {};
+                const ma = result.data.mortgage_application || {};
+                
+                // 1. Name Parsing
+                let finalName = "";
+                if (pd.full_name) finalName = pd.full_name;
+                else if (lead.name) {
+                    finalName = typeof lead.name === 'object' 
+                        ? `${lead.name.first_name || ''} ${lead.name.last_name || ''}`.trim()
+                        : lead.name;
+                }
+                
+                // 2. Phone Parsing
+                let finalPhone = "";
+                if (pd.phone) finalPhone = pd.phone;
+                else if (lead.mobile) {
+                    finalPhone = typeof lead.mobile === 'object' 
+                        ? `${lead.mobile.country_code || ''} ${lead.mobile.number || ''}`.trim()
+                        : lead.mobile;
+                }
 
-  // Navigation Handlers
-  const handleUploadClick = () => {
-    navigate('/mortgages-product-upload-document');
-  };
+                // 3. Address / Location Mapping
+                // Note: 'city' in lead might be "Dubai", 'area' might be "Dubai Marina"
+                // 'country' in refinance lead might be "UAE"
+                const finalCountry = pd.country || lead.country || "UAE";
+                const finalCity = pd.city || lead.city || "";
+                const finalEmirate = pd.emirate || lead.area || "";
 
-  const handleEditRequirements = () => {
-    navigate('/product-requirements-edit');
-  };
+                // 4. Residency
+                let finalResidence = pd.residence_status;
+                if (!finalResidence && lead.residency_status) {
+                    finalResidence = lead.residency_status === 'non_resident' ? "Non-Resident" : "UAE Resident";
+                }
 
-  const handleViewApplications = () => {
-    navigate('/my-applications');
-  };
+                setPersonalDetails(prev => ({
+                    ...prev,
+                    name: finalName,
+                    email: pd.email || lead.email || "",
+                    phone: finalPhone,
+                    
+                    // Fallback Logic for Salary/Employer
+                    salary: pd.monthly_salary || (lead.monthly_income ? String(lead.monthly_income) : ""),
+                    employer: pd.employer_name || lead.occupation || "", // 'Salaried' or Company Name
+                    
+                    residence: finalResidence || "",
+                    
+                    // Other fields initially empty if not provided in step 1
+                    nationality: pd.nationality || "",
+                    dob: pd.dob || "",
+                    gender: pd.gender || "",
+                    marital: pd.marital_status || "",
+                    passportNo: pd.passport_number || "",
+                    passportCountry: pd.passport_country || "",
+                    emiratesId: pd.emirates_id || "",
+                    emiratesExpiry: pd.emirates_expiry || "",
+                    
+                    country: finalCountry,
+                    city: finalCity,
+                    emirate: finalEmirate,
+                    building: pd.building || "",
+                    unit: pd.unit || "",
+                    street: pd.street || "",
+                }));
+            } else {
+                setErrorMsg("Failed to load application data.");
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            setErrorMsg("Network Error: Could not fetch data.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleSelectOffer = (id) => {
-      setSelectedProductId(id);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    fetchData();
+  }, []);
 
-  const toggleProductDetails = (id) => {
-      setOpenDetailsId(prev => prev === id ? null : id);
-  };
+  // --- API FETCH (BANK PRODUCTS) ---
+  useEffect(() => {
+    const fetchBankProducts = async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/api/mortgages/get-all-bank-products`);
+            if(!response.ok) throw new Error("Failed to fetch products");
+            const result = await response.json();
+            if(result.success && Array.isArray(result.data)) {
+                setBankProducts(result.data);
+            }
+        } catch (error) {
+            console.error("Error fetching bank products:", error);
+        } finally {
+            setLoadingProducts(false);
+        }
+    };
+    fetchBankProducts();
+  }, []);
+
+  const toggleSection = (section) => setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  const handlePersonalChange = (field, value) => setPersonalDetails(prev => ({ ...prev, [field]: value }));
+  const handleUploadClick = () => navigate('/mortgages-product-upload-document');
+  const handleEditRequirements = () => navigate('/product-requirements-edit');
+  const handleViewApplications = () => navigate('/my-applications');
+  const handleSelectOffer = (id) => { setSelectedProductId(id); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const toggleProductDetails = (id) => setOpenDetailsId(prev => prev === id ? null : id);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F8F9FB]"><Loader2 className="w-10 h-10 animate-spin text-[#5c039b]" /></div>;
+
+  if (errorMsg) return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FB] p-4">
+          <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md">
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Error</h2>
+              <p className="text-gray-600 mb-6">{errorMsg}</p>
+              <button onClick={() => navigate('/mortgages')} className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800">Go to Home</button>
+          </div>
+      </div>
+  );
+
+  const { mortgage_application, lead } = apiData || {};
 
   return (
     <div className="min-h-screen bg-[#F8F9FB] font-sans p-6 md:p-12 text-[#1a1a1a]">
-      
-      {/* Header Section */}
+      {/* Header */}
       <div className="max-w-7xl mx-auto mb-8 animate-fade-in">
         <div className="flex justify-between items-start mb-6">
           <div>
             <div className="text-gray-500 text-sm mb-2">My Applications / Details</div>
-            <h1 className="text-3xl font-bold text-gray-900">Application ID - XMQS2760</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+                Application ID - {mortgage_application?.application_id || localStorage.getItem("mortgage_app_id") || '---'}
+            </h1>
           </div>
-          <button 
-            onClick={handleViewApplications}
-            className="bg-[#5c039b] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center hover:bg-[#4a027a] transition shadow-sm"
-          >
-            <LayoutGrid size={16} className="mr-2" /> View My Applications
-          </button>
+          <button onClick={handleViewApplications} className="bg-[#5c039b] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center hover:bg-[#4a027a] transition shadow-sm"><LayoutGrid size={16} className="mr-2" /> View My Applications</button>
         </div>
 
+        {/* Summary Grid */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-6 bg-transparent">
-          <SummaryItem label="Loan type" value={productRequirements.purchaseType} />
-          <SummaryItem label="Income type" value={productRequirements.incomeType} />
-          <SummaryItem label="Property value" value={productRequirements.propertyValue} />
-          <SummaryItem label="Loan period" value={productRequirements.loanPeriod} />
-          <div className="flex flex-col items-start">
-             <span className="text-gray-500 text-xs mb-1">Status</span>
-             <StatusBadge status="In Progress" />
-          </div>
+          <SummaryItem label="Loan type" value={mortgage_application?.loan_type || lead?.lead_sub_type?.replace(/_/g, ' ')} />
+          <SummaryItem label="Income type" value={mortgage_application?.income_type || lead?.occupation} />
+          
+          {/* Smart Property Value Display */}
+          <SummaryItem 
+             label="Property value" 
+             value={
+                mortgage_application?.property_value 
+                ? `${Number(mortgage_application.property_value).toLocaleString()} AED` 
+                : lead?.price ? `${Number(lead.price).toLocaleString()} AED` : '-'
+             } 
+          />
+          
+          <SummaryItem label="Loan preference" value={mortgage_application?.loan_preference || '-'} />
+          <div className="flex flex-col items-start"><span className="text-gray-500 text-xs mb-1">Status</span><StatusBadge status={mortgage_application?.status} /></div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 items-start">
-        
         {/* LEFT COLUMN */}
         <div className="flex-1 w-full lg:max-w-[calc(100%-350px)]">
-          
           {selectedProductId && <ApplicationReadyBanner />}
-
-          {/* 1. Product Selection */}
-          <Card 
-            title="Select your product" 
-            subTitle="Hover over a product and click select. Monthly EMI is calculated based on a 25 year mortgage term."
-            icon={<CheckCircle size={20} />}
-            isExpanded={expandedSections.products}
-            toggleExpand={() => toggleSection('products')}
-          >
-             <ProductOffer productId={1} bankName="HSBC" tags={['Popular 1-2 Year Fixed']} details={{ rate: "3.99%", emi: "1,921 AED", fee: "0 AED", upfront: "105,540 AED" }} isSelected={selectedProductId === 1} onSelect={handleSelectOffer} isDetailsOpen={openDetailsId === 1} onToggleDetails={toggleProductDetails} />
-             <ProductOffer productId={2} bankName="Dubai Islamic Bank" tags={['3-4 Year Fixed']} details={{ rate: "3.95%", emi: "1,913 AED", fee: "500 AED", upfront: "105,914 AED" }} isSelected={selectedProductId === 2} onSelect={handleSelectOffer} isDetailsOpen={openDetailsId === 2} onToggleDetails={toggleProductDetails} />
-             <ProductOffer productId={3} bankName="ADCB" tags={['Variable Rate']} details={{ rate: "4.15%", emi: "1,980 AED", fee: "1000 AED", upfront: "106,540 AED" }} isSelected={selectedProductId === 3} onSelect={handleSelectOffer} isDetailsOpen={openDetailsId === 3} onToggleDetails={toggleProductDetails} />
+          
+          <Card title="Select your product" subTitle="Hover over a product and click select..." icon={<CheckCircle size={20} />} isExpanded={expandedSections.products} toggleExpand={() => toggleSection('products')}>
+              {loadingProducts ? (
+                  <div className="flex justify-center py-6 text-gray-500"><Loader2 className="animate-spin mr-2"/> Loading offers...</div>
+              ) : bankProducts.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500 bg-gray-50 rounded-lg">No offers available at this time.</div>
+              ) : (
+                  bankProducts.map((product) => (
+                      <ProductOffer 
+                        key={product._id} 
+                        productData={product}
+                        isSelected={selectedProductId === product._id} 
+                        onSelect={handleSelectOffer} 
+                        isDetailsOpen={openDetailsId === product._id} 
+                        onToggleDetails={toggleProductDetails} 
+                      />
+                  ))
+              )}
           </Card>
 
-          {/* 2. Documents Upload */}
-          <Card 
-            title="Upload your documents" 
-            subTitle={hasFiles ? `${Object.keys(uploadedFiles).length} documents added` : "Upload documents required for your mortgage application (e.g., Passport, Salary Certificate)"}
-            icon={<FileText size={20} />}
-            onUpload={handleUploadClick}
-            isExpanded={expandedSections.documents}
-            toggleExpand={() => toggleSection('documents')}
-          >
-             {hasFiles ? (
-                 <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {Object.entries(uploadedFiles).map(([key, file]) => (
-                            <div key={key} className="flex items-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
-                                <div className="bg-green-50 p-2 rounded-full mr-3 text-green-600">
-                                    <Check size={16} />
-                                </div>
-                                <div className="flex-1 overflow-hidden">
-                                    <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                                    <p className="text-xs text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={handleUploadClick} className="mt-4 text-sm text-[#5c039b] font-medium hover:underline flex items-center">
-                        <Edit2 size={14} className="mr-1" /> Manage Documents
-                    </button>
+          <Card title="Upload your documents" subTitle={hasFiles ? `${Object.keys(uploadedFiles).length} documents added` : "Upload documents required..."} icon={<FileText size={20} />} onUpload={handleUploadClick} isExpanded={expandedSections.documents} toggleExpand={() => toggleSection('documents')}>
+              {hasFiles ? ( <div className="space-y-4">...</div> ) : ( <div className="flex flex-col items-center justify-center py-10 text-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50 animate-fade-in"><div className="w-20 h-20 mb-4 text-gray-300 bg-white rounded-full flex items-center justify-center shadow-sm"><Upload size={32} /></div><p className="text-gray-600 font-medium">No documents uploaded yet.</p><button onClick={handleUploadClick} className="mt-4 bg-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm">Start Uploading</button></div> )}
+          </Card>
+
+          <Card title={isEditingPersonal ? "Add personal details" : "Personal details"} subTitle="Manage your personal information." icon={<User size={20} />} onEdit={() => setIsEditingPersonal(!isEditingPersonal)} isEditing={isEditingPersonal} isExpanded={expandedSections.personal} toggleExpand={() => toggleSection('personal')}>
+              {isEditingPersonal ? (
+                 <div className="space-y-8 animate-fade-in py-2">
+                     <div><h4 className="text-lg font-bold text-gray-900 mb-5">Basic Info</h4><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><FormInput label="Full Name" required value={personalDetails.name} onChange={(e) => handlePersonalChange('name', e.target.value)} /><FormInput label="Date of Birth" required type="date" value={personalDetails.dob} onChange={(e) => handlePersonalChange('dob', e.target.value)} /><FormSelect label="Gender" required options={["Male", "Female"]} value={personalDetails.gender} onChange={(e) => handlePersonalChange('gender', e.target.value)} /><FormSelect label="Marital Status" required options={["Single", "Married", "Divorced"]} value={personalDetails.marital} onChange={(e) => handlePersonalChange('marital', e.target.value)} /><FormInput label="Residence status" required value={personalDetails.residence} onChange={(e) => handlePersonalChange('residence', e.target.value)} /><FormInput label="Nationality" required value={personalDetails.nationality} onChange={(e) => handlePersonalChange('nationality', e.target.value)} /></div></div>
+                     <div><h4 className="text-lg font-bold text-gray-900 mb-5 border-t pt-6">Detailed info</h4><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><FormInput label="Monthly Salary" required type="number" suffix="AED" value={personalDetails.salary} onChange={(e) => handlePersonalChange('salary', e.target.value)} /><FormInput label="Employer" required value={personalDetails.employer} onChange={(e) => handlePersonalChange('employer', e.target.value)} /><FormInput label="Passport Number" required value={personalDetails.passportNo} onChange={(e) => handlePersonalChange('passportNo', e.target.value)} /><FormSelect label="Passport Issuing Country" required options={["India", "UAE", "UK", "USA"]} value={personalDetails.passportCountry} onChange={(e) => handlePersonalChange('passportCountry', e.target.value)} /><FormInput label="Emirates ID#" value={personalDetails.emiratesId} onChange={(e) => handlePersonalChange('emiratesId', e.target.value)} /><FormInput label="Emirates Expiry Date" type="date" value={personalDetails.emiratesExpiry} onChange={(e) => handlePersonalChange('emiratesExpiry', e.target.value)} /></div></div>
+                     <div><h4 className="text-lg font-bold text-gray-900 mb-5 border-t pt-6">Residential address</h4><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><FormInput label="Building name" value={personalDetails.building} onChange={(e) => handlePersonalChange('building', e.target.value)} /><FormInput label="Unit" value={personalDetails.unit} onChange={(e) => handlePersonalChange('unit', e.target.value)} /><FormInput label="Street address" value={personalDetails.street} onChange={(e) => handlePersonalChange('street', e.target.value)} /><FormSelect label="Country" options={["UAE", "India"]} value={personalDetails.country} onChange={(e) => handlePersonalChange('country', e.target.value)} /><FormInput label="City" value={personalDetails.city} onChange={(e) => handlePersonalChange('city', e.target.value)} /><FormInput label="Emirate/State" value={personalDetails.emirate} onChange={(e) => handlePersonalChange('emirate', e.target.value)} /></div></div>
                  </div>
-             ) : (
-                 <div className="flex flex-col items-center justify-center py-10 text-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50 animate-fade-in">
-                    <div className="w-20 h-20 mb-4 text-gray-300 bg-white rounded-full flex items-center justify-center shadow-sm">
-                       <Upload size={32} />
-                    </div>
-                    <p className="text-gray-600 font-medium">No documents uploaded yet.</p>
-                    <button 
-                      onClick={handleUploadClick}
-                      className="mt-4 bg-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm"
-                    >
-                      Start Uploading
-                    </button>
-                 </div>
-             )}
+              ) : (
+                 <>
+                     <div className="mb-8"><h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Basic Info</h4><DataRow label="Name" value={personalDetails.name} /><DataRow label="Email" value={personalDetails.email} /><DataRow label="Phone" value={personalDetails.phone} /><DataRow label="Date of birth" value={personalDetails.dob} /><DataRow label="Gender" value={personalDetails.gender} /><DataRow label="Marital status" value={personalDetails.marital} /><DataRow label="Residence status" value={personalDetails.residence} /><DataRow label="Nationality" value={personalDetails.nationality} /></div>
+                     <div className="mb-8"><h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Detailed Info</h4><DataRow label="Salary (AED)" value={personalDetails.salary} /><DataRow label="Employer" value={personalDetails.employer} /><DataRow label="Passport number" value={personalDetails.passportNo} /><DataRow label="Passport Country" value={personalDetails.passportCountry} /><DataRow label="Emirates ID#" value={personalDetails.emiratesId} /></div>
+                     <div className="mb-2"><h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Address</h4><DataRow label="City" value={personalDetails.city} /><DataRow label="Country" value={personalDetails.country} /></div>
+                 </>
+              )}
           </Card>
 
-          {/* 3. Personal Details (INLINE EDIT) */}
-          <Card 
-            title={isEditingPersonal ? "Add personal details" : "Personal details"}
-            subTitle="Manage your personal information."
-            icon={<User size={20} />}
-            onEdit={() => setIsEditingPersonal(!isEditingPersonal)}
-            isEditing={isEditingPersonal}
-            isExpanded={expandedSections.personal}
-            toggleExpand={() => toggleSection('personal')}
-          >
-             {isEditingPersonal ? (
-                <div className="space-y-8 animate-fade-in py-2">
-                    {/* Basic Info */}
-                    <div>
-                        <h4 className="text-lg font-bold text-gray-900 mb-5">Basic Info</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormInput label="Full Name" required value={personalDetails.name} onChange={(e) => handlePersonalChange('name', e.target.value)} />
-                            <FormInput label="Date of Birth" required type="date" value={personalDetails.dob} onChange={(e) => handlePersonalChange('dob', e.target.value)} />
-                            <FormSelect label="Gender" required options={["Male", "Female"]} value={personalDetails.gender} onChange={(e) => handlePersonalChange('gender', e.target.value)} />
-                            <FormSelect label="Marital Status" required options={["Single", "Married", "Divorced"]} value={personalDetails.marital} onChange={(e) => handlePersonalChange('marital', e.target.value)} />
-                            <FormInput label="Residence status" required value={personalDetails.residence} onChange={(e) => handlePersonalChange('residence', e.target.value)} />
-                            <FormInput label="Nationality" required value={personalDetails.nationality} onChange={(e) => handlePersonalChange('nationality', e.target.value)} />
-                        </div>
-                    </div>
-                    {/* Detailed Info */}
-                    <div>
-                        <h4 className="text-lg font-bold text-gray-900 mb-5 border-t pt-6">Detailed info</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormInput label="Monthly Salary" required type="number" suffix="AED" value={personalDetails.salary} onChange={(e) => handlePersonalChange('salary', e.target.value)} />
-                            <FormInput label="Employer" required value={personalDetails.employer} onChange={(e) => handlePersonalChange('employer', e.target.value)} />
-                            <FormInput label="Passport Number" required value={personalDetails.passportNo} onChange={(e) => handlePersonalChange('passportNo', e.target.value)} />
-                            <FormSelect label="Passport Issuing Country" required options={["India", "UAE", "UK", "USA"]} value={personalDetails.passportCountry} onChange={(e) => handlePersonalChange('passportCountry', e.target.value)} />
-                            <FormInput label="Emirates ID#" value={personalDetails.emiratesId} onChange={(e) => handlePersonalChange('emiratesId', e.target.value)} />
-                            <FormInput label="Emirates Expiry Date" type="date" value={personalDetails.emiratesExpiry} onChange={(e) => handlePersonalChange('emiratesExpiry', e.target.value)} />
-                        </div>
-                    </div>
-                    {/* Address */}
-                    <div>
-                        <h4 className="text-lg font-bold text-gray-900 mb-5 border-t pt-6">Residential address</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormInput label="Building name" value={personalDetails.building} onChange={(e) => handlePersonalChange('building', e.target.value)} />
-                            <FormInput label="Unit" value={personalDetails.unit} onChange={(e) => handlePersonalChange('unit', e.target.value)} />
-                            <FormInput label="Street address" value={personalDetails.street} onChange={(e) => handlePersonalChange('street', e.target.value)} />
-                            <FormSelect label="Country" options={["UAE", "India"]} value={personalDetails.country} onChange={(e) => handlePersonalChange('country', e.target.value)} />
-                            <FormInput label="City" value={personalDetails.city} onChange={(e) => handlePersonalChange('city', e.target.value)} />
-                            <FormInput label="Emirate/State" value={personalDetails.emirate} onChange={(e) => handlePersonalChange('emirate', e.target.value)} />
-                        </div>
-                    </div>
-                </div>
-             ) : (
-                <>
-                    <div className="mb-8">
-                        <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Basic Info</h4>
-                        <DataRow label="Name" value={personalDetails.name} />
-                        <DataRow label="Date of birth" value={personalDetails.dob} />
-                        <DataRow label="Gender" value={personalDetails.gender} />
-                        <DataRow label="Marital status" value={personalDetails.marital} />
-                        <DataRow label="Residence status" value={personalDetails.residence} />
-                        <DataRow label="Nationality" value={personalDetails.nationality} />
-                    </div>
-                    <div className="mb-8">
-                        <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Detailed Info</h4>
-                        <DataRow label="Salary (AED)" value={personalDetails.salary} />
-                        <DataRow label="Employer" value={personalDetails.employer} />
-                        <DataRow label="Passport number" value={personalDetails.passportNo} />
-                        <DataRow label="Passport Country" value={personalDetails.passportCountry} />
-                        <DataRow label="Emirates ID#" value={personalDetails.emiratesId} />
-                    </div>
-                    <div className="mb-2">
-                        <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Address</h4>
-                        <DataRow label="City" value={personalDetails.city} />
-                        <DataRow label="Country" value={personalDetails.country} />
-                    </div>
-                </>
-             )}
+          {/* 4. Product Requirements (READ ONLY, PREFILLED) */}
+          <Card title="Product requirements" subTitle="Review and update your loan requirements." icon={<LayoutGrid size={20} />} onEdit={handleEditRequirements} isEditing={false} isExpanded={expandedSections.requirements} toggleExpand={() => toggleSection('requirements')}>
+              <div className="mb-8"><h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Loan Details</h4>
+                 <DataRow label="Purchase type" value={mortgage_application?.loan_type || lead?.lead_sub_type?.replace(/_/g, ' ')} />
+                 <DataRow label="Loan preference" value={mortgage_application?.loan_preference || '-'} />
+                 <DataRow label="Loan period" value="25 Years" />
+                 <DataRow label="Loan to value" value="80%" />
+              </div>
+              
+              <div className="mb-8"><h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Financials</h4>
+                 <DataRow label="Income type" value={mortgage_application?.income_type || lead?.occupation} />
+                 <DataRow label="Monthly Income" value={personalDetails.salary ? `${personalDetails.salary} AED` : "-"} />
+                 <DataRow label="Age" value={lead?.age || "-"} />
+              </div>
+              
+              <div className="mb-2"><h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Property</h4>
+                 <DataRow 
+                     label="Property value" 
+                     value={mortgage_application?.property_value 
+                        ? `${Number(mortgage_application.property_value).toLocaleString()} AED` 
+                        : lead?.price ? `${Number(lead.price).toLocaleString()} AED` : '-'
+                     } 
+                 />
+              </div>
           </Card>
-
-          {/* 4. Product Requirements (NAVIGATION EDIT) */}
-          <Card 
-            title="Product requirements" 
-            subTitle="Review and update your loan requirements."
-            icon={<LayoutGrid size={20} />}
-            onEdit={handleEditRequirements} 
-            isEditing={false}
-            isExpanded={expandedSections.requirements}
-            toggleExpand={() => toggleSection('requirements')}
-          >
-             <div className="mb-8">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Loan Details</h4>
-               <DataRow label="Purchase type" value={productRequirements.purchaseType} />
-               <DataRow label="Loan period" value={productRequirements.loanPeriod} />
-               <DataRow label="Loan to value" value={productRequirements.ltv} />
-             </div>
-
-             <div className="mb-8">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Financials</h4>
-               <DataRow label="Income type" value={productRequirements.incomeType} />
-               <DataRow label="Monthly Income" value={productRequirements.income} />
-               <DataRow label="Age" value={productRequirements.age} />
-             </div>
-
-             <div className="mb-2">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Property</h4>
-               <DataRow label="Property value" value={productRequirements.propertyValue} />
-             </div>
-          </Card>
-
         </div>
 
-        {/* RIGHT COLUMN (Sidebar) */}
+        {/* RIGHT COLUMN */}
         <div className="w-full lg:w-80 flex-shrink-0 sticky top-6">
           <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-             <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 rounded-full bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center">
-                   <User className="w-8 h-8 text-gray-400" />
-                </div>
-                <div>
-                   <h3 className="font-bold text-gray-900 text-lg">Syed Uddin</h3>
-                   <p className="text-sm text-gray-500">Mortgage Advisor</p>
-                </div>
-             </div>
-
-             <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                   <Mail size={16} /> syed.salman@holo.ae
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                   <Phone size={16} /> +971566138560
-                </div>
-             </div>
-
-             <div className="space-y-4 pt-4 border-t border-gray-100">
-                <button className="w-full bg-[#5c039b] text-white p-3 rounded-lg font-medium hover:bg-[#4a027a] transition flex items-center justify-center">
-                    Contact Advisor
-                </button>
-                <div className="text-xs text-gray-500 text-center px-4 leading-relaxed">
-                    Need help? Your advisor is just a click away to assist with your application.
-                </div>
-             </div>
+              <div className="flex items-center gap-4 mb-6"><div className="w-14 h-14 rounded-full bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center"><User className="w-8 h-8 text-gray-400" /></div><div><h3 className="font-bold text-gray-900 text-lg">Syed Uddin</h3><p className="text-sm text-gray-500">Mortgage Advisor</p></div></div>
+              <div className="space-y-3 mb-6"><div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-2 rounded"><Mail size={16} /> syed.salman@holo.ae</div><div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-2 rounded"><Phone size={16} /> +971566138560</div></div>
+              <div className="space-y-4 pt-4 border-t border-gray-100"><button className="w-full bg-[#5c039b] text-white p-3 rounded-lg font-medium hover:bg-[#4a027a] transition flex items-center justify-center">Contact Advisor</button></div>
           </div>
         </div>
-
       </div>
     </div>
   );
