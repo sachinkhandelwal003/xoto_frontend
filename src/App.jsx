@@ -1,8 +1,12 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useState, useEffect, Suspense, lazy } from "react";
-import { useSelector } from "react-redux";
+// REMOVED REDUX IMPORTS
 import "./App.css";
-import { Navigate } from "react-router-dom";
+
+// --- IMPORT YOUR BLOG CONTEXT ---
+import { BlogProvider } from "./context/BlogContext"; 
+// --------------------------------
+
 import Navbar from "./components/navbar/index.jsx";
 import Footer from "./components/footer/footer";
 import FloatingIcons from "./components/FloatingIcons";
@@ -61,6 +65,7 @@ import Casestudy from "./components/homepage/Casestudy"
 import Training from "./components/homepage/Trainning";
 import RegisterNowPage from "./components/RegisterNowPage";
 import Mortgage from "./components/homepage/Mortgage"
+
 // Lazy-loaded components
 const Home = lazy(() => import("./components/homepage/Home"));
 const Consult = lazy(() => import("./components/consultation/Consult"));
@@ -68,46 +73,30 @@ const Designs = lazy(() => import("./components/AI/Designs"));
 const Quotation = lazy(() => import("./components/quotation/Quotation"));
 const Social = lazy(() => import("./components/social/Index"));
 const Howitworks = lazy(() => import("./components/How-it-works/Index"));
-const Completeproductview = lazy(
-  () => import("./components/Completeproductview")
-);
+const Completeproductview = lazy(() => import("./components/Completeproductview"));
 const Designers = lazy(() => import("./components/Designers/Designers"));
 const Freelancers = lazy(() => import("./components/freelancers/index"));
-const Browsecategory = lazy(
-  () => import("./components/freelancers/Browsecategory")
-);
-const Mainfreelancers = lazy(
-  () => import("./components/freelancers/Mainfreelancers")
-);
-const FreelancerProfile = lazy(
-  () => import("./components/freelancers/FreelancerProfile")
-);
-const LivingRoom = lazy(
-  () => import("./components/Interiorsection/livingroom/Index")
-);
-const Bathroom = lazy(
-  () => import("./components/Interiorsection/bathroom/Index")
-);
-const Kitchen = lazy(
-  () => import("./components/Interiorsection/kitchen/Index")
-);
-const Studyroom = lazy(
-  () => import("./components/Interiorsection/Studyroom/Index")
-);
-const Wardrobe = lazy(
-  () => import("./components/Interiorsection/wardrobe/Index")
-);
-const Bedroom = lazy(
-  () => import("./components/Interiorsection/bedroom/Index")
-);
-const Registration = lazy(
-  () => import("./components/freelancers/Registeration")
-);
+const Browsecategory = lazy(() => import("./components/freelancers/Browsecategory"));
+const Mainfreelancers = lazy(() => import("./components/freelancers/Mainfreelancers"));
+const FreelancerProfile = lazy(() => import("./components/freelancers/FreelancerProfile"));
+const LivingRoom = lazy(() => import("./components/Interiorsection/livingroom/Index"));
+const Bathroom = lazy(() => import("./components/Interiorsection/bathroom/Index"));
+const Kitchen = lazy(() => import("./components/Interiorsection/kitchen/Index"));
+const Studyroom = lazy(() => import("./components/Interiorsection/Studyroom/Index"));
+const Wardrobe = lazy(() => import("./components/Interiorsection/wardrobe/Index"));
+const Bedroom = lazy(() => import("./components/Interiorsection/bedroom/Index"));
+const Registration = lazy(() => import("./components/freelancers/Registeration"));
 const Magazine = lazy(() => import("./components/magazines/Index"));
 
-// PrivateRoute component for protected routes
+// --- UPDATED PRIVATE ROUTE (Without Redux) ---
 function PrivateRoute({ children, allowedRoles }) {
-  const { user, loading } = useSelector((state) => state.auth);
+  // TODO: Replace this with your actual Auth Context
+  // const { user, loading } = useAuthContext(); 
+  
+  // TEMPORARY MOCK so app doesn't crash:
+  const user = { role: { code: "1" } }; 
+  const loading = false;
+  
   const location = useLocation();
 
   if (loading) return <Loader />;
@@ -123,33 +112,15 @@ function LayoutWrapper({ children }) {
   const location = useLocation();
 
   const hideNavbarPaths = [
-    "/login",
-    "/quotation",
-    "/freelancer/browse-category",
-    "/freelancer/category",
-    "/freelancer/free-listing",
-    "/ecommerce",
-    "/freelancer/create-business",
-    "/designs/Tool",
-    "/dashboard",
-    "/customer/dashboard",
-    "/admin/login",
-    "/user/login",
-    "/other/login",
-    "/aiPlanner",
-    "/aiPlanner/interior",
-        "/aiPlanner/landscape",
-
-    "/estimate/calculator",
-    "/estimate/calculator/interior",
-    "/accountant/login",
-    "/ecommerce/seller",
-    "/ecommerce/cart",
+    "/login", "/quotation", "/freelancer/browse-category", "/freelancer/category",
+    "/freelancer/free-listing", "/ecommerce", "/freelancer/create-business",
+    "/designs/Tool", "/dashboard", "/customer/dashboard", "/admin/login",
+    "/user/login", "/other/login", "/aiPlanner", "/aiPlanner/interior",
+    "/aiPlanner/landscape", "/estimate/calculator", "/estimate/calculator/interior",
+    "/accountant/login", "/ecommerce/seller", "/ecommerce/cart",
   ];
 
-  const hideNavbar =
-    hideNavbarPaths.includes(location.pathname) ||
-    location.pathname.startsWith("/dashboard/");
+  const hideNavbar = hideNavbarPaths.includes(location.pathname) || location.pathname.startsWith("/dashboard/");
 
   const showFreelancerNavbar =
     location.pathname === "/freelancer/browse-category" ||
@@ -162,22 +133,10 @@ function LayoutWrapper({ children }) {
     location.pathname === "/ecommerce/cart";
 
   const hideFooterPaths = [
-    "/login",
-    "/quotation",
-    "/designs/Tool",
-    "/dashboard",
-    "/customer/dashboard",
-    "/profile",
-    "/admin/login",
-    "/user/login",
-    "/other/login",
-        "/aiPlanner",
-        "/aiPlanner/interior",
-                "/aiPlanner/landscape",
-        "/estimate/calculator",
-        "/estimate/calculator/interior",
-    "/accountant/login",
-    "/ecommerce/seller",
+    "/login", "/quotation", "/designs/Tool", "/dashboard", "/customer/dashboard",
+    "/profile", "/admin/login", "/user/login", "/other/login", "/aiPlanner",
+    "/aiPlanner/interior", "/aiPlanner/landscape", "/estimate/calculator",
+    "/estimate/calculator/interior", "/accountant/login", "/ecommerce/seller",
     "/freelancer/registration",
   ];
 
@@ -186,62 +145,6 @@ function LayoutWrapper({ children }) {
     location.pathname.startsWith("/dashboard/") ||
     location.pathname.startsWith("/profile/");
 
-  const hideQuoteModalPaths = [
-    "/login",
-    "/quotation",
-    "/freelancer/browse-category",
-    "/freelancer/registration",
-    "/ecommerce/filter",
-    "/freelancer/free-listing",
-    "/freelancer/category",
-    "/freelancer/create-business",
-    "/freelancer/business",
-    "/freelancer/profile",
-    "/designs/Tool",
-    "/dashboard",
-    "/customer/dashboard",
-    "/admin/login",
-    "/user/login",
-    "/other/login",
-        "/aiPlanner",
-        "/aiPlanner/interior",
-                "/aiPlanner/landscape",
-        "/estimate/calculator",
-        "/estimate/calculator/interior",
-    "/ecommerce/seller",
-    "/ecommerce/product",
-  ];
-
-  const hideQuoteModal =
-    hideQuoteModalPaths.includes(location.pathname) ||
-    location.pathname.startsWith("/dashboard/") ||
-    location.pathname.startsWith("/ecommerce/product") ||
-    location.pathname.startsWith("/ecommerce/cart");
-
-  const hideFloatingIconsPaths = [
-    "/dashboard",
-    "/customer/dashboard",
-    "/designs/Tool",
-    "/profile",
-    "/admin/login",
-    "/user/login",
-    "/other/login",
-        "/aiPlanner",
-        "/aiPlanner/interior",
-                "/aiPlanner/landscape",
-        "/estimate/calculator",
-        "/estimate/calculator/interior",
-    "/accountant/login",
-    "/ecommerce/seller",
-    "/ecommerce/product",
-  ];
-
-  const hideFloatingIcons =
-    hideFloatingIconsPaths.includes(location.pathname) ||
-    location.pathname.startsWith("/dashboard/") ||
-    location.pathname.startsWith("/ecommerce/product") ||
-    location.pathname.startsWith("/ecommerce/cart");
-
   return (
     <div className="min-h-screen relative">
       {!hideNavbar && <Navbar />}
@@ -249,138 +152,107 @@ function LayoutWrapper({ children }) {
       {showEcommerceNavbar }
       {children}
       {!hideFooter && <Footer />}
-      {/* {!hideFloatingIcons && <FloatingIcons />} */}
-      {/* {!hideQuoteModal && <QuoteModal />} */}
     </div>
   );
 }
 
 function App() {
   return (
-    <LayoutWrapper>
-      {/* <LocationCategoryModal />  vsvv*/}
-      <ScrollToTop />
-      <Suspense fallback={<Loader />}>
-        <Routes>
-        <Route path="/dashboard" element={<Navigate to="/" replace />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/landscaping" element={<Landspackng />} />
-                    <Route path="/aiPlanner" element={<AITools />} />
-                    <Route path="/aiPlanner/demo" element={<AIPlannerDemoPage />} />
- <Route path="/mortgages" element={<Mortgage />} />
-                                        <Route path="/aiPlanner/interior" element={<ComingSoon />} />
-                                        <Route path="/aiPlanner/landscape" element={<AIPlanner />} />
-                                            <Route path="/register" element={<RegisterNowPage />} />
+    // WRAPPED WITH BLOG PROVIDER (Context API)
+    <BlogProvider>
+      <LayoutWrapper>
+        <ScrollToTop />
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            <Route path="/dashboard" element={<Navigate to="/" replace />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/landscaping" element={<Landspackng />} />
+            <Route path="/aiPlanner" element={<AITools />} />
+            <Route path="/aiPlanner/demo" element={<AIPlannerDemoPage />} />
+            <Route path="/mortgages" element={<Mortgage />} />
+            <Route path="/aiPlanner/interior" element={<ComingSoon />} />
+            <Route path="/aiPlanner/landscape" element={<AIPlanner />} />
+            <Route path="/register" element={<RegisterNowPage />} />
+            <Route path="/aiPlanner/exterior" element={<ComingSoon />} />
+            <Route path="/aiPlanner/furniture" element={<ComingSoon />} />
+            <Route path="/aiPlanner/image" element={<ComingSoon />} />
+            <Route path="/aiPlanner/virtual" element={<ComingSoon />} />
+            <Route path="/estimate/calculator" element={<Calculator />} />
+            <Route path="/estimate/calculator/interior" element={<InteriorCalculator />} />
+            <Route path="/services/interior" element={<Ynterior />} />
+            <Route path="/schedule/estimate" element={<MainCalculatorPage />} />
+            <Route path="/marketplace" element={<Buy />} />
+            <Route path="/ecosystem" element={<Ecosystem />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/aiInterior" element={<Interior />} />
+            <Route path="/other/login" element={<OtherLogin />} />
+            <Route path="/case-studies" element={<Casestudy />} />
+            <Route path="/training" element={<Training />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/user/login" element={<CustomerLogin />} />
+            <Route path="/accountant/login" element={<AccountantLogin />} />
+            <Route path="/consultation" element={<Consult />} />
+            <Route path="/designs" element={<Designs />} />
+            <Route
+              path="/designs/Tool"
+              element={ 
+                <DndProvider backend={HTML5Backend}>
+                  <AITool />
+                </DndProvider>
+              }
+            />
+            {/* The Main AI Page (renders Ai1, Ai2, Ai3 via Context) */}
+            <Route path="/ai" element={<Ai />} />
 
-                                        <Route path="/aiPlanner/exterior" element={<ComingSoon />} />
-                                        <Route path="/aiPlanner/furniture" element={<ComingSoon />} />
-                                        <Route path="/aiPlanner/image" element={<ComingSoon />} />
-                                        <Route path="/aiPlanner/virtual" element={<ComingSoon />} />
-
-                    <Route path="/estimate/calculator" element={<Calculator />} />
-                    <Route path="/estimate/calculator/interior" element={<InteriorCalculator />} />
-          <Route path="/services/interior" element={<Ynterior />} />
-
-          <Route path="/schedule/estimate" element={<MainCalculatorPage />} />
-          <Route path="/marketplace" element={<Buy />} />
-          <Route path="/ecosystem" element={<Ecosystem />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/aiInterior" element={<Interior />} />
-          <Route path="/other/login" element={<OtherLogin />} />
- <Route path="/case-studies" element={<Casestudy />} />
-  <Route path="/training" element={<Training />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-                    <Route path="/user/login" element={<CustomerLogin />} />
-
-          <Route path="/accountant/login" element={<AccountantLogin />} />
-
-          <Route path="/consultation" element={<Consult />} />
-          <Route path="/designs" element={<Designs />} />
-          <Route
-            path="/designs/Tool"
-            element={ 
-              <DndProvider backend={HTML5Backend}>
-                <AITool />
-              </DndProvider>
-            }
-          />
-                    <Route path="/ai" element={<Ai />} />
-
-          <Route path="/mortgage/services" element={<Service />} />
-          <Route path="/properties" element={<Page2 />} />
-          <Route path="/explore" element={<Page3 />} />
-          <Route path="/contact" element={<Page />} />
-
-          <Route path="/quotation" element={<Quotation />} />
-          <Route path="/ecommerce" element={<MainEcommercePage />} />
-          <Route path="/ecommerce/b2c" element={<HomeB2C />} />
-          <Route path="/ecommerce/seller" element={<SellerPage />} />
-          <Route path="/ecommerce/seller/b2b" element={<Sellerb2b />} />
-          <Route path="/ecommerce/b2b" element={<HomeB2B />} />
-          <Route path="/ecommerce/cart" element={<CartPage />} />
-          <Route path="/ecommerce/filter" element={<ProductFilterPage />} />
-          <Route path="/ecommerce/product/:id" element={<Productdetails />} />
-          <Route path="/social" element={<Social />} />
-          <Route path="/how-it-works" element={<Howitworks />} />
-          <Route path="/project-view" element={<Completeproductview />} />
-          <Route path="/designers" element={<Designers />} />
-          <Route path="/freelancer" element={<Freelancers />} />
-          <Route
-            path="/freelancer/browse-subcategory/:id"
-            element={<Browsecategory />}
-          />
-          <Route
-            path="/services/landscaping/:id"
-            element={<Category />}
-          />
-          <Route path="/freelancer/home" element={<Mainfreelancers />} />
-          <Route
-            path="/freelancer/profile"
-            element={<FreelancerProfile />}
-          />
-          <Route
-            path="/freelancer/free-listing"
-            element={<Freelisting />}
-          />
-          <Route
-            path="/freelancer/create-business"
-            element={<CreateBusiness />}
-          />
-          <Route
-            path="/freelancer/business"
-            element={<Businesspage />}
-          />
-          <Route
-            path="/freelancer/registration"
-            element={<Registration />}
-          />
-          <Route path="/interior/living-room" element={<LivingRoom />} />
-          <Route path="/interior/bathroom" element={<Bathroom />} />
-          <Route path="/interior/bedroom" element={<Bedroom />} />
-          <Route path="/interior/modular-kitchen" element={<Kitchen />} />
-          <Route path="/interior/study-room" element={<Studyroom />} />
-          <Route path="/interior/wardrobe" element={<Wardrobe />} />
-          <Route path="/magazines" element={<Magazine />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route
-            path="/customer/dashboard"
-            element={<Customerdashboard />}
-          />
-          <Route
-            path="/dashboard/:roleSlug/*"
-            element={
-              <PrivateRoute
-                allowedRoles={["0", "1", "2", "3", "6", "5", "8", "7", "11","12"]}
-              >
-                <CmsApp />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </LayoutWrapper>
+            <Route path="/mortgage/services" element={<Service />} />
+            <Route path="/properties" element={<Page2 />} />
+            <Route path="/explore" element={<Page3 />} />
+            <Route path="/contact" element={<Page />} />
+            <Route path="/quotation" element={<Quotation />} />
+            <Route path="/ecommerce" element={<MainEcommercePage />} />
+            <Route path="/ecommerce/b2c" element={<HomeB2C />} />
+            <Route path="/ecommerce/seller" element={<SellerPage />} />
+            <Route path="/ecommerce/seller/b2b" element={<Sellerb2b />} />
+            <Route path="/ecommerce/b2b" element={<HomeB2B />} />
+            <Route path="/ecommerce/cart" element={<CartPage />} />
+            <Route path="/ecommerce/filter" element={<ProductFilterPage />} />
+            <Route path="/ecommerce/product/:id" element={<Productdetails />} />
+            <Route path="/social" element={<Social />} />
+            <Route path="/how-it-works" element={<Howitworks />} />
+            <Route path="/project-view" element={<Completeproductview />} />
+            <Route path="/designers" element={<Designers />} />
+            <Route path="/freelancer" element={<Freelancers />} />
+            <Route path="/freelancer/browse-subcategory/:id" element={<Browsecategory />} />
+            <Route path="/services/landscaping/:id" element={<Category />} />
+            <Route path="/freelancer/home" element={<Mainfreelancers />} />
+            <Route path="/freelancer/profile" element={<FreelancerProfile />} />
+            <Route path="/freelancer/free-listing" element={<Freelisting />} />
+            <Route path="/freelancer/create-business" element={<CreateBusiness />} />
+            <Route path="/freelancer/business" element={<Businesspage />} />
+            <Route path="/freelancer/registration" element={<Registration />} />
+            <Route path="/interior/living-room" element={<LivingRoom />} />
+            <Route path="/interior/bathroom" element={<Bathroom />} />
+            <Route path="/interior/bedroom" element={<Bedroom />} />
+            <Route path="/interior/modular-kitchen" element={<Kitchen />} />
+            <Route path="/interior/study-room" element={<Studyroom />} />
+            <Route path="/interior/wardrobe" element={<Wardrobe />} />
+            <Route path="/magazines" element={<Magazine />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/customer/dashboard" element={<Customerdashboard />} />
+            <Route
+              path="/dashboard/:roleSlug/*"
+              element={
+                <PrivateRoute allowedRoles={["0", "1", "2", "3", "6", "5", "8", "7", "11","12"]}>
+                  <CmsApp />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </LayoutWrapper>
+    </BlogProvider>
   );
 }
 

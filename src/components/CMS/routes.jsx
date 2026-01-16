@@ -64,6 +64,7 @@ import TypesGallery from "./pages/estimateMaster/TypesGallery";
 import Questions from "./pages/estimateMaster/Questions";
 import CreateDeveloper from "./pages/Properties/createDeveloper";
 import Propertymanagement from "./pages/Properties/Propertymanagement";
+import Blog from "./pages/Blog/CreateBlog";
 // import AddBrand from "../ecommerce/B2C/products/AddBrand"
 const roleSlugMap = {
   0: "superadmin",
@@ -129,8 +130,7 @@ enquiries:<Enquiry/>,
 packages:<Packages/>,
 "developer/create":<CreateDeveloper/>,
 "developer/property":<Propertymanagement/>
-
-,
+,"create":<Blog/>,
 "products/brands":<AddBrand/>
 };
 
@@ -204,7 +204,7 @@ const CmsRoutes = () => {
             <Route path="products" element={<ProductReview />} />
       <Route path="attributes/add" element={<AddAttributes />} />
       <Route path="tags/add" element={<AddTags />} />
-
+ {/* <Route path="/create" element={<Blog />} /> */}
       <Route path="products/view" element={<ProductProfile />} />
              <Route path="products/edit/:id" element={<UpdateProduct />} />
 
