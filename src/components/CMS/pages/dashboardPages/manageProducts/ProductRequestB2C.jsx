@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
   Button, Modal, Form, Input, Popconfirm, Card, Table,
   Typography, Row, Col, Statistic, Space, Divider, message, notification, Tooltip,
-  InputNumber, Select, Switch, Tag, Upload
+  InputNumber, Select, Switch, Tag, Upload, Avatar
 } from 'antd';
 import {
   PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined, 
@@ -19,6 +19,9 @@ const THEME = {
   success: "#10b981",
   error: "#ef4444",
 };
+
+// ✅ STATIC IMAGE URL
+const STATIC_IMG = "https://placehold.co/400x400?text=No+Image";
 
 const ProductManagement = () => {
   const BASE_URL = "https://xoto.ae"; 
@@ -131,7 +134,6 @@ const ProductManagement = () => {
       console.log("📤 Upload API Response:", response.data);
       
       let imageUrl = '';
-      
       if (typeof response.data === 'string') {
         imageUrl = response.data;
       } else if (response.data?.url) {
@@ -140,14 +142,14 @@ const ProductManagement = () => {
         imageUrl = response.data.secure_url;
       } else if (response.data?.data?.url) {
         imageUrl = response.data.data.url;
-      } else {
-        imageUrl = response.data;
       }
       
-      console.log("📤 Extracted Image URL:", imageUrl);
-      
-      onSuccess(imageUrl);
-      message.success("Image uploaded");
+      if (imageUrl) {
+          onSuccess(imageUrl);
+          message.success("Image uploaded");
+      } else {
+          onError(new Error("No URL returned"));
+      }
     } catch (err) {
       console.error("📤 Upload Error:", err);
       onError(err);
@@ -161,7 +163,6 @@ const ProductManagement = () => {
       const values = await form.validateFields();
       setLoading(true);
 
-      // Convert comma separated strings to arrays for keyFeatures and material
       const keyFeaturesArray = values.keyFeatures 
         ? values.keyFeatures.split(',').map(item => item.trim()).filter(item => item)
         : [];
@@ -170,6 +171,46 @@ const ProductManagement = () => {
         ? values.material.split(',').map(item => item.trim()).filter(item => item)
         : [];
 
+      // 1. Process Main Photos (Top Level)
+      let processedMainPhotos = [];
+      if (values.mainPhotos && Array.isArray(values.mainPhotos)) {
+        processedMainPhotos = values.mainPhotos.map(file => {
+             if (file.response) {
+                  if (typeof file.response === 'string') return file.response;
+                  return file.response.url || file.response.secure_url || file.response;
+             }
+             if (file.url) return file.url;
+             return null; 
+        }).filter(item => item !== null && item !== STATIC_IMG);
+      }
+
+      // 2. Process Colours 
+      const formattedColours = values.colours?.map(col => {
+           let extractedUrls = [];
+           if (col.photos && Array.isArray(col.photos)) {
+               extractedUrls = col.photos.map(file => {
+                   if (file.response) {
+                        if (typeof file.response === 'string') return file.response;
+                        return file.response.url || file.response.secure_url || file.response;
+                   }
+                   if (file.url) {
+                       return file.url; 
+                   }
+                   return null; 
+               }).filter(item => item !== null && item !== STATIC_IMG);
+           }
+
+           const validId = (col._id && typeof col._id === 'string' && col._id.trim().length > 0) ? col._id : undefined;
+
+            return {
+                ...(validId && { _id: validId }),
+                colourName: col.colourName,
+                photos: extractedUrls, 
+                isActive: col.isActive !== undefined ? col.isActive : true
+            };
+      }) || [];
+
+      // Payload Construction
       const payload = {
         product: {
           name: values.name,
@@ -191,35 +232,12 @@ const ProductManagement = () => {
           careInstructions: values.careInstructions,
           originCountry: values.originCountry,
           isActive: values.isActive,
-          isFeatured: values.isFeatured
+          isFeatured: values.isFeatured,
+          
+          // ✅ Using the new Main Photos field
+          photos: processedMainPhotos
         },
-        colours: values.colours?.map(col => {
-           let extractedUrls = [];
-           if (col.photos && Array.isArray(col.photos)) {
-               extractedUrls = col.photos.map(file => {
-                   if (file.response && typeof file.response === 'string') return file.response;
-                   
-                   if (file.response && typeof file.response === 'object') {
-                       return file.response.url || file.response.secure_url || file.response;
-                   }
-
-                   if (file.url) return file.url;
-                   
-                   if (typeof file === 'string') return file;
-                   
-                   return null; 
-               }).filter(item => item !== null);
-           }
-
-           const validId = (col._id && typeof col._id === 'string' && col._id.trim().length > 0) ? col._id : undefined;
-
-            return {
-                ...(validId && { _id: validId }),
-                colourName: col.colourName,
-                photos: extractedUrls, 
-                isActive: col.isActive !== undefined ? col.isActive : true
-            };
-        }) || []
+        colours: formattedColours
       };
 
       console.log("🚀 Payload being sent:", JSON.stringify(payload, null, 2));
@@ -231,7 +249,7 @@ const ProductManagement = () => {
         response = await axios.post(`${BASE_URL}/api/products/create-products`, payload);
       }
       
-      if (response.status === 200 || response.status === 201) {
+      if (response.data?.success === true || response.status === 200 || response.status === 201) {
         notification.success({
           message: editingId ? 'Product Updated' : 'Product Created',
           description: `Product ${values.name} saved successfully.`,
@@ -271,29 +289,21 @@ const ProductManagement = () => {
     form.resetFields();
   };
 
-  // --- 7. HANDLE EDIT - SIMPLIFIED VERSION ---
+  // --- 7. HANDLE EDIT ---
   const handleEdit = (record) => {
     console.log("📝 Editing Record:", record);
     
     setEditingData(record);
-    const productId = record._id || record.id;
+    const productId = record._id || record.id || record.product?._id;
     setEditingId(productId);
     
-    // Reset form
     form.resetFields();
-    
-    // Open modal
     setModalVisible(true);
     
-    // Set form values after a small delay to ensure modal is rendered
     setTimeout(() => {
       try {
         const productData = record.product || record;
         
-        console.log("📝 Product Data:", productData);
-        console.log("📝 Colours Data:", record.colours);
-        
-        // Get brand and category IDs
         const brandId = typeof productData.brandName === 'object' 
           ? productData.brandName?._id || productData.brandName 
           : productData.brandName;
@@ -302,7 +312,6 @@ const ProductManagement = () => {
           ? productData.category?._id || productData.category
           : productData.category;
 
-        // Convert arrays to comma-separated strings for keyFeatures and material
         const keyFeaturesString = Array.isArray(productData.keyFeatures) 
           ? productData.keyFeatures.join(', ') 
           : '';
@@ -311,32 +320,35 @@ const ProductManagement = () => {
           ? productData.material.join(', ') 
           : '';
 
-        // Prepare colours data
+        // Prepare Main Photos for Edit Mode
+        const mainPhotosFileList = (productData.photos || []).map((url, index) => {
+            let safeUrl = typeof url === 'string' ? url : (url.url || STATIC_IMG);
+            return {
+                uid: `main-photo-${index}`,
+                name: `image-${index}.png`,
+                status: 'done',
+                url: safeUrl,
+                response: safeUrl
+            };
+        });
+
         const coloursData = (record.colours || []).map((color, index) => {
           const photosData = (color.photos || []).map((photo, photoIndex) => {
             let imageUrl = '';
+            if (typeof photo === 'string' && photo.length > 5) imageUrl = photo;
+            else if (photo?.url) imageUrl = photo.url;
+            else if (photo?.secure_url) imageUrl = photo.secure_url;
             
-            if (typeof photo === 'string') {
-              imageUrl = photo;
-            } else if (photo?.url) {
-              imageUrl = photo.url;
-            } else if (photo?.secure_url) {
-              imageUrl = photo.secure_url;
-            } else if (photo) {
-              imageUrl = String(photo);
-            }
-            
-            if (!imageUrl) return null;
+            if (!imageUrl) imageUrl = STATIC_IMG;
             
             return {
               uid: `color-${index}-photo-${photoIndex}-${Date.now()}`,
               name: `image-${photoIndex}.jpg`,
               status: 'done',
               url: imageUrl,
-              thumbUrl: imageUrl,
               response: imageUrl
             };
-          }).filter(Boolean);
+          });
 
           return {
             _id: color._id || '',
@@ -346,7 +358,6 @@ const ProductManagement = () => {
           };
         });
 
-        // Set form values
         const formValues = {
           name: productData.name || '',
           brandName: brandId || '',
@@ -359,8 +370,8 @@ const ProductManagement = () => {
           warrantyYears: productData.warrantyYears || 0,
           returnPolicyDays: productData.returnPolicyDays || 0,
           noCostEmiAvailable: productData.noCostEmiAvailable || false,
-          keyFeatures: keyFeaturesString, // Now as string
-          material: materialString, // Now as string
+          keyFeatures: keyFeaturesString,
+          material: materialString,
           finish: productData.finish || '',
           assemblyRequired: productData.assemblyRequired || false,
           assemblyToolsProvided: productData.assemblyToolsProvided || false,
@@ -368,13 +379,11 @@ const ProductManagement = () => {
           originCountry: productData.originCountry || '',
           isActive: productData.isActive !== undefined ? productData.isActive : true,
           isFeatured: productData.isFeatured !== undefined ? productData.isFeatured : false,
-          colours: coloursData.length > 0 ? coloursData : undefined
+          colours: coloursData.length > 0 ? coloursData : undefined,
+          mainPhotos: mainPhotosFileList // ✅ Set Main Photos
         };
 
-        console.log("📝 Form Values to Set:", formValues);
-        
         form.setFieldsValue(formValues);
-        
       } catch (error) {
         console.error("📝 Error setting form values:", error);
         message.error("Failed to load product data");
@@ -387,12 +396,30 @@ const ProductManagement = () => {
       title: 'Product Name',
       key: 'name',
       render: (text, record) => {
-        const name = record.product?.name || record.name || "No Name";
+        const p = record.product || record;
+        const name = p.name || "No Name";
+        
+        let displayImage = STATIC_IMG;
+        
+        // Priority 1: Main Product Photo
+        if (p.photos && p.photos.length > 0 && typeof p.photos[0] === 'string' && p.photos[0].length > 5) {
+            displayImage = p.photos[0];
+        } 
+        // Priority 2: First Colour Variant Photo
+        else if (record.colours && record.colours.length > 0 && record.colours[0].photos && record.colours[0].photos.length > 0) {
+             const firstPhoto = record.colours[0].photos[0];
+             if (typeof firstPhoto === 'string' && firstPhoto.length > 5) displayImage = firstPhoto;
+        }
+
         return (
             <Space>
-            <div style={{ backgroundColor: THEME.primary, padding: 8, borderRadius: '50%', color: '#fff' }}>
-                <AppstoreOutlined />
-            </div>
+            <Avatar 
+                shape="square" 
+                size={48} 
+                src={displayImage} 
+                icon={<AppstoreOutlined />} 
+                style={{ backgroundColor: '#f0f0f0' }}
+            />
             <Text strong>{name}</Text>
             </Space>
         );
@@ -457,7 +484,6 @@ const ProductManagement = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <Title level={3} style={{ margin: 0 }}>Product Management</Title>
@@ -478,7 +504,6 @@ const ProductManagement = () => {
         </Button>
       </div>
 
-      {/* Stats */}
       <Row gutter={[16, 16]} className="mb-6">
         <Col xs={24} sm={8}>
           <Card variant="borderless" className="shadow-sm border-t-4" style={{ borderColor: THEME.primary }}>
@@ -487,7 +512,6 @@ const ProductManagement = () => {
         </Col>
       </Row>
 
-      {/* Table */}
       <Card variant="borderless" className="shadow-md" styles={{ body: { padding: 0 } }}>
         <div className="p-4 border-b bg-white rounded-t-lg">
           <Input 
@@ -515,7 +539,6 @@ const ProductManagement = () => {
         />
       </Card>
 
-      {/* Modal Form - UPDATED STRUCTURE */}
       <Modal
         title={<div className="font-bold text-lg">{editingId ? 'Edit Product' : 'Add New Product'}</div>}
         open={modalVisible}
@@ -545,7 +568,6 @@ const ProductManagement = () => {
           preserve={false}
         >
           
-          {/* Section 1: Basic Info */}
           <div className="mb-6">
              <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Basic Information</Text>
              <Row gutter={16}>
@@ -554,6 +576,31 @@ const ProductManagement = () => {
                         <Input size="large" placeholder="Enter product name" />
                     </Form.Item>
                 </Col>
+
+                {/* ✅✅✅ NEW MAIN IMAGE UPLOAD FIELD ✅✅✅ */}
+                <Col span={24}>
+                    <Form.Item 
+                       name="mainPhotos" 
+                       label="Product Main Images"
+                       valuePropName="fileList"
+                       getValueFromEvent={normFile}
+                       extra="Upload main images for the product (visible on cards)"
+                    >
+                       <Upload 
+                            customRequest={customUploadRequest}
+                            listType="picture-card"
+                            multiple={true}
+                            accept="image/*"
+                            maxCount={5}
+                       >
+                           <div>
+                               <PlusOutlined />
+                               <div style={{ marginTop: 8 }}>Upload</div>
+                           </div>
+                       </Upload>
+                    </Form.Item>
+                </Col>
+                {/* ----------------------------------------------- */}
                 
                 <Col span={12}>
                     <Form.Item name="brandName" label="Brand" rules={[{ required: true, message: 'Brand is required' }]}>
@@ -595,7 +642,6 @@ const ProductManagement = () => {
 
           <Divider />
 
-          {/* Section 2: Pricing */}
           <div className="mb-6">
              <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Pricing & Inventory</Text>
              <Row gutter={16}>
@@ -645,7 +691,6 @@ const ProductManagement = () => {
 
           <Divider />
 
-          {/* Section 3: Specs - UPDATED TO USE TEXT INPUTS */}
           <div className="mb-6">
              <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Specifications</Text>
              <Row gutter={16}>
@@ -715,7 +760,6 @@ const ProductManagement = () => {
 
           <Divider />
 
-          {/* Section 4: Colours & Images - FIXED STRUCTURE */}
           <div className="mb-4">
              <Text strong className="text-gray-500 uppercase text-xs mb-3 block">Colour Variants & Images</Text>
              
@@ -733,14 +777,11 @@ const ProductManagement = () => {
                 ]}
              >
                {(fields, { add, remove }, { errors }) => {
-                 console.log("🎨 Form List Fields:", fields); // Debug
                  return (
                    <div className="flex flex-col gap-4">
                      {fields.map(({ key, name, ...restField }) => {
                        const colourName = form.getFieldValue(['colours', name, 'colourName']);
                        const photos = form.getFieldValue(['colours', name, 'photos']);
-                       
-                       console.log(`🎨 Color ${name}:`, { colourName, photosCount: photos?.length });
                        
                        return (
                          <Card
@@ -751,7 +792,6 @@ const ProductManagement = () => {
                            extra={<Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(name)}>Remove</Button>}
                            style={{ background: '#fafafa', borderColor: '#e5e7eb' }}
                          >
-                            {/* Hidden field for colour ID */}
                             <Form.Item {...restField} name={[name, '_id']} noStyle>
                                 <Input type="hidden" />
                             </Form.Item>
@@ -788,9 +828,7 @@ const ProductManagement = () => {
                                      { required: true, message: 'At least one image is required' },
                                      {
                                         validator: (_, value) => {
-                                          if (value && value.length > 0) {
-                                            return Promise.resolve();
-                                          }
+                                          if (value && value.length > 0) return Promise.resolve();
                                           return Promise.reject(new Error('At least one image is required'));
                                         }
                                      }
@@ -798,19 +836,18 @@ const ProductManagement = () => {
                                    extra="Upload product images for this color variant"
                                  >
                                     <Upload 
-                                       customRequest={customUploadRequest}
-                                       listType="picture-card"
-                                       multiple={true}
-                                       accept="image/*"
-                                       beforeUpload={() => false}
-                                       maxCount={8}
+                                           customRequest={customUploadRequest}
+                                           listType="picture-card"
+                                           multiple={true}
+                                           accept="image/*"
+                                           maxCount={8}
                                     >
-                                       {photos?.length >= 8 ? null : (
-                                         <div>
-                                           <PlusOutlined />
-                                           <div style={{ marginTop: 8 }}>Upload</div>
-                                         </div>
-                                       )}
+                                           {photos?.length >= 8 ? null : (
+                                             <div>
+                                               <PlusOutlined />
+                                               <div style={{ marginTop: 8 }}>Upload</div>
+                                             </div>
+                                           )}
                                     </Upload>
                                  </Form.Item>
                               </Col>

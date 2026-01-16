@@ -1,81 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaShareAlt, FaHeart, FaShoppingCart, FaShoppingBag, FaStar, FaPlus, FaMinus, FaCube, FaTruck, FaShieldAlt, FaSyncAlt, FaCreditCard, FaRulerCombined, FaWeight, FaBoxOpen } from 'react-icons/fa';
+import { 
+  FaChevronLeft, FaChevronRight, FaShareAlt, FaHeart, FaShoppingCart, FaShoppingBag, 
+  FaStar, FaPlus, FaMinus, FaCube, FaTruck, FaShieldAlt, FaSyncAlt, FaCreditCard, 
+  FaRulerCombined, FaWeight, FaBoxOpen 
+} from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiInfo, FiCheck, FiClock, FiPackage } from 'react-icons/fi';
 
-// Dummy Product Data
-const dummyProduct = {
-  _id: '1',
-  name: 'Xoto Nordic Oak Coffee Table',
-  description: 'Handcrafted from premium Scandinavian oak with a minimalist design. This coffee table features clean lines, smooth finish, and sustainable materials. Perfect centerpiece for modern living rooms, blending functionality with timeless elegance.',
-  short_description: 'Designer Note: "Inspired by Nordic winters and clean lines. This piece embodies simplicity and warmth in modern living." – Emma Wilson',
-  pricing: {
-    sale_price: 12999,
-    mrp: 18999,
-    discount: { percentage: 32 },
-  },
-  shipping: {
-    dimensions: { length: 48, width: 24, height: 18 },
-    weight: 35,
-    delivery_time: '3-5 days',
-  },
-  material: { name: 'Solid Oak Wood' },
-  tags: [{ name: 'Scandinavian' }, { name: 'Modern' }, { name: 'Sustainable' }],
-  createdAt: new Date().toISOString(),
-  rent_available: true,
-  color_variants: [
-    {
-      color_name: 'Natural Oak',
-      color_code: '#D4A574',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=800&auto=format&fit=crop', is_primary: true, alt_text: 'Nordic Oak Table - Front' },
-        { url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop', is_primary: false, alt_text: 'Side View' },
-        { url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop', is_primary: false, alt_text: 'Top View' },
-        { url: 'https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800&auto=format&fit=crop', is_primary: false, alt_text: 'In Living Room' },
-      ],
-    },
-    {
-      color_name: 'Walnut Brown',
-      color_code: '#5C4033',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&auto=format&fit=crop', is_primary: true, alt_text: 'Walnut Coffee Table' },
-      ],
-    },
-    {
-      color_name: 'White Wash',
-      color_code: '#F5F5F5',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800&auto=format&fit=crop', is_primary: true, alt_text: 'White Wash Table' },
-      ],
-    },
-  ],
-  features: [
-    'Solid oak construction',
-    'Hand-finished surface',
-    'Water-resistant coating',
-    'Easy assembly',
-    'Sustainable materials',
-    '5-year warranty'
-  ],
-  specifications: {
-    'Material': 'Solid Oak Wood',
-    'Finish': 'Natural Oil',
-    'Assembly': 'Required (tools included)',
-    'Care': 'Wipe with damp cloth',
-    'Warranty': '5 years',
-    'Origin': 'Made in India'
-  }
-};
+// --- IMPORT CONTEXT ---
+import { useProductContext } from '../../context/ProductContext'; 
 
+// Static Similar Products (Kept to maintain UI layout as requested)
 const similarProducts = [
   {
     _id: '2',
     name: 'Xoto Velvet Accent Chair',
-    pricing: { sale_price: 24999, mrp: 34999 },
-    color_variants: [{
-      images: [{ url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop', is_primary: true }]
-    }],
+    pricing: { sale_price: 2499, mrp: 3499 },
+    color_variants: [{ images: [{ url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop', is_primary: true }] }],
     rent_available: true,
     tags: [{ name: 'Luxury' }],
     material: { name: 'Velvet' },
@@ -83,10 +25,8 @@ const similarProducts = [
   {
     _id: '3',
     name: 'Xoto Marble Console',
-    pricing: { sale_price: 35999, mrp: 49999 },
-    color_variants: [{
-      images: [{ url: 'https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800&auto=format&fit=crop', is_primary: true }]
-    }],
+    pricing: { sale_price: 3599, mrp: 4999 },
+    color_variants: [{ images: [{ url: 'https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800&auto=format&fit=crop', is_primary: true }] }],
     rent_available: false,
     tags: [{ name: 'Premium' }],
     material: { name: 'Marble' },
@@ -94,10 +34,8 @@ const similarProducts = [
   {
     _id: '4',
     name: 'Xoto Linen Sofa',
-    pricing: { sale_price: 44999, mrp: 59999 },
-    color_variants: [{
-      images: [{ url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop', is_primary: true }]
-    }],
+    pricing: { sale_price: 4499, mrp: 5999 },
+    color_variants: [{ images: [{ url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop', is_primary: true }] }],
     rent_available: true,
     tags: [{ name: 'Comfort' }],
     material: { name: 'Linen' },
@@ -107,30 +45,76 @@ const similarProducts = [
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  
+  // --- 1. GET DATA FROM CONTEXT ---
+  const { getSingleProduct } = useProductContext();
+
+  // --- STATE ---
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [pincode, setPincode] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [expandedSection, setExpandedSection] = useState(null);
   const [showARModal, setShowARModal] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Static product (in real app, fetch by id)
-  const currentProduct = dummyProduct;
-  const currentImages = currentProduct.color_variants[selectedVariant]?.images || [];
-  const price = currentProduct.pricing.sale_price;
-  const originalPrice = currentProduct.pricing.mrp;
-  const discountPercentage = currentProduct.pricing.discount.percentage;
-  const dimensions = `${currentProduct.shipping.dimensions.length}"W x ${currentProduct.shipping.dimensions.width}"D x ${currentProduct.shipping.dimensions.height}"H`;
-  const material = currentProduct.material.name;
-  const style = currentProduct.tags[0].name;
-  const description = currentProduct.description;
-  const designerNote = currentProduct.short_description;
-  const isNew = true;
-  const rentAvailable = currentProduct.rent_available;
+  // --- 2. FETCH DATA ON LOAD ---
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (id) {
+        setLoading(true);
+        const data = await getSingleProduct(id);
+        setProduct(data);
+        setLoading(false);
+      }
+    };
+    fetchDetails();
+  }, [id]);
+
+  // --- 3. LOADING STATE ---
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-600 border-opacity-75"></div>
+    </div>
+  );
+
+  // --- 4. ERROR STATE ---
+  if (!product) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-600">
+      <h2 className="text-2xl font-bold mb-4">Product Not Found</h2>
+      <button onClick={() => navigate(-1)} className="text-purple-600 hover:underline">Go Back</button>
+    </div>
+  );
+
+  // --- 5. DATA MAPPING (Adapting API data to UI structure) ---
+  const price = product.price || 0;
+  const originalPrice = product.originalPrice || 0;
+  const discountPercentage = originalPrice 
+    ? Math.round(((originalPrice - price) / originalPrice) * 100) 
+    : 0;
+
+  // Handle Images: Ensure we always have an array
+  const mainImage = product.image || "https://placehold.co/600x400/e0e0e0/808080?text=No+Image";
+  const currentImages = [{ url: mainImage, alt_text: product.name }];
+
+  // Fallback data for UI elements
+  const materialName = product.material && product.material.length > 0 ? product.material.join(', ') : 'Premium Material';
+  const categoryName = product.category || 'Furniture';
+  const featuresList = product.fullFeatures && product.fullFeatures.length > 0 ? product.fullFeatures : ['Premium Quality', 'Durable', 'Modern Design'];
+  
+  // Construct Specifications Object
+  const specifications = {
+    'Material': materialName,
+    'Brand': product.brand || 'XOTO',
+    'Category': categoryName,
+    'Warranty': '1 Year Standard',
+    'Assembly': 'Required',
+    'Care': 'Wipe with dry cloth'
+  };
 
   const handleAddToCart = () => {
-    alert(`Added ${quantity} × ${currentProduct.name} to cart!`);
+    alert(`Added ${quantity} × ${product.name} to cart!`);
   };
 
   const handlePrevImage = () => {
@@ -168,42 +152,45 @@ const ProductDetails = () => {
               <motion.img
                 key={activeImageIndex}
                 src={currentImages[activeImageIndex]?.url}
-                alt={currentImages[activeImageIndex]?.alt_text}
+                alt={product.name}
+                // ERROR HANDLING ADDED HERE
+                onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/600x400/e0e0e0/808080?text=No+Image"; }}
                 className="w-full h-full object-cover"
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
               />
               
-              {/* Navigation Arrows */}
-              <button
-                onClick={handlePrevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-purple-600 hover:text-white transition-all duration-300 group"
-              >
-                <FaChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </button>
-              <button
-                onClick={handleNextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-purple-600 hover:text-white transition-all duration-300 group"
-              >
-                <FaChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </button>
+              {/* Navigation Arrows (Hidden if only 1 image) */}
+              {currentImages.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-purple-600 hover:text-white transition-all duration-300 group"
+                  >
+                    <FaChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  </button>
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-3 rounded-full shadow-lg hover:bg-purple-600 hover:text-white transition-all duration-300 group"
+                  >
+                    <FaChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  </button>
+                </>
+              )}
 
               {/* Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
-                {rentAvailable && (
-                  <span className="bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
-                    <FaSyncAlt className="inline mr-1" /> Rent Available
-                  </span>
-                )}
-                {isNew && (
+                {product.isNew && (
                   <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
                     New Arrival
                   </span>
                 )}
-                <span className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
-                  {discountPercentage}% OFF
-                </span>
+                {discountPercentage > 0 && (
+                  <span className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
+                    {discountPercentage}% OFF
+                  </span>
+                )}
               </div>
 
               {/* AR Button */}
@@ -216,23 +203,25 @@ const ProductDetails = () => {
               </button>
             </div>
 
-            {/* Thumbnails */}
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {currentImages.map((image, index) => (
-                <motion.button
-                  key={index}
-                  onClick={() => setActiveImageIndex(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                    activeImageIndex === index 
-                      ? 'border-purple-600 shadow-lg scale-105' 
-                      : 'border-gray-200 hover:border-purple-400'
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <img src={image.url} alt={image.alt_text} className="w-full h-full object-cover" />
-                </motion.button>
-              ))}
-            </div>
+            {/* Thumbnails (Only show if multiple images) */}
+            {currentImages.length > 1 && (
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {currentImages.map((image, index) => (
+                    <motion.button
+                    key={index}
+                    onClick={() => setActiveImageIndex(index)}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                        activeImageIndex === index 
+                        ? 'border-purple-600 shadow-lg scale-105' 
+                        : 'border-gray-200 hover:border-purple-400'
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    >
+                    <img src={image.url} alt="thumbnail" className="w-full h-full object-cover" />
+                    </motion.button>
+                ))}
+                </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -242,18 +231,17 @@ const ProductDetails = () => {
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-sm font-medium text-gray-500">XOTO</span>
                 <span className="text-gray-300">•</span>
-                <span className="text-sm font-medium text-gray-500">{currentProduct.tags.map(t => t.name).join(', ')}</span>
+                <span className="text-sm font-medium text-gray-500">{categoryName}</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">{currentProduct.name}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">{product.name}</h1>
               
               {/* Rating */}
               <div className="flex items-center gap-3 mt-4">
                 <div className="flex items-center bg-gradient-to-r from-amber-400 to-yellow-500 text-white px-3 py-1 rounded-lg">
-                  <span className="font-bold text-lg">4.8</span>
+                  <span className="font-bold text-lg">{product.rating}</span>
                   <FaStar className="w-4 h-4 ml-1 fill-current" />
                 </div>
-                <span className="text-gray-600">(128 reviews)</span>
-               
+                <span className="text-gray-600">({product.reviews} reviews)</span>
               </div>
             </div>
 
@@ -263,59 +251,31 @@ const ProductDetails = () => {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Our Price</p>
                   <p className="text-4xl font-bold text-gray-900">
-                    AED{price.toLocaleString('en-IN')}
+                    AED{price.toLocaleString()}
                   </p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">MRP</p>
-                  <p className="text-xl text-gray-500 line-through">
-                    AED{originalPrice.toLocaleString('en-IN')}
-                  </p>
-                </div>
-                <div className="ml-auto">
-                  <span className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-lg font-bold">
-                    Save {discountPercentage}%
-                  </span>
-                </div>
+                {originalPrice > 0 && (
+                    <div>
+                    <p className="text-sm text-gray-600 mb-1">MRP</p>
+                    <p className="text-xl text-gray-500 line-through">
+                        AED{originalPrice.toLocaleString()}
+                    </p>
+                    </div>
+                )}
+                {discountPercentage > 0 && (
+                    <div className="ml-auto">
+                    <span className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-lg font-bold">
+                        Save {discountPercentage}%
+                    </span>
+                    </div>
+                )}
               </div>
               <p className="text-sm text-gray-500">Inclusive of all taxes • EMI available</p>
             </div>
 
-            {/* Color Variants */}
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-3">Select Color</p>
-              <div className="flex gap-3">
-                {currentProduct.color_variants.map((variant, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setSelectedVariant(idx);
-                      setActiveImageIndex(0);
-                    }}
-                    className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-300 ${
-                      selectedVariant === idx 
-                        ? 'border-purple-600 bg-purple-50' 
-                        : 'border-gray-200 hover:border-purple-400 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div 
-                      className="w-16 h-16 rounded-lg border border-gray-300"
-                      style={{ backgroundColor: variant.color_code }}
-                    />
-                    <span className="text-sm font-medium text-gray-700">{variant.color_name}</span>
-                    {selectedVariant === idx && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
-                        <FiCheck className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Features */}
             <div className="grid grid-cols-2 gap-3">
-              {currentProduct.features.slice(0, 4).map((feature, idx) => (
+              {featuresList.slice(0, 4).map((feature, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-gray-700">
                   <FiCheck className="w-4 h-4 text-green-500 flex-shrink-0" />
                   <span className="text-sm">{feature}</span>
@@ -382,7 +342,7 @@ const ProductDetails = () => {
                   maxLength={6}
                 />
                 <button
-                  onClick={() => alert(`Delivery available in ${currentProduct.shipping.delivery_time} for ${pincode || 'your area'}!`)}
+                  onClick={() => alert(`Delivery available for ${pincode || 'your area'}!`)}
                   className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all font-semibold"
                 >
                   Check
@@ -425,10 +385,7 @@ const ProductDetails = () => {
                   icon: '📝',
                   content: (
                     <div className="space-y-4">
-                      <p className="text-gray-700">{description}</p>
-                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4">
-                        <p className="italic text-gray-600">{designerNote}</p>
-                      </div>
+                      <p className="text-gray-700">{product.description}</p>
                     </div>
                   ) 
                 },
@@ -438,7 +395,7 @@ const ProductDetails = () => {
                   icon: '📋',
                   content: (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Object.entries(currentProduct.specifications).map(([key, value]) => (
+                      {Object.entries(specifications).map(([key, value]) => (
                         <div key={key} className="flex justify-between border-b border-gray-200 py-3">
                           <span className="text-gray-600">{key}</span>
                           <span className="font-medium text-gray-900">{value}</span>
@@ -448,38 +405,12 @@ const ProductDetails = () => {
                   ) 
                 },
                 { 
-                  key: 'dimensions', 
-                  title: 'Dimensions & Details', 
-                  icon: '📏',
-                  content: (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-white p-4 rounded-xl border border-gray-200">
-                          <FaRulerCombined className="w-6 h-6 text-purple-600 mb-2" />
-                          <p className="text-sm text-gray-600">Dimensions</p>
-                          <p className="font-bold text-gray-900">{dimensions}</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-xl border border-gray-200">
-                          <FaWeight className="w-6 h-6 text-purple-600 mb-2" />
-                          <p className="text-sm text-gray-600">Weight</p>
-                          <p className="font-bold text-gray-900">{currentProduct.shipping.weight} kg</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-xl border border-gray-200">
-                          <FiPackage className="w-6 h-6 text-purple-600 mb-2" />
-                          <p className="text-sm text-gray-600">Delivery</p>
-                          <p className="font-bold text-gray-900">{currentProduct.shipping.delivery_time}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ) 
-                },
-                { 
                   key: 'features', 
                   title: 'Key Features', 
                   icon: '⭐',
                   content: (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {currentProduct.features.map((feature, idx) => (
+                      {featuresList.map((feature, idx) => (
                         <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                           <FiCheck className="w-4 h-4 text-green-500 flex-shrink-0" />
                           <span className="text-gray-700">{feature}</span>
@@ -542,7 +473,7 @@ const ProductDetails = () => {
                   <p className="text-sm text-white/80">Lowest price online</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-4xl font-bold text-white mb-1">AED{price.toLocaleString('en-IN')}</p>
+                  <p className="text-4xl font-bold text-white mb-1">AED{price.toLocaleString()}</p>
                   <p className="text-sm text-white/80">Incl. all taxes</p>
                 </div>
               </div>
@@ -556,15 +487,10 @@ const ProductDetails = () => {
                 </button>
               </div>
             </motion.div>
-
-         
-
-            {/* Need Help */}
-           
           </div>
         </div>
 
-        {/* Similar Products */}
+        {/* Similar Products (Static for now to preserve UI) */}
         <motion.div
           className="mt-16"
           initial={{ opacity: 0, y: 30 }}
@@ -581,38 +507,32 @@ const ProductDetails = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {similarProducts.map((product) => (
+            {similarProducts.map((simProduct) => (
               <motion.div
-                key={product._id}
+                key={simProduct._id}
                 className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-200"
                 whileHover={{ y: -8 }}
-                onClick={() => navigate(`/ecommerce/product/${product._id}`)}
+                // For now, these dummy items won't navigate to real pages unless they exist in DB
+                onClick={() => navigate(`/ecommerce/product/${simProduct._id}`)} 
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
-                    src={product.color_variants[0].images[0].url}
-                    alt={product.name}
+                    src={simProduct.color_variants[0].images[0].url}
+                    alt={simProduct.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  {product.rent_available && (
+                  {simProduct.rent_available && (
                     <span className="absolute top-3 left-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
                       <FaSyncAlt className="inline mr-1" /> Rent
                     </span>
                   )}
-                  <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
-                    {Math.round(((product.pricing.mrp - product.pricing.sale_price) / product.pricing.mrp) * 100)}% OFF
-                  </div>
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                 </div>
                 <div className="p-5">
-                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-1">{product.name}</h3>
+                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-1">{simProduct.name}</h3>
                   <div className="flex items-center gap-2 mb-3">
-                    <p className="text-xl font-bold text-gray-900">AED{product.pricing.sale_price.toLocaleString('en-IN')}</p>
-                    <p className="text-sm text-gray-500 line-through">AED{product.pricing.mrp.toLocaleString('en-IN')}</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">{product.tags[0].name}</span>
-                    <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">{product.material.name}</span>
+                    <p className="text-xl font-bold text-gray-900">AED{simProduct.pricing.sale_price}</p>
+                    <p className="text-sm text-gray-500 line-through">AED{simProduct.pricing.mrp}</p>
                   </div>
                   <button className="w-full mt-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2.5 rounded-lg hover:shadow-lg transition-all font-medium opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
                     View Details
