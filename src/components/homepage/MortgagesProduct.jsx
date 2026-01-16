@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = "https://xoto.ae"; 
 
-// --- SUB-COMPONENTS ---
+// --- SUB-COMPONENTS (Same as before) ---
 
 const StatusBadge = ({ status }) => {
   const getStatusColor = (s) => {
@@ -39,8 +39,6 @@ const ApplicationReadyBanner = () => (
     </p>
   </div>
 );
-
-// --- FORM INPUTS ---
 
 const FormInput = ({ label, value, onChange, type = "text", placeholder, suffix, required }) => (
   <div className="flex flex-col">
@@ -82,8 +80,6 @@ const FormSelect = ({ label, value, onChange, options, required }) => (
     </div>
   </div>
 );
-
-// --- CARD COMPONENTS ---
 
 const DataRow = ({ label, value }) => (
   <div className="flex justify-between items-center py-3 border-b border-gray-50 last:border-0 min-h-[50px]">
@@ -136,7 +132,6 @@ const Card = ({ title, subTitle, children, onEdit, isEditing, onUpload, isExpand
   );
 };
 
-// --- PRODUCT OFFER COMPONENT ---
 const ProductOffer = ({ productData, isSelected, onSelect, isDetailsOpen, onToggleDetails }) => {
   const { _id, bankInfo, offerSummary, costBreakdown, loanDetails, insurance } = productData;
   const fmt = (val) => val ? Number(val).toLocaleString() + ` ${offerSummary?.currency || 'AED'}` : '0 AED';
@@ -199,6 +194,7 @@ const ProductOffer = ({ productData, isSelected, onSelect, isDetailsOpen, onTogg
                         <div className="flex justify-between"><span className="text-gray-600">Dubai land department fee</span> <span className="font-medium">{fmt(costBreakdown?.dldFee)}</span></div>
                         <div className="flex justify-between"><span className="text-gray-600">Mortgage registration fee</span> <span className="font-medium">{fmt(costBreakdown?.mortgageRegistrationFee)}</span></div>
                         <div className="flex justify-between"><span className="text-gray-600">Trustee fee</span> <span className="font-medium">{fmt(costBreakdown?.trusteeFee)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-600">Bank processing fee</span> <span className="font-medium">{fmt(costBreakdown?.bankProcessingFee)}</span></div>
                         <div className="flex justify-between"><span className="text-gray-600">Valuation</span> <span className="font-medium">{fmt(costBreakdown?.valuationFee)}</span></div>
                         <div className="flex justify-between pt-2 border-t font-bold text-gray-900"><span className="">Total upfront cost</span> <span className="">{fmt(costBreakdown?.totalUpfrontCost)}</span></div>
                     </div>
@@ -221,7 +217,7 @@ const ProductOffer = ({ productData, isSelected, onSelect, isDetailsOpen, onTogg
   );
 };
 
-// --- MAIN COMPONENT ---
+// --- MAIN COMPONENT STARTS HERE ---
 
 const MortgageProduct = ({ uploadedFiles = {} }) => {
   const navigate = useNavigate();
@@ -252,7 +248,7 @@ const MortgageProduct = ({ uploadedFiles = {} }) => {
       building: "", unit: "", street: "", country: "", city: "", emirate: ""
   });
 
-  // --- API FETCH (LEAD DATA) ---
+  // --- 1. GET LEAD DATA & PREFILL ---
   useEffect(() => {
     const fetchData = async () => {
         try {
@@ -269,58 +265,68 @@ const MortgageProduct = ({ uploadedFiles = {} }) => {
             if (!response.ok) throw new Error("Failed to fetch");
             const result = await response.json();
 
+            // --- DEBUGGING LOGS (Check Console) ---
+            console.log("FULL API RESPONSE:", result);
+
             if (result.success && result.data) {
                 setApiData(result.data);
                 
-                // --- ROBUST PREFILL LOGIC ---
                 const lead = result.data.lead || {};
                 const pd = result.data.personal_details || {};
-                const ma = result.data.mortgage_application || {};
                 
-                // 1. Name Parsing
-                let finalName = "";
-                if (pd.full_name) finalName = pd.full_name;
-                else if (lead.name) {
+                console.log("LEAD OBJECT:", lead);
+                console.log("PD OBJECT:", pd);
+
+                // --- DATA MAPPING ---
+                
+                // Name
+                let finalName = pd.full_name || "";
+                if (!finalName && lead.name) {
                     finalName = typeof lead.name === 'object' 
                         ? `${lead.name.first_name || ''} ${lead.name.last_name || ''}`.trim()
                         : lead.name;
                 }
-                
-                // 2. Phone Parsing
-                let finalPhone = "";
-                if (pd.phone) finalPhone = pd.phone;
-                else if (lead.mobile) {
+
+                // Phone
+                let finalPhone = pd.phone || "";
+                if (!finalPhone && lead.mobile) {
                     finalPhone = typeof lead.mobile === 'object' 
                         ? `${lead.mobile.country_code || ''} ${lead.mobile.number || ''}`.trim()
                         : lead.mobile;
                 }
 
-                // 3. Address / Location Mapping
-                // Note: 'city' in lead might be "Dubai", 'area' might be "Dubai Marina"
-                // 'country' in refinance lead might be "UAE"
-                const finalCountry = pd.country || lead.country || "UAE";
+                // Email
+                const finalEmail = pd.email || lead.email || "";
+
+                // Salary & Occupation
+                const finalSalary = pd.monthly_salary || (lead.monthly_income ? String(lead.monthly_income) : "");
+                const finalEmployer = pd.employer_name || lead.occupation || "";
+
+                // Location
                 const finalCity = pd.city || lead.city || "";
+                const finalCountry = pd.country || lead.country || "UAE";
                 const finalEmirate = pd.emirate || lead.area || "";
 
-                // 4. Residency
+                // Residency
                 let finalResidence = pd.residence_status;
-                if (!finalResidence && lead.residency_status) {
+                if(!finalResidence && lead.residency_status) {
                     finalResidence = lead.residency_status === 'non_resident' ? "Non-Resident" : "UAE Resident";
                 }
 
+                // Update State
                 setPersonalDetails(prev => ({
                     ...prev,
                     name: finalName,
-                    email: pd.email || lead.email || "",
+                    email: finalEmail,
                     phone: finalPhone,
-                    
-                    // Fallback Logic for Salary/Employer
-                    salary: pd.monthly_salary || (lead.monthly_income ? String(lead.monthly_income) : ""),
-                    employer: pd.employer_name || lead.occupation || "", // 'Salaried' or Company Name
-                    
+                    salary: finalSalary,
+                    employer: finalEmployer,
+                    country: finalCountry,
+                    city: finalCity,
+                    emirate: finalEmirate,
                     residence: finalResidence || "",
                     
-                    // Other fields initially empty if not provided in step 1
+                    // Keep existing PD data or init empty
                     nationality: pd.nationality || "",
                     dob: pd.dob || "",
                     gender: pd.gender || "",
@@ -329,14 +335,11 @@ const MortgageProduct = ({ uploadedFiles = {} }) => {
                     passportCountry: pd.passport_country || "",
                     emiratesId: pd.emirates_id || "",
                     emiratesExpiry: pd.emirates_expiry || "",
-                    
-                    country: finalCountry,
-                    city: finalCity,
-                    emirate: finalEmirate,
                     building: pd.building || "",
                     unit: pd.unit || "",
-                    street: pd.street || "",
+                    street: pd.street || ""
                 }));
+
             } else {
                 setErrorMsg("Failed to load application data.");
             }
@@ -351,7 +354,7 @@ const MortgageProduct = ({ uploadedFiles = {} }) => {
     fetchData();
   }, []);
 
-  // --- API FETCH (BANK PRODUCTS) ---
+  // --- 2. GET BANK PRODUCTS ---
   useEffect(() => {
     const fetchBankProducts = async () => {
         try {
@@ -412,7 +415,6 @@ const MortgageProduct = ({ uploadedFiles = {} }) => {
           <SummaryItem label="Loan type" value={mortgage_application?.loan_type || lead?.lead_sub_type?.replace(/_/g, ' ')} />
           <SummaryItem label="Income type" value={mortgage_application?.income_type || lead?.occupation} />
           
-          {/* Smart Property Value Display */}
           <SummaryItem 
              label="Property value" 
              value={
