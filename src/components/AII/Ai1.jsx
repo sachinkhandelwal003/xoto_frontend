@@ -1,518 +1,124 @@
-import React, { useState, useRef } from 'react';
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  Edit2, 
-  Upload, 
-  FileText, 
-  User,
-  LayoutGrid,
-  CheckCircle,
-  Save,
-  X,
-  Check,
-  Mail,
-  Phone
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useBlogContext } from "../../context/BlogContext";
 
-// --- Sub-Components ---
+// Images
+import Picture from "../../assets/img/Ai.png"; // Fixed background image
+import AvatarImage from "../../assets/img/img.png";
 
-// 1. Status Badge
-const StatusBadge = ({ status }) => (
-  <span className="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-medium">
-    {status}
-  </span>
-);
+const Ai1 = () => {
+  const { selectedBlogId } = useBlogContext();
 
-// 2. Summary Item
-const SummaryItem = ({ label, value }) => (
-  <div className="flex flex-col">
-    <span className="text-gray-500 text-xs mb-1">{label}</span>
-    <span className="text-gray-900 font-medium text-sm">{value}</span>
-  </div>
-);
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-// 3. Success/Ready Banner
-const ApplicationReadyBanner = () => (
-  <div className="bg-[#F0FDF4] border border-green-200 rounded-xl p-6 mb-6 animate-fade-in">
-    <h3 className="text-lg font-bold text-gray-900 mb-2">Your application is almost ready!</h3>
-    <p className="text-gray-600 text-sm leading-relaxed">
-      To help move the process along smoothly, please upload the required documents and complete your personal details. 
-      Your assigned agent will reach out with the next steps, and you can always return to this dashboard to track your progress.
-    </p>
-  </div>
-);
+  useEffect(() => {
+    if (!selectedBlogId) return;
 
-// 4. Card Container
-const Card = ({ title, subTitle, children, onEdit, isEditing, onUpload, isExpanded = true, toggleExpand, icon }) => {
+    setLoading(true);
+
+    axios
+      .get(
+        `https://xoto.ae/api/blogs/get-blog-by-id?id=${selectedBlogId}`
+      )
+      .then((res) => {
+        setBlog(res.data.data || res.data.blog || res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [selectedBlogId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center text-white bg-gray-900">
+        Loading Hero Section...
+      </div>
+    );
+  }
+
+  if (!blog) return null;
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 mb-4 overflow-hidden shadow-sm transition-all">
-      <div className="p-6 flex items-start justify-between">
-        <div className="flex gap-4">
-          <div className="mt-1">
-            <div className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center bg-gray-50 text-gray-500">
-               {icon}
-            </div>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-            <p className="text-gray-500 text-sm mt-1">{subTitle}</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {onUpload && (
-            <button onClick={onUpload} className="flex items-center text-gray-600 text-sm font-medium hover:text-black bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-md transition-colors">
-              <Upload size={16} className="mr-2" /> Upload
-            </button>
-          )}
-          {onEdit && (
-            <button onClick={onEdit} className={`flex items-center text-sm font-medium px-3 py-1.5 rounded-md transition-colors ${isEditing ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-600 hover:text-black bg-gray-100 hover:bg-gray-200'}`}>
-              {isEditing ? <><Save size={16} className="mr-2" /> Save</> : <><Edit2 size={16} className="mr-2" /> Edit</>}
-            </button>
-          )}
-          <button onClick={toggleExpand} className="text-gray-400 hover:text-gray-600 p-1">
-            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-          </button>
-        </div>
-      </div>
-      
-      {isExpanded && (
-        <div className="px-6 pb-6 pt-0 border-t border-transparent animate-fade-in">
-           <div className="h-px w-full bg-gray-100 mb-6"></div> 
-           {children}
-        </div>
-      )}
-    </div>
-  );
-};
+    <div className="text-gray-900 w-full">
+      <section
+        className="
+          relative
+          bg-cover bg-center bg-no-repeat
+          min-h-[55vh] sm:min-h-[65vh] md:min-h-[70vh] lg:min-h-[75vh]
+          flex items-center
+          text-white
+        "
+        style={{ backgroundImage: `url(${Picture})` }}
+      >
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/40"></div>
 
-// 5. Product Offer Card (UPDATED with Full Details View)
-const ProductOffer = ({ productId, bankName, tags, details, isSelected, onSelect, isDetailsOpen, onToggleDetails }) => {
-  return (
-    <div className={`border rounded-lg p-5 mb-4 relative group transition-all duration-300 ${isSelected ? 'border-purple-600 bg-purple-50 shadow-md' : 'border-gray-200 hover:border-gray-400 hover:shadow'}`}>
-      
-      {/* Top Section: Tags & Select Button */}
-      <div className="flex justify-between items-start mb-4">
-         <div className="flex gap-2">
-            {tags && tags.map((tag, idx) => (
-                <span key={idx} className={`text-xs px-2 py-1 rounded ${tag.includes('Popular') ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
-                {tag}
-                </span>
-            ))}
-         </div>
-         {isSelected ? (
-            <span className="flex items-center text-purple-600 font-bold text-sm bg-white px-3 py-1.5 rounded-full shadow-sm border border-purple-100">
-                <CheckCircle size={16} className="mr-1 text-purple-600" fill="currentColor" stroke="none"/> 
-                Selected
-            </span>
-        ) : (
-            <button 
-                onClick={() => onSelect(productId)}
-                className="bg-black text-white text-sm font-medium px-5 py-2 rounded-full hover:bg-gray-800 transition-all shadow-sm"
-            >
-                Select Offer
-            </button>
-        )}
-      </div>
+        {/* Bottom Clipped Bars */}
+        <div className="hidden lg:block absolute bottom-0 left-0 w-56 lg:w-64 h-10 lg:h-12 bg-[var(--color-body)] z-[5] clip-left-shape"></div>
+        <div className="hidden lg:block absolute bottom-0 right-0 w-56 lg:w-64 h-10 lg:h-12 bg-[var(--color-body)] z-[5] clip-right-shape"></div>
 
-      {/* Main Info Row (Always Visible) */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-4">
-        <div className="flex items-center gap-3 w-full md:w-1/4">
-           <div className="font-bold text-xl text-gray-800">{bankName}</div> 
-        </div>
+        <style>{`
+          .clip-left-shape {
+            clip-path: polygon(0 0, 55% 0, 100% 100%, 0% 100%);
+          }
+          .clip-right-shape {
+            clip-path: polygon(47% 0, 100% 0, 100% 100%, 0% 100%);
+          }
+        `}</style>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-           <div>
-              <p className="text-gray-500 text-xs mb-1">Initial rate</p>
-              <p className="font-bold text-gray-900 text-lg">{details.rate}</p>
-           </div>
-           <div>
-              <p className="text-gray-500 text-xs mb-1">Monthly EMI</p>
-              <p className="font-bold text-gray-900 text-lg">{details.emi}</p>
-           </div>
-           <div>
-              <p className="text-gray-500 text-xs mb-1">Bank processing fee</p>
-              <p className="font-bold text-gray-900 text-lg">{details.fee}</p>
-           </div>
-           <div>
-              <p className="text-gray-500 text-xs mb-1">Total upfront cost</p>
-              <p className="font-bold text-gray-900 text-lg">{details.upfront}</p>
-           </div>
-        </div>
-      </div>
-
-      {/* Toggle View More Button */}
-      <div className="flex justify-start">
-        <button 
-            onClick={() => onToggleDetails(productId)}
-            className="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+        {/* MAIN CONTENT */}
+        <div
+          className="
+            relative z-10
+            w-full max-w-7xl mx-auto
+            px-4 sm:px-6 lg:px-8
+            py-12 sm:py-16 md:py-20
+            flex flex-col gap-6 sm:gap-8
+          "
         >
-            {isDetailsOpen ? (
-                <><ChevronUp size={16} className="mr-1"/> Hide details</>
-            ) : (
-                <><ChevronDown size={16} className="mr-1"/> View details</>
-            )}
-        </button>
-      </div>
-      
-      {/* EXPANDED DETAILS SECTION */}
-      {isDetailsOpen && (
-          <div className="mt-6 pt-6 border-t border-gray-200 animate-fade-in bg-white/50">
-            <h4 className="font-medium text-gray-900 mb-2">5 year(s) FIXED | 65% Loan to value application | Conventional</h4>
-            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                Your monthly installment will be {details.emi} based on a loan over 25 years, with an initial rate of {details.rate}. 
-                At your purchase price, the total upfront cost including fees will be {details.upfront} with your bank financing the remaining balance.
-            </p>
+          {/* DATE */}
+          <div className="text-white text-xs sm:text-sm md:text-base font-normal tracking-wide flex items-center gap-2">
+            <span>{new Date(blog.createdAt).toDateString()}</span>
+            <span className="opacity-60">|</span>
+            <span className="opacity-90">Trending Analysis</span>
+          </div>
 
-            <div className="grid md:grid-cols-2 gap-10">
-                {/* Column 1: Costs Breakdown */}
-                <div>
-                    <h5 className="font-semibold text-gray-900 mb-4 border-b pb-2">Costs breakdown</h5>
-                    <div className="space-y-3 text-sm">
-                        <div className="flex justify-between"><span className="text-gray-600">Down payment</span> <span className="font-medium">159,440 AED</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Dubai land department fee</span> <span className="font-medium">18,801.8 AED</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Mortgage registration fee</span> <span className="font-medium">1,030.26 AED</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Trustee fee</span> <span className="font-medium">4,200 AED</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Bank processing fee</span> <span className="font-medium">{details.fee}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Valuation</span> <span className="font-medium">2,625 AED</span></div>
-                        <div className="flex justify-between text-red-500"><span className="">Fees add to loan</span> <span className="font-medium">-0 AED</span></div>
-                        <div className="flex justify-between pt-2 border-t font-bold text-gray-900"><span className="">Total upfront cost</span> <span className="">{details.upfront}</span></div>
-                    </div>
-                </div>
+          {/* TITLE + AUTHOR SECTION */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 lg:gap-16">
+            {/* TITLE */}
+            <h1 className="font-bold text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl leading-tight max-w-4xl">
+              {blog.title}
+            </h1>
 
-                {/* Column 2: Loan Breakdown */}
-                <div>
-                    <h5 className="font-semibold text-gray-900 mb-4 border-b pb-2">Loan breakdown</h5>
-                    <div className="space-y-3 text-sm">
-                        <div className="flex justify-between"><span className="text-gray-600">Product type</span> <span className="font-medium">Fixed</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Initial interest rate</span> <span className="font-medium">{details.rate}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Follow on rate</span> <span className="font-medium">1.69% + 3 Months Eibor</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Bank processing fee</span> <span className="font-medium">{details.fee}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Life insurance</span> <span className="font-medium">--</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Property insurance</span> <span className="font-medium">--</span></div>
-                        <div className="flex justify-between"><span className="text-gray-600">Over payments allowed</span> <span className="font-medium">25%</span></div>
-                    </div>
+            {/* AUTHOR */}
+            <div className="flex items-center gap-4 sm:gap-5">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 p-[2px] flex-shrink-0">
+                <div className="w-full h-full rounded-full overflow-hidden bg-gray-300">
+                  <img
+                    src={blog.authorImage || AvatarImage}
+                    alt={blog.authorName}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
+              </div>
+
+              <div>
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold">
+                  {blog.authorName || "Silicaman"}
+                </p>
+                <p className="text-xs sm:text-sm md:text-base text-white/70">
+                  Author
+                </p>
+              </div>
             </div>
           </div>
-      )}
+        </div>
+      </section>
     </div>
   );
 };
 
-// 6. Editable Data Row
-const EditableDataRow = ({ label, value, isEditing, onChange, type = "text" }) => (
-  <div className="flex justify-between items-center py-3 border-b border-gray-50 last:border-0 min-h-[50px]">
-    <span className="text-gray-500 text-sm">{label}</span>
-    {isEditing ? (
-      <input 
-        type={type}
-        value={value} 
-        onChange={(e) => onChange(e.target.value)}
-        className="border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 font-medium focus:outline-none focus:border-black text-right w-1/2"
-      />
-    ) : (
-      <span className="text-gray-900 text-sm font-medium">{value}</span>
-    )}
-  </div>
-);
-
-// --- Main Component ---
-
-const MortgageProduct = () => {
-  const navigate = useNavigate();
-
-  // --- STATES ---
-  const [expandedSections, setExpandedSections] = useState({
-    products: true, documents: true, personal: true, requirements: true
-  });
-
-  const [isEditingPersonal, setIsEditingPersonal] = useState(false);
-  const [isEditingRequirements, setIsEditingRequirements] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState(null);
-  const [openDetailsId, setOpenDetailsId] = useState(null); 
-  
-  const [uploadedDocuments, setUploadedDocuments] = useState([]);
-  const fileInputRef = useRef(null);
-
-  // Initial Data
-  const [personalDetails, setPersonalDetails] = useState({
-      name: "Shivam Mishra", dob: "--", gender: "--", marital: "--", residence: "Resident", nationality: "Expat",
-      salary: "45,151", employer: "--", passportNo: "--", passportCountry: "--", emiratesId: "--", emiratesExpiry: "--",
-      building: "--", unit: "--", street: "--", country: "UAE", city: "Dubai", emirate: "--"
-  });
-
-  const [productRequirements, setProductRequirements] = useState({
-      purchaseType: "Buy Out", hasMortgage: "NO", foundProperty: "YES", mortgageType: "--", fixedTerm: "--", loanType: "--", loanPeriod: "25 Years", ltv: "80%",
-      incomeType: "Salaried", income: "45,151", age: "21", financeAudit: "YES",
-      propertyValue: "455,545", propertyEmirate: "--", propertyArea: "--"
-  });
-
-  // --- HANDLERS ---
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
-
-  const handlePersonalChange = (field, value) => {
-    setPersonalDetails(prev => ({ ...prev, [field]: value }));
-  };
-  
-  const handleRequirementChange = (field, value) => {
-    setProductRequirements(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setUploadedDocuments(prev => [...prev, { name: file.name, id: Date.now() }]);
-      event.target.value = null; 
-    }
-  };
-
-  const removeDocument = (id) => {
-    setUploadedDocuments(prev => prev.filter(doc => doc.id !== id));
-  };
-
-  // Toggle "View More" for products
-  const toggleProductDetails = (id) => {
-      setOpenDetailsId(prev => prev === id ? null : id);
-  };
-
-  // Handle Select Offer
-  const handleSelectOffer = (id) => {
-      setSelectedProductId(id);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  return (
-    <div className="min-h-screen bg-[#F8F9FB] font-sans p-6 md:p-12 text-[#1a1a1a]">
-      
-      {/* Header Section */}
-      <div className="max-w-7xl mx-auto mb-8 animate-fade-in">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <div className="text-gray-500 text-sm mb-2">My Applications / Details</div>
-            <h1 className="text-3xl font-bold text-gray-900">Application ID - XMQS2760</h1>
-          </div>
-          <button className="bg-black text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center hover:bg-gray-800 transition shadow-sm">
-            <LayoutGrid size={16} className="mr-2" /> View My Applications
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-6 bg-transparent">
-          <SummaryItem label="Loan type" value={productRequirements.purchaseType} />
-          <SummaryItem label="Income type" value={productRequirements.incomeType} />
-          <SummaryItem label="Property value" value={productRequirements.propertyValue} />
-          <SummaryItem label="Loan period" value={productRequirements.loanPeriod} />
-          <div className="flex flex-col items-start">
-             <span className="text-gray-500 text-xs mb-1">Status</span>
-             <StatusBadge status="In Progress" />
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 items-start">
-        
-        {/* LEFT COLUMN (Main Content) */}
-        <div className="flex-1 w-full lg:max-w-[calc(100%-350px)]">
-          
-          {/* SHOW BANNER IF A PRODUCT IS SELECTED */}
-          {selectedProductId && <ApplicationReadyBanner />}
-
-          {/* 1. Selected Product Card */}
-          <Card 
-            title="Select your product" 
-            subTitle="Hover over a product and click select. Monthly EMI is calculated based on a 25 year mortgage term."
-            icon={<CheckCircle size={20} />}
-            isExpanded={expandedSections.products}
-            toggleExpand={() => toggleSection('products')}
-          >
-             <ProductOffer 
-                productId={1}
-                bankName="HSBC"
-                tags={['Popular 1-2 Year Fixed']}
-                details={{ rate: "3.99%", emi: "1,921 AED", fee: "0 AED", upfront: "105,540 AED" }}
-                isSelected={selectedProductId === 1}
-                onSelect={handleSelectOffer}
-                isDetailsOpen={openDetailsId === 1}
-                onToggleDetails={toggleProductDetails}
-             />
-             <ProductOffer 
-                productId={2}
-                bankName="Dubai Islamic Bank"
-                tags={['3-4 Year Fixed']}
-                details={{ rate: "3.95%", emi: "1,913 AED", fee: "500 AED", upfront: "105,914 AED" }}
-                isSelected={selectedProductId === 2}
-                onSelect={handleSelectOffer}
-                isDetailsOpen={openDetailsId === 2}
-                onToggleDetails={toggleProductDetails}
-             />
-             <ProductOffer 
-                productId={3}
-                bankName="ADCB"
-                tags={['Variable Rate']}
-                details={{ rate: "4.15%", emi: "1,980 AED", fee: "1000 AED", upfront: "106,540 AED" }}
-                isSelected={selectedProductId === 3}
-                onSelect={handleSelectOffer}
-                isDetailsOpen={openDetailsId === 3}
-                onToggleDetails={toggleProductDetails}
-             />
-          </Card>
-
-          {/* 2. Documents Upload */}
-          <Card 
-            title="Upload your documents" 
-            subTitle="Upload documents required for your mortgage application (e.g., Passport, Salary Certificate)"
-            icon={<FileText size={20} />}
-            onUpload={handleUploadClick}
-            isExpanded={expandedSections.documents}
-            toggleExpand={() => toggleSection('documents')}
-          >
-             <input 
-               type="file" 
-               ref={fileInputRef} 
-               onChange={handleFileChange} 
-               className="hidden" 
-               accept=".pdf,.jpg,.jpeg,.png"
-             />
-
-             {uploadedDocuments.length === 0 ? (
-                 <div className="flex flex-col items-center justify-center py-10 text-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
-                    <div className="w-20 h-20 mb-4 text-gray-300 bg-white rounded-full flex items-center justify-center shadow-sm">
-                       <Upload size={32} />
-                    </div>
-                    <p className="text-gray-600 font-medium">No documents uploaded yet.</p>
-                    <p className="text-gray-400 text-sm mb-6 mt-2 max-w-xs">Click the upload button above to add files (PDF, JPG, PNG).</p>
-                 </div>
-             ) : (
-                 <div className="space-y-3">
-                    <h4 className="font-medium text-gray-900 mb-4">Uploaded Files ({uploadedDocuments.length})</h4>
-                    {uploadedDocuments.map(doc => (
-                        <div key={doc.id} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200 animate-fade-in-up">
-                            <div className="flex items-center overflow-hidden">
-                                <div className="bg-white p-2 rounded border border-gray-200 mr-3 text-blue-600">
-                                    <FileText size={20} />
-                                </div>
-                                <span className="text-sm font-medium text-gray-700 truncate">{doc.name}</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <span className="text-xs text-green-600 font-medium flex items-center bg-green-50 px-2 py-1 rounded-full"><Check size={12} className="mr-1"/> Uploaded</span>
-                                <button onClick={() => removeDocument(doc.id)} className="text-gray-400 hover:text-red-500 p-1 hover:bg-gray-200 rounded transition">
-                                    <X size={18} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                 </div>
-             )}
-          </Card>
-
-          {/* 3. Personal Details */}
-          <Card 
-            title="Personal details" 
-            subTitle="Manage your personal information."
-            icon={<User size={20} />}
-            onEdit={() => setIsEditingPersonal(!isEditingPersonal)}
-            isEditing={isEditingPersonal}
-            isExpanded={expandedSections.personal}
-            toggleExpand={() => toggleSection('personal')}
-          >
-             <div className="mb-8">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Basic Info</h4>
-               <EditableDataRow label="Name" value={personalDetails.name} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('name', val)} />
-               <EditableDataRow label="Date of birth" value={personalDetails.dob} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('dob', val)} />
-               <EditableDataRow label="Gender" value={personalDetails.gender} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('gender', val)} />
-               <EditableDataRow label="Residence status" value={personalDetails.residence} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('residence', val)} />
-             </div>
-
-             <div className="mb-8">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Detailed Info</h4>
-               <EditableDataRow label="Salary (AED)" value={personalDetails.salary} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('salary', val)} type="number" />
-               <EditableDataRow label="Employer" value={personalDetails.employer} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('employer', val)} />
-               <EditableDataRow label="Emirates ID#" value={personalDetails.emiratesId} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('emiratesId', val)} />
-             </div>
-
-             <div className="mb-2">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Address</h4>
-               <EditableDataRow label="City" value={personalDetails.city} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('city', val)} />
-               <EditableDataRow label="Country" value={personalDetails.country} isEditing={isEditingPersonal} onChange={(val) => handlePersonalChange('country', val)} />
-             </div>
-          </Card>
-
-          {/* 4. Product Requirements */}
-          <Card 
-            title="Product requirements" 
-            subTitle="Review and update your loan requirements."
-            icon={<LayoutGrid size={20} />}
-            onEdit={() => setIsEditingRequirements(!isEditingRequirements)}
-            isEditing={isEditingRequirements}
-            isExpanded={expandedSections.requirements}
-            toggleExpand={() => toggleSection('requirements')}
-          >
-             <div className="mb-8">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Loan Details</h4>
-               <EditableDataRow label="Purchase type" value={productRequirements.purchaseType} isEditing={isEditingRequirements} onChange={(val) => handleRequirementChange('purchaseType', val)} />
-               <EditableDataRow label="Loan period" value={productRequirements.loanPeriod} isEditing={isEditingRequirements} onChange={(val) => handleRequirementChange('loanPeriod', val)} />
-               <EditableDataRow label="Loan to value" value={productRequirements.ltv} isEditing={isEditingRequirements} onChange={(val) => handleRequirementChange('ltv', val)} />
-             </div>
-
-             <div className="mb-8">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Financials</h4>
-               <EditableDataRow label="Income type" value={productRequirements.incomeType} isEditing={isEditingRequirements} onChange={(val) => handleRequirementChange('incomeType', val)} />
-               <EditableDataRow label="Monthly Income" value={productRequirements.income} isEditing={isEditingRequirements} onChange={(val) => handleRequirementChange('income', val)} type="number" />
-               <EditableDataRow label="Age" value={productRequirements.age} isEditing={isEditingRequirements} onChange={(val) => handleRequirementChange('age', val)} type="number"/>
-             </div>
-
-             <div className="mb-2">
-               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Property</h4>
-               <EditableDataRow label="Property value" value={productRequirements.propertyValue} isEditing={isEditingRequirements} onChange={(val) => handleRequirementChange('propertyValue', val)} type="number" />
-             </div>
-          </Card>
-
-        </div>
-
-        {/* RIGHT COLUMN (Sidebar - Static) */}
-        <div className="w-full lg:w-80 flex-shrink-0 sticky top-6">
-          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-             <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 rounded-full bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center">
-                   <User className="w-8 h-8 text-gray-400" />
-                </div>
-                <div>
-                   <h3 className="font-bold text-gray-900 text-lg">Syed Uddin</h3>
-                   <p className="text-sm text-gray-500">Mortgage Advisor</p>
-                </div>
-             </div>
-
-             <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                   <Mail size={16} /> syed.salman@holo.ae
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                   <Phone size={16} /> +971566138560
-                </div>
-             </div>
-
-             <div className="space-y-4 pt-4 border-t border-gray-100">
-                <button className="w-full bg-black text-white p-3 rounded-lg font-medium hover:bg-gray-800 transition flex items-center justify-center">
-                    Contact Advisor
-                </button>
-                <div className="text-xs text-gray-500 text-center px-4 leading-relaxed">
-                    Need help? Your advisor is just a click away to assist with your application.
-                </div>
-             </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
-};
-
-export default MortgageProduct;
+export default Ai1;
