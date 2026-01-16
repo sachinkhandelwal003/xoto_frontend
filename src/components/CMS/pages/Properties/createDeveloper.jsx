@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios'; 
 import {
   Button, Modal, Form, Input, Popconfirm, Card, Table,
-  Typography, Avatar, Row, Col, Statistic, Space, Divider, message, notification, Tooltip, Grid
+  Typography, Avatar, Row, Col, Statistic, Space, Divider, message, notification, Tooltip, Grid, Switch
 } from 'antd';
 import {
   PlusOutlined, UserOutlined, MailOutlined, PhoneOutlined,
-  DeleteOutlined, EditOutlined, SearchOutlined, UsergroupAddOutlined, GlobalOutlined
+  DeleteOutlined, EditOutlined, SearchOutlined, UsergroupAddOutlined, GlobalOutlined, 
+  CheckOutlined, CloseOutlined, LockOutlined, HomeOutlined, EnvironmentOutlined, LinkOutlined, FileTextOutlined, NumberOutlined
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
+const { TextArea } = Input;
 
 const THEME = {
   primary: "#7c3aed", 
@@ -21,11 +23,11 @@ const THEME = {
 const CreateDeveloper = () => {
   const BASE_URL = "https://xoto.ae/api/property"; 
   
-  // Ant Design Hook for Javascript-level responsiveness (useful for Modal width)
   const screens = useBreakpoint();
 
   const [developers, setDevelopers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -73,11 +75,20 @@ const CreateDeveloper = () => {
       });
       const dev = response.data?.data || response.data;
       if (dev) {
+        // Updated to set ALL fields
         form.setFieldsValue({
           name: dev.name,
           email: dev.email,
           phone_number: dev.phone_number,
-          country_code: dev.country_code || '+91'
+          country_code: dev.country_code || '+91',
+          password: dev.password,
+          description: dev.description,
+          websiteUrl: dev.websiteUrl,
+          country: dev.country,
+          city: dev.city,
+          address: dev.address,
+          reraNumber: dev.reraNumber,
+          logo: dev.logo
         });
         setEditingId(id);
         setModalVisible(true);
@@ -93,11 +104,21 @@ const CreateDeveloper = () => {
   const handleSave = async (values) => {
     setLoading(true);
     try {
+      // Create payload with ALL fields
       const payload = {
         name: values.name,
         email: values.email,
         phone_number: values.phone_number,
         country_code: values.country_code,
+        password: values.password,
+        description: values.description || "",
+        websiteUrl: values.websiteUrl || "",
+        country: values.country || "",
+        city: values.city || "",
+        address: values.address || "",
+        reraNumber: values.reraNumber || "",
+        logo: values.logo || "",
+        // Note: isVerifiedByAdmin is NOT updated here, only via toggle
       };
 
       let response;
@@ -106,6 +127,7 @@ const CreateDeveloper = () => {
           params: { id: editingId }
         });
       } else {
+        // Default verified status for new ones can be handled by backend or added here if needed
         response = await axios.post(`${BASE_URL}/create-developer`, payload);
       }
       
@@ -125,7 +147,32 @@ const CreateDeveloper = () => {
     }
   };
 
-  // --- 4. DELETE ---
+  // --- 4. QUICK STATUS TOGGLE (From Table Only) ---
+  const handleStatusToggle = async (record, checked) => {
+    setActionLoading(record._id || record.id);
+    try {
+      // Re-sending necessary fields plus the new status
+      const payload = {
+        ...record, // Spread existing record data
+        isVerifiedByAdmin: checked
+      };
+      // Remove _id from payload if it exists inside record to avoid duplication conflicts
+      delete payload._id; 
+
+      await axios.post(`${BASE_URL}/edit-developer`, payload, {
+        params: { id: record._id || record.id }
+      });
+      
+      message.success(`Developer ${checked ? 'Verified' : 'Unverified'} successfully`);
+      fetchDevelopers(currentPage, pageSize, searchText);
+    } catch (err) {
+      message.error("Failed to update status");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // --- 5. DELETE ---
   const deleteDeveloper = async (id) => {
     try {
       setLoading(true);
@@ -153,12 +200,17 @@ const CreateDeveloper = () => {
       title: 'Developer Name',
       dataIndex: 'name',
       key: 'name',
-      fixed: screens.md ? 'left' : false, // Fix column on desktop only
+      fixed: screens.md ? 'left' : false, 
       width: 200,
-      render: (text) => (
+      render: (text, record) => (
         <Space>
-          <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: THEME.primary }} />
-          <Text strong>{text}</Text>
+          <Avatar size="small" src={record.logo} icon={<UserOutlined />} style={{ backgroundColor: record.isVerifiedByAdmin ? THEME.success : THEME.primary }} />
+          <div>
+            <Text strong>{text}</Text>
+            {record.isVerifiedByAdmin && (
+               <div className="text-[10px] text-green-600 leading-none">Verified</div>
+            )}
+          </div>
         </Space>
       ),
     },
@@ -166,25 +218,46 @@ const CreateDeveloper = () => {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      width: 250,
+      width: 220,
       render: (email) => (
         <Text type="secondary"><MailOutlined /> {email}</Text>
       ),
     },
     {
-      title: 'Contact',
-      key: 'contact',
+      title: 'Location',
+      key: 'location',
       width: 180,
       render: (_, record) => (
-        <Text><PhoneOutlined /> {record.country_code} {record.phone_number}</Text>
+         <div className="flex flex-col text-xs text-gray-500">
+             <span>{record.city}, {record.country}</span>
+             <span className="truncate max-w-[150px]">{record.address}</span>
+         </div>
+      ),
+    },
+    // --- STATUS TOGGLE IS HERE ONLY ---
+    {
+      title: 'Verified',
+      dataIndex: 'isVerifiedByAdmin',
+      key: 'isVerifiedByAdmin',
+      width: 100,
+      align: 'center',
+      render: (checked, record) => (
+        <Switch 
+          checked={checked}
+          loading={actionLoading === (record._id || record.id)}
+          onChange={(val) => handleStatusToggle(record, val)}
+          checkedChildren={<CheckOutlined />}
+          unCheckedChildren={<CloseOutlined />}
+          style={{ backgroundColor: checked ? THEME.success : undefined }}
+        />
       ),
     },
     {
       title: 'Action',
       key: 'actions',
       align: 'center',
-      fixed: screens.md ? 'right' : false, // Fix column on desktop only
-      width: 120,
+      fixed: screens.md ? 'right' : false,
+      width: 100,
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Edit">
@@ -212,10 +285,9 @@ const CreateDeveloper = () => {
   ];
 
   return (
-    // Changed p-6 to p-4 md:p-6 for better mobile spacing
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
       
-      {/* 1. HEADER: Flex-col on mobile, Flex-row on desktop */}
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <Title level={3} style={{ margin: 0 }}>Developer Management</Title>
@@ -225,9 +297,13 @@ const CreateDeveloper = () => {
           type="primary" 
           size="large" 
           icon={<PlusOutlined />} 
-          onClick={() => setModalVisible(true)}
+          onClick={() => {
+              setEditingId(null);
+              form.resetFields();
+              setModalVisible(true);
+          }}
           style={{ backgroundColor: THEME.primary, borderColor: THEME.primary }}
-          className="w-full md:w-auto" // Full width button on mobile
+          className="w-full md:w-auto"
         >
           Add New Developer
         </Button>
@@ -247,7 +323,6 @@ const CreateDeveloper = () => {
 
       <Card bordered={false} className="shadow-md" bodyStyle={{ padding: 0 }}>
         <div className="p-4 border-b bg-white rounded-t-lg">
-          {/* 2. SEARCH: 100% width on mobile, 400px on desktop */}
           <Input 
             prefix={<SearchOutlined className="text-gray-400" />} 
             placeholder="Search by name or email..." 
@@ -261,13 +336,12 @@ const CreateDeveloper = () => {
           />
         </div>
 
-        {/* 3. TABLE: Added scroll prop for horizontal scrolling on mobile */}
         <Table 
           columns={columns} 
           dataSource={developers} 
-          loading={loading}
+          loading={loading && !actionLoading}
           rowKey={(record) => record._id || record.id}
-          scroll={{ x: 800 }} // Enables horizontal scroll if screen < 800px
+          scroll={{ x: 1000 }} 
           pagination={{
             current: currentPage,
             pageSize: pageSize,
@@ -277,7 +351,6 @@ const CreateDeveloper = () => {
               setCurrentPage(page);
               setPageSize(size);
             },
-            // Repsonsive Pagination position
             position: ['bottomRight']
           }}
         />
@@ -290,37 +363,96 @@ const CreateDeveloper = () => {
         footer={null}
         centered
         destroyOnClose
-        // 4. MODAL: Responsive width logic
-        width={screens.xs ? '95%' : 500}
+        width={screens.xs ? '95%' : 700} // Increased width for more fields
       >
         <Divider style={{ margin: '10px 0 25px 0' }} />
-        <Form form={form} layout="vertical" onFinish={handleSave} initialValues={{ country_code: '+91' }}>
-          <Form.Item name="name" label="Developer Name" rules={[{ required: true, message: 'Please enter developer name' }]}>
-            <Input prefix={<UserOutlined />} placeholder="e.g. John Doe" size="large" />
-          </Form.Item>
+        <Form 
+            form={form} 
+            layout="vertical" 
+            onFinish={handleSave} 
+            initialValues={{ country_code: '+91' }}
+        >
+          {/* SECTION 1: ACCOUNT DETAILS */}
+          <Text strong className="text-gray-500 block mb-3 uppercase text-xs">Account Details</Text>
+          <Row gutter={16}>
+             <Col xs={24} md={12}>
+                <Form.Item name="name" label="Developer Name" rules={[{ required: true, message: 'Required' }]}>
+                    <Input prefix={<UserOutlined />} placeholder="e.g. John Doe" />
+                </Form.Item>
+             </Col>
+             <Col xs={24} md={12}>
+                <Form.Item name="email" label="Email Address" rules={[{ required: true, type: 'email', message: 'Invalid email' }]}>
+                    <Input prefix={<MailOutlined />} placeholder="email@example.com" />
+                </Form.Item>
+             </Col>
+             <Col xs={24} md={12}>
+                <Form.Item name="password" label="Password" rules={[{ required: !editingId, message: 'Password is required' }]}>
+                    <Input.Password prefix={<LockOutlined />} placeholder="Enter password" />
+                </Form.Item>
+             </Col>
+             <Col xs={24} md={12}>
+                <Form.Item name="reraNumber" label="RERA Number">
+                    <Input prefix={<NumberOutlined />} placeholder="e.g. RERA123456" />
+                </Form.Item>
+             </Col>
+          </Row>
 
-          <Form.Item name="email" label="Email Address" rules={[{ required: true, type: 'email', message: 'Please enter a valid email' }]}>
-            <Input prefix={<MailOutlined />} placeholder="johndoe@gmail.com" size="large" />
-          </Form.Item>
+          <Divider style={{ margin: '10px 0 20px 0' }} />
 
-          <Row gutter={10}>
-            <Col xs={8} sm={7}>
+          {/* SECTION 2: CONTACT & LOCATION */}
+          <Text strong className="text-gray-500 block mb-3 uppercase text-xs">Contact & Location</Text>
+          <Row gutter={16}>
+            <Col xs={8} md={6}>
               <Form.Item name="country_code" label="Code">
-                <Input prefix={<GlobalOutlined />} readOnly style={{ backgroundColor: '#f5f5f5' }} size="large" />
+                <Input prefix={<GlobalOutlined />} readOnly style={{ backgroundColor: '#f5f5f5' }} />
               </Form.Item>
             </Col>
-            <Col xs={16} sm={17}>
-              <Form.Item 
-                name="phone_number" 
-                label="Phone Number" 
-                rules={[{ required: true, pattern: /^\d{10}$/, message: 'Must be exactly 10 digits' }]}
-              >
-                <Input prefix={<PhoneOutlined />} placeholder="9876543210" size="large" maxLength={10} />
+            <Col xs={16} md={18}>
+              <Form.Item name="phone_number" label="Phone Number" rules={[{ required: true }]}>
+                <Input prefix={<PhoneOutlined />} placeholder="9876543210" maxLength={15} />
               </Form.Item>
+            </Col>
+            
+            <Col xs={24} md={12}>
+                <Form.Item name="country" label="Country">
+                    <Input prefix={<GlobalOutlined />} placeholder="UAE" />
+                </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+                <Form.Item name="city" label="City">
+                    <Input prefix={<EnvironmentOutlined />} placeholder="Los Angeles" />
+                </Form.Item>
+            </Col>
+            <Col span={24}>
+                <Form.Item name="address" label="Address">
+                    <Input prefix={<HomeOutlined />} placeholder="Business Bay, Dubai" />
+                </Form.Item>
             </Col>
           </Row>
 
-          <div className="flex justify-end gap-3 mt-6">
+          <Divider style={{ margin: '10px 0 20px 0' }} />
+
+          {/* SECTION 3: ADDITIONAL INFO */}
+          <Text strong className="text-gray-500 block mb-3 uppercase text-xs">Additional Info</Text>
+          <Row gutter={16}>
+            <Col span={24}>
+                <Form.Item name="websiteUrl" label="Website URL">
+                    <Input prefix={<LinkOutlined />} placeholder="https://example.com" />
+                </Form.Item>
+            </Col>
+            <Col span={24}>
+                <Form.Item name="logo" label="Logo URL">
+                    <Input prefix={<FileTextOutlined />} placeholder="https://image-url.com/logo.png" />
+                </Form.Item>
+            </Col>
+            <Col span={24}>
+                <Form.Item name="description" label="Description">
+                    <TextArea rows={3} placeholder="About the developer..." />
+                </Form.Item>
+            </Col>
+          </Row>
+
+          <div className="flex justify-end gap-3 mt-4">
             <Button size="large" onClick={closeModal}>Cancel</Button>
             <Button 
               type="primary" 
