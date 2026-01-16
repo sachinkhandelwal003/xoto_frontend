@@ -32,6 +32,10 @@ import Employeedashboard from "./components/CMS/pages/Employeedashboard";
 import Customerdashboard from "./components/CMS/pages/Customerdashboard";
 import AdminLogin from "./components/login/AdminLogin";
 import SellerPage from "./components/ecommerce/B2C/SellerPage";
+import DeveloperRegistration from "./components/ecommerce/B2C/DeveloperRegistration";
+import DeveloperLayout from "./components/ecommerce/B2C/DeveloperLayout";
+import DeveloperDashboard from "./components/ecommerce/B2C/DeveloperDashboard";
+import PropertyManagement from "./components/ecommerce/B2C/DeveloperPropertyManagement";
 import Sellerb2b from "./components/ecommerce/B2C/Sellerb2b";
 import Landspackng from "./components/homepage/Landspackng";
 import Ynterior from "./components/homepage/Yniterior";
@@ -324,7 +328,12 @@ function App() {
           <Route path="/ecommerce" element={<MainEcommercePage />} />
           <Route path="/ecommerce/b2c" element={<HomeB2C />} />
           <Route path="/ecommerce/seller" element={<SellerPage />} />
-          <Route path="/ecommerce/seller/b2b" element={<Sellerb2b />} />
+          <Route path="/developer/registration" element={<DeveloperRegistration />} />
+<Route path="/dashboard/developer" element={<DeveloperLayout />}>
+  <Route index element={<DeveloperDashboard />} />
+  <Route path="property-management" element={<PropertyManagement />} />
+</Route>
+        <Route path="/ecommerce/seller/b2b" element={<Sellerb2b />} />
           <Route path="/ecommerce/b2b" element={<HomeB2B />} />
           <Route path="/ecommerce/cart" element={<CartPage />} />
           <Route path="/ecommerce/filter" element={<ProductFilterPage />} />
