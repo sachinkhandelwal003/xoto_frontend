@@ -32,6 +32,8 @@ import {
   ShoppingFilled,
   TeamOutlined,
   CodeOutlined,
+  IdcardOutlined,
+  ApartmentOutlined, // ✅ Icon for Agency
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -106,6 +108,9 @@ const SelectionCard = styled.div`
 
 const Login = () => {
   const [form] = Form.useForm();
+  
+  // view states: 'main' | 'xoto-select' | 'login'
+  const [view, setView] = useState("main"); 
   const [selectedPartnerType, setSelectedPartnerType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState("");
@@ -116,44 +121,80 @@ const Login = () => {
   const screens = useBreakpoint();
   const isMobile = !screens.md;
 
-  // --- Partner Configuration ---
-  const partnerTypes = [
+  // --- Configuration ---
+  
+  // 1. Main Categories (First Screen)
+  const mainCategories = [
     {
-      value: "freelancer",
+      id: "freelancer",
       label: "Execution Partners",
       desc: "For Service Providers",
       icon: <UserOutlined style={{ fontSize: "28px" }} />,
       color: "#5C039B",
       gradient: "linear-gradient(135deg, #5C039B, #8E44AD)",
+      type: "direct",
     },
     {
-      value: "vendor-b2c",
+      id: "vendor-b2c",
       label: "Strategic Alliances",
       desc: "For Product Sellers",
       icon: <ShopOutlined style={{ fontSize: "28px" }} />,
       color: "#03A4F4",
       gradient: "linear-gradient(135deg, #03A4F4, #0077b6)",
+      type: "direct",
     },
     {
-      value: "business-association",
+      id: "business-association",
       label: "Business Associates",
       desc: "For Business Networks",
       icon: <TeamOutlined style={{ fontSize: "28px" }} />,
       color: "#10B981",
       gradient: "linear-gradient(135deg, #10B981, #059669)",
+      type: "direct",
     },
     {
-      value: "developer",
-      label: "Developers",
-      desc: "For Developer Partners",
+      id: "xoto-grid", // Group Trigger
+      label: "Xoto Grid",
+      desc: "Devs, Agents & Agencies",
       icon: <CodeOutlined style={{ fontSize: "28px" }} />,
       color: "#F97316",
       gradient: "linear-gradient(135deg, #F97316, #EA580C)",
+      type: "group", 
+    },
+  ];
+
+  // 2. All Partner Types (For Login Logic & Sub-selection)
+  const partnerTypes = [
+    ...mainCategories,
+    {
+      value: "developer",
+      label: "Developer",
+      desc: "For Real Estate Developers",
+      icon: <CodeOutlined style={{ fontSize: "28px" }} />,
+      color: "#F97316", // Orange
+      gradient: "linear-gradient(135deg, #F97316, #EA580C)",
+    },
+    {
+      value: "agent",
+      label: "Agent",
+      desc: "For Real Estate Agents",
+      icon: <IdcardOutlined style={{ fontSize: "28px" }} />,
+      color: "#E11D48", // Rose/Red
+      gradient: "linear-gradient(135deg, #E11D48, #BE123C)",
+    },
+    {
+      value: "agency",
+      label: "Agency",
+      desc: "For Property Agencies",
+      icon: <ApartmentOutlined style={{ fontSize: "28px" }} />,
+      color: "#4F46E5", // Indigo/Blue
+      gradient: "linear-gradient(135deg, #4F46E5, #4338ca)",
     },
   ];
 
   const getSelectedPartner = () =>
-    partnerTypes.find((t) => t.value === selectedPartnerType);
+    partnerTypes.find((t) => t.value === selectedPartnerType) || 
+    partnerTypes.find((t) => t.id === selectedPartnerType);
 
   // ✅ Login success effect
   useEffect(() => {
@@ -166,9 +207,16 @@ const Login = () => {
       let themeColor = "#5C039B";
       let themeIcon = <RocketFilled />;
 
+      // Determine theme based on partner type
       if (selectedPartnerType === "developer") {
         themeColor = "#F97316";
         themeIcon = <CodeOutlined />;
+      } else if (selectedPartnerType === "agent") {
+        themeColor = "#E11D48";
+        themeIcon = <IdcardOutlined />;
+      } else if (selectedPartnerType === "agency") {
+        themeColor = "#4F46E5"; // Indigo for Agency
+        themeIcon = <ApartmentOutlined />;
       } else if (["5", "6"].includes(roleCode)) {
         themeColor = "#03A4F4";
         themeIcon = <ShoppingFilled />;
@@ -209,7 +257,11 @@ const Login = () => {
           autoClose: 2000,
           style: {
             background:
-              themeColor === "#5C039B"
+              selectedPartnerType === "agent"
+                ? "linear-gradient(135deg, #E11D48, #BE123C)"
+                : selectedPartnerType === "agency"
+                ? "linear-gradient(135deg, #4F46E5, #4338ca)"
+                : themeColor === "#5C039B"
                 ? "linear-gradient(135deg, #5C039B, #8E44AD)"
                 : themeColor === "#03A4F4"
                 ? "linear-gradient(135deg, #03A4F4, #0077b6)"
@@ -227,9 +279,16 @@ const Login = () => {
 
       // ✅ Redirect after toast
       setTimeout(() => {
-        // ✅ Developer always goes here
         if (selectedPartnerType === "developer") {
           navigate("/dashboard/developer", { replace: true });
+          return;
+        }
+        if (selectedPartnerType === "agent") {
+          navigate("/dashboard/agent", { replace: true });
+          return;
+        }
+        if (selectedPartnerType === "agency") {
+          navigate("/dashboard/agency", { replace: true });
           return;
         }
 
@@ -251,16 +310,39 @@ const Login = () => {
   }, [isAuthenticated, user, token, navigate, selectedPartnerType]);
 
   // --- Handlers ---
-  const handlePartnerSelect = (type) => {
-    setSelectedPartnerType(type);
-    setGeneralError("");
-    form.resetFields();
+  
+  const handleMainSelect = (category) => {
+    if (category.type === "group") {
+        setView("xoto-select"); 
+    } else {
+        setSelectedPartnerType(category.id);
+        setView("login");
+        setGeneralError("");
+        form.resetFields();
+    }
   };
 
-  const handleBackToSelection = () => {
-    setSelectedPartnerType(null);
+  const handleSubSelect = (type) => {
+    setSelectedPartnerType(type);
+    setView("login");
     setGeneralError("");
     form.resetFields();
+  }
+
+  const handleBack = () => {
+    setGeneralError("");
+    form.resetFields();
+    
+    if (view === "login") {
+        if (["developer", "agent", "agency"].includes(selectedPartnerType)) {
+            setView("xoto-select"); 
+        } else {
+            setView("main"); 
+            setSelectedPartnerType(null);
+        }
+    } else if (view === "xoto-select") {
+        setView("main");
+    }
   };
 
   // ✅ MAIN LOGIN SUBMIT
@@ -277,7 +359,11 @@ const Login = () => {
       else if (selectedPartnerType === "business-association")
         endpoint = "/association/login";
       else if (selectedPartnerType === "developer")
-        endpoint = "/property/login-developer"; // ✅ FIXED API
+        endpoint = "/property/login-developer"; 
+      else if (selectedPartnerType === "agent")
+        endpoint = "/property/login-agent";
+      else if (selectedPartnerType === "agency")
+        endpoint = "/property/login-agency"; // ✅ Agency Endpoint
 
       await login(endpoint, {
         email: values.email,
@@ -300,12 +386,18 @@ const Login = () => {
       navigate("/ecommerce/seller");
     else if (selectedPartnerType === "developer")
       navigate("/developer/registration");
+    else if (selectedPartnerType === "agent")
+      navigate("/agent/registration"); 
+    else if (selectedPartnerType === "agency")
+      navigate("/agency/registration"); // ✅ Agency Registration
   };
 
   // --- RENDER CONTENT ---
-  const renderPartnerSelection = () => (
+  
+  // 1. Main Selection Screen
+  const renderMainSelection = () => (
     <motion.div
-      key="selection"
+      key="main-selection"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
@@ -314,157 +406,160 @@ const Login = () => {
       <div style={{ marginBottom: 24 }}>
         <ArrowLeftOutlined
           onClick={() => navigate("/")}
-          style={{
-            fontSize: "24px",
-            color: "#000",
-            cursor: "pointer",
-            padding: "8px",
-            marginLeft: "-8px",
-          }}
+          style={{ fontSize: "24px", color: "#000", cursor: "pointer", padding: "8px", marginLeft: "-8px" }}
         />
       </div>
 
       <div style={{ textAlign: "center", marginBottom: 30 }}>
-        <Title level={3} style={{ margin: 0, color: "#333" }}>
-          Select Partner Type
-        </Title>
+        <Title level={3} style={{ margin: 0, color: "#333" }}>Select Partner Type</Title>
         <Text type="secondary">Choose your Account type to continue</Text>
       </div>
 
-      <Row gutter={[20, 20]} style={{ marginBottom: 20 }}>
-        <Col xs={24} sm={12} md={12}>
-          <SelectionCard
-            $active={selectedPartnerType === "freelancer"}
-            $color="#5C039B"
-            onClick={() => handlePartnerSelect("freelancer")}
-          >
-            <div
-              style={{
-                width: 70,
-                height: 70,
-                borderRadius: "50%",
-                background: "#5C039B",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-              }}
-            >
-              <UserOutlined style={{ fontSize: "28px" }} />
-            </div>
-            <div>
-              <div style={{ fontSize: 20, fontWeight: "bold", color: "#333" }}>
-                Execution Partners
-              </div>
-              <div style={{ fontSize: 14, color: "#888" }}>
-                For Service Providers
-              </div>
-            </div>
-          </SelectionCard>
-        </Col>
-
-        <Col xs={24} sm={12} md={12}>
-          <SelectionCard
-            $active={selectedPartnerType === "vendor-b2c"}
-            $color="#03A4F4"
-            onClick={() => handlePartnerSelect("vendor-b2c")}
-          >
-            <div
-              style={{
-                width: 70,
-                height: 70,
-                borderRadius: "50%",
-                background: "#03A4F4",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-              }}
-            >
-              <ShopOutlined style={{ fontSize: "28px" }} />
-            </div>
-            <div>
-              <div style={{ fontSize: 20, fontWeight: "bold", color: "#333" }}>
-                Strategic Alliances
-              </div>
-              <div style={{ fontSize: 14, color: "#888" }}>
-                For Product Sellers
-              </div>
-            </div>
-          </SelectionCard>
-        </Col>
-      </Row>
-
       <Row gutter={[20, 20]}>
-        <Col xs={24} sm={12} md={12}>
-          <SelectionCard
-            $active={selectedPartnerType === "business-association"}
-            $color="#10B981"
-            onClick={() => handlePartnerSelect("business-association")}
-          >
-            <div
-              style={{
-                width: 70,
-                height: 70,
-                borderRadius: "50%",
-                background: "#10B981",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-              }}
-            >
-              <TeamOutlined style={{ fontSize: "28px" }} />
-            </div>
-            <div>
-              <div style={{ fontSize: 20, fontWeight: "bold", color: "#333" }}>
-                Business Associates
-              </div>
-              <div style={{ fontSize: 14, color: "#888" }}>
-                For Business Networks
-              </div>
-            </div>
-          </SelectionCard>
-        </Col>
+        {mainCategories.map((cat) => (
+             <Col xs={24} sm={12} md={12} key={cat.id}>
+             <SelectionCard
+               $active={false} 
+               $color={cat.color}
+               onClick={() => handleMainSelect(cat)}
+             >
+               <div
+                 style={{
+                   width: 70, height: 70, borderRadius: "50%",
+                   background: cat.color, color: "#fff",
+                   display: "flex", alignItems: "center", justifyContent: "center",
+                   boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                 }}
+               >
+                 {cat.icon}
+               </div>
+               <div>
+                 <div style={{ fontSize: 20, fontWeight: "bold", color: "#333" }}>
+                   {cat.label}
+                 </div>
+                 <div style={{ fontSize: 14, color: "#888" }}>
+                   {cat.desc}
+                 </div>
+               </div>
+             </SelectionCard>
+           </Col>
+        ))}
+      </Row>
+    </motion.div>
+  );
 
-        <Col xs={24} sm={12} md={12}>
+  // 2. Xoto Sub-Selection Screen (Developer, Agent & Agency)
+  const renderXotoSelection = () => (
+    <motion.div
+      key="xoto-selection"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Button
+          type="text"
+          icon={<ArrowLeftOutlined />}
+          onClick={handleBack}
+          style={{ marginBottom: 16, paddingLeft: 0, color: "#888" }}
+        >
+          Back to Selection
+        </Button>
+
+      <div style={{ textAlign: "center", marginBottom: 30 }}>
+        <Title level={3} style={{ margin: 0, color: "#333" }}>Xoto Grid Access</Title>
+        <Text type="secondary">Select your role to proceed</Text>
+      </div>
+
+      <Row gutter={[16, 16]} justify="center">
+        {/* Developer Card */}
+        <Col xs={24} sm={12} md={8}>
           <SelectionCard
             $active={selectedPartnerType === "developer"}
             $color="#F97316"
-            onClick={() => handlePartnerSelect("developer")}
+            onClick={() => handleSubSelect("developer")}
           >
-            <div
-              style={{
-                width: 70,
-                height: 70,
-                borderRadius: "50%",
-                background: "#F97316",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-              }}
-            >
-              <CodeOutlined style={{ fontSize: "28px" }} />
-            </div>
-            <div>
-              <div style={{ fontSize: 20, fontWeight: "bold", color: "#333" }}>
-                Developers
-              </div>
-              <div style={{ fontSize: 14, color: "#888" }}>
-                For Grid
-              </div>
-            </div>
+             <div
+                 style={{
+                   width: 60, height: 60, borderRadius: "50%",
+                   background: "#F97316", color: "#fff",
+                   display: "flex", alignItems: "center", justifyContent: "center",
+                   boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                 }}
+               >
+                 <CodeOutlined style={{ fontSize: "24px" }} />
+               </div>
+               <div>
+                 <div style={{ fontSize: 18, fontWeight: "bold", color: "#333" }}>
+                   Developer
+                 </div>
+                 <div style={{ fontSize: 13, color: "#888" }}>
+                   Real Estate Developers
+                 </div>
+               </div>
+          </SelectionCard>
+        </Col>
+
+        {/* Agency Card */}
+        <Col xs={24} sm={12} md={8}>
+          <SelectionCard
+            $active={selectedPartnerType === "agency"}
+            $color="#4F46E5"
+            onClick={() => handleSubSelect("agency")}
+          >
+             <div
+                 style={{
+                   width: 60, height: 60, borderRadius: "50%",
+                   background: "#4F46E5", color: "#fff",
+                   display: "flex", alignItems: "center", justifyContent: "center",
+                   boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                 }}
+               >
+                 <ApartmentOutlined style={{ fontSize: "24px" }} />
+               </div>
+               <div>
+                 <div style={{ fontSize: 18, fontWeight: "bold", color: "#333" }}>
+                   Agency
+                 </div>
+                 <div style={{ fontSize: 13, color: "#888" }}>
+                   Property Agencies
+                 </div>
+               </div>
+          </SelectionCard>
+        </Col>
+
+        {/* Agent Card */}
+        <Col xs={24} sm={12} md={8}>
+          <SelectionCard
+            $active={selectedPartnerType === "agent"}
+            $color="#E11D48"
+            onClick={() => handleSubSelect("agent")}
+          >
+             <div
+                 style={{
+                   width: 60, height: 60, borderRadius: "50%",
+                   background: "#E11D48", color: "#fff",
+                   display: "flex", alignItems: "center", justifyContent: "center",
+                   boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                 }}
+               >
+                 <IdcardOutlined style={{ fontSize: "24px" }} />
+               </div>
+               <div>
+                 <div style={{ fontSize: 18, fontWeight: "bold", color: "#333" }}>
+                   Agent
+                 </div>
+                 <div style={{ fontSize: 13, color: "#888" }}>
+                   Real Estate Agents
+                 </div>
+               </div>
           </SelectionCard>
         </Col>
       </Row>
     </motion.div>
   );
 
+  // 3. Login Form
   const renderLoginForm = () => {
     const activePartner = getSelectedPartner();
 
@@ -479,10 +574,10 @@ const Login = () => {
         <Button
           type="text"
           icon={<ArrowLeftOutlined />}
-          onClick={handleBackToSelection}
+          onClick={handleBack}
           style={{ marginBottom: 16, paddingLeft: 0, color: "#888" }}
         >
-          Back to Selection
+          {view === 'xoto-select' ? "Back to Xoto Grid" : "Back to Selection"}
         </Button>
 
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
@@ -491,7 +586,7 @@ const Login = () => {
               width: 60,
               height: 60,
               borderRadius: 12,
-              background: activePartner.gradient,
+              background: activePartner?.gradient,
               color: "#fff",
               display: "flex",
               alignItems: "center",
@@ -499,11 +594,11 @@ const Login = () => {
               boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
             }}
           >
-            {activePartner.icon}
+            {activePartner?.icon}
           </div>
           <div>
             <Title level={4} style={{ margin: 0, color: "#333" }}>
-              Login as {activePartner.label}
+              Login as {activePartner?.label}
             </Title>
             <Text type="secondary">
               Enter your credentials to access dashboard
@@ -557,7 +652,7 @@ const Login = () => {
                 borderRadius: 12,
                 fontWeight: "bold",
                 fontSize: "15px",
-                background: activePartner.gradient,
+                background: activePartner?.gradient,
                 border: "none",
                 boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
               }}
@@ -573,8 +668,8 @@ const Login = () => {
                 borderRadius: 12,
                 fontWeight: "bold",
                 fontSize: "15px",
-                borderColor: activePartner.color,
-                color: activePartner.color,
+                borderColor: activePartner?.color,
+                color: activePartner?.color,
               }}
             >
               Register
@@ -596,6 +691,10 @@ const Login = () => {
               ? "#10B981"
               : selectedPartnerType === "developer"
               ? "#F97316"
+              : selectedPartnerType === "agent"
+              ? "#E11D48"
+              : selectedPartnerType === "agency"
+              ? "#4F46E5"
               : "#5C039B",
           borderRadius: 8,
           fontFamily: "Poppins, sans-serif",
@@ -662,7 +761,7 @@ const Login = () => {
                 >
                   {!selectedPartnerType
                     ? "Connect, Collaborate, and Grow with our extensive ecosystem."
-                    : `Welcome back, ${getSelectedPartner().label}. Let's get to work.`}
+                    : `Welcome back, ${getSelectedPartner()?.label}. Let's get to work.`}
                 </Text>
               </motion.div>
             </Col>
@@ -672,11 +771,13 @@ const Login = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                style={{ width: "100%", maxWidth: 550 }}
+                style={{ width: "100%", maxWidth: 650 }} // Increased slightly for 3 columns
               >
                 <GlassCard bordered={false} $isMobile={isMobile}>
                   <AnimatePresence mode="wait">
-                    {!selectedPartnerType ? renderPartnerSelection() : renderLoginForm()}
+                    {view === "main" && renderMainSelection()}
+                    {view === "xoto-select" && renderXotoSelection()}
+                    {view === "login" && renderLoginForm()}
                   </AnimatePresence>
                 </GlassCard>
               </motion.div>
