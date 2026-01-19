@@ -1,100 +1,100 @@
-// import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-// import { useState, useEffect, Suspense, lazy } from "react";
-// // REMOVED REDUX IMPORTS
-// import "./App.css";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { useState, useEffect, Suspense, lazy } from "react";
+// REMOVED REDUX IMPORTS
+import "./App.css";
 
-// // --- CONTEXT IMPORTS ---
-// import { BlogProvider } from "./context/BlogContext";
-// import { ProductProvider } from "./context/ProductContext"; // BASE LOGIC ADDED
-// // -----------------------
+// --- CONTEXT IMPORTS ---
+import { BlogProvider } from "./context/BlogContext";
+import { ProductProvider } from "./context/ProductContext"; // BASE LOGIC ADDED
+// -----------------------
 
-// import Navbar from "./components/navbar/index.jsx";
-// import Footer from "./components/footer/footer";
-// import FloatingIcons from "./components/FloatingIcons";
-// import QuoteModal from "./components/modal/QuoteModal.jsx";
-// import ScrollToTop from "./components/ScrollToTop.js";
-// import Loader from "./components/Loader.jsx";
-// import FreelancerNavbar from "./components/navbar/FreelancerNavbar.jsx";
-// import ProductFilterPage from "./components/ecommerce/ProductFilterPage.jsx";
-// import Freelisting from "./components/freelancers/Listing/Free-listing.jsx";
-// import Category from "./components/freelancers/Category.jsx";
-// import CreateBusiness from "./components/freelancers/Listing/CreateBusiness.jsx";
-// import Businesspage from "./components/freelancers/Listing/Businesspage.jsx";
-// import Productdetails from "./components/ecommerce/Productdetails.jsx";
-// import MainEcommercePage from "./components/ecommerce/Index";
-// import HomeB2B from "./components/ecommerce/B2B/Home";
-// import HomeB2C from "./components/ecommerce/B2C/Home";
-// import CartPage from "./components/ecommerce/CartPage";
-// import CmsApp from "./components/CMS/CmsApp";
-// import AITool from "./components/AI/Tool/AITool";
-// const NotFound = lazy(() => import("./components/NotFound"));
-// import { DndProvider } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import Login from "./components/login";
-// import Profile from "./components/CMS/components/Profile/Profile";
-// import Employeedashboard from "./components/CMS/pages/Employeedashboard";
-// import Customerdashboard from "./components/CMS/pages/Customerdashboard";
-// import AdminLogin from "./components/login/AdminLogin";
-// import SellerPage from "./components/ecommerce/B2C/SellerPage";
-// import DeveloperRegistration from "./components/ecommerce/B2C/DeveloperRegistration";
-// import DeveloperLayout from "./components/ecommerce/B2C/DeveloperLayout";
-// import DeveloperDashboard from "./components/ecommerce/B2C/DeveloperDashboard";
-// import PropertyManagement from "./components/ecommerce/B2C/DeveloperPropertyManagement";
-// import Sellerb2b from "./components/ecommerce/B2C/Sellerb2b";
-// import Landspackng from "./components/homepage/Landspackng";
-// import Ynterior from "./components/homepage/Yniterior";
-// import Buy from "./components/homepage/Buy";
-// import Ecosystem from "./components/homepage/Ecosystem";
-// import About from "./components/homepage/About";
-// import AccountantLogin from "./components/login/AccountantLogin";
-// import Service from "./components/homepage/Services";
-// import Page2 from "./components/homepage/Page2";
-// import Page3 from "./components/homepage/Page3";
-// import Page from "./components/homepage/Page";
-// import AIPlanner from "./components/homepage/AiPlanner/AIPlanner";
-// import Interior from "./components/homepage/Interior/Interior";
-// import Ai from "./components/AII/Ai";
-// import EstimateCalculator from "./components/modal/EstimateCalculator";
-// import Calculator from "./components/homepage/AiPlanner/Calculator";
-// import OtherLogin from "./components/login/OtherLogin";
-// import InteriorPlanner from "./components/homepage/AiPlanner/InteriorPlanner";
-// import InteriorCalculator from "./components/homepage/AiPlanner/InteriorCalculator";
-// import MainCalculatorPage from "./components/homepage/AiPlanner/MainCalculatorPage";
-// import CustomerLogin from "./components/login/CustomerLogin";
-// import AIPlannerDemoPage from "./components/homepage/AiPlanner/AIPlannerDemoPage";
-// import LocationCategoryModal from "./components/modal/LocationCategoryModal";
-// import AITools from "./components/homepage/AiPlanner/AITools";
-// import ComingSoon from "./components/homepage/AiPlanner/ComingSoon";
-// import Casestudy from "./components/homepage/Casestudy"
-// import Training from "./components/homepage/Trainning";
-// import RegisterNowPage from "./components/RegisterNowPage";
-// import Mortgage from "./components/homepage/Mortgage"
-// import MortgagesProduct from "./components/homepage/MortgagesProduct";
-// import UploadDocuments from "./components/homepage/UploadDocuments";
-// import ProductRequirementsEdit from "./components/homepage/ProductRequirementsEdit";
-// import MyApplications from "./components/homepage/MyApplications";
+import Navbar from "./components/navbar/index.jsx";
+import Footer from "./components/footer/footer";
+import FloatingIcons from "./components/FloatingIcons";
+import QuoteModal from "./components/modal/QuoteModal.jsx";
+import ScrollToTop from "./components/ScrollToTop.js";
+import Loader from "./components/Loader.jsx";
+import FreelancerNavbar from "./components/navbar/FreelancerNavbar.jsx";
+import ProductFilterPage from "./components/ecommerce/ProductFilterPage.jsx";
+import Freelisting from "./components/freelancers/Listing/Free-listing.jsx";
+import Category from "./components/freelancers/Category.jsx";
+import CreateBusiness from "./components/freelancers/Listing/CreateBusiness.jsx";
+import Businesspage from "./components/freelancers/Listing/Businesspage.jsx";
+import Productdetails from "./components/ecommerce/Productdetails.jsx";
+import MainEcommercePage from "./components/ecommerce/Index";
+import HomeB2B from "./components/ecommerce/B2B/Home";
+import HomeB2C from "./components/ecommerce/B2C/Home";
+import CartPage from "./components/ecommerce/CartPage";
+import CmsApp from "./components/CMS/CmsApp";
+import AITool from "./components/AI/Tool/AITool";
+const NotFound = lazy(() => import("./components/NotFound"));
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import Login from "./components/login";
+import Profile from "./components/CMS/components/Profile/Profile";
+import Employeedashboard from "./components/CMS/pages/Employeedashboard";
+import Customerdashboard from "./components/CMS/pages/Customerdashboard";
+import AdminLogin from "./components/login/AdminLogin";
+import SellerPage from "./components/ecommerce/B2C/SellerPage";
+import DeveloperRegistration from "./components/ecommerce/B2C/DeveloperRegistration";
+import DeveloperLayout from "./components/ecommerce/B2C/DeveloperLayout";
+import DeveloperDashboard from "./components/ecommerce/B2C/DeveloperDashboard";
+import PropertyManagement from "./components/ecommerce/B2C/DeveloperPropertyManagement";
+import Sellerb2b from "./components/ecommerce/B2C/Sellerb2b";
+import Landspackng from "./components/homepage/Landspackng";
+import Ynterior from "./components/homepage/Yniterior";
+import Buy from "./components/homepage/Buy";
+import Ecosystem from "./components/homepage/Ecosystem";
+import About from "./components/homepage/About";
+import AccountantLogin from "./components/login/AccountantLogin";
+import Service from "./components/homepage/Services";
+import Page2 from "./components/homepage/Page2";
+import Page3 from "./components/homepage/Page3";
+import Page from "./components/homepage/Page";
+import AIPlanner from "./components/homepage/AiPlanner/AIPlanner";
+import Interior from "./components/homepage/Interior/Interior";
+import Ai from "./components/AII/Ai";
+import EstimateCalculator from "./components/modal/EstimateCalculator";
+import Calculator from "./components/homepage/AiPlanner/Calculator";
+import OtherLogin from "./components/login/OtherLogin";
+import InteriorPlanner from "./components/homepage/AiPlanner/InteriorPlanner";
+import InteriorCalculator from "./components/homepage/AiPlanner/InteriorCalculator";
+import MainCalculatorPage from "./components/homepage/AiPlanner/MainCalculatorPage";
+import CustomerLogin from "./components/login/CustomerLogin";
+import AIPlannerDemoPage from "./components/homepage/AiPlanner/AIPlannerDemoPage";
+import LocationCategoryModal from "./components/modal/LocationCategoryModal";
+import AITools from "./components/homepage/AiPlanner/AITools";
+import ComingSoon from "./components/homepage/AiPlanner/ComingSoon";
+import Casestudy from "./components/homepage/Casestudy"
+import Training from "./components/homepage/Trainning";
+import RegisterNowPage from "./components/RegisterNowPage";
+import Mortgage from "./components/homepage/Mortgage"
+import MortgagesProduct from "./components/homepage/MortgagesProduct";
+import UploadDocuments from "./components/homepage/UploadDocuments";
+import ProductRequirementsEdit from "./components/homepage/ProductRequirementsEdit";
+import MyApplications from "./components/homepage/MyApplications";
 
-// // Lazy-loaded components
-// const Home = lazy(() => import("./components/homepage/Home"));
-// const Consult = lazy(() => import("./components/consultation/Consult"));
-// const Designs = lazy(() => import("./components/AI/Designs"));
-// const Quotation = lazy(() => import("./components/quotation/Quotation"));
-// const Social = lazy(() => import("./components/social/Index"));
-// const Howitworks = lazy(() => import("./components/How-it-works/Index"));
-// const Completeproductview = lazy(() => import("./components/Completeproductview"));
-// const Designers = lazy(() => import("./components/Designers/Designers"));
-// const Freelancers = lazy(() => import("./components/freelancers/index"));
-// const Browsecategory = lazy(() => import("./components/freelancers/Browsecategory"));
-// const Mainfreelancers = lazy(() => import("./components/freelancers/Mainfreelancers"));
-// const FreelancerProfile = lazy(() => import("./components/freelancers/FreelancerProfile"));
-// const LivingRoom = lazy(() => import("./components/Interiorsection/livingroom/Index"));
-// const Bathroom = lazy(() => import("./components/Interiorsection/bathroom/Index"));
-// const Kitchen = lazy(() => import("./components/Interiorsection/kitchen/Index"));
-// const Studyroom = lazy(() => import("./components/Interiorsection/Studyroom/Index"));
-// const Wardrobe = lazy(() => import("./components/Interiorsection/wardrobe/Index"));
-// const Bedroom = lazy(() => import("./components/Interiorsection/bedroom/Index"));
+// Lazy-loaded components
+const Home = lazy(() => import("./components/homepage/Home"));
+const Consult = lazy(() => import("./components/consultation/Consult"));
+const Designs = lazy(() => import("./components/AI/Designs"));
+const Quotation = lazy(() => import("./components/quotation/Quotation"));
+const Social = lazy(() => import("./components/social/Index"));
+const Howitworks = lazy(() => import("./components/How-it-works/Index"));
+const Completeproductview = lazy(() => import("./components/Completeproductview"));
+const Designers = lazy(() => import("./components/Designers/Designers"));
+const Freelancers = lazy(() => import("./components/freelancers/index"));
+const Browsecategory = lazy(() => import("./components/freelancers/Browsecategory"));
+const Mainfreelancers = lazy(() => import("./components/freelancers/Mainfreelancers"));
+const FreelancerProfile = lazy(() => import("./components/freelancers/FreelancerProfile"));
+const LivingRoom = lazy(() => import("./components/Interiorsection/livingroom/Index"));
+const Bathroom = lazy(() => import("./components/Interiorsection/bathroom/Index"));
+const Kitchen = lazy(() => import("./components/Interiorsection/kitchen/Index"));
+const Studyroom = lazy(() => import("./components/Interiorsection/Studyroom/Index"));
+const Wardrobe = lazy(() => import("./components/Interiorsection/wardrobe/Index"));
+const Bedroom = lazy(() => import("./components/Interiorsection/bedroom/Index"));
 // const Registration = lazy(() => import("./components/freelancers/Registeration"));
-// const Magazine = lazy(() => import("./components/magazines/Index"));
+const Magazine = lazy(() => import("./components/magazines/Index"));
 
 // function PrivateRoute({ children, allowedRoles }) {
 //   const user = { role: { code: "1" } };
@@ -396,76 +396,76 @@
 
 
 
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { Suspense, lazy } from "react";
-import "./App.css";
+// import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+// import { Suspense, lazy } from "react";
+// import "./App.css";
 
-// --- CONTEXT IMPORTS ---
-import { BlogProvider } from "./context/BlogContext";
-import { ProductProvider } from "./context/ProductContext";
-// -----------------------
+// // --- CONTEXT IMPORTS ---
+// import { BlogProvider } from "./context/BlogContext";
+// import { ProductProvider } from "./context/ProductContext";
+// // -----------------------
 
-// --- Component Imports ---
-import Navbar from "./components/navbar/index.jsx";
-import Footer from "./components/footer/footer";
-import Loader from "./components/Loader.jsx";
-import FreelancerNavbar from "./components/navbar/FreelancerNavbar.jsx";
-import ScrollToTop from "./components/ScrollToTop.js";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+// // --- Component Imports ---
+// import Navbar from "./components/navbar/index.jsx";
+// import Footer from "./components/footer/footer";
+// import Loader from "./components/Loader.jsx";
+// import FreelancerNavbar from "./components/navbar/FreelancerNavbar.jsx";
+// import ScrollToTop from "./components/ScrollToTop.js";
+// import { DndProvider } from "react-dnd";
+// import { HTML5Backend } from "react-dnd-html5-backend";
 
-// Direct component imports
+// // Direct component imports
 import RegistrationAgency from "./components/ecommerce/B2C/RegistrationAgency";
-import MainEcommercePage from "./components/ecommerce/Index";
-import HomeB2B from "./components/ecommerce/B2B/Home";
-import HomeB2C from "./components/ecommerce/B2C/Home";
-import SellerPage from "./components/ecommerce/B2C/SellerPage";
-import DeveloperRegistration from "./components/ecommerce/B2C/DeveloperRegistration";
-import DeveloperLayout from "./components/ecommerce/B2C/DeveloperLayout";
-import DeveloperDashboard from "./components/ecommerce/B2C/DeveloperDashboard";
-import PropertyManagement from "./components/ecommerce/B2C/DeveloperPropertyManagement";
-import Sellerb2b from "./components/ecommerce/B2C/Sellerb2b";
-import CartPage from "./components/ecommerce/CartPage";
-import ProductFilterPage from "./components/ecommerce/ProductFilterPage";
-import Productdetails from "./components/ecommerce/Productdetails.jsx";
-import Freelisting from "./components/freelancers/Listing/Free-listing.jsx";
-import Category from "./components/freelancers/Category.jsx";
-import CreateBusiness from "./components/freelancers/Listing/CreateBusiness.jsx";
-import Businesspage from "./components/freelancers/Listing/Businesspage.jsx";
+// import MainEcommercePage from "./components/ecommerce/Index";
+// import HomeB2B from "./components/ecommerce/B2B/Home";
+// import HomeB2C from "./components/ecommerce/B2C/Home";
+// import SellerPage from "./components/ecommerce/B2C/SellerPage";
+// import DeveloperRegistration from "./components/ecommerce/B2C/DeveloperRegistration";
+// import DeveloperLayout from "./components/ecommerce/B2C/DeveloperLayout";
+// import DeveloperDashboard from "./components/ecommerce/B2C/DeveloperDashboard";
+// import PropertyManagement from "./components/ecommerce/B2C/DeveloperPropertyManagement";
+// import Sellerb2b from "./components/ecommerce/B2C/Sellerb2b";
+// import CartPage from "./components/ecommerce/CartPage";
+// import ProductFilterPage from "./components/ecommerce/ProductFilterPage";
+// import Productdetails from "./components/ecommerce/Productdetails.jsx";
+// import Freelisting from "./components/freelancers/Listing/Free-listing.jsx";
+// import Category from "./components/freelancers/Category.jsx";
+// import CreateBusiness from "./components/freelancers/Listing/CreateBusiness.jsx";
+// import Businesspage from "./components/freelancers/Listing/Businesspage.jsx";
 import Registration from "./components/freelancers/Registeration";
-import Mainfreelancers from "./components/freelancers/Mainfreelancers";
-import FreelancerProfile from "./components/freelancers/FreelancerProfile";
-import Designers from "./components/Designers/Designers";
-import Freelancers from "./components/freelancers/index";
-import Profile from "./components/CMS/components/Profile/Profile";
-import Customerdashboard from "./components/CMS/pages/Customerdashboard";
-import CmsApp from "./components/CMS/CmsApp";
-import AITool from "./components/AI/Tool/AITool";
-import Login from "./components/login";
-import AdminLogin from "./components/login/AdminLogin";
-import CustomerLogin from "./components/login/CustomerLogin";
-import AccountantLogin from "./components/login/AccountantLogin";
-import OtherLogin from "./components/login/OtherLogin";
+// import Mainfreelancers from "./components/freelancers/Mainfreelancers";
+// import FreelancerProfile from "./components/freelancers/FreelancerProfile";
+// import Designers from "./components/Designers/Designers";
+// import Freelancers from "./components/freelancers/index";
+// import Profile from "./components/CMS/components/Profile/Profile";
+// import Customerdashboard from "./components/CMS/pages/Customerdashboard";
+// import CmsApp from "./components/CMS/CmsApp";
+// import AITool from "./components/AI/Tool/AITool";
+// import Login from "./components/login";
+// import AdminLogin from "./components/login/AdminLogin";
+// import CustomerLogin from "./components/login/CustomerLogin";
+// import AccountantLogin from "./components/login/AccountantLogin";
+// import OtherLogin from "./components/login/OtherLogin";
 
-// Lazy-loaded pages
-const Home = lazy(() => import("./components/homepage/Home"));
-const NotFound = lazy(() => import("./components/NotFound"));
-const Landspackng = lazy(() => import("./components/homepage/Landspackng"));
-const Ynterior = lazy(() => import("./components/homepage/Yniterior"));
-const Buy = lazy(() => import("./components/homepage/Buy"));
-const Ecosystem = lazy(() => import("./components/homepage/Ecosystem"));
-const About = lazy(() => import("./components/homepage/About"));
-const AIPlannerDemoPage = lazy(() => import("./components/homepage/AiPlanner/AIPlannerDemoPage"));
-const AITools = lazy(() => import("./components/homepage/AiPlanner/AITools"));
-const ComingSoon = lazy(() => import("./components/homepage/AiPlanner/ComingSoon"));
-const Calculator = lazy(() => import("./components/homepage/AiPlanner/Calculator"));
-const InteriorCalculator = lazy(() => import("./components/homepage/AiPlanner/InteriorCalculator"));
-const MainCalculatorPage = lazy(() => import("./components/homepage/AiPlanner/MainCalculatorPage"));
-const Mortgage = lazy(() => import("./components/homepage/Mortgage"));
-const MortgagesProduct = lazy(() => import("./components/homepage/MortgagesProduct"));
-const UploadDocuments = lazy(() => import("./components/homepage/UploadDocuments"));
-const ProductRequirementsEdit = lazy(() => import("./components/homepage/ProductRequirementsEdit"));
-const MyApplications = lazy(() => import("./components/homepage/MyApplications"));
+// // Lazy-loaded pages
+// const Home = lazy(() => import("./components/homepage/Home"));
+// const NotFound = lazy(() => import("./components/NotFound"));
+// const Landspackng = lazy(() => import("./components/homepage/Landspackng"));
+// const Ynterior = lazy(() => import("./components/homepage/Yniterior"));
+// const Buy = lazy(() => import("./components/homepage/Buy"));
+// const Ecosystem = lazy(() => import("./components/homepage/Ecosystem"));
+// const About = lazy(() => import("./components/homepage/About"));
+// const AIPlannerDemoPage = lazy(() => import("./components/homepage/AiPlanner/AIPlannerDemoPage"));
+// const AITools = lazy(() => import("./components/homepage/AiPlanner/AITools"));
+// const ComingSoon = lazy(() => import("./components/homepage/AiPlanner/ComingSoon"));
+// const Calculator = lazy(() => import("./components/homepage/AiPlanner/Calculator"));
+// const InteriorCalculator = lazy(() => import("./components/homepage/AiPlanner/InteriorCalculator"));
+// const MainCalculatorPage = lazy(() => import("./components/homepage/AiPlanner/MainCalculatorPage"));
+// const Mortgage = lazy(() => import("./components/homepage/Mortgage"));
+// const MortgagesProduct = lazy(() => import("./components/homepage/MortgagesProduct"));
+// const UploadDocuments = lazy(() => import("./components/homepage/UploadDocuments"));
+// const ProductRequirementsEdit = lazy(() => import("./components/homepage/ProductRequirementsEdit"));
+// const MyApplications = lazy(() => import("./components/homepage/MyApplications"));
 
 // PrivateRoute wrapper
 function PrivateRoute({ children, allowedRoles }) {
@@ -556,7 +556,7 @@ function App() {
               <Route path="/freelancer/registration" element={<Registration />} />
               <Route path="/freelancer/profile" element={<FreelancerProfile />} />
               <Route path="/freelancer/home" element={<Mainfreelancers />} />
-              <Route path="/freelancer/browse-subcategory/:id" element={<Browsecategory />} />
+              {/* --- Freelancer <Route path="/freelancer/browse-subcategory/:id" element={<Browsecategory />} /> --- */}
               <Route path="/services/landscaping/:id" element={<Category />} />
 
               {/* --- Interior / Pages --- */}
