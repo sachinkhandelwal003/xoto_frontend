@@ -1,33 +1,28 @@
-import React, { useState, useRef } from 'react';
-import { Upload, ChevronLeft, FileText, X, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, FileText, X, CheckCircle, Loader2, AlertCircle, Edit2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = "https://xoto.ae";
 
-// --- Reusable Upload Item Component ---
-const UploadItem = ({ id, label, required, description, link, fileData, onFileSelect, onFileRemove }) => {
+// --- HELPERS ---
+const getLeadId = () => localStorage.getItem("mortgage_lead_id");
+const getAppId = () => localStorage.getItem("mortgage_app_id") || "XOTO-5E33XI";
+const getCustomerId = () => localStorage.getItem("customer_id") || "696a40c29830f633a591332c";
+
+// --- UPLOAD ITEM COMPONENT (With Update Button) ---
+const UploadItem = ({ id, label, required, description, fileData, onFileSelect, onFileRemove }) => {
   const fileInputRef = useRef(null);
-
-  const handleClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      onFileSelect(id, e.target.files[0]);
-    }
-    // Reset input so the same file can be selected again if needed (e.g. after error)
-    e.target.value = ''; 
-  };
-
-  // Determine current state based on fileData
+  
   const isUploading = fileData?.status === 'uploading';
   const isSuccess = fileData?.status === 'success';
-  const isError = fileData?.status === 'error';
-  const hasFile = fileData?.file;
+  const hasFile = fileData?.url; 
+
+  const handleUpdate = () => {
+    fileInputRef.current.click(); 
+  };
 
   return (
-    <div className="mb-8 border-b border-gray-100 pb-8 last:border-0 last:pb-0 last:mb-0">
+    <div className="mb-8 border-b border-gray-100 pb-8 last:border-0">
       <label className="block text-sm font-semibold text-gray-900 mb-3">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
@@ -35,237 +30,237 @@ const UploadItem = ({ id, label, required, description, link, fileData, onFileSe
       <input 
         type="file" 
         ref={fileInputRef} 
-        onChange={handleChange} 
+        onChange={(e) => e.target.files[0] && onFileSelect(id, e.target.files[0])} 
         className="hidden" 
         accept="image/*,.pdf" 
-        disabled={isUploading} // Disable while uploading
       />
 
       {!hasFile ? (
-        // STATE 1: Empty - Show Upload Button
-        <button 
-          onClick={handleClick}
-          className="border border-gray-300 bg-white text-gray-700 px-4 py-2.5 rounded-md text-sm flex items-center hover:bg-gray-50 transition-colors shadow-sm group"
-        >
-          <Upload size={16} className="mr-2 text-gray-400 group-hover:text-black" /> Click to upload
+        <button onClick={() => fileInputRef.current.click()} disabled={isUploading} className="border border-gray-300 bg-white text-gray-700 px-4 py-2.5 rounded-md text-sm flex items-center hover:bg-gray-50 transition-colors shadow-sm group">
+          {isUploading ? (
+             <><Loader2 size={16} className="animate-spin mr-2 text-blue-600" /> Uploading...</>
+          ) : (
+             <><Upload size={16} className="mr-2 text-gray-400 group-hover:text-black" /> Click to upload</>
+          )}
         </button>
       ) : (
-        // STATE 2: File Selected - Show Status
         <div className="flex items-center gap-3">
-            <div className={`flex items-center border px-4 py-2.5 rounded-md text-sm shadow-sm min-w-[200px] justify-between ${
-                isError ? 'bg-red-50 border-red-200 text-red-700' : 
-                isSuccess ? 'bg-green-50 border-green-200 text-green-700' : 
-                'bg-gray-50 border-gray-200 text-gray-700'
-            }`}>
-                <div className="flex items-center overflow-hidden">
-                    <FileText size={16} className="mr-2 flex-shrink-0" />
-                    <span className="font-medium truncate max-w-[150px]">{fileData.file.name}</span>
-                </div>
-
-                {/* Status Icons */}
-                <div className="ml-3">
-                    {isUploading && <Loader2 size={16} className="animate-spin text-blue-600" />}
-                    {isSuccess && <CheckCircle size={16} className="text-green-600" />}
-                    {isError && <AlertCircle size={16} className="text-red-600" />}
-                </div>
+            <div className="flex items-center border border-green-200 bg-green-50 px-4 py-2.5 rounded-md text-sm text-green-700 min-w-[200px] shadow-sm">
+                <FileText size={16} className="mr-2" />
+                <span className="font-medium truncate max-w-[150px]">
+                    {fileData.file?.name || "Uploaded Document"}
+                </span>
+                <CheckCircle size={16} className="ml-2" />
             </div>
 
-            {/* Remove Button (Disabled while uploading) */}
+            {/* 🔥 Update Button (Pencil Icon) */}
             <button 
-                onClick={() => onFileRemove(id)}
+                onClick={handleUpdate}
                 disabled={isUploading}
-                className={`p-2 rounded-full transition-colors ${
-                    isUploading ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-red-500 hover:bg-gray-100'
-                }`}
-                title="Remove file"
+                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                title="Update / Replace File"
             >
+                {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Edit2 size={18} />}
+            </button>
+
+            {/* Remove Button */}
+            <button onClick={() => onFileRemove(id)} disabled={isUploading} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
                 <X size={18} />
             </button>
         </div>
       )}
-
-      {/* Error Message */}
-      {isError && (
-          <p className="text-xs text-red-500 mt-2">Upload failed. Please remove and try again.</p>
-      )}
-
-      {description && !hasFile && (
-        <p className="text-xs text-gray-500 mt-3 leading-relaxed max-w-xl">
-          {description} {link && <span className="text-blue-600 underline cursor-pointer">Learn More</span>}
-        </p>
-      )}
+      {description && !hasFile && <p className="text-xs text-gray-500 mt-3 leading-relaxed max-w-xl">{description}</p>}
     </div>
   );
 };
 
-// --- Main Component ---
+// --- MAIN COMPONENT ---
 const UploadDocuments = () => {
   const navigate = useNavigate();
-  
-  // State structure: { [id]: { file: FileObj, status: 'uploading'|'success'|'error', url: string } }
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [files, setFiles] = useState({});
+  const [initLoading, setInitLoading] = useState(true);
 
-  const handleBack = () => {
-    navigate(-1);
+  // Helper to extract filename
+  const getFileNameFromUrl = (url) => {
+    if (!url) return "Document.pdf";
+    try {
+        const parts = decodeURIComponent(url).split('/');
+        return parts[parts.length - 1].split('?')[0]; 
+    } catch (e) { return "Document.pdf"; }
   };
 
-  const uploadFileToApi = async (id, file) => {
-    const formData = new FormData();
-    formData.append('file', file); // 'file' is the key expected by standard upload APIs
+  // 1. PAGE LOAD: FETCH EXISTING DATA (FIXED)
+  useEffect(() => {
+    const loadDocs = async () => {
+        const leadId = getLeadId();
+        if(!leadId) { setInitLoading(false); return; }
+
+        try {
+            console.log("Fetching for Lead:", leadId);
+            const res = await fetch(`${BASE_URL}/api/mortgages/get-lead-data?lead_id=${leadId}`);
+            const json = await res.json();
+            
+            if(json.success && json.data) {
+                // Smart Check for Data
+                const getNonEmpty = (obj) => (obj && Object.keys(obj).length > 0) ? obj : null;
+                
+                // 🔥 CRITICAL FIX: Added 'json.data' as a fallback
+                // Aapke JSON me data seedha root 'data' object me hai
+                const apiDocs = getNonEmpty(json.data.documents) || 
+                                getNonEmpty(json.data.lead?.documents) || 
+                                getNonEmpty(json.data.uploaded_documents) || 
+                                json.data || // <-- YE LINE ADD KI HAI (Yahi data pakdegi)
+                                {};
+
+                console.log("📥 Extracted Docs:", apiDocs);
+
+                const newFiles = {};
+                // Helper to set state
+                const setIfUrl = (key, urlOrArray) => {
+                    let url = urlOrArray;
+                    if(Array.isArray(urlOrArray) && urlOrArray.length > 0) url = urlOrArray[0];
+                    
+                    // Fixed Check: Removed "length > 5" constraint to allow "https" to show (for testing)
+                    if(url && typeof url === 'string' && url.trim().length > 0) {
+                        newFiles[key] = {
+                            status: 'success',
+                            url: url,
+                            file: { name: getFileNameFromUrl(url) }
+                        };
+                    }
+                };
+
+                setIfUrl('passport', apiDocs.passport || apiDocs.passport_url);
+                setIfUrl('visa', apiDocs.visa || apiDocs.visa_url);
+                setIfUrl('emiratesId', apiDocs.emirates_id || apiDocs.emiratesId);
+                setIfUrl('marriageCert', apiDocs.marriage_certificate || apiDocs.marriageCert);
+                setIfUrl('bankStatements', apiDocs.bank_statements || apiDocs.bankStatements);
+                setIfUrl('payslips', apiDocs.payslips || apiDocs.payslips_url);
+                setIfUrl('salaryCert', apiDocs.salary_certificate || apiDocs.salaryCert);
+
+                setFiles(newFiles);
+            }
+        } catch(e) { console.error(e); }
+        finally { setInitLoading(false); }
+    };
+    loadDocs();
+  }, []);
+
+  // 2. SAVE TO BACKEND
+  const saveToBackend = async (updatedFiles) => {
+    setIsAutoSaving(true);
+    const leadId = getLeadId();
+
+    const getUrl = (key) => updatedFiles[key]?.url || null;
+
+    const payload = {
+        passport: getUrl('passport'),
+        visa: getUrl('visa'),
+        emirates_id: getUrl('emiratesId'),
+        marriage_certificate: getUrl('marriageCert'),
+        bank_statements: getUrl('bankStatements') ? [getUrl('bankStatements')] : [],
+        payslips: getUrl('payslips') ? [getUrl('payslips')] : [],
+        salary_certificate: getUrl('salaryCert')
+    };
 
     try {
-        const response = await fetch(`${BASE_URL}/api/upload`, {
+        await fetch(`${BASE_URL}/api/mortgages/update-lead-documents?customerId=${getCustomerId()}&application_id=${getAppId()}&lead_id=${leadId}`, {
             method: 'POST',
-            body: formData,
-            // Note: Do NOT set Content-Type header manually for FormData, 
-            // the browser sets it automatically with the boundary.
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
+        console.log("💾 Saved to backend");
+    } catch(e) { console.error("Save failed", e); }
+    finally { setIsAutoSaving(false); }
+  };
 
-        const result = await response.json();
+  // 3. UPLOAD AND EXTRACT URL (FIXED)
+  const handleUpload = async (id, file) => {
+    setFiles(prev => ({ ...prev, [id]: { status: 'uploading', file: file } }));
 
-        if (response.ok && result.success) {
-            // ✅ FIX APPLIED HERE: Use Optional Chaining (?.)
-            // Checks if result.data exists before accessing .url, otherwise falls back to result.url
-            const uploadedUrl = result.data?.url || result.url;
+    const formData = new FormData();
+    formData.append('file', file);
 
-            setFiles(prev => ({
-                ...prev,
-                [id]: { ...prev[id], status: 'success', url: uploadedUrl } 
-            }));
-        } else {
-            throw new Error(result.message || "Upload failed");
-        }
-    } catch (error) {
-        console.error(`Error uploading ${id}:`, error);
-        setFiles(prev => ({
-            ...prev,
-            [id]: { ...prev[id], status: 'error' }
-        }));
+    try {
+        console.log("📤 Uploading...");
+        const res = await fetch(`${BASE_URL}/api/upload`, { method: 'POST', body: formData });
+        const json = await res.json();
+
+        if(json.success) {
+            // Extraction Logic - checks file.url, data.url, or root url
+            let uploadedUrl = null;
+            if (json.file) uploadedUrl = json.file.url || json.file.location || json.file.path;
+            if (!uploadedUrl && json.data) uploadedUrl = (typeof json.data === 'string') ? json.data : json.data.url;
+            if (!uploadedUrl) uploadedUrl = json.url || json.secure_url;
+
+            if (!uploadedUrl) throw new Error("URL missing in response");
+
+            console.log("🔗 URL:", uploadedUrl);
+            
+            setFiles(prev => {
+                const newState = { 
+                    ...prev, 
+                    [id]: { status: 'success', url: uploadedUrl, file: file } 
+                };
+                saveToBackend(newState); 
+                return newState;
+            });
+        } else { throw new Error("Upload failed"); }
+    } catch(e) {
+        console.error(e);
+        setFiles(prev => ({ ...prev, [id]: { status: 'error' } }));
     }
   };
 
-  const handleFileSelect = (id, file) => {
-    // 1. Set local state to 'uploading' immediately
-    setFiles((prev) => ({ 
-        ...prev, 
-        [id]: { file: file, status: 'uploading', url: null } 
-    }));
-
-    // 2. Trigger API upload
-    uploadFileToApi(id, file);
+  const handleRemove = (id) => {
+      setFiles(prev => {
+          const newState = {...prev};
+          delete newState[id];
+          saveToBackend(newState);
+          return newState;
+      });
   };
 
-  const handleFileRemove = (id) => {
-    setFiles((prev) => {
-        const newFiles = { ...prev };
-        delete newFiles[id];
-        return newFiles;
-    });
-  };
+  if(initLoading) return <div className="h-screen flex items-center justify-center bg-[#F8F9FB]"><Loader2 className="w-10 h-10 animate-spin text-[#5c039b]" /></div>;
 
   return (
     <div className="min-h-screen bg-[#F8F9FB] font-sans p-6 md:p-12 text-[#1a1a1a]">
       <div className="max-w-5xl mx-auto">
-        
-        {/* Breadcrumb & Header */}
-        <div className="mb-8 animate-fade-in">
-          <div className="text-gray-500 text-sm mb-2">My Applications / Details / Upload Document</div>
-          <h1 className="text-4xl font-bold text-gray-900">Upload your documents</h1>
+        <div className="mb-8 flex justify-between items-end">
+            <div>
+                <div className="text-gray-500 text-sm mb-2">My Applications / Details / Upload Document</div>
+                <h1 className="text-4xl font-bold text-gray-900">Upload your documents</h1>
+            </div>
+            {isAutoSaving && <div className="flex items-center text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full animate-pulse"><Loader2 size={14} className="animate-spin mr-2" /> Saving changes...</div>}
         </div>
 
-        {/* Main Content Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 md:p-12">
-          
-          {/* SECTION 1: Personal Documents */}
-          <div className="flex flex-col md:flex-row gap-12 border-b border-gray-200 pb-12 mb-12">
-            <div className="w-full md:w-1/3">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Personal documents</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Please upload your personal documents. You may upload more than one file per section. If you have a joint application, please upload for each spouse.
-              </p>
+            <div className="flex flex-col md:flex-row gap-12 border-b border-gray-200 pb-12 mb-12">
+                <div className="w-full md:w-1/3">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">Personal documents</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">Changes are saved automatically.</p>
+                </div>
+                <div className="w-full md:w-2/3">
+                    <UploadItem id="passport" label="Passport" required link={true} fileData={files['passport']} onFileSelect={handleUpload} onFileRemove={handleRemove} />
+                    <UploadItem id="visa" label="Visa" required fileData={files['visa']} onFileSelect={handleUpload} onFileRemove={handleRemove} />
+                    <UploadItem id="emiratesId" label="Emirates ID" required fileData={files['emiratesId']} onFileSelect={handleUpload} onFileRemove={handleRemove} />
+                    <UploadItem id="marriageCert" label="Marriage certificate" fileData={files['marriageCert']} onFileSelect={handleUpload} onFileRemove={handleRemove} />
+                </div>
             </div>
 
-            <div className="w-full md:w-2/3">
-              <UploadItem 
-                id="passport"
-                label="Passport" 
-                required 
-                description="Please make sure the passport is valid and image is clear with all information visible."
-                link={true}
-                fileData={files['passport']}
-                onFileSelect={handleFileSelect}
-                onFileRemove={handleFileRemove}
-              />
-              <UploadItem 
-                id="visa"
-                label="Visa" 
-                required 
-                fileData={files['visa']}
-                onFileSelect={handleFileSelect}
-                onFileRemove={handleFileRemove}
-              />
-              <UploadItem 
-                id="emiratesId"
-                label="Emirates ID" 
-                required 
-                fileData={files['emiratesId']}
-                onFileSelect={handleFileSelect}
-                onFileRemove={handleFileRemove}
-              />
-              <UploadItem 
-                id="marriageCert"
-                label="Marriage certificate"
-                fileData={files['marriageCert']}
-                onFileSelect={handleFileSelect}
-                onFileRemove={handleFileRemove}
-              />
-            </div>
-          </div>
-
-          {/* SECTION 2: Income Documents */}
-          <div className="flex flex-col md:flex-row gap-12">
-            <div className="w-full md:w-1/3">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Income documents</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Please upload your income documents.
-              </p>
+            <div className="flex flex-col md:flex-row gap-12">
+                <div className="w-full md:w-1/3"><h3 className="text-lg font-bold text-gray-900 mb-2">Income documents</h3></div>
+                <div className="w-full md:w-2/3">
+                    <UploadItem id="bankStatements" label="Bank Statements" fileData={files['bankStatements']} onFileSelect={handleUpload} onFileRemove={handleRemove} />
+                    <UploadItem id="payslips" label="Payslips" fileData={files['payslips']} onFileSelect={handleUpload} onFileRemove={handleRemove} />
+                    <UploadItem id="salaryCert" label="Salary Certificate" fileData={files['salaryCert']} onFileSelect={handleUpload} onFileRemove={handleRemove} />
+                </div>
             </div>
 
-            <div className="w-full md:w-2/3">
-              <UploadItem 
-                id="bankStatements"
-                label="Bank Statements (6 Months)" 
-                fileData={files['bankStatements']}
-                onFileSelect={handleFileSelect}
-                onFileRemove={handleFileRemove}
-              />
-              <UploadItem 
-                id="payslips"
-                label="Payslips (6 Months)" 
-                fileData={files['payslips']}
-                onFileSelect={handleFileSelect}
-                onFileRemove={handleFileRemove}
-              />
-              <UploadItem 
-                id="salaryCert"
-                label="Salary Certificate (Proof of Bonus)" 
-                fileData={files['salaryCert']}
-                onFileSelect={handleFileSelect}
-                onFileRemove={handleFileRemove}
-              />
+            <div className="mt-12 pt-8 border-t border-gray-200 flex justify-end">
+                <button onClick={() => navigate(-1)} className="bg-[#5c039c] text-white px-8 py-3 rounded-lg text-sm font-medium hover:bg-[#4a027d] transition-colors">Back to application</button>
             </div>
-          </div>
-
-          {/* Footer Action */}
-          <div className="mt-12 pt-8 border-t border-gray-200 flex justify-end">
-            <button 
-              onClick={handleBack}
-              className="bg-[#5c039c] text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors"
-            >
-              Back to application
-            </button>
-          </div>
-
         </div>
       </div>
     </div>
