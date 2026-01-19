@@ -36,6 +36,7 @@ import DeveloperRegistration from "./components/ecommerce/B2C/DeveloperRegistrat
 import DeveloperLayout from "./components/ecommerce/B2C/DeveloperLayout";
 import DeveloperDashboard from "./components/ecommerce/B2C/DeveloperDashboard";
 import PropertyManagement from "./components/ecommerce/B2C/DeveloperPropertyManagement";
+import RegistrationAgency from "./components/ecommerce/B2C/RegistrationAgency";
 import Sellerb2b from "./components/ecommerce/B2C/Sellerb2b";
 import Landspackng from "./components/homepage/Landspackng";
 import Ynterior from "./components/homepage/Yniterior";
@@ -333,6 +334,7 @@ function App() {
   <Route index element={<DeveloperDashboard />} />
   <Route path="property-management" element={<PropertyManagement />} />
 </Route>
+<Route path="/agency/registration" element={<RegistrationAgency />} />
         <Route path="/ecommerce/seller/b2b" element={<Sellerb2b />} />
           <Route path="/ecommerce/b2b" element={<HomeB2B />} />
           <Route path="/ecommerce/cart" element={<CartPage />} />
