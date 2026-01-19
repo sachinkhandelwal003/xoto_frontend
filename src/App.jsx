@@ -3,11 +3,10 @@ import { useState, useEffect, Suspense, lazy } from "react";
 // REMOVED REDUX IMPORTS
 import "./App.css";
 
-// --- IMPORT YOUR BLOG CONTEXT ---
+// --- CONTEXT IMPORTS ---
 import { BlogProvider } from "./context/BlogContext";
-// --- IMPORT PRODUCT CONTEXT (ADDED) ---
-import { ProductProvider } from "./context/ProductContext"; 
-// --------------------------------
+import { ProductProvider } from "./context/ProductContext"; // BASE LOGIC ADDED
+// -----------------------
 
 import Navbar from "./components/navbar/index.jsx";
 import Footer from "./components/footer/footer";
@@ -16,7 +15,6 @@ import QuoteModal from "./components/modal/QuoteModal.jsx";
 import ScrollToTop from "./components/ScrollToTop.js";
 import Loader from "./components/Loader.jsx";
 import FreelancerNavbar from "./components/navbar/FreelancerNavbar.jsx";
-// import EcommerceNavbar from "./components/navbar/EcommerceNavbar.jsx";
 import ProductFilterPage from "./components/ecommerce/ProductFilterPage.jsx";
 import Freelisting from "./components/freelancers/Listing/Free-listing.jsx";
 import Category from "./components/freelancers/Category.jsx";
@@ -94,15 +92,9 @@ const Bedroom = lazy(() => import("./components/Interiorsection/bedroom/Index"))
 const Registration = lazy(() => import("./components/freelancers/Registeration"));
 const Magazine = lazy(() => import("./components/magazines/Index"));
 
-// --- UPDATED PRIVATE ROUTE (Without Redux) ---
 function PrivateRoute({ children, allowedRoles }) {
-  // TODO: Replace this with your actual Auth Context
-  // const { user, loading } = useAuthContext(); 
-
-  // TEMPORARY MOCK so app doesn't crash:
   const user = { role: { code: "1" } };
   const loading = false;
-
   const location = useLocation();
 
   if (loading) return <Loader />;
@@ -113,10 +105,8 @@ function PrivateRoute({ children, allowedRoles }) {
   return children;
 }
 
-// LayoutWrapper manages visibility
 function LayoutWrapper({ children }) {
   const location = useLocation();
-
   const hideNavbarPaths = [
     "/login", "/quotation", "/freelancer/browse-category", "/freelancer/category",
     "/freelancer/free-listing", "/ecommerce", "/freelancer/create-business",
@@ -127,7 +117,6 @@ function LayoutWrapper({ children }) {
   ];
 
   const hideNavbar = hideNavbarPaths.includes(location.pathname) || location.pathname.startsWith("/dashboard/");
-
   const showFreelancerNavbar =
     location.pathname === "/freelancer/browse-category" ||
     location.pathname === "/freelancer/free-listing" ||
@@ -155,7 +144,6 @@ function LayoutWrapper({ children }) {
     <div className="min-h-screen relative">
       {!hideNavbar && <Navbar />}
       {showFreelancerNavbar && <FreelancerNavbar />}
-      {showEcommerceNavbar}
       {children}
       {!hideFooter && <Footer />}
     </div>
@@ -164,9 +152,7 @@ function LayoutWrapper({ children }) {
 
 function App() {
   return (
-    // WRAPPED WITH BLOG PROVIDER (Context API)
     <BlogProvider>
-      {/* WRAPPED WITH PRODUCT PROVIDER (ADDED) */}
       <ProductProvider>
         <LayoutWrapper>
           <ScrollToTop />
@@ -182,7 +168,6 @@ function App() {
               <Route path="/mortgages-product-upload-document" element={<UploadDocuments />} />
               <Route path="/product-requirements-edit" element={<ProductRequirementsEdit />} />
               <Route path="/my-applications" element={<MyApplications />} />
-              <Route path="/mortgages" element={<Mortgage />} />
               <Route path="/aiPlanner/interior" element={<ComingSoon />} />
               <Route path="/aiPlanner/landscape" element={<AIPlanner />} />
               <Route path="/register" element={<RegisterNowPage />} />
@@ -215,9 +200,7 @@ function App() {
                   </DndProvider>
                 }
               />
-              {/* The Main AI Page (renders Ai1, Ai2, Ai3 via Context) */}
               <Route path="/ai" element={<Ai />} />
-
               <Route path="/mortgage/services" element={<Service />} />
               <Route path="/properties" element={<Page2 />} />
               <Route path="/explore" element={<Page3 />} />

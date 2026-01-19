@@ -31,6 +31,7 @@ const RegisterNowPage = () => {
   const {
     control,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({ mode: "onBlur" });
 
@@ -88,6 +89,23 @@ const RegisterNowPage = () => {
     } catch (err) {
       const apiError = err?.response?.data;
 
+      // Handle structured validation errors from backend
+      if (apiError?.errors && Array.isArray(apiError.errors)) {
+        apiError.errors.forEach((errObj) => {
+          let fieldName = errObj.field;
+          
+          if (fieldName === "mobile.number") {
+            fieldName = "mobileNumber"; 
+          }
+
+          setError(fieldName, {
+            type: "manual",
+            message: errObj.message,
+          });
+        });
+        return; 
+      }
+
       if (
         apiError?.message?.toLowerCase().includes("already") ||
         apiError?.message?.toLowerCase().includes("exists")
@@ -97,7 +115,12 @@ const RegisterNowPage = () => {
         return;
       }
 
-      message.error(apiError?.message || "Registration failed");
+      if (apiError?.message && apiError.message !== "Validation failed") {
+          message.error(apiError.message);
+      } else if (!apiError?.errors) {
+          message.error("Registration failed");
+      }
+      
     } finally {
       setLoading(false);
     }
@@ -208,6 +231,8 @@ const RegisterNowPage = () => {
             <Form.Item
               label={`Mobile Number (${COUNTRY_PHONE_RULES[countryCode].digits} digits)`}
               required
+              validateStatus={errors.mobileNumber && "error"}
+              help={errors.mobileNumber?.message}
             >
               <div className="flex gap-3">
                 <Select
@@ -230,6 +255,7 @@ const RegisterNowPage = () => {
                   size="large"
                   prefix={<Phone />}
                   value={mobileNumber}
+                  status={errors.mobileNumber ? "error" : ""}
                   onChange={(e) =>
                     setMobileNumber(e.target.value.replace(/\D/g, ""))
                   }
@@ -277,12 +303,12 @@ const RegisterNowPage = () => {
             {/* CTA */}
             <div className="pt-4">
               <Button
-                type="primary"
+                // type="primary"
                 htmlType="submit"
                 loading={loading}
                 block
                 size="large"
-                className="rounded-xl h-12 text-base font-semibold bg-[#0ea5e9]"
+                className="rounded-xl h-12 !border-none !text-white font-semibold !bg-[#5C039B] "
               >
                 Create Account
               </Button>
@@ -293,7 +319,7 @@ const RegisterNowPage = () => {
               <span className="text-gray-500">Already have an account? </span>
               <span
                 onClick={() => navigate("/user/login")}
-                className="text-[#0ea5e9] font-semibold cursor-pointer hover:underline"
+                className="text-[#5C039B] font-semibold cursor-pointer hover:underline"
               >
                 Login
               </span>
