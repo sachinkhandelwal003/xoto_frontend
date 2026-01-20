@@ -1,344 +1,161 @@
-import React, { useState, useMemo } from 'react';
-import { Layout, Card, Image, Button, Tag, Modal, Dropdown, Space, Avatar, Typography, Input, Select, Form, message } from 'antd';
-import { VideoCameraOutlined, DownOutlined, StarFilled, CheckCircleFilled, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Layout, Tag, Button, Typography, Affix, Drawer } from 'antd';
+import { VideoCameraOutlined, StarFilled, FilterOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import bannerImage from '../../assets/img/ecommercebanner.png';
 import Filters from './Filters';
 import ProductGrid from './ProductGrid';
 
 const { Content } = Layout;
-const { Text, Title } = Typography;
-const { TextArea } = Input;
-
-// Dummy Product Data
-const dummyProducts = [
-  {
-    _id: '1',
-    name: 'Nordic Oak Coffee Table',
-    short_description: 'Minimalist Scandinavian design with solid oak legs.',
-    pricing: {
-      sale_price: 12999,
-      mrp: 18999,
-      discount: { value: 32, type: 'percentage' },
-      currency: { symbol: 'AED' },
-    },
-    color_variants: [
-      {
-        color_name: 'Natural Oak',
-        color_code: '#D4A574',
-        images: [
-          { url: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=800&auto=format&fit=crop', is_primary: true },
-        ],
-      },
-    ],
-    tags: [{ _id: 't1', name: 'New' }],
-    material: { name: 'Wood' },
-    category: { name: 'Tables' },
-    brand: { name: 'xoto' },
-  },
-  {
-    _id: '2',
-    name: 'Velvet Accent Armchair',
-    short_description: 'Luxurious velvet upholstery with golden legs.',
-    pricing: {
-      sale_price: 24999,
-      mrp: 34999,
-      discount: { value: 29, type: 'percentage' },
-      currency: { symbol: 'AED' },
-    },
-    color_variants: [
-      {
-        color_name: 'Emerald Green',
-        color_code: '#10B981',
-        images: [
-          { url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop', is_primary: true },
-        ],
-      },
-    ],
-    tags: [{ _id: 't2', name: 'Best Seller' }],
-    material: { name: 'Fabric' },
-    category: { name: 'Chairs' },
-    brand: { name: 'xoto' },
-  },
-  {
-    _id: '3',
-    name: 'Marble Top Console',
-    short_description: 'Italian Carrara marble with matte black steel frame.',
-    pricing: {
-      sale_price: 35999,
-      mrp: 49999,
-      discount: { value: 28, type: 'percentage' },
-      currency: { symbol: 'AED' },
-    },
-    color_variants: [
-      {
-        color_name: 'White Marble',
-        color_code: '#F3F4F6',
-        images: [
-          { url: 'https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800&auto=format&fit=crop', is_primary: true },
-        ],
-      },
-    ],
-    tags: [{ _id: 't3', name: 'Premium' }],
-    material: { name: 'Stone' },
-    category: { name: 'Tables' },
-    brand: { name: 'xoto' },
-  },
-  {
-    _id: '4',
-    name: 'Modern Sectional Sofa',
-    short_description: 'Modular design with premium fabric and memory foam cushions.',
-    pricing: {
-      sale_price: 45999,
-      mrp: 59999,
-      discount: { value: 23, type: 'percentage' },
-      currency: { symbol: 'AED' },
-    },
-    color_variants: [
-      {
-        color_name: 'Charcoal Gray',
-        color_code: '#4B5563',
-        images: [
-          { url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&auto=format&fit=crop', is_primary: true },
-        ],
-      },
-    ],
-    tags: [{ _id: 't4', name: 'Hot Deal' }],
-    material: { name: 'Fabric' },
-    category: { name: 'Sofas' },
-    brand: { name: 'xoto' },
-  },
-  {
-    _id: '5',
-    name: 'Industrial Bookshelf',
-    short_description: 'Steel frame with reclaimed wood shelves.',
-    pricing: {
-      sale_price: 18999,
-      mrp: 24999,
-      discount: { value: 24, type: 'percentage' },
-      currency: { symbol: 'AED' },
-    },
-    color_variants: [
-      {
-        color_name: 'Rustic Brown',
-        color_code: '#92400E',
-        images: [
-          { url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop', is_primary: true },
-        ],
-      },
-    ],
-    tags: [{ _id: 't5', name: 'New' }],
-    material: { name: 'Metal' },
-    category: { name: 'Storage' },
-    brand: { name: 'xoto' },
-  },
-  {
-    _id: '6',
-    name: 'Minimalist Dining Table',
-    short_description: 'Clean lines with solid oak top and powder-coated legs.',
-    pricing: {
-      sale_price: 32999,
-      mrp: 42999,
-      discount: { value: 23, type: 'percentage' },
-      currency: { symbol: 'AED' },
-    },
-    color_variants: [
-      {
-        color_name: 'Natural Wood',
-        color_code: '#D4A574',
-        images: [
-          { url: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800&auto=format&fit=crop', is_primary: true },
-        ],
-      },
-    ],
-    tags: [{ _id: 't6', name: 'Premium' }],
-    material: { name: 'Wood' },
-    category: { name: 'Dining' },
-    brand: { name: 'xoto' },
-  },
-];
 
 const ProductFilterPage = () => {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const [priceRange, setPriceRange] = useState([0, 50000]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedColors, setSelectedColors] = useState([]);
-  const [selectedStyles, setSelectedStyles] = useState([]);
-  const [selectedMaterials, setSelectedMaterials] = useState([]);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [showFilters, setShowFilters] = useState(true);
+  const [selectedBrands, setSelectedBrands] = useState([]);
   const [sortOption, setSortOption] = useState('most-popular');
 
-  const filteredProducts = useMemo(() => {
-    return dummyProducts.filter((product) => {
-      const price = product.pricing.sale_price;
-      const colors = product.color_variants.map((v) => v.color_name.toLowerCase());
-      const category = product.category.name;
-      const material = product.material.name;
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
 
-      return (
-        (selectedCategories.length === 0 || selectedCategories.includes(category)) &&
-        (selectedColors.length === 0 || selectedColors.some((c) => colors.includes(c.toLowerCase()))) &&
-        (selectedStyles.length === 0 || selectedStyles.includes('all')) &&
-        (selectedMaterials.length === 0 || selectedMaterials.includes(material)) &&
-        price >= priceRange[0] &&
-        price <= priceRange[1]
-      );
-    });
-  }, [selectedCategories, selectedColors, selectedStyles, selectedMaterials, priceRange]);
+  const BASE_URL = "https://xoto.ae";
 
-  const sortedProducts = useMemo(() => {
-    return [...filteredProducts].sort((a, b) => {
-      const priceA = a.pricing.sale_price;
-      const priceB = b.pricing.sale_price;
+  // Fetch Metadata (Categories + Brands)
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const [catRes, brandRes] = await Promise.all([
+          fetch(`${BASE_URL}/api/products/get-all-category?limit=100`),
+          fetch(`${BASE_URL}/api/products/get-all-brand?limit=100`)
+        ]);
+        const catJson = await catRes.json();
+        const brandJson = await brandRes.json();
 
-      switch (sortOption) {
-        case 'price-low-high':
-          return priceA - priceB;
-        case 'price-high-low':
-          return priceB - priceA;
-        case 'newest':
-          return b._id - a._id;
-        default:
-          return 0;
+        if (catJson.success) setCategories(catJson.data);
+        if (brandJson.success) setBrands(brandJson.data);
+      } catch (err) {
+        console.error("Metadata fetch error:", err);
       }
-    });
-  }, [filteredProducts, sortOption]);
+    };
+    fetchMetadata();
+  }, []);
+
+  // Fetch Products with filters
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      let query = `${BASE_URL}/api/products/get-all-products?page=1&limit=20`;
+
+      if (selectedCategories.length > 0) query += `&category_id=${selectedCategories.join(',')}`;
+      if (selectedBrands.length > 0) query += `&brand_id=${selectedBrands.join(',')}`;
+      if (priceRange[0] > 0) query += `&min_price=${priceRange[0]}`;
+      if (priceRange[1] < 50000) query += `&max_price=${priceRange[1]}`;
+
+      const res = await fetch(query);
+      const json = await res.json();
+      if (json.success) {
+        setProducts(json.data.products);
+      }
+    } catch (err) {
+      console.error("Product fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCategories, selectedBrands, priceRange]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const resetFilters = () => {
     setSelectedCategories([]);
-    setSelectedColors([]);
-    setSelectedStyles([]);
-    setSelectedMaterials([]);
+    setSelectedBrands([]);
     setPriceRange([0, 50000]);
   };
 
+  // Responsive check (you can also use useMediaQuery hook if you want)
+  const isMobile = window.innerWidth < 992;
+
   return (
     <Layout style={{ background: '#f8fafc', minHeight: '100vh' }}>
-      <Content style={{ padding: '0 24px' }}>
-        {/* Hero Banner with Gradient */}
-        <div 
-          className="relative rounded-2xl overflow-hidden mb-8 mt-6 shadow-2xl"
+      <Content style={{ padding: '0 12px sm:0 16px md:0 24px' }}>
+
+        {/* ────────────── HERO BANNER ────────────── */}
+        <div
+          className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 mt-4 sm:mt-6 shadow-xl sm:shadow-2xl"
           style={{
             background: 'linear-gradient(135deg, #420183ff 0%, #764ba2 100%)',
-            height: '400px',
+            height: isMobile ? '260px' : '340px md:400px',
           }}
         >
           <div className="absolute inset-0 bg-black/20"></div>
-          <div className="absolute top-6 right-6">
-            <Tag color="gold" style={{ fontSize: '14px', fontWeight: 'bold', padding: '4px 12px' }}>
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+            <Tag
+              color="gold"
+              style={{
+                fontSize: isMobile ? '12px' : '14px',
+                fontWeight: 'bold',
+                padding: isMobile ? '3px 10px' : '4px 12px'
+              }}
+            >
               New Collection
             </Tag>
           </div>
-          
-          <div className="relative z-10 h-full flex flex-col md:flex-row items-center justify-between p-8 md:p-16">
-            <div className="max-w-2xl">
+
+          <div className="relative z-10 h-full flex flex-col md:flex-row items-center justify-between p-6 sm:p-8 md:p-16">
+            <div className="max-w-2xl text-center md:text-left">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">
                   Discover Your <span className="text-yellow-300">Perfect</span> Space
                 </h1>
-                <p className="text-xl text-white/90 mb-8 max-w-xl">
+                <p className={`text-base ${isMobile ? 'sm:text-lg' : 'md:text-xl'} text-white/90 mb-6 md:mb-8 max-w-xl mx-auto md:mx-0`}>
                   AI-curated furniture collections that blend modern design with timeless elegance.
                   Transform your home with pieces that tell your story.
                 </p>
-               <div className="flex flex-wrap gap-4">
-  {/* Button 1 — Primary CTA */}
-  <Button
-    size="large"
-    className="
-      !bg-white
-      !text-black
-      font-bold
-      px-8
-      h-12
-      rounded-lg
-      border-2 border-transparent
-      transition-all duration-300 ease-out
-      hover:!bg-transparent
-      hover:!backdrop-blur-md
-      hover:!text-white
-      hover:!border-white
-    "
-  >
-    Shop New Arrivals
-  </Button>
 
-  {/* Button 2 — Glass CTA */}
-  {/* <Button
-    size="large"
-    className="
-      !bg-white/10 
-      !border-2 !border-white/30 
-      !text-white 
-      font-bold
-      px-8
-      h-12
-      rounded-lg
-      backdrop-blur-md
-      transition-all duration-300 ease-out
-      hover:!bg-white
-      hover:!text-black
-      hover:!border-white
-    "
-  >
-    <VideoCameraOutlined className="mr-2" />
-    AR Preview
-  </Button> */}
-<div className="relative inline-block">
-  {/* Coming Soon badge */}
-  <span className="
-    absolute -top-4 -right-2 
-    bg-grey text-white 
-    text-[10px] font-bold 
-    px-2 py-1 
-    rounded-full 
-    shadow-md
-    z-10
-  ">
-  Upcoming
-  </span>
+                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                  <Button
+                    size="large"
+                    className="!bg-white !text-black font-bold px-6 sm:px-8 h-10 sm:h-12 rounded-lg border-2 border-transparent transition-all duration-300 ease-out hover:!bg-transparent hover:!backdrop-blur-md hover:!text-white hover:!border-white"
+                  >
+                    Shop New Arrivals
+                  </Button>
 
-  <Button
-    size="large"
-    className="
-      !bg-white/10 
-      !border-2 !border-white/30 
-      !text-white 
-      font-bold
-      px-8
-      h-12
-      rounded-lg
-      backdrop-blur-md
-      transition-all duration-300 ease-out
-      hover:!bg-white
-      hover:!text-black
-      hover:!border-white
-    "
-    disabled  // optional: disable kar diya taaki click na ho
-  >
-    <VideoCameraOutlined className="mr-2" />
-    AR Preview
-  </Button>
-</div>
-</div>
-
-
+                  <div className="relative inline-block">
+                    <span className="absolute -top-3 -right-2 bg-gray-500 text-white text-[9px] sm:text-[10px] font-bold px-2 py-1 rounded-full shadow-md z-10">
+                      Upcoming
+                    </span>
+                    <Button
+                      size="large"
+                      disabled
+                      className="!bg-white/10 !border-2 !border-white/30 !text-white font-bold px-6 sm:px-8 h-10 sm:h-12 rounded-lg backdrop-blur-md"
+                    >
+                      <VideoCameraOutlined className="mr-1 sm:mr-2" />
+                      AR Preview
+                    </Button>
+                  </div>
+                </div>
               </motion.div>
             </div>
-            
+
+            {/* Featured Image - only on large screens */}
             <div className="hidden lg:block">
               <div className="relative">
                 <div className="absolute -top-4 -left-4 w-64 h-64 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl opacity-50"></div>
-                <img 
-                  src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=500&auto=format&fit=crop" 
+                <img
+                  src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=500&auto=format&fit=crop"
                   alt="Featured Furniture"
                   className="relative w-72 h-72 object-cover rounded-2xl shadow-2xl"
                   style={{ transform: 'rotate(3deg)' }}
                 />
-                <div 
+                <div
                   className="absolute -bottom-4 -right-4 bg-white p-4 rounded-xl shadow-2xl"
                   style={{ transform: 'rotate(-2deg)' }}
                 >
@@ -357,38 +174,99 @@ const ProductFilterPage = () => {
           </div>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: showFilters ? '280px 1fr' : '1fr',
-            gap: 24,
-            marginBottom: 40,
-          }}
-        >
-          <Filters
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            selectedCategories={selectedCategories}
-            setSelectedCategories={setSelectedCategories}
-            selectedColors={selectedColors}
-            setSelectedColors={setSelectedColors}
-            selectedStyles={selectedStyles}
-            setSelectedStyles={setSelectedStyles}
-            selectedMaterials={selectedMaterials}
-            setSelectedMaterials={setSelectedMaterials}
-            mobileFiltersOpen={mobileFiltersOpen}
-            setMobileFiltersOpen={setMobileFiltersOpen}
-            showFilters={showFilters}
-            setShowFilters={setShowFilters}
-            resetFilters={resetFilters}
-          />
+        {/* ────────────── MAIN CONTENT ────────────── */}
+        <div className="relative">
+          {/* Desktop Sidebar (only visible on large screens) */}
+          {showFilters && !isMobile && (
+            <div className="hidden lg:block lg:sticky lg:top-4 lg:w-72 lg:pr-6">
+              <Filters
+                categories={categories}
+                brands={brands}
+                priceRange={priceRange}
+                setPriceRange={setPriceRange}
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
+                selectedBrands={selectedBrands}
+                setSelectedBrands={setSelectedBrands}
+                mobileFiltersOpen={mobileFiltersOpen}
+                setMobileFiltersOpen={setMobileFiltersOpen}
+                showFilters={showFilters}
+                setShowFilters={setShowFilters}
+                resetFilters={resetFilters}
+              />
+            </div>
+          )}
 
-          <ProductGrid
-            sortedProducts={sortedProducts}
-            showFilters={showFilters}
-            sortOption={sortOption}
-            setSortOption={setSortOption}
-          />
+          {/* Product Grid - full width on mobile or when filters hidden */}
+          <div className={`${showFilters && !isMobile ? 'lg:ml-72' : ''} transition-all duration-300`}>
+            <ProductGrid
+              products={products}
+              loading={loading}
+              showFilters={showFilters}
+              sortOption={sortOption}
+              setSortOption={setSortOption}
+            />
+          </div>
+
+          {/* Mobile Filters Drawer */}
+          <Drawer
+            title="Filters"
+            placement="left"
+            onClose={() => setMobileFiltersOpen(false)}
+            open={mobileFiltersOpen}
+            width="85%"
+          >
+            <Filters
+              categories={categories}
+              brands={brands}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
+              selectedBrands={selectedBrands}
+              setSelectedBrands={setSelectedBrands}
+              mobileFiltersOpen={mobileFiltersOpen}
+              setMobileFiltersOpen={setMobileFiltersOpen}
+              showFilters={showFilters}
+              setShowFilters={setShowFilters}
+              resetFilters={resetFilters}
+            />
+          </Drawer>
+
+          {/* Floating filter button (mobile + when sidebar hidden on desktop) */}
+          {(isMobile || !showFilters) && (
+            <Affix offsetBottom={24}>
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              >
+                <Button
+                  type="primary"
+                  size="large"
+                  icon={<FilterOutlined />}
+                  onClick={() => {
+                    if (isMobile) {
+                      setMobileFiltersOpen(true);
+                    } else {
+                      setShowFilters(true);
+                    }
+                  }}
+                  style={{
+                    height: 52,
+                    borderRadius: 50,
+                    boxShadow: '0 4px 20px rgba(92, 3, 155, 0.3)',
+                    background: '#5C039B',
+                    border: 'none',
+                    fontWeight: 600,
+                    padding: '0 20px',
+                  }}
+                >
+                  {isMobile ? "Filters" : "Show Filters"}
+                </Button>
+              </motion.div>
+            </Affix>
+          )}
         </div>
       </Content>
     </Layout>

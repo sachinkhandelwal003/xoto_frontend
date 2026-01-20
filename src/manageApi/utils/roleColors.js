@@ -1,4 +1,4 @@
-// src/utils/roleColors.js
+﻿// src/utils/roleColors.js
 
 // Role-based color configuration
 export const roleColors = {

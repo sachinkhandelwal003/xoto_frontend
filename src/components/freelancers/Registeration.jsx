@@ -1,3 +1,4 @@
+
 /* src/components/freelancers/Registration.jsx */
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
